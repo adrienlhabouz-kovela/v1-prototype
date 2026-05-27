@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Shell } from "@/components/Shell";
-import { Badge, Card, DoctrineNote } from "@/components/ui";
+import { Badge, Card, DoctrineNote, PageHeader } from "@/components/ui";
 import { useKovela } from "@/lib/store";
 import { formatDateTime } from "@/lib/format";
 import type { AiDecision, AiFunction, LogKind } from "@/lib/types";
@@ -60,12 +60,11 @@ export default function LogsPage() {
 
   return (
     <Shell>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-navy-900">Logs</h1>
-        <p className="text-sm text-charcoal/55">
-          Traçabilité opérationnelle. Logs fictifs de démonstration.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Traçabilité"
+        title="Logs"
+        subtitle="Traçabilité opérationnelle. Logs fictifs de démonstration."
+      />
 
       <DoctrineNote className="mb-6" />
 

@@ -89,10 +89,15 @@ export function StatCard({
   accent?: boolean;
 }) {
   return (
-    <Card className="p-5 transition-shadow hover:shadow-lift">
+    <Card className="group relative overflow-hidden p-5 transition-shadow hover:shadow-lift">
+      <span
+        className={`absolute left-0 top-5 h-7 w-[3px] rounded-full transition-colors ${
+          accent ? "bg-teal-500" : "bg-navy-100 group-hover:bg-teal-300"
+        }`}
+      />
       <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-charcoal/50">{label}</p>
       <p
-        className={`mt-2 font-display text-[2rem] leading-none tracking-tight ${
+        className={`mt-2.5 font-display text-[2.25rem] leading-none tracking-tight ${
           accent ? "text-teal-600" : "text-navy-900"
         }`}
       >
@@ -112,19 +117,55 @@ export function SectionTitle({ children, hint }: { children: React.ReactNode; hi
   );
 }
 
-// Bandeau doctrine — rappel du périmètre non médical.
+// Bandeau doctrine — rappel du périmètre non médical (variante claire, premium).
 export function DoctrineNote({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`flex items-start gap-3 rounded-2xl bg-navy-900 px-5 py-4 text-xs leading-relaxed text-navy-100/85 wave-motif ${className}`}
+      className={`flex items-start gap-3 rounded-2xl bg-white px-5 py-3.5 text-xs leading-relaxed text-charcoal/75 shadow-soft ring-1 ring-navy-900/[0.05] ${className}`}
     >
-      <span className="mt-0.5 flex h-5 shrink-0 items-center rounded-full bg-teal-500/20 px-2 text-[10px] font-semibold uppercase tracking-wide text-teal-100">
+      <span className="mt-0.5 flex h-5 shrink-0 items-center rounded-full bg-teal-50 px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-teal-700 ring-1 ring-teal-100">
         Doctrine
       </span>
       <p>
-        KOVELA ne décide pas médicalement. KOVELA structure, trace, priorise opérationnellement et
-        escalade. L'IA est assistive, interne, loggée et human-in-the-loop.
+        <span className="font-semibold text-navy-900">KOVELA ne décide pas médicalement.</span>{" "}
+        KOVELA structure, trace, priorise opérationnellement et escalade. L'IA est assistive,
+        interne, loggée et human-in-the-loop.
       </p>
+    </div>
+  );
+}
+
+// Header de page « ambiance KOVELA » — bandeau navy, titre éditorial, motif wave.
+export function PageHeader({
+  title,
+  subtitle,
+  eyebrow,
+  children,
+}: {
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
+  eyebrow?: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="relative mb-6 overflow-hidden rounded-3xl bg-navy-depth wave-motif shadow-lift">
+      <div className="absolute left-0 top-0 h-full w-1 bg-teal-500/80" />
+      <div className="relative flex flex-col gap-4 px-7 py-6 md:flex-row md:items-center md:justify-between">
+        <div>
+          {eyebrow && (
+            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+              {eyebrow}
+            </p>
+          )}
+          <h1 className="font-display text-[1.85rem] leading-tight tracking-tight text-white md:text-4xl">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-navy-100/70">{subtitle}</p>
+          )}
+        </div>
+        {children && <div className="flex shrink-0 flex-wrap items-center gap-2">{children}</div>}
+      </div>
     </div>
   );
 }

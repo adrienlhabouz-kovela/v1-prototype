@@ -10,6 +10,7 @@ import {
   CardHeader,
   DoctrineNote,
   Modal,
+  PageHeader,
   SectionTitle,
   StatCard,
 } from "@/components/ui";
@@ -70,12 +71,11 @@ export default function AdminPage() {
 
   return (
     <Shell>
-      <div className="mb-6 flex flex-col gap-1">
-        <h1 className="font-display text-3xl tracking-tight text-navy-900">Tableau de bord</h1>
-        <p className="text-sm text-charcoal/55">
-          Pilotage opérationnel de la coordination post-opératoire — Admin KOVELA. Données fictives.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Admin KOVELA"
+        title="Tableau de bord"
+        subtitle="Pilotage opérationnel de la coordination post-opératoire. Données fictives."
+      />
 
       <DoctrineNote className="mb-6" />
 

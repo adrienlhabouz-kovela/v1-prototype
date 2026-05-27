@@ -31,11 +31,19 @@ export default function PatientMessages() {
         <UrgencyBanner />
 
         <Card className="mt-4 flex flex-1 flex-col overflow-hidden">
-          <div className="border-b border-navy-900/[0.06] px-4 py-3">
-            <h1 className="text-sm font-semibold text-navy-900">Messagerie de coordination</h1>
-            <p className="text-xs text-charcoal/45">
-              {k.surgeonName(patient.surgeonId)} · suivi post-opératoire
-            </p>
+          <div className="flex items-center gap-3 bg-navy-depth px-4 py-3.5 text-white">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-sm font-semibold ring-1 ring-white/15">
+              {patient.name
+                .split(" ")
+                .map((w) => w[0])
+                .join("")}
+            </span>
+            <div className="leading-tight">
+              <h1 className="text-sm font-semibold text-white">Messagerie de coordination</h1>
+              <p className="text-xs text-navy-100/65">
+                {k.surgeonName(patient.surgeonId)} · suivi post-opératoire
+              </p>
+            </div>
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto p-4">

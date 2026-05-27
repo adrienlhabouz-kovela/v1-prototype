@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
-import { Badge, Card, DoctrineNote } from "@/components/ui";
+import { Badge, Card, DoctrineNote, PageHeader } from "@/components/ui";
 import { useKovela } from "@/lib/store";
 import { relativeDays, statusLabels, statusStyles } from "@/lib/format";
 import type { Patient } from "@/lib/types";
@@ -67,24 +67,21 @@ export default function SuperviseurInbox() {
 
   return (
     <Shell>
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl tracking-tight text-navy-900">Inbox opérationnelle</h1>
-          <p className="text-sm text-charcoal/55">
-            File organisée selon des critères opérationnels : messages non traités, délais, CR en
-            attente et escalades ouvertes.
-          </p>
-        </div>
-        <label className="flex shrink-0 items-center gap-2 text-sm text-charcoal/70">
+      <PageHeader
+        eyebrow="Espace superviseur"
+        title="Inbox opérationnelle"
+        subtitle="File organisée selon des critères opérationnels : messages non traités, délais, CR en attente et escalades ouvertes."
+      >
+        <label className="flex cursor-pointer select-none items-center gap-2 rounded-xl bg-white/[0.06] px-3 py-2 text-xs text-navy-100/80 ring-1 ring-white/10">
           <input
             type="checkbox"
             checked={onlyMine}
             onChange={(e) => setOnlyMine(e.target.checked)}
-            className="h-4 w-4 rounded border-navy-200 text-teal-600"
+            className="h-4 w-4 rounded border-navy-200 text-teal-500"
           />
           Mes patients uniquement
         </label>
-      </div>
+      </PageHeader>
 
       <DoctrineNote className="mb-6" />
 

@@ -117,7 +117,7 @@ export default function PatientOnboarding() {
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-teal-600">
               ✓
             </div>
-            <h1 className="text-lg font-semibold text-navy-900">Onboarding complété</h1>
+            <h1 className="font-display text-2xl tracking-tight text-navy-900">Onboarding complété</h1>
             <p className="mt-2 text-sm text-charcoal/55">
               Votre suivi post-opératoire est actif. Vous êtes considéré(e) comme patient activé.
             </p>
@@ -135,7 +135,7 @@ export default function PatientOnboarding() {
                 />
               ))}
             </div>
-            <h1 className="text-lg font-semibold text-navy-900">{current.title}</h1>
+            <h1 className="font-display text-2xl tracking-tight text-navy-900">{current.title}</h1>
             <div className="mt-4">{current.content}</div>
 
             <div className="mt-6 flex gap-2">

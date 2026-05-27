@@ -1,6 +1,62 @@
 import Link from "next/link";
 import { BrandMark, Wordmark } from "@/components/Brand";
 
+// Graphisme « infrastructure » : flux Patient → Coordination → Chirurgien.
+function HeroGraphic() {
+  return (
+    <svg viewBox="0 0 420 460" fill="none" className="h-full w-full" aria-hidden="true">
+      <defs>
+        <radialGradient id="core" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#38B8B1" />
+          <stop offset="100%" stopColor="#137C76" />
+        </radialGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="6" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* Connexions */}
+      <g stroke="#1FA7A0" strokeOpacity="0.5" strokeWidth="1.4" strokeDasharray="2 7" strokeLinecap="round">
+        <path d="M110 96 C 200 130, 230 180, 256 224" />
+        <path d="M150 392 C 220 340, 240 300, 262 256" />
+        <path d="M300 240 C 350 250, 380 210, 392 150" />
+      </g>
+
+      {/* Anneaux du noyau */}
+      <circle cx="270" cy="240" r="74" stroke="#1FA7A0" strokeOpacity="0.18" />
+      <circle cx="270" cy="240" r="54" stroke="#1FA7A0" strokeOpacity="0.28" />
+
+      {/* Noyau KOVELA */}
+      <circle cx="270" cy="240" r="34" fill="url(#core)" filter="url(#glow)" />
+      <text x="270" y="245" textAnchor="middle" fontSize="13" fontWeight="700" fill="#06121B">
+        K
+      </text>
+
+      {/* Nœud Patient */}
+      <circle cx="100" cy="86" r="22" fill="#0E2835" stroke="#1FA7A0" strokeOpacity="0.7" />
+      <circle cx="100" cy="86" r="4" fill="#BFE3DE" />
+      <text x="100" y="46" textAnchor="middle" fontSize="11" fill="#9CB1BC" letterSpacing="1">
+        PATIENT
+      </text>
+
+      {/* Nœud Chirurgien */}
+      <circle cx="138" cy="404" r="22" fill="#0E2835" stroke="#1FA7A0" strokeOpacity="0.7" />
+      <circle cx="138" cy="404" r="4" fill="#BFE3DE" />
+      <text x="138" y="444" textAnchor="middle" fontSize="11" fill="#9CB1BC" letterSpacing="1">
+        CHIRURGIEN
+      </text>
+
+      {/* Accents */}
+      <circle cx="392" cy="150" r="5" fill="#1FA7A0" />
+      <circle cx="356" cy="320" r="3" fill="#BFE3DE" fillOpacity="0.6" />
+    </svg>
+  );
+}
+
 const pillars = [
   {
     title: "Présence 7/7",
@@ -42,6 +98,9 @@ export default function Landing() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 hero-lines opacity-90" />
+        <div className="pointer-events-none absolute right-0 top-0 hidden h-[560px] w-[460px] opacity-90 lg:block">
+          <HeroGraphic />
+        </div>
         <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-14 md:pt-20">
           <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-teal-200 ring-1 ring-white/10">
             <span className="h-1.5 w-1.5 rounded-full bg-teal-400" />

@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
-import { Badge, Button, Card, CardHeader, StatCard } from "@/components/ui";
+import { Badge, Button, Card, CardHeader, PageHeader, StatCard } from "@/components/ui";
 import { useKovela } from "@/lib/store";
 import { formatDate, relativeDays, statusLabels, statusStyles } from "@/lib/format";
 
@@ -35,12 +35,11 @@ export default function ChirurgienDashboard() {
 
   return (
     <Shell>
-      <div className="mb-6">
-        <h1 className="font-display text-3xl tracking-tight text-navy-900">Mes patients</h1>
-        <p className="text-sm text-charcoal/55">
-          {k.surgeonName(MY_SURGEON_ID)} — information claire et exploitable. Vous gardez la main.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow={k.surgeonName(MY_SURGEON_ID)}
+        title="Mes patients"
+        subtitle="Information claire et exploitable. Vous gardez la main."
+      />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Patients suivis" value={myPatients.length} />
