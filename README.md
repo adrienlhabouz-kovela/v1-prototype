@@ -33,6 +33,48 @@ Aucune variable d'environnement, aucun backend, aucune base de données, aucune 
 
 ---
 
+## 1bis. Déploiement sur Vercel (preview partageable)
+
+Objectif : obtenir une **URL de preview** pour tester visuellement le prototype **sans installation locale**.
+Next.js est détecté automatiquement par Vercel ; le dépôt contient déjà un `vercel.json` minimal.
+
+> **Aucun secret, aucune clé API, aucune variable d'environnement** n'est nécessaire.
+> Laissez la liste des variables d'environnement **vide** dans Vercel. Données 100 % fictives.
+
+### Option A — Import via le dashboard Vercel (recommandé, zéro installation)
+
+1. Connectez-vous sur [vercel.com](https://vercel.com) avec votre compte GitHub.
+2. **Add New… → Project** puis importez le dépôt `adrienlhabouz-kovela/v1-prototype`.
+3. Vercel détecte **Next.js** automatiquement :
+   - Framework Preset : `Next.js`
+   - Build Command : `next build` (par défaut)
+   - Install Command : `npm install` (par défaut)
+   - Output : géré automatiquement
+4. Ne renseignez **aucune** variable d'environnement.
+5. **Deploy**.
+
+Une fois le dépôt connecté, Vercel crée **automatiquement une preview pour chaque branche et chaque
+Pull Request** : un push sur `claude/eloquent-darwin-wwVME` (ou sur la PR) génère une URL de preview
+dédiée, idéale pour la revue visuelle.
+
+### Option B — CLI Vercel (depuis une machine locale)
+
+```bash
+npm i -g vercel
+vercel        # déploiement de preview → renvoie une URL *.vercel.app
+vercel --prod # déploiement de production (optionnel)
+```
+
+### Vérifier la preview
+Ouvrez l'URL `*.vercel.app` fournie par Vercel, puis déroulez les parcours :
+`/` → `/login` → `/admin` → `/superviseur` → fiche patient → `/chirurgien` → `/patient/onboarding` →
+`/patient/messages` → `/logs`. L'espace patient est pensé **mobile-first** (testez en largeur réduite).
+
+> Rappel : l'état est **en mémoire** (volatile). Un rafraîchissement réinitialise les données mockées.
+> C'est volontaire pour un prototype : aucune donnée n'est persistée.
+
+---
+
 ## 2. Stack
 
 | Choix | Détail |
