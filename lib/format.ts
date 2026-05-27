@@ -1,4 +1,31 @@
-import type { CRStatus, OnboardingStatus, PatientStatus, PlanningStatus } from "./types";
+import type {
+  CRStatus,
+  FollowType,
+  MandateStatus,
+  OnboardingStatus,
+  PatientStatus,
+  PlanningStatus,
+} from "./types";
+
+export const mandateLabels: Record<MandateStatus, string> = {
+  a_creer: "À créer",
+  lien_envoye: "Lien envoyé",
+  mandat_actif: "Mandat actif",
+  prelevement_pret: "Prélèvement prêt",
+};
+
+export const mandateStyles: Record<MandateStatus, string> = {
+  a_creer: "bg-navy-50 text-charcoal/60 ring-navy-100",
+  lien_envoye: "bg-amber-50/70 text-amber-700 ring-amber-100",
+  mandat_actif: "bg-teal-50 text-teal-700 ring-teal-100",
+  prelevement_pret: "bg-teal-50 text-teal-700 ring-teal-100",
+};
+
+export const followTypeLabels: Record<FollowType, string> = {
+  standard: "Standard",
+  renforce: "Renforcé",
+  premium: "Premium cabinet",
+};
 
 export const crStatusLabels: Record<CRStatus, string> = {
   brouillon: "Brouillon de CR à valider",

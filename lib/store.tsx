@@ -5,27 +5,31 @@
 
 import React, { createContext, useContext, useMemo, useState } from "react";
 import {
-  assistants,
+  assistants as seedAssistants,
   buildEscalations,
   buildInitialLogs,
   buildPatients,
   buildReports,
   PRICING,
   supervisors,
-  surgeons,
+  surgeons as seedSurgeons,
 } from "./mock-data";
 import { PROMPT_VERSION } from "./ai";
 import type {
   AiDecision,
   AiFunction,
   AiLog,
+  Assistant,
+  CabinetConfig,
   ClinicalReport,
   Escalation,
   LogEntry,
   LogKind,
+  MandateStatus,
   Message,
   Patient,
   Role,
+  Surgeon,
 } from "./types";
 
 export interface PlanningInput {
@@ -52,8 +56,8 @@ interface KovelaState {
   aiLogs: AiLog[];
 
   // sélections / contexte
-  surgeons: typeof surgeons;
-  assistants: typeof assistants;
+  surgeons: Surgeon[];
+  assistants: Assistant[];
   supervisors: typeof supervisors;
   pricing: typeof PRICING;
 
@@ -82,10 +86,17 @@ interface KovelaState {
   prepareCompilation: (patientId: string, compilation: string) => void;
   transmitCompilation: (patientId: string) => void;
 
+  // onboarding chirurgien / cabinet
+  saveCabinetConfig: (surgeonId: string, config: CabinetConfig) => void;
+  setMandateStatus: (surgeonId: string, status: MandateStatus) => void;
+  addAssistant: (surgeonId: string, name: string) => void;
+
   logAi: (fn: AiFunction, decision: AiDecision, patientId?: string) => void;
 
   // helpers
   surgeonName: (id: string) => string;
+  surgeon: (id: string) => Surgeon | undefined;
+  assistantsFor: (surgeonId: string) => Assistant[];
   supervisorName: (id: string | null) => string;
   reportFor: (patientId: string) => ClinicalReport | undefined;
   escalationFor: (patientId: string) => Escalation | undefined;
@@ -114,6 +125,8 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
   const [reports, setReports] = useState<ClinicalReport[]>(() => buildReports(initialPatients));
   const [logs, setLogs] = useState<LogEntry[]>(() => buildInitialLogs(initialPatients));
   const [aiLogs, setAiLogs] = useState<AiLog[]>([]);
+  const [surgeonsState, setSurgeons] = useState<Surgeon[]>(() => seedSurgeons.map((s) => ({ ...s })));
+  const [assistantsState, setAssistants] = useState<Assistant[]>(() => seedAssistants.map((a) => ({ ...a })));
 
   const currentUser = userByRole[role];
 
@@ -128,7 +141,10 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
     setPatients((prev) => prev.map((p) => (p.id === id ? fn(p) : p)));
   }
 
-  const surgeonName = (id: string) => surgeons.find((s) => s.id === id)?.name ?? "—";
+  const surgeonName = (id: string) => surgeonsState.find((s) => s.id === id)?.name ?? "—";
+  const surgeon = (id: string) => surgeonsState.find((s) => s.id === id);
+  const assistantsFor = (surgeonId: string) =>
+    assistantsState.filter((a) => a.surgeonId === surgeonId);
   const supervisorName = (id: string | null) =>
     id ? supervisors.find((s) => s.id === id)?.name ?? "—" : "Non assigné";
   const reportFor = (patientId: string) => reports.find((r) => r.patientId === patientId);
@@ -144,8 +160,8 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
     reports,
     logs,
     aiLogs,
-    surgeons,
-    assistants,
+    surgeons: surgeonsState,
+    assistants: assistantsState,
     supervisors,
     pricing: PRICING,
 
@@ -419,6 +435,36 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
       pushLog("escalade_transmise", "Escalade transmise au chirurgien.", patientId);
     },
 
+    saveCabinetConfig(surgeonId, config) {
+      setSurgeons((prev) =>
+        prev.map((s) =>
+          s.id === surgeonId
+            ? { ...s, specialty: config.specialization || s.specialty, clinic: config.locations[0] || s.clinic, config: { ...config, configured: true } }
+            : s
+        )
+      );
+      pushLog("cabinet_configure", `Configuration du cabinet enregistrée (${config.vertical || config.specialization}).`);
+    },
+
+    setMandateStatus(surgeonId, status) {
+      setSurgeons((prev) =>
+        prev.map((s) => (s.id === surgeonId ? { ...s, config: { ...s.config, mandateStatus: status } } : s))
+      );
+      const label: Record<MandateStatus, string> = {
+        a_creer: "à créer",
+        lien_envoye: "lien GoCardless envoyé",
+        mandat_actif: "mandat actif",
+        prelevement_pret: "prélèvement prêt",
+      };
+      pushLog("mandat_gocardless", `Mandat GoCardless (fictif) — statut : ${label[status]}.`);
+    },
+
+    addAssistant(surgeonId, name) {
+      const assistant: Assistant = { id: uid("a"), name, surgeonId };
+      setAssistants((prev) => [...prev, assistant]);
+      pushLog("assistante_invitee", `Assistante « ${name} » invitée (fictif).`);
+    },
+
     logAi(fn, decision, patientId) {
       setAiLogs((prev) => [
         {
@@ -447,6 +493,8 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
     },
 
     surgeonName,
+    surgeon,
+    assistantsFor,
     supervisorName,
     reportFor,
     escalationFor,

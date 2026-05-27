@@ -19,6 +19,7 @@ const nav: Record<Role, { href: string; label: string }[]> = {
   chirurgien: [
     { href: "/chirurgien", label: "Mes patients" },
     { href: "/chirurgien/planning", label: "Planning opératoire" },
+    { href: "/chirurgien/onboarding", label: "Configuration cabinet" },
     { href: "/logs", label: "Logs" },
   ],
   patient: [

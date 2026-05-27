@@ -5,7 +5,15 @@ import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Badge, Button, Card, CardHeader, PageHeader, StatCard } from "@/components/ui";
 import { useKovela } from "@/lib/store";
-import { formatDate, relativeDays, statusLabels, statusStyles } from "@/lib/format";
+import {
+  followTypeLabels,
+  formatDate,
+  mandateLabels,
+  mandateStyles,
+  relativeDays,
+  statusLabels,
+  statusStyles,
+} from "@/lib/format";
 
 const MY_SURGEON_ID = "s1"; // Dr. Camille Aragon (chirurgien de démo)
 
@@ -23,6 +31,9 @@ export default function ChirurgienDashboard() {
     () => myPatients.filter((p) => p.onboardingComplete && p.planningStatus !== "annule"),
     [myPatients]
   );
+
+  const config = k.surgeon(MY_SURGEON_ID)?.config;
+  const assistant = k.assistantsFor(MY_SURGEON_ID)[0];
 
   const NOW = new Date("2026-05-27T12:00:00Z").getTime();
 
@@ -108,32 +119,89 @@ export default function ChirurgienDashboard() {
           </div>
         </Card>
 
-        <Card>
-          <CardHeader title="Abonnement" subtitle="Simulation — aucun paiement réel" />
-          <div className="space-y-3 p-5 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-charcoal/55">Statut</span>
-              <Badge className="bg-teal-50 text-teal-700 ring-teal-200">Actif</Badge>
+        <div className="space-y-6">
+          {/* Configuration cabinet */}
+          <Card>
+            <CardHeader
+              title="Configuration cabinet"
+              subtitle={config?.configured ? "Cabinet configuré" : "Configuration à compléter"}
+              action={
+                <Link href="/chirurgien/onboarding" className="text-xs font-medium text-teal-600 hover:text-teal-700">
+                  Modifier →
+                </Link>
+              }
+            />
+            <div className="space-y-2.5 p-5 text-sm">
+              <Row label="Spécialisation" value={config?.specialization ?? "—"} />
+              <Row label="Verticale" value={<Badge className="bg-navy-50 text-charcoal/70 ring-navy-100">{config?.vertical ?? "—"}</Badge>} />
+              <Row label="Durée de suivi par défaut" value={config?.defaultProtocol ?? "—"} />
+              <Row label="Typologie de suivi" value={config ? followTypeLabels[config.followType] : "—"} />
+              <Row label="Fréquence CR" value={config?.crFrequency ?? "—"} />
+              <Row label="Assistante autorisée" value={assistant?.name ?? "—"} />
+              <Row
+                label="Mandat GoCardless"
+                value={
+                  config ? (
+                    <Badge className={mandateStyles[config.mandateStatus]}>
+                      {config.mandateStatus === "mandat_actif" || config.mandateStatus === "prelevement_pret"
+                        ? "Actif"
+                        : "À finaliser"}
+                    </Badge>
+                  ) : (
+                    "—"
+                  )
+                }
+              />
+              <div className="mt-2 rounded-lg bg-navy-50 px-3 py-2 text-xs text-charcoal/70">
+                Prochaine étape :{" "}
+                <Link href="/chirurgien/planning" className="font-medium text-teal-600 hover:text-teal-700">
+                  importer mon planning opératoire →
+                </Link>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-charcoal/55">Mandat GoCardless</span>
-              <Badge className="bg-navy-50 text-charcoal/70 ring-navy-100">MND-FICTIF-7733</Badge>
+          </Card>
+
+          {/* Abonnement */}
+          <Card>
+            <CardHeader title="Abonnement" subtitle="Simulation — aucun paiement réel" />
+            <div className="space-y-3 p-5 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-charcoal/55">Statut</span>
+                <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Actif</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-charcoal/55">Mandat GoCardless</span>
+                {config && (
+                  <Badge className={mandateStyles[config.mandateStatus]}>
+                    {mandateLabels[config.mandateStatus]}
+                  </Badge>
+                )}
+              </div>
+              <div className="my-2 border-t border-navy-900/[0.06]" />
+              <div className="flex items-center justify-between">
+                <span className="text-charcoal/55">Patients activés (mois)</span>
+                <span className="font-medium text-navy-900">{stats.activesMois}</span>
+              </div>
+              <div className="flex items-center justify-between rounded-lg bg-navy-50 px-3 py-2">
+                <span className="font-semibold text-navy-900">Montant estimé</span>
+                <span className="text-lg font-semibold text-teal-600">{montant} € HT</span>
+              </div>
+              <p className="text-[11px] text-charcoal/45">
+                {k.pricing.baseMonthly} € HT / mois + {k.pricing.perActivatedPatient} € HT / patient activé.
+              </p>
             </div>
-            <div className="my-2 border-t border-navy-900/[0.06]" />
-            <div className="flex items-center justify-between">
-              <span className="text-charcoal/55">Patients activés (mois)</span>
-              <span className="font-medium text-navy-900">{stats.activesMois}</span>
-            </div>
-            <div className="flex items-center justify-between rounded-lg bg-navy-50 px-3 py-2">
-              <span className="font-semibold text-navy-900">Montant estimé</span>
-              <span className="text-lg font-semibold text-teal-600">{montant} € HT</span>
-            </div>
-            <p className="text-[11px] text-charcoal/45">
-              {k.pricing.baseMonthly} € HT / mois + {k.pricing.perActivatedPatient} € HT / patient activé.
-            </p>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
     </Shell>
+  );
+}
+
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-charcoal/55">{label}</span>
+      <span className="text-right font-medium text-navy-900">{value}</span>
+    </div>
   );
 }

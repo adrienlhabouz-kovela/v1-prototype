@@ -3,9 +3,11 @@
 
 import type {
   Assistant,
+  CabinetConfig,
   ClinicalReport,
   Escalation,
   LogEntry,
+  MandateStatus,
   Patient,
   PatientStatus,
   Supervisor,
@@ -17,12 +19,84 @@ export const PRICING = {
   perActivatedPatient: 50, // € HT / patient activé
 };
 
+function baseConfig(over: Partial<CabinetConfig>): CabinetConfig {
+  return {
+    specialization: "Chirurgie esthétique / plastique",
+    vertical: "Esthétique & plastique",
+    locations: ["Clinique du Parc"],
+    defaultProtocol: "J+8 / J+15",
+    followType: "standard",
+    crFrequency: "CR fin de suivi",
+    transmissionChannel: "Interface KOVELA",
+    cabinetContact: {
+      name: "Secrétariat du cabinet",
+      role: "Contact de transmission cabinet",
+      email: "cabinet@exemple.test",
+      phone: "01 00 00 00 00",
+    },
+    workingHours: "Jours ouvrés — 9h à 18h (indicatif)",
+    patientPrefs: { photo: true, audio: true, relancesOnboarding: true, rappelSilencieux: true },
+    welcomeMessage:
+      "Votre chirurgien a mis en place un suivi organisé avec KOVELA afin de centraliser vos échanges post-opératoires.",
+    mandateStatus: "mandat_actif",
+    configured: true,
+    ...over,
+  };
+}
+
 export const surgeons: Surgeon[] = [
-  { id: "s1", name: "Dr. Camille Aragon", specialty: "Chirurgie plastique", clinic: "Clinique du Parc" },
-  { id: "s2", name: "Dr. Élodie Vasseur", specialty: "Chirurgie esthétique", clinic: "Institut Lutèce" },
-  { id: "s3", name: "Dr. Marc Toussaint", specialty: "Chirurgie plastique", clinic: "Clinique Belvédère" },
-  { id: "s4", name: "Dr. Léa Sorbier", specialty: "Chirurgie reconstructrice", clinic: "Centre Montaigne" },
-  { id: "s5", name: "Dr. Olivier Renaud", specialty: "Chirurgie esthétique", clinic: "Clinique du Parc" },
+  {
+    id: "s1",
+    name: "Dr. Camille Aragon",
+    specialty: "Chirurgie plastique",
+    clinic: "Clinique du Parc",
+    config: baseConfig({
+      specialization: "Chirurgie esthétique / plastique",
+      vertical: "Esthétique & plastique",
+      locations: ["Clinique du Parc", "Institut Lutèce"],
+      followType: "premium",
+      crFrequency: "CR fin de suivi + CR si escalade transmise",
+      mandateStatus: "lien_envoye", // à finaliser — démontrable
+    }),
+  },
+  {
+    id: "s2",
+    name: "Dr. Élodie Vasseur",
+    specialty: "Chirurgie esthétique",
+    clinic: "Institut Lutèce",
+    config: baseConfig({ locations: ["Institut Lutèce"], followType: "renforce", mandateStatus: "mandat_actif" }),
+  },
+  {
+    id: "s3",
+    name: "Dr. Marc Toussaint",
+    specialty: "Chirurgie maxillo-faciale",
+    clinic: "Clinique Belvédère",
+    config: baseConfig({
+      specialization: "Chirurgie maxillo-faciale",
+      vertical: "ORL / maxillo-facial",
+      locations: ["Clinique Belvédère"],
+      mandateStatus: "prelevement_pret",
+    }),
+  },
+  {
+    id: "s4",
+    name: "Dr. Léa Sorbier",
+    specialty: "Chirurgie orthopédique",
+    clinic: "Centre Montaigne",
+    config: baseConfig({
+      specialization: "Chirurgie orthopédique",
+      vertical: "Ambulatoire orthopédique",
+      locations: ["Centre Montaigne"],
+      mandateStatus: "mandat_actif",
+    }),
+  },
+  {
+    id: "s5",
+    name: "Dr. Olivier Renaud",
+    specialty: "Chirurgie esthétique",
+    clinic: "Clinique du Parc",
+    config: baseConfig({ locations: ["Clinique du Parc"], mandateStatus: "lien_envoye" }),
+  },
 ];
 
 export const assistants: Assistant[] = [

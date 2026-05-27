@@ -16,11 +16,47 @@ export type CRStatus = "brouillon" | "valide" | "disponible";
 
 export type MessageAuthor = "patient" | "superviseur" | "systeme";
 
+export type FollowType = "standard" | "renforce" | "premium";
+
+export type MandateStatus = "a_creer" | "lien_envoye" | "mandat_actif" | "prelevement_pret";
+
+export interface CabinetContact {
+  name: string;
+  role: string;
+  email: string;
+  phone: string;
+}
+
+export interface PatientPrefs {
+  photo: boolean;
+  audio: boolean;
+  relancesOnboarding: boolean;
+  rappelSilencieux: boolean;
+}
+
+// Configuration de suivi du cabinet (onboarding chirurgien). Non médical.
+export interface CabinetConfig {
+  specialization: string; // spécialisation principale
+  vertical: string; // verticale KOVELA associée
+  locations: string[]; // lieux d'intervention / cliniques
+  defaultProtocol: string; // durée de suivi par défaut (J+8 / J+15…)
+  followType: FollowType; // typologie de suivi
+  crFrequency: string; // fréquence des comptes-rendus
+  transmissionChannel: string; // canal de transmission cabinet
+  cabinetContact: CabinetContact; // contact de transmission cabinet
+  workingHours: string; // horaires de traitement souhaités
+  patientPrefs: PatientPrefs; // préférences de suivi opérationnel
+  welcomeMessage: string; // message d'accueil cabinet (non médical)
+  mandateStatus: MandateStatus; // mandat GoCardless fictif
+  configured: boolean;
+}
+
 export interface Surgeon {
   id: string;
   name: string;
   specialty: string;
   clinic: string;
+  config: CabinetConfig;
 }
 
 export interface Assistant {
@@ -152,7 +188,10 @@ export type LogKind =
   | "planning_modifie"
   | "planning_reporte"
   | "planning_annule"
-  | "planning_import";
+  | "planning_import"
+  | "cabinet_configure"
+  | "mandat_gocardless"
+  | "assistante_invitee";
 
 export interface LogEntry {
   id: string;

@@ -97,6 +97,13 @@ function emptyInput(): PlanningInput {
 
 export default function PlanningPage() {
   const k = useKovela();
+  const config = k.surgeon(MY_SURGEON_ID)?.config;
+  // Le planning reprend les préférences du cabinet (lieu + durée par défaut).
+  const addDefaults: PlanningInput = {
+    ...emptyInput(),
+    clinic: config?.locations[0] ?? "Clinique du Parc",
+    protocol: config?.defaultProtocol ?? "J+8 / J+15",
+  };
 
   const planning = useMemo(
     () =>
@@ -264,7 +271,7 @@ export default function PlanningPage() {
       <PlanningFormModal
         open={addOpen}
         title="Ajouter un patient au planning"
-        initial={emptyInput()}
+        initial={addDefaults}
         submitLabel="Ajouter au planning"
         onClose={() => setAddOpen(false)}
         onSubmit={(input) => {
@@ -415,11 +422,13 @@ function PlanningFormModal({
         </Field>
         <Field label="Durée de suivi prévue">
           <select className={inputCls} value={form.protocol} onChange={set("protocol")}>
-            {PROTOCOLS.map((pr) => (
-              <option key={pr} value={pr}>
-                {pr}
-              </option>
-            ))}
+            {[form.protocol, ...PROTOCOLS]
+              .filter((v, i, a) => v && a.indexOf(v) === i)
+              .map((pr) => (
+                <option key={pr} value={pr}>
+                  {pr}
+                </option>
+              ))}
           </select>
         </Field>
         <Field label="Téléphone (fictif)">

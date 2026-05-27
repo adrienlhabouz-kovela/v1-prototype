@@ -200,6 +200,48 @@ export default function AdminPage() {
         </Card>
       </div>
 
+      {/* Chirurgiens & verticales */}
+      <div className="mt-8">
+        <SectionTitle hint="KOVELA démarre en esthétique / plastique, extensible à d'autres segments">
+          Chirurgiens & verticales
+        </SectionTitle>
+        <Card className="p-5">
+          <div className="mb-4 flex flex-wrap gap-2">
+            {Object.entries(
+              k.surgeons.reduce<Record<string, number>>((acc, s) => {
+                const v = s.config.vertical || "Autre";
+                acc[v] = (acc[v] ?? 0) + 1;
+                return acc;
+              }, {})
+            ).map(([vertical, count]) => (
+              <span
+                key={vertical}
+                className="inline-flex items-center gap-1.5 rounded-full bg-navy-50 px-3 py-1 text-xs text-charcoal/70"
+              >
+                {vertical}
+                <span className="font-semibold text-navy-900">{count}</span>
+              </span>
+            ))}
+          </div>
+          <div className="divide-y divide-navy-900/[0.05]">
+            {k.surgeons.map((s) => (
+              <div key={s.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-navy-900">{s.name}</p>
+                  <p className="truncate text-xs text-charcoal/45">{s.config.specialization}</p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Badge className="bg-teal-50/60 text-navy-700 ring-teal-100">{s.config.vertical}</Badge>
+                  {!s.config.configured && (
+                    <Badge className="bg-amber-50/70 text-amber-700 ring-amber-100">À configurer</Badge>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
       {/* Table patients */}
       <div className="mt-8 scroll-mt-6" id="patients-table">
         <SectionTitle hint={`${filtered.length} patient(s)`}>Patients</SectionTitle>

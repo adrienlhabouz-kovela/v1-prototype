@@ -27,6 +27,9 @@ const logKindLabel: Record<LogKind, string> = {
   planning_reporte: "Planning — report",
   planning_annule: "Planning — annulation",
   planning_import: "Planning — import",
+  cabinet_configure: "Cabinet — configuration",
+  mandat_gocardless: "Mandat GoCardless (fictif)",
+  assistante_invitee: "Assistante invitée",
 };
 
 const logKindStyle: Partial<Record<LogKind, string>> = {
@@ -59,12 +62,13 @@ const aiDecisionLabel: Record<AiDecision, string> = {
   refuse: "Refusée",
 };
 
-type OpsFilter = "all" | "ia" | "cr" | "escalade" | "patient" | "attribution";
+type OpsFilter = "all" | "ia" | "cr" | "escalade" | "patient" | "attribution" | "cabinet";
 
 const opsFilterKinds: Record<Exclude<OpsFilter, "all">, LogKind[]> = {
   ia: ["ia_utilisee", "ia_suggestion"],
   cr: ["cr_prepare", "cr_valide", "cr_disponible"],
   escalade: ["compilation_preparee", "escalade_transmise"],
+  cabinet: ["cabinet_configure", "mandat_gocardless", "assistante_invitee"],
   patient: [
     "message_envoye",
     "patient_relance",
@@ -130,6 +134,7 @@ export default function LogsPage() {
             ["escalade", "Escalade"],
             ["patient", "Patient"],
             ["attribution", "Attribution"],
+            ["cabinet", "Cabinet"],
           ] as [OpsFilter, string][]).map(([f, label]) => (
             <button
               key={f}
