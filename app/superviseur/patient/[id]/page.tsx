@@ -49,7 +49,7 @@ export default function PatientFiche() {
   if (!patient) {
     return (
       <Shell>
-        <p className="text-sm text-slate-500">Patient introuvable.</p>
+        <p className="text-sm text-charcoal/55">Patient introuvable.</p>
         <Link href="/superviseur" className="text-sm text-teal-600">← Retour à l'inbox</Link>
       </Shell>
     );
@@ -100,14 +100,14 @@ export default function PatientFiche() {
       <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-start">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight text-navy-900">{patient.name}</h1>
+            <h1 className="font-display text-3xl tracking-tight text-navy-900">{patient.name}</h1>
             <Badge className={statusStyles[patient.status]}>{statusLabels[patient.status]}</Badge>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-charcoal/55">
             {patient.intervention} · {k.surgeonName(patient.surgeonId)} · Intervention le{" "}
             {formatDate(patient.interventionDate)} · Protocole {patient.protocol}
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-charcoal/45">
             Superviseur : {k.supervisorName(patient.supervisorId)}
           </p>
         </div>
@@ -142,7 +142,7 @@ export default function PatientFiche() {
                       m.author === "superviseur"
                         ? "bg-teal-600 text-white"
                         : m.author === "systeme"
-                        ? "bg-slate-100 text-slate-600"
+                        ? "bg-navy-50 text-charcoal/70"
                         : "bg-navy-50 text-navy-900"
                     }`}
                   >
@@ -151,7 +151,7 @@ export default function PatientFiche() {
                       <span>·</span>
                       <span>{formatDateTime(m.at)}</span>
                       {m.author === "patient" && !m.treated && (
-                        <span className="rounded bg-rose-500 px-1.5 text-white">non traité</span>
+                        <span className="rounded bg-amber-400 px-1.5 text-navy-900">non traité</span>
                       )}
                     </div>
                     <p className="leading-relaxed">{m.text}</p>
@@ -172,13 +172,13 @@ export default function PatientFiche() {
             </div>
 
             {/* Zone de réponse */}
-            <div className="border-t border-slate-100 p-5">
+            <div className="border-t border-navy-900/[0.06] p-5">
               <textarea
                 value={reply}
                 onChange={(e) => setReply(e.target.value)}
                 rows={3}
                 placeholder="Écrire une réponse de coordination…"
-                className="w-full resize-none rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400"
+                className="w-full resize-none rounded-xl border border-navy-100 p-3 text-sm outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400"
               />
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <Button variant="subtle" onClick={() => setTemplatesOpen(true)}>
@@ -212,7 +212,7 @@ export default function PatientFiche() {
                   value={noteText}
                   onChange={(e) => setNoteText(e.target.value)}
                   placeholder="Ajouter une note interne…"
-                  className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-400"
+                  className="flex-1 rounded-xl border border-navy-100 px-3 py-2 text-sm outline-none focus:border-teal-400"
                 />
                 <Button
                   variant="subtle"
@@ -227,12 +227,12 @@ export default function PatientFiche() {
               </div>
               <div className="mt-4 space-y-3">
                 {patient.notes.length === 0 && (
-                  <p className="text-xs text-slate-400">Aucune note interne.</p>
+                  <p className="text-xs text-charcoal/45">Aucune note interne.</p>
                 )}
                 {patient.notes.map((n) => (
-                  <div key={n.id} className="rounded-xl bg-slate-50 p-3">
+                  <div key={n.id} className="rounded-xl bg-navy-50/50 p-3">
                     <p className="whitespace-pre-wrap text-sm text-navy-900">{n.text}</p>
-                    <p className="mt-1 text-[11px] text-slate-400">
+                    <p className="mt-1 text-[11px] text-charcoal/45">
                       {n.author} · {formatDateTime(n.at)}
                     </p>
                   </div>
@@ -256,7 +256,7 @@ export default function PatientFiche() {
               <Button variant="subtle" className="w-full" onClick={() => runAi("compilation_escalade")}>
                 Préparer compilation d'escalade
               </Button>
-              <p className="pt-1 text-[11px] leading-tight text-slate-400">
+              <p className="pt-1 text-[11px] leading-tight text-charcoal/45">
                 L'IA ne diagnostique pas, ne qualifie pas un symptôme, n'analyse pas les photos
                 et ne décide jamais d'escalader. Chaque sortie est à valider par un humain.
               </p>
@@ -283,7 +283,7 @@ export default function PatientFiche() {
                   >
                     {report.status === "brouillon" ? "Brouillon de CR à valider" : report.status}
                   </Badge>
-                  <pre className="mt-3 max-h-48 overflow-y-auto whitespace-pre-wrap rounded-xl bg-slate-50 p-3 font-sans text-xs leading-relaxed text-navy-900">
+                  <pre className="mt-3 max-h-48 overflow-y-auto whitespace-pre-wrap rounded-xl bg-navy-50/50 p-3 font-sans text-xs leading-relaxed text-navy-900">
                     {report.content}
                   </pre>
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -300,7 +300,7 @@ export default function PatientFiche() {
                   </div>
                 </>
               ) : (
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-charcoal/45">
                   Aucun CR. Utilisez « Préparer le CR » pour générer un brouillon à valider.
                 </p>
               )}
@@ -320,7 +320,7 @@ export default function PatientFiche() {
                     {escalation.status === "ouverte" ? "Compilation prête" : "Transmise au chirurgien"}
                   </Badge>
                   {escalation.compilation && (
-                    <pre className="mt-3 max-h-40 overflow-y-auto whitespace-pre-wrap rounded-xl bg-slate-50 p-3 font-sans text-xs leading-relaxed text-navy-900">
+                    <pre className="mt-3 max-h-40 overflow-y-auto whitespace-pre-wrap rounded-xl bg-navy-50/50 p-3 font-sans text-xs leading-relaxed text-navy-900">
                       {escalation.compilation}
                     </pre>
                   )}
@@ -335,7 +335,7 @@ export default function PatientFiche() {
                   )}
                 </>
               ) : (
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-charcoal/45">
                   Utilisez « Préparer compilation d'escalade » pour réunir les éléments factuels.
                 </p>
               )}
@@ -346,11 +346,11 @@ export default function PatientFiche() {
           <Card>
             <CardHeader title="Logs liés au patient" subtitle="Traçabilité opérationnelle" />
             <div className="max-h-64 space-y-2 overflow-y-auto p-5">
-              {patientLogs.length === 0 && <p className="text-xs text-slate-400">Aucun log.</p>}
+              {patientLogs.length === 0 && <p className="text-xs text-charcoal/45">Aucun log.</p>}
               {patientLogs.map((l) => (
                 <div key={l.id} className="border-l-2 border-teal-200 pl-3">
                   <p className="text-xs text-navy-900">{l.detail}</p>
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-[10px] text-charcoal/45">
                     {l.user} · {formatDateTime(l.at)}
                   </p>
                 </div>
@@ -362,7 +362,7 @@ export default function PatientFiche() {
 
       {/* Modal templates */}
       <Modal open={templatesOpen} onClose={() => setTemplatesOpen(false)} title="Bibliothèque de templates" wide>
-        <p className="mb-4 text-xs text-slate-500">
+        <p className="mb-4 text-xs text-charcoal/55">
           Aucun template ne donne de conseil médical. Coordination uniquement.
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -373,10 +373,10 @@ export default function PatientFiche() {
                 setReply((prev) => (prev ? prev + "\n\n" : "") + t.body);
                 setTemplatesOpen(false);
               }}
-              className="rounded-xl border border-slate-200 p-3 text-left hover:border-teal-300 hover:bg-teal-50/40"
+              className="rounded-xl border border-navy-100 p-3 text-left hover:border-teal-300 hover:bg-teal-50/40"
             >
               <p className="text-sm font-medium text-navy-900">{t.title}</p>
-              <p className="mt-1 line-clamp-2 text-xs text-slate-500">{t.body}</p>
+              <p className="mt-1 line-clamp-2 text-xs text-charcoal/55">{t.body}</p>
             </button>
           ))}
         </div>
@@ -396,7 +396,7 @@ export default function PatientFiche() {
               value={aiOutput}
               onChange={(e) => setAiOutput(e.target.value)}
               rows={14}
-              className="w-full rounded-xl border border-slate-200 p-3 font-sans text-sm leading-relaxed outline-none focus:border-teal-400"
+              className="w-full rounded-xl border border-navy-100 p-3 font-sans text-sm leading-relaxed outline-none focus:border-teal-400"
             />
             <div className="mt-3 flex gap-2">
               <Button variant="primary" onClick={acceptAi}>

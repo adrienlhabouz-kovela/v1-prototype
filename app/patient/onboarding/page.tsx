@@ -26,7 +26,7 @@ export default function PatientOnboarding() {
     {
       title: "Bienvenue dans votre suivi KOVELA",
       content: (
-        <div className="space-y-3 text-sm leading-relaxed text-slate-600">
+        <div className="space-y-3 text-sm leading-relaxed text-charcoal/70">
           <p>
             Bonjour {patient.name.split(" ")[0]}, votre chirurgien{" "}
             <span className="font-medium text-navy-900">{k.surgeonName(patient.surgeonId)}</span> vous
@@ -47,7 +47,7 @@ export default function PatientOnboarding() {
     {
       title: "Comprendre les limites du service",
       content: (
-        <div className="space-y-3 text-sm leading-relaxed text-slate-600">
+        <div className="space-y-3 text-sm leading-relaxed text-charcoal/70">
           <UrgencyBanner />
           <ul className="list-disc space-y-1.5 pl-5">
             <li>KOVELA ne remplace pas une consultation médicale.</li>
@@ -60,7 +60,7 @@ export default function PatientOnboarding() {
               type="checkbox"
               checked={accepted.limites}
               onChange={(e) => setAccepted((a) => ({ ...a, limites: e.target.checked }))}
-              className="mt-0.5 h-4 w-4 rounded border-slate-300 text-teal-600"
+              className="mt-0.5 h-4 w-4 rounded border-navy-200 text-teal-600"
             />
             <span className="text-navy-900">J'ai compris les limites du service.</span>
           </label>
@@ -71,12 +71,12 @@ export default function PatientOnboarding() {
     {
       title: "Consentement (fictif)",
       content: (
-        <div className="space-y-3 text-sm leading-relaxed text-slate-600">
+        <div className="space-y-3 text-sm leading-relaxed text-charcoal/70">
           <p>
             J'accepte que mes messages et pièces jointes soient utilisés dans le cadre de la
             coordination de mon suivi post-opératoire, sous supervision humaine.
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-charcoal/45">
             Consentement de démonstration uniquement. Aucune donnée réelle n'est collectée.
           </p>
           <label className="flex items-start gap-2 pt-2">
@@ -84,7 +84,7 @@ export default function PatientOnboarding() {
               type="checkbox"
               checked={accepted.consent}
               onChange={(e) => setAccepted((a) => ({ ...a, consent: e.target.checked }))}
-              className="mt-0.5 h-4 w-4 rounded border-slate-300 text-teal-600"
+              className="mt-0.5 h-4 w-4 rounded border-navy-200 text-teal-600"
             />
             <span className="text-navy-900">Je donne mon consentement.</span>
           </label>
@@ -93,7 +93,7 @@ export default function PatientOnboarding() {
               type="checkbox"
               checked={accepted.urgence}
               onChange={(e) => setAccepted((a) => ({ ...a, urgence: e.target.checked }))}
-              className="mt-0.5 h-4 w-4 rounded border-slate-300 text-teal-600"
+              className="mt-0.5 h-4 w-4 rounded border-navy-200 text-teal-600"
             />
             <span className="text-navy-900">
               Je confirme avoir pris connaissance du rappel d'urgence (15 / 112).
@@ -118,7 +118,7 @@ export default function PatientOnboarding() {
               ✓
             </div>
             <h1 className="text-lg font-semibold text-navy-900">Onboarding complété</h1>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-charcoal/55">
               Votre suivi post-opératoire est actif. Vous êtes considéré(e) comme patient activé.
             </p>
             <Button variant="primary" className="mt-4 w-full" onClick={() => router.push("/patient/messages")}>
@@ -131,7 +131,7 @@ export default function PatientOnboarding() {
               {steps.map((_, i) => (
                 <div
                   key={i}
-                  className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-teal-500" : "bg-slate-200"}`}
+                  className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-teal-500" : "bg-navy-100"}`}
                 />
               ))}
             </div>

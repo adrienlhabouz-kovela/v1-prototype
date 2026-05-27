@@ -38,12 +38,12 @@ export const statusLabels: Record<PatientStatus, string> = {
   cloture: "Clôturé",
 };
 
-// Couleurs opérationnelles (jamais de codage de gravité médicale).
+// Couleurs opérationnelles sobres (jamais de codage de gravité médicale).
 export const statusStyles: Record<PatientStatus, string> = {
-  onboarding_incomplet: "bg-amber-50 text-amber-700 ring-amber-200",
-  actif: "bg-teal-50 text-teal-700 ring-teal-200",
-  silencieux: "bg-slate-100 text-slate-600 ring-slate-200",
-  escalade_ouverte: "bg-indigo-50 text-indigo-700 ring-indigo-200",
-  cr_en_attente: "bg-sky-50 text-sky-700 ring-sky-200",
-  cloture: "bg-slate-50 text-slate-500 ring-slate-200",
+  onboarding_incomplet: "bg-amber-50/70 text-amber-700 ring-amber-100",
+  actif: "bg-teal-50 text-teal-700 ring-teal-100",
+  silencieux: "bg-navy-50 text-charcoal/60 ring-navy-100",
+  escalade_ouverte: "bg-navy-900 text-teal-100 ring-navy-900",
+  cr_en_attente: "bg-teal-50/60 text-navy-700 ring-teal-100",
+  cloture: "bg-navy-50/60 text-charcoal/45 ring-navy-100",
 };

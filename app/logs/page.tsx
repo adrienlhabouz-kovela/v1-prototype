@@ -38,7 +38,7 @@ const aiFnLabel: Record<AiFunction, string> = {
 };
 
 const aiDecisionStyle: Record<AiDecision, string> = {
-  propose: "bg-slate-100 text-slate-600 ring-slate-200",
+  propose: "bg-navy-50 text-charcoal/70 ring-navy-100",
   accepte: "bg-teal-50 text-teal-700 ring-teal-200",
   modifie: "bg-amber-50 text-amber-700 ring-amber-200",
   refuse: "bg-rose-50 text-rose-700 ring-rose-200",
@@ -62,7 +62,7 @@ export default function LogsPage() {
     <Shell>
       <div className="mb-6">
         <h1 className="text-2xl font-semibold tracking-tight text-navy-900">Logs</h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-charcoal/55">
           Traçabilité opérationnelle. Logs fictifs de démonstration.
         </p>
       </div>
@@ -73,7 +73,7 @@ export default function LogsPage() {
         <button
           onClick={() => setTab("ops")}
           className={`rounded-full px-4 py-1.5 text-sm font-medium ${
-            tab === "ops" ? "bg-navy-900 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200"
+            tab === "ops" ? "bg-navy-900 text-white" : "bg-white text-charcoal/70 ring-1 ring-navy-100"
           }`}
         >
           Logs opérationnels ({k.logs.length})
@@ -81,7 +81,7 @@ export default function LogsPage() {
         <button
           onClick={() => setTab("ia")}
           className={`rounded-full px-4 py-1.5 text-sm font-medium ${
-            tab === "ia" ? "bg-navy-900 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200"
+            tab === "ia" ? "bg-navy-900 text-white" : "bg-white text-charcoal/70 ring-1 ring-navy-100"
           }`}
         >
           Logs IA ({k.aiLogs.length})
@@ -93,7 +93,7 @@ export default function LogsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wide text-slate-400">
+                <tr className="border-b border-navy-900/[0.06] text-left text-xs uppercase tracking-wide text-charcoal/45">
                   <th className="px-4 py-3 font-medium">Type</th>
                   <th className="px-4 py-3 font-medium">Détail</th>
                   <th className="px-4 py-3 font-medium">Patient</th>
@@ -103,16 +103,16 @@ export default function LogsPage() {
               </thead>
               <tbody>
                 {k.logs.map((l) => (
-                  <tr key={l.id} className="border-b border-slate-50">
+                  <tr key={l.id} className="border-b border-navy-900/[0.05]">
                     <td className="px-4 py-3">
-                      <Badge className={logKindStyle[l.kind] ?? "bg-slate-100 text-slate-600 ring-slate-200"}>
+                      <Badge className={logKindStyle[l.kind] ?? "bg-navy-50 text-charcoal/70 ring-navy-100"}>
                         {logKindLabel[l.kind]}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-navy-900">{l.detail}</td>
-                    <td className="px-4 py-3 text-slate-500">{patientName(l.patientId)}</td>
-                    <td className="px-4 py-3 text-slate-500">{l.user}</td>
-                    <td className="px-4 py-3 text-slate-400">{formatDateTime(l.at)}</td>
+                    <td className="px-4 py-3 text-charcoal/55">{patientName(l.patientId)}</td>
+                    <td className="px-4 py-3 text-charcoal/55">{l.user}</td>
+                    <td className="px-4 py-3 text-charcoal/45">{formatDateTime(l.at)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -122,7 +122,7 @@ export default function LogsPage() {
       ) : (
         <Card className="overflow-hidden">
           {k.aiLogs.length === 0 ? (
-            <p className="p-8 text-center text-sm text-slate-400">
+            <p className="p-8 text-center text-sm text-charcoal/45">
               Aucune fonction IA utilisée pour l'instant. Lancez un résumé, un CR ou une
               compilation depuis une fiche patient superviseur.
             </p>
@@ -130,7 +130,7 @@ export default function LogsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wide text-slate-400">
+                  <tr className="border-b border-navy-900/[0.06] text-left text-xs uppercase tracking-wide text-charcoal/45">
                     <th className="px-4 py-3 font-medium">Fonction IA</th>
                     <th className="px-4 py-3 font-medium">Prompt</th>
                     <th className="px-4 py-3 font-medium">Statut</th>
@@ -141,15 +141,15 @@ export default function LogsPage() {
                 </thead>
                 <tbody>
                   {k.aiLogs.map((l) => (
-                    <tr key={l.id} className="border-b border-slate-50">
+                    <tr key={l.id} className="border-b border-navy-900/[0.05]">
                       <td className="px-4 py-3 font-medium text-navy-900">{aiFnLabel[l.fn]}</td>
-                      <td className="px-4 py-3 text-slate-500">{l.promptVersion}</td>
+                      <td className="px-4 py-3 text-charcoal/55">{l.promptVersion}</td>
                       <td className="px-4 py-3">
                         <Badge className={aiDecisionStyle[l.decision]}>{aiDecisionLabel[l.decision]}</Badge>
                       </td>
-                      <td className="px-4 py-3 text-slate-500">{patientName(l.patientId)}</td>
-                      <td className="px-4 py-3 text-slate-500">{l.user}</td>
-                      <td className="px-4 py-3 text-slate-400">{formatDateTime(l.at)}</td>
+                      <td className="px-4 py-3 text-charcoal/55">{patientName(l.patientId)}</td>
+                      <td className="px-4 py-3 text-charcoal/55">{l.user}</td>
+                      <td className="px-4 py-3 text-charcoal/45">{formatDateTime(l.at)}</td>
                     </tr>
                   ))}
                 </tbody>

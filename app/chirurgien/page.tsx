@@ -36,8 +36,8 @@ export default function ChirurgienDashboard() {
   return (
     <Shell>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-navy-900">Mes patients</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="font-display text-3xl tracking-tight text-navy-900">Mes patients</h1>
+        <p className="text-sm text-charcoal/55">
           {k.surgeonName(MY_SURGEON_ID)} — information claire et exploitable. Vous gardez la main.
         </p>
       </div>
@@ -52,7 +52,7 @@ export default function ChirurgienDashboard() {
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader title="Patients suivis" subtitle="Statut, CR et escalades transmises" />
-          <div className="divide-y divide-slate-50">
+          <div className="divide-y divide-navy-900/[0.05]">
             {myPatients.map((p) => {
               const report = k.reportFor(p.id);
               const esc = k.escalationFor(p.id);
@@ -61,7 +61,7 @@ export default function ChirurgienDashboard() {
                 <div key={p.id} className="flex items-center justify-between gap-4 px-5 py-3.5">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-navy-900">{p.name}</p>
-                    <p className="truncate text-xs text-slate-400">
+                    <p className="truncate text-xs text-charcoal/45">
                       {p.intervention} · {formatDate(p.interventionDate)} · {relativeDays(p.lastMessageAt)}
                     </p>
                   </div>
@@ -87,23 +87,23 @@ export default function ChirurgienDashboard() {
           <CardHeader title="Abonnement" subtitle="Simulation — aucun paiement réel" />
           <div className="space-y-3 p-5 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Statut</span>
+              <span className="text-charcoal/55">Statut</span>
               <Badge className="bg-teal-50 text-teal-700 ring-teal-200">Actif</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Mandat GoCardless</span>
-              <Badge className="bg-slate-100 text-slate-600 ring-slate-200">MND-FICTIF-7733</Badge>
+              <span className="text-charcoal/55">Mandat GoCardless</span>
+              <Badge className="bg-navy-50 text-charcoal/70 ring-navy-100">MND-FICTIF-7733</Badge>
             </div>
-            <div className="my-2 border-t border-slate-100" />
+            <div className="my-2 border-t border-navy-900/[0.06]" />
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Patients activés (mois)</span>
+              <span className="text-charcoal/55">Patients activés (mois)</span>
               <span className="font-medium text-navy-900">{stats.activesMois}</span>
             </div>
             <div className="flex items-center justify-between rounded-lg bg-navy-50 px-3 py-2">
               <span className="font-semibold text-navy-900">Montant estimé</span>
               <span className="text-lg font-semibold text-teal-600">{montant} € HT</span>
             </div>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-charcoal/45">
               {k.pricing.baseMonthly} € HT / mois + {k.pricing.perActivatedPatient} € HT / patient activé.
             </p>
           </div>

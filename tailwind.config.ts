@@ -9,46 +9,55 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Charte KOVELA
         navy: {
-          DEFAULT: "#0A1A2F",
-          50: "#F2F5F9",
-          100: "#E2E8F0",
-          700: "#142C4A",
-          800: "#0F2238",
-          900: "#0A1A2F",
-          950: "#06101D",
+          DEFAULT: "#0A1F2D", // Deep Navy
+          50: "#EAF0F2",
+          100: "#C8D5DC",
+          200: "#9CB1BC",
+          600: "#21495E",
+          700: "#16384A",
+          800: "#0E2835",
+          900: "#0A1F2D",
+          950: "#06121B",
         },
         teal: {
-          DEFAULT: "#0FB5AE",
-          50: "#EBFBFA",
-          100: "#CFF5F2",
-          400: "#33C9C2",
-          500: "#0FB5AE",
-          600: "#0B928C",
-          700: "#0A736E",
+          DEFAULT: "#1FA7A0", // Surgical Teal
+          50: "#ECF7F5",
+          100: "#BFE3DE", // Soft Teal
+          200: "#9FD6CF",
+          400: "#38B8B1",
+          500: "#1FA7A0",
+          600: "#178F89",
+          700: "#137C76",
         },
-        offwhite: "#F7F9FB",
-        ink: "#0A1A2F",
+        offwhite: "#E6E9EC",
+        charcoal: "#1B1F23",
+        ink: "#0A1F2D",
       },
       fontFamily: {
-        sans: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Inter",
-          "Roboto",
-          "Helvetica Neue",
-          "Arial",
-          "sans-serif",
-        ],
+        sans: ["var(--font-sans)", "Inter", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "Georgia", "serif"],
+      },
+      letterSpacing: {
+        brand: "0.18em",
       },
       boxShadow: {
-        card: "0 1px 2px rgba(10,26,47,0.04), 0 8px 24px rgba(10,26,47,0.06)",
-        soft: "0 1px 3px rgba(10,26,47,0.08)",
+        // Ombres très douces
+        soft: "0 1px 2px rgba(10,31,45,0.04)",
+        card: "0 1px 2px rgba(10,31,45,0.03), 0 6px 24px -12px rgba(10,31,45,0.10)",
+        lift: "0 12px 40px -16px rgba(10,31,45,0.22)",
       },
       borderRadius: {
         xl: "0.875rem",
         "2xl": "1.25rem",
+        "3xl": "1.75rem",
+      },
+      backgroundImage: {
+        "navy-depth":
+          "radial-gradient(120% 120% at 85% -10%, #16384A 0%, #0A1F2D 45%, #06121B 100%)",
+        "teal-sheen":
+          "linear-gradient(135deg, rgba(31,167,160,0.16) 0%, rgba(31,167,160,0) 55%)",
       },
     },
   },

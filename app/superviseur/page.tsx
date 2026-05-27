@@ -69,17 +69,17 @@ export default function SuperviseurInbox() {
     <Shell>
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-navy-900">Inbox opérationnelle</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="font-display text-3xl tracking-tight text-navy-900">Inbox opérationnelle</h1>
+          <p className="text-sm text-charcoal/55">
             Classement strictement opérationnel. Aucun tri médical, aucune notion de gravité.
           </p>
         </div>
-        <label className="flex shrink-0 items-center gap-2 text-sm text-slate-600">
+        <label className="flex shrink-0 items-center gap-2 text-sm text-charcoal/70">
           <input
             type="checkbox"
             checked={onlyMine}
             onChange={(e) => setOnlyMine(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-teal-600"
+            className="h-4 w-4 rounded border-navy-200 text-teal-600"
           />
           Mes patients uniquement
         </label>
@@ -92,18 +92,18 @@ export default function SuperviseurInbox() {
           const list = scope.filter((p) => section.match(p, { unTreated }));
           return (
             <Card key={section.key} className="flex flex-col">
-              <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+              <div className="flex items-center justify-between border-b border-navy-900/[0.06] px-4 py-3">
                 <div>
                   <h2 className="text-sm font-semibold text-navy-900">{section.title}</h2>
-                  <p className="text-[11px] text-slate-400">{section.hint}</p>
+                  <p className="text-[11px] text-charcoal/45">{section.hint}</p>
                 </div>
                 <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-navy-900 px-1.5 text-xs font-semibold text-white">
                   {list.length}
                 </span>
               </div>
-              <div className="flex-1 divide-y divide-slate-50">
+              <div className="flex-1 divide-y divide-navy-900/[0.05]">
                 {list.length === 0 && (
-                  <p className="px-4 py-6 text-center text-xs text-slate-400">Rien à traiter ici.</p>
+                  <p className="px-4 py-6 text-center text-xs text-charcoal/45">Rien à traiter ici.</p>
                 )}
                 {list.map((p) => {
                   const n = unTreated(p);
@@ -111,17 +111,17 @@ export default function SuperviseurInbox() {
                     <Link
                       key={p.id}
                       href={`/superviseur/patient/${p.id}`}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/70"
+                      className="flex items-center justify-between px-4 py-3 hover:bg-teal-50/30"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-navy-900">{p.name}</p>
-                        <p className="truncate text-xs text-slate-400">
+                        <p className="truncate text-xs text-charcoal/45">
                           {k.surgeonName(p.surgeonId)} · {relativeDays(p.lastMessageAt)}
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-1.5">
                         {n > 0 && (
-                          <Badge className="bg-rose-50 text-rose-600 ring-rose-200">{n} non traité</Badge>
+                          <Badge className="bg-amber-50 text-amber-700 ring-amber-100">{n} non traité</Badge>
                         )}
                         <Badge className={statusStyles[p.status]}>{statusLabels[p.status]}</Badge>
                       </div>

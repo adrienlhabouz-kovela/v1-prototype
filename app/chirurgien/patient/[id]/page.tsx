@@ -15,7 +15,7 @@ export default function ChirurgienPatient() {
   if (!patient) {
     return (
       <Shell>
-        <p className="text-sm text-slate-500">Patient introuvable.</p>
+        <p className="text-sm text-charcoal/55">Patient introuvable.</p>
         <Link href="/chirurgien" className="text-sm text-teal-600">← Retour</Link>
       </Shell>
     );
@@ -34,10 +34,10 @@ export default function ChirurgienPatient() {
       </Link>
 
       <div className="mb-6 flex items-center gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-navy-900">{patient.name}</h1>
+        <h1 className="font-display text-3xl tracking-tight text-navy-900">{patient.name}</h1>
         <Badge className={statusStyles[patient.status]}>{statusLabels[patient.status]}</Badge>
       </div>
-      <p className="-mt-4 mb-6 text-sm text-slate-500">
+      <p className="-mt-4 mb-6 text-sm text-charcoal/55">
         {patient.intervention} · Intervention le {formatDate(patient.interventionDate)} · Protocole{" "}
         {patient.protocol} · Coordination : {k.supervisorName(patient.supervisorId)}
       </p>
@@ -51,11 +51,11 @@ export default function ChirurgienPatient() {
           />
           <div className="p-5">
             {visibleEscalation?.compilation ? (
-              <pre className="whitespace-pre-wrap rounded-xl bg-slate-50 p-4 font-sans text-sm leading-relaxed text-navy-900">
+              <pre className="whitespace-pre-wrap rounded-xl bg-navy-50/50 p-4 font-sans text-sm leading-relaxed text-navy-900">
                 {visibleEscalation.compilation}
               </pre>
             ) : (
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-charcoal/45">
                 Aucune compilation factuelle transmise pour ce patient.
               </p>
             )}
@@ -74,12 +74,12 @@ export default function ChirurgienPatient() {
                 <Badge className="mb-3 bg-teal-50 text-teal-700 ring-teal-200">
                   {visibleReport.status === "disponible" ? "Disponible" : "Validé"}
                 </Badge>
-                <pre className="whitespace-pre-wrap rounded-xl bg-slate-50 p-4 font-sans text-sm leading-relaxed text-navy-900">
+                <pre className="whitespace-pre-wrap rounded-xl bg-navy-50/50 p-4 font-sans text-sm leading-relaxed text-navy-900">
                   {visibleReport.content}
                 </pre>
               </>
             ) : (
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-charcoal/45">
                 Aucun CR rendu disponible. Les brouillons restent côté coordination jusqu'à validation.
               </p>
             )}
@@ -93,7 +93,7 @@ export default function ChirurgienPatient() {
         <div className="space-y-3 p-5">
           {patient.messages.slice(-5).map((m) => (
             <div key={m.id} className="flex items-start gap-3 text-sm">
-              <span className="mt-0.5 w-24 shrink-0 text-xs capitalize text-slate-400">
+              <span className="mt-0.5 w-24 shrink-0 text-xs capitalize text-charcoal/45">
                 {m.author} · {formatDateTime(m.at)}
               </span>
               <span className="text-navy-900">{m.text}</span>

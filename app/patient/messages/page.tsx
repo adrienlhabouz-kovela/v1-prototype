@@ -31,9 +31,9 @@ export default function PatientMessages() {
         <UrgencyBanner />
 
         <Card className="mt-4 flex flex-1 flex-col overflow-hidden">
-          <div className="border-b border-slate-100 px-4 py-3">
+          <div className="border-b border-navy-900/[0.06] px-4 py-3">
             <h1 className="text-sm font-semibold text-navy-900">Messagerie de coordination</h1>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-charcoal/45">
               {k.surgeonName(patient.surgeonId)} · suivi post-opératoire
             </p>
           </div>
@@ -49,7 +49,7 @@ export default function PatientMessages() {
                     m.author === "patient"
                       ? "bg-teal-600 text-white"
                       : m.author === "systeme"
-                      ? "bg-slate-100 text-slate-600"
+                      ? "bg-navy-50 text-charcoal/70"
                       : "bg-navy-50 text-navy-900"
                   }`}
                 >
@@ -66,7 +66,7 @@ export default function PatientMessages() {
             ))}
           </div>
 
-          <div className="border-t border-slate-100 p-3">
+          <div className="border-t border-navy-900/[0.06] p-3">
             <div className="mb-2 flex gap-2">
               <Button variant="subtle" className="flex-1 text-xs" onClick={() => attach("photo")}>
                 + Photo (placeholder)
@@ -86,7 +86,7 @@ export default function PatientMessages() {
                   }
                 }}
                 placeholder="Écrire un message…"
-                className="flex-1 rounded-full border border-slate-200 px-4 py-2 text-sm outline-none focus:border-teal-400"
+                className="flex-1 rounded-full border border-navy-100 px-4 py-2 text-sm outline-none focus:border-teal-400"
               />
               <Button
                 variant="primary"
@@ -99,7 +99,7 @@ export default function PatientMessages() {
                 Envoyer
               </Button>
             </div>
-            <p className="mt-2 text-center text-[10px] text-slate-400">
+            <p className="mt-2 text-center text-[10px] text-charcoal/45">
               Vos messages sont traités par une équipe humaine de coordination. Aucune réponse
               automatique par IA.
             </p>
