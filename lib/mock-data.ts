@@ -71,6 +71,26 @@ function daysAgoISO(days: number, hour = 10): string {
   return d.toISOString();
 }
 
+function daysFromNowISO(days: number, hour = 9): string {
+  const d = new Date("2026-05-27T09:00:00Z");
+  d.setDate(d.getDate() + days);
+  d.setHours(hour, 0, 0, 0);
+  return d.toISOString();
+}
+
+const times = ["08:00", "09:30", "11:00", "13:30", "15:00", "16:30"];
+
+// Coordonnées fictives (jamais de vraies données).
+function fakePhone(i: number): string {
+  const last2 = String(10 + (i % 89)).padStart(2, "0");
+  return `06 00 00 00 ${last2}`;
+}
+function fakeEmail(first: string, last: string): string {
+  const norm = (s: string) =>
+    s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z]/g, "");
+  return `${norm(first)}.${norm(last)}@exemple.test`;
+}
+
 // Distribution déterministe des statuts sur 30 patients.
 const statusPlan: PatientStatus[] = [
   // onboarding incomplet (4)
@@ -207,8 +227,22 @@ function buildMessages(status: PatientStatus, idx: number): Patient["messages"] 
   return msgs;
 }
 
+function onboardingStatusFor(status: PatientStatus, i: number): Patient["onboardingStatus"] {
+  if (status !== "onboarding_incomplet") return "complete";
+  if (i % 3 === 0) return "a_envoyer";
+  if (i % 3 === 1) return "envoye";
+  return "relance";
+}
+
+function planningStatusFor(status: PatientStatus, onboardingStatus: Patient["onboardingStatus"]): Patient["planningStatus"] {
+  if (status === "onboarding_incomplet") {
+    return onboardingStatus === "a_envoyer" ? "importe" : "onboarding_envoye";
+  }
+  return "actif";
+}
+
 export function buildPatients(): Patient[] {
-  return Array.from({ length: 30 }).map((_, i) => {
+  const base: Patient[] = Array.from({ length: 30 }).map((_, i) => {
     const status = statusPlan[i];
     const surgeon = surgeons[i % surgeons.length];
     // ~4 patients sans superviseur (parmi onboarding/actifs)
@@ -218,6 +252,7 @@ export function buildPatients(): Patient[] {
     const messages = buildMessages(status, i);
     const lastMessageAt = messages.length ? messages[messages.length - 1].at : null;
     const activatedThisMonth = onboardingComplete && i % 3 === 0;
+    const onboardingStatus = onboardingStatusFor(status, i);
     return {
       id: `p${i + 1}`,
       name: `${firstNames[i]} ${lastNames[i]}`,
@@ -225,8 +260,16 @@ export function buildPatients(): Patient[] {
       supervisorId,
       intervention: interventions[i % interventions.length],
       interventionDate: daysAgoISO(10 + (i % 18), 8),
-      protocol: i % 2 === 0 ? "J+12 / J+15" : "J+7 / J+15 / J+30",
+      interventionTime: times[i % times.length],
+      clinic: surgeon.clinic,
+      phone: fakePhone(i),
+      email: fakeEmail(firstNames[i], lastNames[i]),
+      cabinetNote: i % 5 === 0 ? "Patient à recontacter en priorité par le cabinet." : "",
+      protocol: i % 2 === 0 ? "J+12 / J+15" : "J+8 / J+15",
       status,
+      onboardingStatus,
+      planningStatus: planningStatusFor(status, onboardingStatus),
+      planningUpdatedAt: daysAgoISO(2 + (i % 6), 12),
       onboardingComplete,
       activatedThisMonth,
       consentGiven: onboardingComplete,
@@ -245,6 +288,41 @@ export function buildPatients(): Patient[] {
       lastMessageAt,
     };
   });
+
+  // Interventions À VENIR pour le chirurgien de démo (s1) — point d'entrée planning.
+  const upcoming: Patient[] = [
+    { name: "Hélène Vasseur", days: 3, intv: "Rhinoplastie", time: "09:30", ob: "a_envoyer" as const, pl: "importe" as const },
+    { name: "Karim Benali", days: 7, intv: "Lipoaspiration", time: "11:00", ob: "envoye" as const, pl: "onboarding_envoye" as const },
+    { name: "Sofia Pereira", days: 12, intv: "Augmentation mammaire", time: "14:00", ob: "a_envoyer" as const, pl: "importe" as const },
+  ].map((u, j) => {
+    const [first, last] = u.name.split(" ");
+    return {
+      id: `pu${j + 1}`,
+      name: u.name,
+      surgeonId: "s1",
+      supervisorId: null,
+      intervention: u.intv,
+      interventionDate: daysFromNowISO(u.days, 8),
+      interventionTime: u.time,
+      clinic: "Clinique du Parc",
+      phone: fakePhone(40 + j),
+      email: fakeEmail(first, last),
+      cabinetNote: j === 0 ? "Première intervention — prévoir onboarding rapidement." : "",
+      protocol: "J+8 / J+15",
+      status: "onboarding_incomplet" as PatientStatus,
+      onboardingStatus: u.ob,
+      planningStatus: u.pl,
+      planningUpdatedAt: daysAgoISO(1, 10),
+      onboardingComplete: false,
+      activatedThisMonth: false,
+      consentGiven: false,
+      messages: [],
+      notes: [],
+      lastMessageAt: null,
+    };
+  });
+
+  return [...upcoming, ...base];
 }
 
 export function buildEscalations(patients: Patient[]): Escalation[] {

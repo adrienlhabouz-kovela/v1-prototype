@@ -17,9 +17,15 @@ const logKindLabel: Record<LogKind, string> = {
   ia_suggestion: "Suggestion IA",
   escalade_transmise: "Escalade transmise",
   onboarding_complete: "Onboarding complété",
+  onboarding_envoye: "Lien onboarding envoyé",
   patient_relance: "Patient relancé",
   suivi_cloture: "Suivi clôturé",
   note_interne: "Note interne",
+  planning_ajout: "Planning — ajout",
+  planning_modifie: "Planning — modification",
+  planning_reporte: "Planning — report",
+  planning_annule: "Planning — annulation",
+  planning_import: "Planning — import",
 };
 
 const logKindStyle: Partial<Record<LogKind, string>> = {
@@ -57,7 +63,19 @@ const opsFilterKinds: Record<Exclude<OpsFilter, "all">, LogKind[]> = {
   ia: ["ia_utilisee", "ia_suggestion"],
   cr: ["cr_prepare", "cr_valide", "cr_disponible"],
   escalade: ["escalade_transmise"],
-  patient: ["message_envoye", "patient_relance", "suivi_cloture", "onboarding_complete", "note_interne"],
+  patient: [
+    "message_envoye",
+    "patient_relance",
+    "suivi_cloture",
+    "onboarding_complete",
+    "onboarding_envoye",
+    "note_interne",
+    "planning_ajout",
+    "planning_modifie",
+    "planning_reporte",
+    "planning_annule",
+    "planning_import",
+  ],
   attribution: ["patient_attribue"],
 };
 

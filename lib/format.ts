@@ -1,4 +1,4 @@
-import type { PatientStatus } from "./types";
+import type { OnboardingStatus, PatientStatus, PlanningStatus } from "./types";
 
 export function formatDate(iso: string | null): string {
   if (!iso) return "—";
@@ -46,4 +46,34 @@ export const statusStyles: Record<PatientStatus, string> = {
   escalade_ouverte: "bg-navy-900 text-teal-100 ring-navy-900",
   cr_en_attente: "bg-teal-50/60 text-navy-700 ring-teal-100",
   cloture: "bg-navy-50/60 text-charcoal/45 ring-navy-100",
+};
+
+export const onboardingLabels: Record<OnboardingStatus, string> = {
+  a_envoyer: "À envoyer",
+  envoye: "Lien envoyé",
+  complete: "Complété",
+  relance: "Relance nécessaire",
+};
+
+export const onboardingStyles: Record<OnboardingStatus, string> = {
+  a_envoyer: "bg-navy-50 text-charcoal/60 ring-navy-100",
+  envoye: "bg-teal-50/60 text-navy-700 ring-teal-100",
+  complete: "bg-teal-50 text-teal-700 ring-teal-100",
+  relance: "bg-amber-50/70 text-amber-700 ring-amber-100",
+};
+
+export const planningLabels: Record<PlanningStatus, string> = {
+  importe: "Importé",
+  onboarding_envoye: "Onboarding envoyé",
+  actif: "Actif",
+  reporte: "Reporté",
+  annule: "Annulé",
+};
+
+export const planningStyles: Record<PlanningStatus, string> = {
+  importe: "bg-navy-50 text-charcoal/60 ring-navy-100",
+  onboarding_envoye: "bg-teal-50/60 text-navy-700 ring-teal-100",
+  actif: "bg-teal-50 text-teal-700 ring-teal-100",
+  reporte: "bg-amber-50/70 text-amber-700 ring-amber-100",
+  annule: "bg-navy-50/60 text-charcoal/45 ring-navy-100",
 };

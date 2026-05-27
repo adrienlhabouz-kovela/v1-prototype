@@ -18,6 +18,7 @@ const nav: Record<Role, { href: string; label: string }[]> = {
   ],
   chirurgien: [
     { href: "/chirurgien", label: "Mes patients" },
+    { href: "/chirurgien/planning", label: "Planning opératoire" },
     { href: "/logs", label: "Logs" },
   ],
   patient: [
@@ -67,7 +68,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
         <nav className="mt-10 flex flex-col gap-1">
           {items.map((it) => {
-            const active = pathname === it.href || pathname.startsWith(it.href + "/");
+            const matches = items
+              .filter((x) => pathname === x.href || pathname.startsWith(x.href + "/"))
+              .sort((a, b) => b.href.length - a.href.length);
+            const active = matches[0]?.href === it.href;
             return (
               <Link
                 key={it.href}

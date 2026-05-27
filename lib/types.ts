@@ -77,6 +77,17 @@ export interface ClinicalReport {
   updatedAt: string;
 }
 
+// Statut d'onboarding (planning opératoire).
+export type OnboardingStatus = "a_envoyer" | "envoye" | "complete" | "relance";
+
+// Statut KOVELA dans le planning opératoire (point d'entrée).
+export type PlanningStatus =
+  | "importe"
+  | "onboarding_envoye"
+  | "actif"
+  | "reporte"
+  | "annule";
+
 export interface Patient {
   id: string;
   name: string;
@@ -84,8 +95,16 @@ export interface Patient {
   supervisorId: string | null;
   intervention: string;
   interventionDate: string; // ISO
+  interventionTime: string; // ex: "09:30"
+  clinic: string; // lieu / clinique
+  phone: string; // fictif
+  email: string; // fictif
+  cabinetNote: string;
   protocol: string; // ex: "J+12 / J+15"
   status: PatientStatus;
+  onboardingStatus: OnboardingStatus;
+  planningStatus: PlanningStatus;
+  planningUpdatedAt: string;
   onboardingComplete: boolean;
   activatedThisMonth: boolean;
   consentGiven: boolean;
@@ -122,9 +141,15 @@ export type LogKind =
   | "ia_suggestion"
   | "escalade_transmise"
   | "onboarding_complete"
+  | "onboarding_envoye"
   | "patient_relance"
   | "suivi_cloture"
-  | "note_interne";
+  | "note_interne"
+  | "planning_ajout"
+  | "planning_modifie"
+  | "planning_reporte"
+  | "planning_annule"
+  | "planning_import";
 
 export interface LogEntry {
   id: string;

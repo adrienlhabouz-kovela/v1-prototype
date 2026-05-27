@@ -28,6 +28,18 @@ import type {
   Role,
 } from "./types";
 
+export interface PlanningInput {
+  name: string;
+  intervention: string;
+  interventionDate: string; // ISO ou yyyy-mm-dd
+  interventionTime: string;
+  clinic: string;
+  phone: string;
+  email: string;
+  protocol: string;
+  cabinetNote: string;
+}
+
 interface KovelaState {
   role: Role;
   setRole: (r: Role) => void;
@@ -53,6 +65,14 @@ interface KovelaState {
   clotureSuivi: (patientId: string) => void;
   addNote: (patientId: string, text: string) => void;
   completeOnboarding: (patientId: string) => void;
+
+  // planning opératoire
+  addPlanningPatient: (input: PlanningInput) => void;
+  importPlanning: (rows: PlanningInput[]) => void;
+  updatePlanningPatient: (patientId: string, input: Partial<PlanningInput>) => void;
+  postponeIntervention: (patientId: string, date: string, time: string) => void;
+  cancelIntervention: (patientId: string) => void;
+  resendOnboardingLink: (patientId: string) => void;
 
   upsertReport: (patientId: string, content: string, status?: ClinicalReport["status"]) => void;
   validateReport: (patientId: string) => void;
@@ -197,9 +217,125 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
         onboardingComplete: true,
         consentGiven: true,
         activatedThisMonth: true,
+        onboardingStatus: "complete",
+        planningStatus: p.planningStatus === "annule" ? p.planningStatus : "actif",
         status: p.status === "onboarding_incomplet" ? "actif" : p.status,
       }));
       pushLog("onboarding_complete", "Onboarding complété et suivi lancé (patient activé).", patientId);
+    },
+
+    addPlanningPatient(input) {
+      const id = uid("p");
+      const patient: Patient = {
+        id,
+        name: input.name || "Nouveau patient",
+        surgeonId: "s1",
+        supervisorId: null,
+        intervention: input.intervention || "Intervention à préciser",
+        interventionDate: input.interventionDate
+          ? new Date(input.interventionDate).toISOString()
+          : new Date().toISOString(),
+        interventionTime: input.interventionTime || "09:00",
+        clinic: input.clinic || "Clinique du Parc",
+        phone: input.phone || "",
+        email: input.email || "",
+        cabinetNote: input.cabinetNote || "",
+        protocol: input.protocol || "J+8 / J+15",
+        status: "onboarding_incomplet",
+        onboardingStatus: "a_envoyer",
+        planningStatus: "importe",
+        planningUpdatedAt: new Date().toISOString(),
+        onboardingComplete: false,
+        activatedThisMonth: false,
+        consentGiven: false,
+        messages: [],
+        notes: [],
+        lastMessageAt: null,
+      };
+      setPatients((prev) => [patient, ...prev]);
+      pushLog("planning_ajout", `Patient « ${patient.name} » ajouté au planning opératoire (importé).`, id);
+    },
+
+    importPlanning(rows) {
+      const created: Patient[] = rows.map((input) => ({
+        id: uid("p"),
+        name: input.name || "Nouveau patient",
+        surgeonId: "s1",
+        supervisorId: null,
+        intervention: input.intervention || "Intervention à préciser",
+        interventionDate: input.interventionDate
+          ? new Date(input.interventionDate).toISOString()
+          : new Date().toISOString(),
+        interventionTime: input.interventionTime || "09:00",
+        clinic: input.clinic || "Clinique du Parc",
+        phone: input.phone || "",
+        email: input.email || "",
+        cabinetNote: input.cabinetNote || "",
+        protocol: input.protocol || "J+8 / J+15",
+        status: "onboarding_incomplet" as const,
+        onboardingStatus: "a_envoyer" as const,
+        planningStatus: "importe" as const,
+        planningUpdatedAt: new Date().toISOString(),
+        onboardingComplete: false,
+        activatedThisMonth: false,
+        consentGiven: false,
+        messages: [],
+        notes: [],
+        lastMessageAt: null,
+      }));
+      setPatients((prev) => [...created, ...prev]);
+      pushLog("planning_import", `${created.length} patient(s) importé(s) dans le planning opératoire.`);
+    },
+
+    updatePlanningPatient(patientId, input) {
+      updatePatient(patientId, (p) => ({
+        ...p,
+        ...(input.name !== undefined ? { name: input.name } : {}),
+        ...(input.intervention !== undefined ? { intervention: input.intervention } : {}),
+        ...(input.interventionDate
+          ? { interventionDate: new Date(input.interventionDate).toISOString() }
+          : {}),
+        ...(input.interventionTime !== undefined ? { interventionTime: input.interventionTime } : {}),
+        ...(input.clinic !== undefined ? { clinic: input.clinic } : {}),
+        ...(input.phone !== undefined ? { phone: input.phone } : {}),
+        ...(input.email !== undefined ? { email: input.email } : {}),
+        ...(input.protocol !== undefined ? { protocol: input.protocol } : {}),
+        ...(input.cabinetNote !== undefined ? { cabinetNote: input.cabinetNote } : {}),
+        planningUpdatedAt: new Date().toISOString(),
+      }));
+      pushLog("planning_modifie", "Ligne de planning opératoire modifiée.", patientId);
+    },
+
+    postponeIntervention(patientId, date, time) {
+      updatePatient(patientId, (p) => ({
+        ...p,
+        interventionDate: new Date(date).toISOString(),
+        interventionTime: time || p.interventionTime,
+        planningStatus: "reporte",
+        onboardingStatus: p.onboardingComplete ? p.onboardingStatus : "a_envoyer",
+        planningUpdatedAt: new Date().toISOString(),
+      }));
+      pushLog("planning_reporte", "Intervention reportée — onboarding à reprogrammer.", patientId);
+    },
+
+    cancelIntervention(patientId) {
+      updatePatient(patientId, (p) => ({
+        ...p,
+        planningStatus: "annule",
+        planningUpdatedAt: new Date().toISOString(),
+      }));
+      pushLog("planning_annule", "Intervention annulée — suivi non activé.", patientId);
+    },
+
+    resendOnboardingLink(patientId) {
+      updatePatient(patientId, (p) => ({
+        ...p,
+        onboardingStatus: p.onboardingComplete ? "complete" : "envoye",
+        planningStatus:
+          p.planningStatus === "importe" ? "onboarding_envoye" : p.planningStatus,
+        planningUpdatedAt: new Date().toISOString(),
+      }));
+      pushLog("onboarding_envoye", "Lien d'activation onboarding renvoyé au patient.", patientId);
     },
 
     upsertReport(patientId, content, status = "brouillon") {

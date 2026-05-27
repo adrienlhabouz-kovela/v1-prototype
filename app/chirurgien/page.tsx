@@ -17,6 +17,8 @@ export default function ChirurgienDashboard() {
     [k.patients]
   );
 
+  const NOW = new Date("2026-05-27T12:00:00Z").getTime();
+
   const stats = useMemo(() => {
     const actifs = myPatients.filter((p) => p.status !== "cloture").length;
     const crDispo = myPatients.filter((p) => {
@@ -28,8 +30,14 @@ export default function ChirurgienDashboard() {
       return e && e.status === "transmise";
     }).length;
     const activesMois = myPatients.filter((p) => p.activatedThisMonth).length;
-    return { actifs, crDispo, escalades, activesMois };
-  }, [myPatients, k]);
+    const aVenir = myPatients.filter(
+      (p) => p.planningStatus !== "annule" && new Date(p.interventionDate).getTime() >= NOW
+    ).length;
+    const onboardingsACompleter = myPatients.filter(
+      (p) => p.planningStatus !== "annule" && !p.onboardingComplete
+    ).length;
+    return { actifs, crDispo, escalades, activesMois, aVenir, onboardingsACompleter };
+  }, [myPatients, k, NOW]);
 
   const montant = k.pricing.baseMonthly + stats.activesMois * k.pricing.perActivatedPatient;
 
@@ -39,13 +47,18 @@ export default function ChirurgienDashboard() {
         eyebrow={k.surgeonName(MY_SURGEON_ID)}
         title="Mes patients"
         subtitle="Vous ne recevez pas du bruit : un historique clair et exploitable. Vous gardez la main."
-      />
+      >
+        <Link href="/chirurgien/planning">
+          <Button variant="primary">Déposer / modifier mon planning opératoire</Button>
+        </Link>
+      </PageHeader>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard label="Patients suivis" value={myPatients.length} />
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-5">
+        <StatCard label="Interventions à venir" value={stats.aVenir} />
+        <StatCard label="Onboardings à compléter" value={stats.onboardingsACompleter} />
         <StatCard label="Patients actifs" value={stats.actifs} />
         <StatCard label="CR disponibles" value={stats.crDispo} accent />
-        <StatCard label="Escalades reçues" value={stats.escalades} />
+        <StatCard label="Escalades transmises" value={stats.escalades} />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
