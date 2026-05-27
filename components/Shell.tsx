@@ -54,6 +54,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   const items = nav[role];
 
+  const activeHref = items
+    .filter((x) => pathname === x.href || pathname.startsWith(x.href + "/"))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+
   function switchRole(r: Role) {
     setRole(r);
     router.push(roleHome[r]);
@@ -69,10 +73,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
         <nav className="mt-10 flex flex-col gap-1">
           {items.map((it) => {
-            const matches = items
-              .filter((x) => pathname === x.href || pathname.startsWith(x.href + "/"))
-              .sort((a, b) => b.href.length - a.href.length);
-            const active = matches[0]?.href === it.href;
+            const active = activeHref === it.href;
             return (
               <Link
                 key={it.href}
@@ -132,6 +133,24 @@ export function Shell({ children }: { children: React.ReactNode }) {
             Rôle
           </Link>
         </header>
+
+        {/* Navigation mobile — onglets du rôle */}
+        <nav className="flex gap-1.5 overflow-x-auto border-b border-navy-900/[0.06] bg-white px-4 py-2 md:hidden">
+          {items.map((it) => {
+            const active = activeHref === it.href;
+            return (
+              <Link
+                key={it.href}
+                href={it.href}
+                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                  active ? "bg-navy-900 text-white" : "bg-navy-50 text-charcoal/70"
+                }`}
+              >
+                {it.label}
+              </Link>
+            );
+          })}
+        </nav>
 
         {/* Bandeau prototype — état non persistant */}
         <div className="flex items-center gap-2 border-b border-navy-900/[0.06] bg-navy-50/60 px-4 py-1.5 text-[11px] text-charcoal/55 md:px-8">

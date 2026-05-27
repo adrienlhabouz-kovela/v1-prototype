@@ -152,7 +152,14 @@ export default function ChirurgienDashboard() {
                   )
                 }
               />
-              <div className="mt-2 rounded-lg bg-navy-50 px-3 py-2 text-xs text-charcoal/70">
+              <Link href="/chirurgien/onboarding" className="block">
+                <Button variant="primary" className="mt-1 w-full">
+                  {config?.configured
+                    ? "Voir / modifier la configuration cabinet"
+                    : "Configurer mon cabinet"}
+                </Button>
+              </Link>
+              <div className="mt-1 rounded-lg bg-navy-50 px-3 py-2 text-xs text-charcoal/70">
                 Prochaine étape :{" "}
                 <Link href="/chirurgien/planning" className="font-medium text-teal-600 hover:text-teal-700">
                   importer mon planning opératoire →
