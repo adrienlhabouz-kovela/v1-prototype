@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { BrandMark, Wordmark } from "@/components/Brand";
 
+const DEMO = "mailto:contact@kovela.care?subject=Demande%20de%20démo%20KOVELA";
+
 // Graphisme « infrastructure » : flux Patient → Coordination → Chirurgien.
 function HeroGraphic() {
   return (
@@ -18,160 +20,377 @@ function HeroGraphic() {
           </feMerge>
         </filter>
       </defs>
-
-      {/* Connexions */}
       <g stroke="#1FA7A0" strokeOpacity="0.5" strokeWidth="1.4" strokeDasharray="2 7" strokeLinecap="round">
         <path d="M110 96 C 200 130, 230 180, 256 224" />
         <path d="M150 392 C 220 340, 240 300, 262 256" />
         <path d="M300 240 C 350 250, 380 210, 392 150" />
       </g>
-
-      {/* Anneaux du noyau */}
       <circle cx="270" cy="240" r="74" stroke="#1FA7A0" strokeOpacity="0.18" />
       <circle cx="270" cy="240" r="54" stroke="#1FA7A0" strokeOpacity="0.28" />
-
-      {/* Noyau KOVELA */}
       <circle cx="270" cy="240" r="34" fill="url(#core)" filter="url(#glow)" />
-      <text x="270" y="245" textAnchor="middle" fontSize="13" fontWeight="700" fill="#06121B">
-        K
-      </text>
-
-      {/* Nœud Patient */}
+      <text x="270" y="245" textAnchor="middle" fontSize="13" fontWeight="700" fill="#06121B">K</text>
       <circle cx="100" cy="86" r="22" fill="#0E2835" stroke="#1FA7A0" strokeOpacity="0.7" />
       <circle cx="100" cy="86" r="4" fill="#BFE3DE" />
-      <text x="100" y="46" textAnchor="middle" fontSize="11" fill="#9CB1BC" letterSpacing="1">
-        PATIENT
-      </text>
-
-      {/* Nœud Chirurgien */}
+      <text x="100" y="46" textAnchor="middle" fontSize="11" fill="#9CB1BC" letterSpacing="1">PATIENT</text>
       <circle cx="138" cy="404" r="22" fill="#0E2835" stroke="#1FA7A0" strokeOpacity="0.7" />
       <circle cx="138" cy="404" r="4" fill="#BFE3DE" />
-      <text x="138" y="444" textAnchor="middle" fontSize="11" fill="#9CB1BC" letterSpacing="1">
-        CHIRURGIEN
-      </text>
-
-      {/* Accents */}
+      <text x="138" y="444" textAnchor="middle" fontSize="11" fill="#9CB1BC" letterSpacing="1">CHIRURGIEN</text>
       <circle cx="392" cy="150" r="5" fill="#1FA7A0" />
       <circle cx="356" cy="320" r="3" fill="#BFE3DE" fillOpacity="0.6" />
     </svg>
   );
 }
 
-const pillars = [
-  {
-    title: "Présence 7/7",
-    desc: "Suivi structuré tout au long de la période critique post-opératoire.",
-  },
-  {
-    title: "Coordination experte",
-    desc: "Des professionnels formés et encadrés assurent la continuité.",
-  },
-  {
-    title: "Vigilance humaine",
-    desc: "Classement opérationnel et escalade maîtrisée vers le chirurgien.",
-  },
-  {
-    title: "Rapports clairs",
-    desc: "Traçabilité complète et synthèses opérationnelles actionnables.",
-  },
+const pains = [
+  { t: "Messages dispersés", d: "WhatsApp, appels, SMS, emails, secrétariat : les échanges patients arrivent partout, sans fil conducteur." },
+  { t: "Charge cabinet", d: "Beaucoup de messages répétitifs, peu de visibilité structurée. L'assistante absorbe le bruit." },
+  { t: "Patients en attente de réponse", d: "Ils veulent être entendus, rassurés dans le parcours et guidés vers le bon canal." },
+  { t: "Historique difficile à reconstituer", d: "Le chirurgien garde la responsabilité, mais manque souvent d'un historique clair et exploitable." },
 ];
+
+const pillars = [
+  { t: "Onboarding patient structuré", d: "Le patient reçoit un lien, comprend les limites du service et active son suivi." },
+  { t: "Messagerie sécurisée", d: "Texte, photo, audio, historique lisible et rappel urgence permanent." },
+  { t: "Supervision humaine, augmentée par l'IA", d: "Les superviseurs traitent, documentent, relancent et préparent les comptes-rendus." },
+  { t: "Compte-rendu factuel", d: "Le chirurgien ne reçoit pas du bruit : il reçoit un historique clair et exploitable." },
+];
+
+const steps = [
+  { t: "Le cabinet configure KOVELA", d: "Spécialité, préférences de suivi, assistante, mandat de prélèvement (simulation)." },
+  { t: "Le planning opératoire est déposé", d: "Ajout manuel ou import simple du planning des patients." },
+  { t: "Le patient active son suivi", d: "Lien sécurisé, limites du service, messagerie." },
+  { t: "KOVELA supervise et documente", d: "Messages, relances, IA assistive, traçabilité complète." },
+  { t: "Le chirurgien consulte les CR", d: "Compte-rendu factuel, escalades transmises avec contexte, visibilité claire." },
+];
+
+const surgeonBenefits = [
+  "Cabinet moins sollicité",
+  "Patients mieux orientés dans le parcours",
+  "Messages centralisés",
+  "Comptes-rendus factuels disponibles",
+  "Escalades transmises avec contexte",
+  "Visibilité sans charge supplémentaire",
+];
+
+const patientBenefits = [
+  "Un espace unique de suivi",
+  "Message, photo, audio",
+  "Historique lisible",
+  "Confirmation après envoi",
+  "Rappel urgence permanent",
+  "Un suivi organisé avec le chirurgien",
+];
+
+const supervisionPoints = [
+  "Superviseurs assignés",
+  "Charge suivie",
+  "Messages non traités visibles",
+  "CR à contrôler",
+  "Usage de l'IA assistive tracé",
+  "Qualité suivie par le Head of Care",
+  "Formation des superviseurs",
+  "Logs complets",
+];
+
+const securityPoints = [
+  "Séparation site public / application métier",
+  "Données patient uniquement dans l'environnement applicatif prévu",
+  "Accès par rôle et journalisation des actions",
+  "Liens sécurisés prévus pour la production",
+  "IA assistive désactivable, jamais autonome",
+  "Aucune donnée patient sur ce site public",
+];
+
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-teal-600">{children}</p>;
+}
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-navy-depth text-white">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <Wordmark light />
-        <nav className="hidden items-center gap-8 text-sm text-navy-100/70 md:flex">
-          <span>Solutions</span>
-          <span>Pour les chirurgiens</span>
-          <span>Expertise</span>
-          <span>À propos</span>
-        </nav>
-        <Link
-          href="/login"
-          className="rounded-xl bg-teal-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-teal-600"
-        >
-          Entrer dans la démo
-        </Link>
+    <div className="bg-[#eef1f3] text-navy-900">
+      {/* Header */}
+      <header className="sticky top-0 z-30 border-b border-navy-900/[0.06] bg-white/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
+          <Wordmark />
+          <nav className="hidden items-center gap-8 text-sm text-charcoal/70 md:flex">
+            <a href="#probleme" className="hover:text-navy-900">Le problème</a>
+            <a href="#solution" className="hover:text-navy-900">La solution</a>
+            <a href="#etapes" className="hover:text-navy-900">Comment ça marche</a>
+            <a href="#ia" className="hover:text-navy-900">IA assistive</a>
+          </nav>
+          <div className="flex items-center gap-2">
+            <Link href="/login" className="hidden rounded-xl px-3 py-2 text-sm font-medium text-navy-900 hover:bg-navy-50 sm:block">
+              Voir le prototype
+            </Link>
+            <a href={DEMO} className="rounded-xl bg-teal-500 px-4 py-2 text-sm font-medium text-white hover:bg-teal-600">
+              Demander une démo
+            </a>
+          </div>
+        </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
+      {/* Section 1 — Hero */}
+      <section className="relative overflow-hidden bg-navy-depth text-white">
         <div className="pointer-events-none absolute inset-0 hero-lines opacity-90" />
         <div className="pointer-events-none absolute right-0 top-0 hidden h-[560px] w-[460px] opacity-90 lg:block">
           <HeroGraphic />
         </div>
-        <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-14 md:pt-20">
+        <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-16 md:pt-24">
           <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-teal-200 ring-1 ring-white/10">
             <span className="h-1.5 w-1.5 rounded-full bg-teal-400" />
-            Prototype de démonstration — données fictives
+            Coordination post-opératoire pour chirurgiens libéraux
           </span>
 
-          <h1 className="mt-7 max-w-3xl font-display text-5xl font-normal leading-[1.05] tracking-tight md:text-6xl">
-            L'infrastructure
-            <br />
-            du post-op moderne.
+          <h1 className="mt-7 max-w-3xl font-display text-4xl font-normal leading-[1.08] tracking-tight md:text-6xl">
+            La continuité post-opératoire, enfin structurée.
           </h1>
-          <p className="mt-5 max-w-xl font-display text-2xl italic text-teal-200/90">
-            La continuité clinique, enfin structurée.
-          </p>
 
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-navy-100/75">
-            Une présence humaine experte, augmentée par la technologie, pour la coordination et la
-            continuité post-opératoire des chirurgiens libéraux. Supervision humaine, IA assistive,
-            traçabilité complète.
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-navy-100/80">
+            KOVELA aide les chirurgiens libéraux à organiser le suivi post-opératoire de leurs
+            patients : messagerie sécurisée, supervision humaine, IA assistive, comptes-rendus
+            factuels et traçabilité.
           </p>
 
           <div className="mt-9 flex flex-wrap gap-3">
-            <Link
-              href="/login"
-              className="rounded-xl bg-teal-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-teal-600"
-            >
+            <a href={DEMO} className="rounded-xl bg-teal-500 px-6 py-3 text-sm font-medium text-white hover:bg-teal-600">
               Demander une démo
-            </Link>
-            <Link
-              href="/admin"
-              className="rounded-xl bg-white/8 px-6 py-3 text-sm font-medium text-white ring-1 ring-white/15 transition-colors hover:bg-white/15"
-            >
-              En savoir plus
+            </a>
+            <Link href="/login" className="rounded-xl bg-white/8 px-6 py-3 text-sm font-medium text-white ring-1 ring-white/15 hover:bg-white/15">
+              Voir le prototype
             </Link>
           </div>
 
-          {/* Piliers */}
-          <div className="mt-16 grid gap-px overflow-hidden rounded-2xl bg-white/[0.06] ring-1 ring-white/10 sm:grid-cols-2 lg:grid-cols-4">
-            {pillars.map((p) => (
-              <div key={p.title} className="bg-navy-900/40 p-5 backdrop-blur-sm">
-                <div className="mb-3 h-px w-8 bg-teal-400/70" />
-                <h3 className="text-sm font-semibold text-white">{p.title}</h3>
-                <p className="mt-1.5 text-xs leading-relaxed text-navy-100/65">{p.desc}</p>
+          <p className="mt-6 text-sm text-navy-100/55">Conçu avec des chirurgiens, pour des chirurgiens.</p>
+        </div>
+      </section>
+
+      {/* Section 2 — Le problème */}
+      <section id="probleme" className="mx-auto max-w-6xl px-6 py-20">
+        <Eyebrow>Le constat</Eyebrow>
+        <h2 className="max-w-2xl font-display text-3xl tracking-tight text-navy-900 md:text-4xl">
+          Le post-opératoire vit encore trop souvent dans le désordre.
+        </h2>
+        <p className="mt-4 max-w-2xl text-charcoal/65">
+          Entre échanges dispersés et historique difficile à reconstituer, le désordre opérationnel
+          pèse sur le cabinet — et sur l'expérience patient.
+        </p>
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {pains.map((p) => (
+            <div key={p.t} className="rounded-2xl bg-white p-5 shadow-card ring-1 ring-navy-900/[0.05]">
+              <div className="mb-3 h-px w-8 bg-teal-400" />
+              <h3 className="text-sm font-semibold text-navy-900">{p.t}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-charcoal/60">{p.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section 3 — La solution */}
+      <section id="solution" className="border-y border-navy-900/[0.06] bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <Eyebrow>La solution KOVELA</Eyebrow>
+          <h2 className="max-w-3xl font-display text-3xl tracking-tight text-navy-900 md:text-4xl">
+            KOVELA transforme le suivi post-op en flux clair, supervisé et traçable.
+          </h2>
+          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {pillars.map((p, i) => (
+              <div key={p.t} className="rounded-2xl bg-[#eef1f3] p-5 ring-1 ring-navy-900/[0.05]">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy-900 font-display text-sm text-white">
+                  {i + 1}
+                </span>
+                <h3 className="mt-3 text-sm font-semibold text-navy-900">{p.t}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-charcoal/60">{p.d}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-10 font-display text-2xl italic tracking-tight text-navy-900">
+            Le patient se sent accompagné. Le cabinet respire. Le chirurgien garde la main.
+          </p>
+        </div>
+      </section>
+
+      {/* Section 4 — Comment ça marche */}
+      <section id="etapes" className="mx-auto max-w-6xl px-6 py-20">
+        <Eyebrow>Comment ça marche</Eyebrow>
+        <h2 className="font-display text-3xl tracking-tight text-navy-900 md:text-4xl">
+          Du planning opératoire au compte-rendu, en cinq étapes.
+        </h2>
+        <ol className="mt-10 grid gap-4 md:grid-cols-5">
+          {steps.map((s, i) => (
+            <li key={s.t} className="relative rounded-2xl bg-white p-5 shadow-card ring-1 ring-navy-900/[0.05]">
+              <span className="font-display text-3xl text-teal-500/80">{i + 1}</span>
+              <h3 className="mt-2 text-sm font-semibold text-navy-900">{s.t}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-charcoal/60">{s.d}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* Section 5 — IA assistive */}
+      <section id="ia" className="bg-navy-depth text-white">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <Eyebrow>
+            <span className="text-teal-300">IA assistive, jamais autonome</span>
+          </Eyebrow>
+          <h2 className="max-w-2xl font-display text-3xl tracking-tight text-white md:text-4xl">
+            Une IA utile, encadrée, au service de l'équipe.
+          </h2>
+
+          <div className="mt-10 grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl bg-white/[0.05] p-6 ring-1 ring-white/10">
+              <h3 className="text-sm font-semibold text-teal-200">L'IA KOVELA aide à</h3>
+              <ul className="mt-3 space-y-2 text-sm text-navy-100/80">
+                {["résumer les échanges", "préparer les comptes-rendus", "reformuler des réponses non médicales", "compiler factuellement une transmission", "signaler les tâches opérationnelles"].map((x) => (
+                  <li key={x} className="flex gap-2"><span className="text-teal-400">+</span>{x}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-2xl bg-white/[0.05] p-6 ring-1 ring-white/10">
+              <h3 className="text-sm font-semibold text-navy-100">L'IA KOVELA ne fait jamais</h3>
+              <ul className="mt-3 space-y-2 text-sm text-navy-100/70">
+                {["de réponse autonome au patient", "d'avis médical", "d'interprétation des photos", "de décision d'escalade", "d'évaluation chiffrée du patient"].map((x) => (
+                  <li key={x} className="flex gap-2"><span className="text-navy-100/40">—</span>{x}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <p className="mt-8 font-display text-2xl italic text-teal-200">
+            L'IA prépare. L'humain valide. Le chirurgien décide.
+          </p>
+          <p className="mt-4 max-w-2xl text-xs leading-relaxed text-navy-100/45">
+            KOVELA ne décide pas médicalement. KOVELA structure, trace, priorise opérationnellement
+            et escalade.
+          </p>
+        </div>
+      </section>
+
+      {/* Section 6 — Pour le chirurgien */}
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <div>
+            <Eyebrow>Pour le chirurgien</Eyebrow>
+            <h2 className="font-display text-3xl tracking-tight text-navy-900 md:text-4xl">
+              Moins de bruit. Plus de visibilité. Aucun transfert de responsabilité.
+            </h2>
+            <p className="mt-4 text-charcoal/65">
+              Un service pensé pour les chirurgiens libéraux : le cabinet respire, le chirurgien
+              garde la main.
+            </p>
+            <Link href="/chirurgien" className="mt-6 inline-block rounded-xl bg-navy-900 px-5 py-3 text-sm font-medium text-white hover:bg-navy-800">
+              Voir l'espace chirurgien
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {surgeonBenefits.map((b) => (
+              <div key={b} className="flex items-start gap-2 rounded-xl bg-white p-4 text-sm text-navy-900 shadow-soft ring-1 ring-navy-900/[0.05]">
+                <span className="mt-0.5 text-teal-500">✓</span>
+                {b}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Doctrine */}
-      <section className="border-t border-white/10 bg-navy-950/40">
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <div className="flex flex-col gap-6 md:flex-row md:items-start">
-            <BrandMark size={44} className="text-white" />
-            <div className="max-w-3xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">
-                Doctrine
-              </p>
-              <p className="mt-3 text-lg leading-relaxed text-navy-100/80">
-                KOVELA ne décide pas médicalement. L'IA est uniquement assistive, interne, loggée,
-                désactivable et human-in-the-loop. Elle ne répond jamais seule au patient, ne
-                diagnostique jamais, ne qualifie jamais un symptôme et n'analyse jamais médicalement
-                les photos.
+      {/* Section 7 — Pour le patient */}
+      <section className="border-y border-navy-900/[0.06] bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+            <div className="grid gap-3 sm:grid-cols-2">
+              {patientBenefits.map((b) => (
+                <div key={b} className="flex items-start gap-2 rounded-xl bg-[#eef1f3] p-4 text-sm text-navy-900 ring-1 ring-navy-900/[0.05]">
+                  <span className="mt-0.5 text-teal-500">✓</span>
+                  {b}
+                </div>
+              ))}
+            </div>
+            <div>
+              <Eyebrow>Pour le patient</Eyebrow>
+              <h2 className="font-display text-3xl tracking-tight text-navy-900 md:text-4xl">
+                Une expérience post-op plus claire et plus rassurante.
+              </h2>
+              <p className="mt-4 text-charcoal/65">
+                KOVELA accompagne l'organisation du suivi. En cas d'urgence, le patient suit les
+                consignes de son chirurgien ou contacte le 15 / 112.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-white/10 px-6 py-6 text-center text-xs text-navy-100/45">
-        KOVELA — prototype non destiné à la production HDS. Aucune donnée réelle. · kovela.care
+      {/* Section 8 — Supervision & qualité */}
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <Eyebrow>Supervision & qualité</Eyebrow>
+        <h2 className="max-w-2xl font-display text-3xl tracking-tight text-navy-900 md:text-4xl">
+          Une supervision pilotée, formée et traçable.
+        </h2>
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {supervisionPoints.map((p) => (
+            <div key={p} className="rounded-xl bg-white p-4 text-sm text-navy-900 shadow-soft ring-1 ring-navy-900/[0.05]">
+              {p}
+            </div>
+          ))}
+        </div>
+        <p className="mt-10 max-w-3xl font-display text-2xl italic tracking-tight text-navy-900">
+          KOVELA ne scale pas seulement par la tech. KOVELA scale par une supervision formée,
+          assistée et contrôlée.
+        </p>
+      </section>
+
+      {/* Section 9 — Sécurité / données / cadre */}
+      <section className="border-y border-navy-900/[0.06] bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-10">
+            <BrandMark size={44} className="text-navy-900" />
+            <div>
+              <Eyebrow>Sécurité, données & cadre</Eyebrow>
+              <h2 className="max-w-2xl font-display text-3xl tracking-tight text-navy-900 md:text-4xl">
+                Conçu pour un cadre santé exigeant.
+              </h2>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {securityPoints.map((p) => (
+                  <div key={p} className="flex items-start gap-2 text-sm text-charcoal/75">
+                    <span className="mt-0.5 text-teal-500">•</span>
+                    {p}
+                  </div>
+                ))}
+              </div>
+              <p className="mt-6 text-xs leading-relaxed text-charcoal/45">
+                Éléments d'architecture cible, à valider juridiquement avant un déploiement en
+                production. Ce site est un démonstrateur : aucune donnée patient n'y est collectée.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 10 — CTA final */}
+      <section className="bg-navy-depth text-white">
+        <div className="mx-auto max-w-4xl px-6 py-20 text-center">
+          <h2 className="font-display text-3xl tracking-tight md:text-4xl">
+            Structurer le post-op sans alourdir le cabinet.
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-navy-100/75">
+            Découvrez comment KOVELA peut transformer le suivi post-opératoire en un flux clair,
+            supervisé et exploitable.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <a href={DEMO} className="rounded-xl bg-teal-500 px-6 py-3 text-sm font-medium text-white hover:bg-teal-600">
+              Demander une démo
+            </a>
+            <Link href="/login" className="rounded-xl bg-white/8 px-6 py-3 text-sm font-medium text-white ring-1 ring-white/15 hover:bg-white/15">
+              Accéder au prototype
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-navy-950 text-navy-100/50">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-center text-xs sm:flex-row sm:text-left">
+          <Wordmark light />
+          <p>Prototype de démonstration — données fictives, hors HDS. Aucune donnée réelle. · kovela.care</p>
+        </div>
       </footer>
     </div>
   );
