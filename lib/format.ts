@@ -38,7 +38,7 @@ export const statusLabels: Record<PatientStatus, string> = {
   cloture: "Clôturé",
 };
 
-// Couleurs opérationnelles sobres (jamais de codage de gravité médicale).
+// Couleurs opérationnelles sobres, fondées uniquement sur l'état des tâches.
 export const statusStyles: Record<PatientStatus, string> = {
   onboarding_incomplet: "bg-amber-50/70 text-amber-700 ring-amber-100",
   actif: "bg-teal-50 text-teal-700 ring-teal-100",

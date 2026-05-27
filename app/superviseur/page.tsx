@@ -71,7 +71,8 @@ export default function SuperviseurInbox() {
         <div>
           <h1 className="font-display text-3xl tracking-tight text-navy-900">Inbox opérationnelle</h1>
           <p className="text-sm text-charcoal/55">
-            Classement strictement opérationnel. Aucun tri médical, aucune notion de gravité.
+            File organisée selon des critères opérationnels : messages non traités, délais, CR en
+            attente et escalades ouvertes.
           </p>
         </div>
         <label className="flex shrink-0 items-center gap-2 text-sm text-charcoal/70">

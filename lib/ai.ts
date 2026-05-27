@@ -1,6 +1,8 @@
 // KOVELA — couche IA assistive SIMULÉE.
-// Aucun appel API réel. Aucune analyse médicale, aucune analyse photo,
-// aucun diagnostic. L'IA est assistive, interne, loggée, human-in-the-loop.
+// Aucun appel API réel. Les sorties IA restent limitées à l'organisation,
+// la documentation, la synthèse et la reformulation. Elles ne qualifient pas
+// l'état du patient et ne prennent aucune décision.
+// L'IA est assistive, interne, loggée, human-in-the-loop.
 // Doctrine : KOVELA ne décide pas médicalement. Elle structure, trace,
 // priorise opérationnellement et escalade.
 
