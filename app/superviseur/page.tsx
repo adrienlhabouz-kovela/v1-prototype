@@ -105,23 +105,35 @@ export default function SuperviseurInbox() {
                 )}
                 {list.map((p) => {
                   const n = unTreated(p);
+                  const lastMsg = p.messages[p.messages.length - 1];
                   return (
                     <Link
                       key={p.id}
                       href={`/superviseur/patient/${p.id}`}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-teal-50/30"
+                      className="group block px-4 py-3 hover:bg-teal-50/30"
                     >
-                      <div className="min-w-0">
+                      <div className="flex items-center justify-between gap-2">
                         <p className="truncate text-sm font-medium text-navy-900">{p.name}</p>
-                        <p className="truncate text-xs text-charcoal/45">
-                          {k.surgeonName(p.surgeonId)} · {relativeDays(p.lastMessageAt)}
-                        </p>
+                        <span className="shrink-0 text-[11px] text-charcoal/40">
+                          {relativeDays(p.lastMessageAt)}
+                        </span>
                       </div>
-                      <div className="flex shrink-0 items-center gap-1.5">
-                        {n > 0 && (
-                          <Badge className="bg-amber-50 text-amber-700 ring-amber-100">{n} non traité</Badge>
-                        )}
-                        <Badge className={statusStyles[p.status]}>{statusLabels[p.status]}</Badge>
+                      <p className="mt-0.5 truncate text-xs text-charcoal/50">
+                        {k.surgeonName(p.surgeonId)}
+                        {lastMsg ? ` · ${lastMsg.text}` : ""}
+                      </p>
+                      <div className="mt-2 flex items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {n > 0 && (
+                            <Badge className="bg-amber-50 text-amber-700 ring-amber-100">
+                              {n} non traité
+                            </Badge>
+                          )}
+                          <Badge className={statusStyles[p.status]}>{statusLabels[p.status]}</Badge>
+                        </div>
+                        <span className="shrink-0 text-xs font-medium text-teal-600 opacity-0 transition-opacity group-hover:opacity-100">
+                          Ouvrir →
+                        </span>
                       </div>
                     </Link>
                   );

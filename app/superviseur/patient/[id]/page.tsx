@@ -244,21 +244,39 @@ export default function PatientFiche() {
 
         {/* Colonne droite : IA + CR + escalade + logs */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader title="IA assistive" subtitle="Human-in-the-loop · loggée · désactivable" />
+          <Card className="ring-1 ring-teal-100">
+            <CardHeader
+              title={
+                <span className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-md bg-teal-500 text-[10px] font-bold text-white">
+                    IA
+                  </span>
+                  IA assistive
+                </span>
+              }
+              subtitle="Assiste la documentation · human-in-the-loop · loggée"
+            />
             <div className="space-y-2 p-5">
-              <Button variant="subtle" className="w-full" onClick={() => runAi("resume_conversation")}>
-                Résumer la conversation
+              <Button variant="primary" className="w-full" onClick={() => runAi("resume_conversation")}>
+                Résumer
               </Button>
               <Button variant="subtle" className="w-full" onClick={() => runAi("preparation_cr")}>
                 Préparer le CR
               </Button>
+              <Button
+                variant="subtle"
+                className="w-full"
+                onClick={() => runAi("reformulation")}
+                disabled={!reply.trim()}
+              >
+                Reformuler {reply.trim() ? "le message" : "(écrivez une réponse)"}
+              </Button>
               <Button variant="subtle" className="w-full" onClick={() => runAi("compilation_escalade")}>
-                Préparer compilation d'escalade
+                Préparer compilation factuelle
               </Button>
               <p className="pt-1 text-[11px] leading-tight text-charcoal/45">
-                L'IA ne diagnostique pas, ne qualifie pas un symptôme, n'analyse pas les photos
-                et ne décide jamais d'escalader. Chaque sortie est à valider par un humain.
+                L'IA assiste la documentation. Elle ne formule aucun avis médical. Chaque sortie
+                est à valider par un humain.
               </p>
             </div>
           </Card>

@@ -27,54 +27,71 @@ function authorLabel(a: Message["author"]): string {
   return "Système";
 }
 
-// 1. Résumé conversation — synthèse factuelle, non médicale.
+// 1. Résumé conversation — résumé opérationnel des échanges (non médical).
 export function aiSummarize(patient: Patient): string {
   const total = patient.messages.length;
   const fromPatient = patient.messages.filter((m) => m.author === "patient").length;
+  const relances = patient.messages.filter(
+    (m) => m.author === "superviseur" || m.author === "systeme"
+  ).length;
   const attachments = patient.messages.flatMap((m) => m.attachments ?? []);
   const photos = attachments.filter((a) => a.kind === "photo").length;
   const audios = attachments.filter((a) => a.kind === "audio").length;
-  const last = patient.messages[patient.messages.length - 1];
+  const recent = patient.messages.slice(-3);
 
   return [
-    `Synthèse opérationnelle — ${patient.name}`,
+    `Résumé opérationnel des échanges — ${patient.name}`,
     "",
-    `• ${total} message(s) échangé(s), dont ${fromPatient} émis par le patient.`,
-    `• Pièces jointes déclarées : ${photos} photo(s), ${audios} audio(s) (placeholders).`,
-    last
-      ? `• Dernier échange le ${fmtDate(last.at)} (${authorLabel(last.author)}).`
-      : "• Aucun échange enregistré.",
+    `• ${total} message(s) au total, dont ${fromPatient} émis par le patient.`,
     `• Protocole de suivi : ${patient.protocol}.`,
     "",
-    "Résumé factuel : échanges classés opérationnellement. Aucun élément",
-    "n'est interprété médicalement par KOVELA. Transmission au chirurgien",
-    "si nécessaire selon décision humaine.",
+    "Derniers échanges :",
+    ...(recent.length
+      ? recent.map((m) => `— ${fmtDate(m.at)} [${authorLabel(m.author)}] : ${m.text}`)
+      : ["— Aucun échange enregistré."]),
+    "",
+    "Actions déjà réalisées :",
+    `— ${relances} message(s) de coordination / relance émis côté KOVELA.`,
+    "— Échanges classés opérationnellement.",
+    "",
+    "Pièces jointes disponibles :",
+    `— ${photos} photo(s) jointe(s), ${audios} audio(s) joint(s) (placeholders).`,
+    "",
+    "Note : résumé opérationnel factuel. KOVELA n'interprète pas les échanges et ne",
+    "formule aucun avis médical. Transmission au chirurgien selon décision humaine.",
   ].join("\n");
 }
 
-// 2. Préparation CR — brouillon factuel à valider.
+// 2. Préparation CR — brouillon de CR factuel à valider.
 export function aiPrepareReport(patient: Patient): string {
   const patientMsgs = patient.messages.filter((m) => m.author === "patient");
+  const relances = patient.messages.filter(
+    (m) => m.author === "superviseur" || m.author === "systeme"
+  ).length;
+  const hasEscalade = patient.status === "escalade_ouverte";
   return [
     "Brouillon de CR à valider",
     "",
     `Patient : ${patient.name}`,
+    `Période : suivi structuré — protocole ${patient.protocol}`,
     `Intervention déclarée : ${patient.intervention}`,
-    `Protocole : ${patient.protocol}`,
     "",
-    "Messages principaux (factuels) :",
+    "Messages principaux :",
     ...(patientMsgs.length
       ? patientMsgs.slice(0, 3).map((m) => `— ${fmtDate(m.at)} : ${m.text}`)
       : ["— Aucun message patient sur la période."]),
     "",
+    "Relances :",
+    `— ${relances} relance(s) / message(s) de coordination effectué(s).`,
+    "",
     "Actions KOVELA :",
-    "— Classement opérationnel des messages.",
-    "— Relances de continuité post-opératoire.",
+    "— Réception et classement opérationnel des messages.",
+    "— Continuité post-opératoire assurée.",
     "",
-    "Escalades : voir section dédiée.",
-    "Statut final : à compléter par le superviseur.",
+    `Escalade : ${hasEscalade ? "compilation factuelle en cours de préparation." : "aucune escalade ouverte sur la période."}`,
+    "Statut final : à compléter et valider par le superviseur.",
     "",
-    "⚠ Brouillon — synthèse opérationnelle non médicale. À valider par un humain.",
+    "⚠ Brouillon de CR à valider — synthèse opérationnelle non médicale.",
   ].join("\n");
 }
 

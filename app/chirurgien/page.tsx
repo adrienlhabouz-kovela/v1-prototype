@@ -38,7 +38,7 @@ export default function ChirurgienDashboard() {
       <PageHeader
         eyebrow={k.surgeonName(MY_SURGEON_ID)}
         title="Mes patients"
-        subtitle="Information claire et exploitable. Vous gardez la main."
+        subtitle="Vous ne recevez pas du bruit : un historique clair et exploitable. Vous gardez la main."
       />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

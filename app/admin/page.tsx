@@ -18,7 +18,7 @@ import { useKovela } from "@/lib/store";
 import { formatDate, relativeDays, statusLabels, statusStyles } from "@/lib/format";
 import type { Patient } from "@/lib/types";
 
-type Filter = "all" | "sans_superviseur" | "escalade" | "cr_a_faire";
+type Filter = "all" | "sans_superviseur" | "escalade" | "cr_a_faire" | "silencieux" | "messages";
 
 export default function AdminPage() {
   const k = useKovela();
@@ -55,19 +55,34 @@ export default function AdminPage() {
       const assigned = k.patients.filter((p) => p.supervisorId === s.id && p.status !== "cloture");
       const escalades = assigned.filter((p) => p.status === "escalade_ouverte").length;
       const cr = assigned.filter((p) => p.status === "cr_en_attente").length;
-      return { ...s, count: assigned.length, escalades, cr };
+      const silencieux = assigned.filter((p) => p.status === "silencieux").length;
+      const nonTraites = assigned.reduce(
+        (acc, p) => acc + p.messages.filter((m) => m.author === "patient" && !m.treated).length,
+        0
+      );
+      return { ...s, count: assigned.length, escalades, cr, silencieux, nonTraites };
     });
   }, [k.patients, k.supervisors]);
 
   const maxLoad = Math.max(1, ...supervisorLoad.map((s) => s.count));
+
+  const hasUntreated = (p: Patient) =>
+    p.messages.some((m) => m.author === "patient" && !m.treated);
 
   const filtered = useMemo(() => {
     let list = k.patients;
     if (filter === "sans_superviseur") list = list.filter((p) => p.supervisorId === null);
     if (filter === "escalade") list = list.filter((p) => p.status === "escalade_ouverte");
     if (filter === "cr_a_faire") list = list.filter((p) => p.status === "cr_en_attente");
+    if (filter === "silencieux") list = list.filter((p) => p.status === "silencieux");
+    if (filter === "messages") list = list.filter(hasUntreated);
     return list;
   }, [k.patients, filter]);
+
+  function focusTable(f: Filter) {
+    setFilter(f);
+    document.getElementById("patients-table")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <Shell>
@@ -79,7 +94,32 @@ export default function AdminPage() {
 
       <DoctrineNote className="mb-6" />
 
+      {/* Actions prioritaires */}
+      <SectionTitle hint="Où concentrer la coordination">Actions prioritaires</SectionTitle>
+      <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-5">
+        {([
+          ["sans_superviseur", stats.sansSuperviseur, "Patients sans superviseur", "à attribuer"],
+          ["messages", stats.messagesNonTraites, "Messages non traités", "à traiter"],
+          ["cr_a_faire", stats.crAFaire, "CR à faire", "brouillons à préparer"],
+          ["escalade", stats.escalades, "Escalades ouvertes", "à transmettre"],
+          ["silencieux", stats.silencieux, "Patients silencieux", "à relancer"],
+        ] as [Filter, number, string, string][]).map(([f, count, label, desc]) => (
+          <Card key={f} className="flex flex-col p-5">
+            <p className="font-display text-[2rem] leading-none text-navy-900">{count}</p>
+            <p className="mt-2 text-sm font-medium text-navy-900">{label}</p>
+            <p className="mt-0.5 text-xs text-charcoal/50">{desc}</p>
+            <button
+              onClick={() => focusTable(f)}
+              className="mt-3 inline-flex w-fit items-center gap-1 text-xs font-medium text-teal-600 hover:text-teal-700"
+            >
+              Voir →
+            </button>
+          </Card>
+        ))}
+      </div>
+
       {/* Stats principales */}
+      <SectionTitle hint="Vue d'ensemble">Indicateurs</SectionTitle>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Chirurgiens actifs" value={stats.chirurgiens} />
         <StatCard label="Patients actifs" value={stats.activePatients} />
@@ -105,17 +145,19 @@ export default function AdminPage() {
                     </span>
                     <span className="font-medium text-navy-900">{s.name}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-charcoal/55">
-                    {s.escalades > 0 && <span className="text-navy-700">{s.escalades} escalade(s)</span>}
-                    {s.cr > 0 && <span className="text-teal-600">{s.cr} CR</span>}
-                    <span className="font-semibold text-navy-900">{s.count} patients</span>
-                  </div>
+                  <span className="font-semibold text-navy-900">{s.count} patients actifs</span>
                 </div>
                 <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-navy-100/70">
                   <div
                     className="h-full rounded-full bg-teal-500"
                     style={{ width: `${(s.count / maxLoad) * 100}%` }}
                   />
+                </div>
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-charcoal/55">
+                  <span>{s.nonTraites} message(s) non traité(s)</span>
+                  <span>{s.silencieux} silencieux</span>
+                  <span>{s.escalades} escalade(s) ouverte(s)</span>
+                  <span>{s.cr} CR à faire</span>
                 </div>
               </div>
             ))}
@@ -159,14 +201,16 @@ export default function AdminPage() {
       </div>
 
       {/* Table patients */}
-      <div className="mt-8">
+      <div className="mt-8 scroll-mt-6" id="patients-table">
         <SectionTitle hint={`${filtered.length} patient(s)`}>Patients</SectionTitle>
         <div className="mb-3 flex flex-wrap gap-2">
           {([
             ["all", "Tous"],
             ["sans_superviseur", "Sans superviseur"],
-            ["escalade", "Escalades ouvertes"],
+            ["messages", "Messages non traités"],
             ["cr_a_faire", "CR à faire"],
+            ["escalade", "Escalades ouvertes"],
+            ["silencieux", "Patients silencieux"],
           ] as [Filter, string][]).map(([f, label]) => (
             <button
               key={f}

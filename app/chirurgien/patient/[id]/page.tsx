@@ -65,7 +65,7 @@ export default function ChirurgienPatient() {
         {/* CR */}
         <Card>
           <CardHeader
-            title="Compte-rendu"
+            title="Compte-rendu factuel du suivi"
             subtitle={visibleReport ? `Mis à jour le ${formatDate(visibleReport.updatedAt)}` : "Aucun CR disponible"}
           />
           <div className="p-5">

@@ -27,6 +27,9 @@ export default function PatientOnboarding() {
       title: "Bienvenue dans votre suivi KOVELA",
       content: (
         <div className="space-y-3 text-sm leading-relaxed text-charcoal/70">
+          <p className="font-display text-lg text-navy-900">
+            Votre suivi post-op, organisé simplement.
+          </p>
           <p>
             Bonjour {patient.name.split(" ")[0]}, votre chirurgien{" "}
             <span className="font-medium text-navy-900">{k.surgeonName(patient.surgeonId)}</span> vous
@@ -51,8 +54,8 @@ export default function PatientOnboarding() {
           <UrgencyBanner />
           <ul className="list-disc space-y-1.5 pl-5">
             <li>KOVELA ne remplace pas une consultation médicale.</li>
-            <li>KOVELA ne donne pas d'avis médical et ne pose pas de diagnostic.</li>
-            <li>Toute décision médicale relève de votre chirurgien.</li>
+            <li>KOVELA ne donne pas d'avis médical : toute décision relève de votre chirurgien.</li>
+            <li>KOVELA assure la coordination et la continuité de votre suivi post-opératoire.</li>
             <li>Vos messages sont traités par une équipe humaine de coordination.</li>
           </ul>
           <label className="flex items-start gap-2 pt-2">

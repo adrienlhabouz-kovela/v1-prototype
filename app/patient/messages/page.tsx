@@ -13,8 +13,19 @@ export default function PatientMessages() {
   const k = useKovela();
   const patient = k.patients.find((p) => p.id === PATIENT_ID);
   const [text, setText] = useState("");
+  const [confirm, setConfirm] = useState<string | null>(null);
 
   if (!patient) return null;
+
+  function notify(msg: string) {
+    setConfirm(msg);
+    window.setTimeout(() => setConfirm(null), 2500);
+  }
+
+  function send(content: string) {
+    k.sendMessage(PATIENT_ID, content, "patient");
+    notify("Message envoyé à l'équipe de coordination.");
+  }
 
   function attach(kind: "photo" | "audio") {
     // Placeholder uniquement — aucune vraie pièce jointe.
@@ -23,12 +34,22 @@ export default function PatientMessages() {
       kind === "photo" ? "[Photo jointe]" : "[Mémo vocal joint]",
       "patient"
     );
+    notify(kind === "photo" ? "Photo envoyée." : "Mémo vocal envoyé.");
   }
 
   return (
     <Shell>
       <div className="mx-auto flex max-w-md flex-col" style={{ minHeight: "calc(100vh - 9rem)" }}>
         <UrgencyBanner />
+
+        {confirm && (
+          <div className="mt-3 flex items-center gap-2 rounded-xl bg-teal-50 px-4 py-2.5 text-sm text-teal-700 ring-1 ring-teal-100">
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-teal-500 text-[10px] text-white">
+              ✓
+            </span>
+            {confirm}
+          </div>
+        )}
 
         <Card className="mt-4 flex flex-1 flex-col overflow-hidden">
           <div className="flex items-center gap-3 bg-navy-depth px-4 py-3.5 text-white">
@@ -89,7 +110,7 @@ export default function PatientMessages() {
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && text.trim()) {
-                    k.sendMessage(PATIENT_ID, text.trim(), "patient");
+                    send(text.trim());
                     setText("");
                   }
                 }}
@@ -100,7 +121,7 @@ export default function PatientMessages() {
                 variant="primary"
                 disabled={!text.trim()}
                 onClick={() => {
-                  k.sendMessage(PATIENT_ID, text.trim(), "patient");
+                  send(text.trim());
                   setText("");
                 }}
               >

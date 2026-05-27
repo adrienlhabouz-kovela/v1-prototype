@@ -51,12 +51,26 @@ const aiDecisionLabel: Record<AiDecision, string> = {
   refuse: "Refusée",
 };
 
+type OpsFilter = "all" | "ia" | "cr" | "escalade" | "patient" | "attribution";
+
+const opsFilterKinds: Record<Exclude<OpsFilter, "all">, LogKind[]> = {
+  ia: ["ia_utilisee", "ia_suggestion"],
+  cr: ["cr_prepare", "cr_valide", "cr_disponible"],
+  escalade: ["escalade_transmise"],
+  patient: ["message_envoye", "patient_relance", "suivi_cloture", "onboarding_complete", "note_interne"],
+  attribution: ["patient_attribue"],
+};
+
 export default function LogsPage() {
   const k = useKovela();
   const [tab, setTab] = useState<"ops" | "ia">("ops");
+  const [opsFilter, setOpsFilter] = useState<OpsFilter>("all");
 
   const patientName = (id?: string) =>
     id ? k.patients.find((p) => p.id === id)?.name ?? id : "—";
+
+  const opsLogs =
+    opsFilter === "all" ? k.logs : k.logs.filter((l) => opsFilterKinds[opsFilter].includes(l.kind));
 
   return (
     <Shell>
@@ -87,6 +101,31 @@ export default function LogsPage() {
         </button>
       </div>
 
+      {tab === "ops" && (
+        <div className="mb-3 flex flex-wrap gap-2">
+          {([
+            ["all", "Tous"],
+            ["ia", "IA"],
+            ["cr", "CR"],
+            ["escalade", "Escalade"],
+            ["patient", "Patient"],
+            ["attribution", "Attribution"],
+          ] as [OpsFilter, string][]).map(([f, label]) => (
+            <button
+              key={f}
+              onClick={() => setOpsFilter(f)}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                opsFilter === f
+                  ? "bg-navy-900 text-white"
+                  : "bg-white text-charcoal/65 ring-1 ring-navy-100 hover:bg-teal-50/50 hover:text-navy-900"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {tab === "ops" ? (
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
@@ -101,7 +140,7 @@ export default function LogsPage() {
                 </tr>
               </thead>
               <tbody>
-                {k.logs.map((l) => (
+                {opsLogs.map((l) => (
                   <tr key={l.id} className="border-b border-navy-900/[0.05]">
                     <td className="px-4 py-3">
                       <Badge className={logKindStyle[l.kind] ?? "bg-navy-50 text-charcoal/70 ring-navy-100"}>
