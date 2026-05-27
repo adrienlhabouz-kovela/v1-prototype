@@ -33,7 +33,7 @@ export default function AdminPage() {
       0
     );
     const silencieux = k.patients.filter((p) => p.status === "silencieux").length;
-    const escalades = k.escalations.filter((e) => e.status === "ouverte").length;
+    const escalades = k.patients.filter((p) => p.status === "escalade_ouverte").length;
     const crAFaire = k.patients.filter((p) => p.status === "cr_en_attente").length;
     const activesMois = k.patients.filter((p) => p.activatedThisMonth).length;
     const montant = k.pricing.baseMonthly + activesMois * k.pricing.perActivatedPatient;
@@ -269,13 +269,25 @@ export default function AdminPage() {
                       <td className="px-5 py-3.5 text-charcoal/55">{relativeDays(p.lastMessageAt)}</td>
                       <td className="px-5 py-3.5">
                         {report ? (
-                          <span className="text-xs text-teal-600">{report.status}</span>
+                          <span className="text-xs text-charcoal/70">
+                            {report.status === "brouillon"
+                              ? "Brouillon"
+                              : report.status === "valide"
+                              ? "Validé interne"
+                              : "Disponible"}
+                          </span>
                         ) : (
                           <span className="text-xs text-charcoal/30">—</span>
                         )}
                       </td>
                       <td className="px-5 py-3.5">
-                        {esc ? <span className="text-xs text-navy-700">●</span> : <span className="text-charcoal/30">—</span>}
+                        {p.status === "escalade_ouverte" ? (
+                          <span className="text-xs text-navy-700" title={esc?.status === "transmise" ? "Transmise" : "En préparation"}>
+                            {esc?.status === "transmise" ? "Transmise" : "Préparée"}
+                          </span>
+                        ) : (
+                          <span className="text-charcoal/30">—</span>
+                        )}
                       </td>
                       <td className="px-5 py-3.5 text-right">
                         <Button variant="subtle" onClick={() => setAssignPatient(p)}>

@@ -23,8 +23,8 @@ export default function ChirurgienPatient() {
 
   const report = k.reportFor(patient.id);
   const escalation = k.escalationFor(patient.id);
-  // Côté chirurgien : seulement les CR rendus disponibles/validés.
-  const visibleReport = report && (report.status === "disponible" || report.status === "valide") ? report : null;
+  // Côté chirurgien : uniquement les CR explicitement rendus disponibles.
+  const visibleReport = report && report.status === "disponible" ? report : null;
   const visibleEscalation = escalation?.status === "transmise" ? escalation : null;
 
   return (
@@ -71,8 +71,8 @@ export default function ChirurgienPatient() {
           <div className="p-5">
             {visibleReport ? (
               <>
-                <Badge className="mb-3 bg-teal-50 text-teal-700 ring-teal-200">
-                  {visibleReport.status === "disponible" ? "Disponible" : "Validé"}
+                <Badge className="mb-3 bg-teal-50 text-teal-700 ring-teal-100">
+                  CR disponible pour le chirurgien
                 </Badge>
                 <pre className="whitespace-pre-wrap rounded-xl bg-navy-50/50 p-4 font-sans text-sm leading-relaxed text-navy-900">
                   {visibleReport.content}
@@ -80,7 +80,8 @@ export default function ChirurgienPatient() {
               </>
             ) : (
               <p className="text-sm text-charcoal/45">
-                Aucun CR rendu disponible. Les brouillons restent côté coordination jusqu'à validation.
+                Aucun CR disponible. Les brouillons et les CR validés en interne restent côté
+                coordination jusqu'à mise à disposition explicite.
               </p>
             )}
           </div>

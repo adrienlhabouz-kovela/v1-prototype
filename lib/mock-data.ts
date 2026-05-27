@@ -322,24 +322,50 @@ export function buildPatients(): Patient[] {
     };
   });
 
-  return [...upcoming, ...base];
+  // Les patients en escalade ont une compilation factuelle déjà préparée
+  // (brouillon interne), mais NON transmise au chirurgien.
+  const withDrafts = base.map((p) =>
+    p.status === "escalade_ouverte" ? { ...p, compilationDraft: compilationDraftFor(p) } : p
+  );
+
+  return [...upcoming, ...withDrafts];
 }
 
-export function buildEscalations(patients: Patient[]): Escalation[] {
-  return patients
-    .filter((p) => p.status === "escalade_ouverte")
-    .map((p, i) => ({
-      id: `e${i + 1}`,
-      patientId: p.id,
-      status: "ouverte" as const,
-      openedAt: daysAgoISO(1, 15),
-    }));
+// Aucune escalade transmise au démarrage : la transmission au chirurgien
+// est une action humaine explicite (dissociée de la préparation de compilation).
+export function buildEscalations(): Escalation[] {
+  return [];
+}
+
+// Compilation factuelle préparée (brouillon interne) pour les patients dont
+// le suivi présente une escalade en cours de préparation — non transmise.
+export function compilationDraftFor(p: Patient): string {
+  return [
+    "Compilation factuelle (brouillon) — éléments chronologiques pour transmission au chirurgien",
+    "",
+    `Patient : ${p.name}`,
+    `Intervention déclarée : ${p.intervention} — Protocole ${p.protocol}`,
+    "",
+    "Chronologie des échanges récents :",
+    ...p.messages.slice(-4).map((m) => {
+      const who = m.author === "patient" ? "Patient" : m.author === "superviseur" ? "Superviseur" : "Système";
+      return `— ${who} : ${m.text}`;
+    }),
+    "",
+    "Actions déjà réalisées par KOVELA :",
+    "— Réception et classement opérationnel des messages.",
+    "— Compilation factuelle préparée, en attente de transmission humaine.",
+    "",
+    "Note : compilation strictement factuelle. Aucune interprétation. Décision au chirurgien.",
+  ].join("\n");
 }
 
 export function buildReports(patients: Patient[]): ClinicalReport[] {
   const reports: ClinicalReport[] = [];
-  patients.forEach((p, i) => {
+  let s1DisponibleSeen = 0;
+  patients.forEach((p) => {
     if (p.status === "cloture") {
+      // Suivi terminé → CR disponible pour le chirurgien.
       reports.push({
         id: `cr-${p.id}`,
         patientId: p.id,
@@ -348,11 +374,15 @@ export function buildReports(patients: Patient[]): ClinicalReport[] {
         content: defaultReportContent(p.name),
         updatedAt: daysAgoISO(10, 12),
       });
-    } else if (p.status === "actif" && i % 4 === 0) {
+    } else if (p.status === "actif") {
+      // Un CR déjà disponible pour le chirurgien de démo (s1), les autres
+      // restent validés en interne (non visibles côté chirurgien).
+      const disponible = p.surgeonId === "s1" && s1DisponibleSeen === 0;
+      if (disponible) s1DisponibleSeen += 1;
       reports.push({
         id: `cr-${p.id}`,
         patientId: p.id,
-        status: "valide",
+        status: disponible ? "disponible" : "valide",
         period: `${p.protocol} — suivi en cours`,
         content: defaultReportContent(p.name),
         updatedAt: daysAgoISO(4, 12),

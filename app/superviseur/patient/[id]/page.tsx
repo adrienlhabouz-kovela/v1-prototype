@@ -15,7 +15,14 @@ import {
 import { useKovela } from "@/lib/store";
 import { aiCompileEscalation, aiPrepareReport, aiReformulate, aiSummarize } from "@/lib/ai";
 import { templates } from "@/lib/templates";
-import { formatDate, formatDateTime, statusLabels, statusStyles } from "@/lib/format";
+import {
+  crStatusLabels,
+  crStatusStyles,
+  formatDate,
+  formatDateTime,
+  statusLabels,
+  statusStyles,
+} from "@/lib/format";
 import type { AiFunction } from "@/lib/types";
 
 type AiKind = AiFunction;
@@ -73,7 +80,7 @@ export default function PatientFiche() {
     k.logAi(aiKind, editing ? "modifie" : "accepte", patient.id);
     if (aiKind === "reformulation") setReply(aiOutput);
     if (aiKind === "preparation_cr") k.upsertReport(patient.id, aiOutput, "brouillon");
-    if (aiKind === "compilation_escalade") k.openEscalation(patient.id, aiOutput);
+    if (aiKind === "compilation_escalade") k.prepareCompilation(patient.id, aiOutput);
     if (aiKind === "resume_conversation") k.addNote(patient.id, "Synthèse opérationnelle (IA, validée) :\n" + aiOutput);
     closeAi();
   }
@@ -284,35 +291,32 @@ export default function PatientFiche() {
           {/* Compte-rendu */}
           <Card>
             <CardHeader
-              title="Compte-rendu"
-              subtitle={report ? `Statut : ${report.status}` : "Aucun CR"}
+              title="Compte-rendu factuel du suivi"
+              subtitle={report ? crStatusLabels[report.status] : "Aucun CR"}
             />
             <div className="p-5">
               {report ? (
                 <>
-                  <Badge
-                    className={
-                      report.status === "disponible"
-                        ? "bg-teal-50 text-teal-700 ring-teal-200"
-                        : report.status === "valide"
-                        ? "bg-sky-50 text-sky-700 ring-sky-200"
-                        : "bg-amber-50 text-amber-700 ring-amber-200"
-                    }
-                  >
-                    {report.status === "brouillon" ? "Brouillon de CR à valider" : report.status}
+                  <Badge className={crStatusStyles[report.status]}>
+                    {crStatusLabels[report.status]}
                   </Badge>
+                  {report.status === "valide" && (
+                    <p className="mt-2 text-[11px] text-charcoal/55">
+                      Validé en interne — pas encore visible côté chirurgien.
+                    </p>
+                  )}
                   <pre className="mt-3 max-h-48 overflow-y-auto whitespace-pre-wrap rounded-xl bg-navy-50/50 p-3 font-sans text-xs leading-relaxed text-navy-900">
                     {report.content}
                   </pre>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {report.status === "brouillon" && (
                       <Button variant="primary" onClick={() => k.validateReport(patient.id)}>
-                        Valider le CR
+                        Valider en interne
                       </Button>
                     )}
                     {report.status !== "disponible" && (
                       <Button variant="secondary" onClick={() => k.publishReport(patient.id)}>
-                        Rendre disponible au chirurgien
+                        Rendre disponible pour le chirurgien
                       </Button>
                     )}
                   </div>
@@ -325,36 +329,53 @@ export default function PatientFiche() {
             </div>
           </Card>
 
-          {/* Escalade */}
+          {/* Escalade — compilation factuelle puis transmission explicite */}
           <Card>
             <CardHeader
-              title="Escalade"
-              subtitle={escalation ? `Statut : ${escalation.status}` : "Aucune escalade ouverte"}
+              title="Compilation factuelle d'escalade"
+              subtitle={
+                escalation?.status === "transmise"
+                  ? "Transmise au chirurgien"
+                  : patient.compilationDraft
+                  ? "Brouillon préparé — non transmis"
+                  : "Aucune compilation"
+              }
             />
             <div className="p-5">
-              {escalation ? (
+              {escalation?.status === "transmise" ? (
                 <>
-                  <Badge className="bg-indigo-50 text-indigo-700 ring-indigo-200">
-                    {escalation.status === "ouverte" ? "Compilation prête" : "Transmise au chirurgien"}
+                  <Badge className="bg-navy-900 text-teal-100 ring-navy-900">
+                    Escalade transmise au chirurgien
                   </Badge>
                   {escalation.compilation && (
                     <pre className="mt-3 max-h-40 overflow-y-auto whitespace-pre-wrap rounded-xl bg-navy-50/50 p-3 font-sans text-xs leading-relaxed text-navy-900">
                       {escalation.compilation}
                     </pre>
                   )}
-                  {escalation.status === "ouverte" && (
-                    <Button
-                      variant="secondary"
-                      className="mt-3"
-                      onClick={() => k.transmitEscalation(patient.id)}
-                    >
-                      Transmettre au chirurgien
-                    </Button>
-                  )}
+                </>
+              ) : patient.compilationDraft ? (
+                <>
+                  <Badge className="bg-amber-50/70 text-amber-700 ring-amber-100">
+                    Compilation factuelle préparée (brouillon)
+                  </Badge>
+                  <p className="mt-2 text-[11px] text-charcoal/55">
+                    Préparée en interne — n'ouvre pas d'escalade tant qu'elle n'est pas transmise.
+                  </p>
+                  <pre className="mt-3 max-h-40 overflow-y-auto whitespace-pre-wrap rounded-xl bg-navy-50/50 p-3 font-sans text-xs leading-relaxed text-navy-900">
+                    {patient.compilationDraft}
+                  </pre>
+                  <Button
+                    variant="secondary"
+                    className="mt-3"
+                    onClick={() => k.transmitCompilation(patient.id)}
+                  >
+                    Transmettre au chirurgien
+                  </Button>
                 </>
               ) : (
                 <p className="text-xs text-charcoal/45">
-                  Utilisez « Préparer compilation d'escalade » pour réunir les éléments factuels.
+                  Utilisez « Préparer compilation factuelle » pour réunir les éléments. La
+                  transmission au chirurgien reste une action explicite.
                 </p>
               )}
             </div>

@@ -1,4 +1,16 @@
-import type { OnboardingStatus, PatientStatus, PlanningStatus } from "./types";
+import type { CRStatus, OnboardingStatus, PatientStatus, PlanningStatus } from "./types";
+
+export const crStatusLabels: Record<CRStatus, string> = {
+  brouillon: "Brouillon de CR à valider",
+  valide: "CR validé en interne",
+  disponible: "CR disponible pour le chirurgien",
+};
+
+export const crStatusStyles: Record<CRStatus, string> = {
+  brouillon: "bg-amber-50/70 text-amber-700 ring-amber-100",
+  valide: "bg-navy-50 text-navy-700 ring-navy-100",
+  disponible: "bg-teal-50 text-teal-700 ring-teal-100",
+};
 
 export function formatDate(iso: string | null): string {
   if (!iso) return "—";

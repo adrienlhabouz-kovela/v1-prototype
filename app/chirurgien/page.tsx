@@ -17,13 +17,20 @@ export default function ChirurgienDashboard() {
     [k.patients]
   );
 
+  // « Patients suivis » = réellement actifs/clôturés (onboarding complété),
+  // hors planning non activé, onboarding incomplet et interventions annulées.
+  const followedPatients = useMemo(
+    () => myPatients.filter((p) => p.onboardingComplete && p.planningStatus !== "annule"),
+    [myPatients]
+  );
+
   const NOW = new Date("2026-05-27T12:00:00Z").getTime();
 
   const stats = useMemo(() => {
     const actifs = myPatients.filter((p) => p.status !== "cloture").length;
     const crDispo = myPatients.filter((p) => {
       const r = k.reportFor(p.id);
-      return r && (r.status === "disponible" || r.status === "valide");
+      return r && r.status === "disponible";
     }).length;
     const escalades = myPatients.filter((p) => {
       const e = k.escalationFor(p.id);
@@ -63,9 +70,15 @@ export default function ChirurgienDashboard() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader title="Patients suivis" subtitle="Statut, CR et escalades transmises" />
+          <CardHeader
+            title="Patients suivis"
+            subtitle="Patients réellement en suivi KOVELA (onboarding complété)"
+          />
           <div className="divide-y divide-navy-900/[0.05]">
-            {myPatients.map((p) => {
+            {followedPatients.length === 0 && (
+              <p className="px-5 py-6 text-sm text-charcoal/45">Aucun patient en suivi pour le moment.</p>
+            )}
+            {followedPatients.map((p) => {
               const report = k.reportFor(p.id);
               const esc = k.escalationFor(p.id);
               const escTransmise = esc?.status === "transmise";
@@ -81,8 +94,8 @@ export default function ChirurgienDashboard() {
                     {escTransmise && (
                       <Badge className="bg-indigo-50 text-indigo-700 ring-indigo-200">Escalade reçue</Badge>
                     )}
-                    {report && (report.status === "disponible" || report.status === "valide") && (
-                      <Badge className="bg-teal-50 text-teal-700 ring-teal-200">CR dispo</Badge>
+                    {report && report.status === "disponible" && (
+                      <Badge className="bg-teal-50 text-teal-700 ring-teal-100">CR disponible</Badge>
                     )}
                     <Badge className={statusStyles[p.status]}>{statusLabels[p.status]}</Badge>
                     <Link href={`/chirurgien/patient/${p.id}`}>

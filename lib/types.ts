@@ -111,6 +111,8 @@ export interface Patient {
   messages: Message[];
   notes: InternalNote[];
   lastMessageAt: string | null;
+  // Brouillon de compilation factuelle préparé (interne), non encore transmis.
+  compilationDraft?: string;
 }
 
 export type AiFunction =
@@ -139,6 +141,7 @@ export type LogKind =
   | "cr_disponible"
   | "ia_utilisee"
   | "ia_suggestion"
+  | "compilation_preparee"
   | "escalade_transmise"
   | "onboarding_complete"
   | "onboarding_envoye"

@@ -132,6 +132,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </Link>
         </header>
 
+        {/* Bandeau prototype — état non persistant */}
+        <div className="flex items-center gap-2 border-b border-navy-900/[0.06] bg-navy-50/60 px-4 py-1.5 text-[11px] text-charcoal/55 md:px-8">
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500" />
+          Prototype de démonstration — données fictives, état non persistant. Un rafraîchissement
+          peut réinitialiser la démo.
+        </div>
+
         <main className="flex-1 px-4 py-7 md:px-8 md:py-9">{children}</main>
       </div>
     </div>

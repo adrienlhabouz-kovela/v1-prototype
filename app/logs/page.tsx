@@ -10,12 +10,13 @@ import type { AiDecision, AiFunction, LogKind } from "@/lib/types";
 const logKindLabel: Record<LogKind, string> = {
   patient_attribue: "Patient attribué",
   message_envoye: "Message envoyé",
-  cr_prepare: "CR préparé",
-  cr_valide: "CR validé",
-  cr_disponible: "CR disponible",
+  cr_prepare: "CR — brouillon préparé",
+  cr_valide: "CR — validé en interne",
+  cr_disponible: "CR — disponible pour le chirurgien",
   ia_utilisee: "IA utilisée",
   ia_suggestion: "Suggestion IA",
-  escalade_transmise: "Escalade transmise",
+  compilation_preparee: "Compilation factuelle préparée",
+  escalade_transmise: "Escalade transmise au chirurgien",
   onboarding_complete: "Onboarding complété",
   onboarding_envoye: "Lien onboarding envoyé",
   patient_relance: "Patient relancé",
@@ -29,11 +30,12 @@ const logKindLabel: Record<LogKind, string> = {
 };
 
 const logKindStyle: Partial<Record<LogKind, string>> = {
-  ia_utilisee: "bg-teal-50 text-teal-700 ring-teal-200",
-  ia_suggestion: "bg-teal-50 text-teal-700 ring-teal-200",
-  escalade_transmise: "bg-indigo-50 text-indigo-700 ring-indigo-200",
-  cr_disponible: "bg-sky-50 text-sky-700 ring-sky-200",
-  cr_valide: "bg-sky-50 text-sky-700 ring-sky-200",
+  ia_utilisee: "bg-teal-50 text-teal-700 ring-teal-100",
+  ia_suggestion: "bg-teal-50 text-teal-700 ring-teal-100",
+  compilation_preparee: "bg-amber-50/70 text-amber-700 ring-amber-100",
+  escalade_transmise: "bg-navy-900 text-teal-100 ring-navy-900",
+  cr_disponible: "bg-teal-50 text-teal-700 ring-teal-100",
+  cr_valide: "bg-navy-50 text-navy-700 ring-navy-100",
 };
 
 const aiFnLabel: Record<AiFunction, string> = {
@@ -62,7 +64,7 @@ type OpsFilter = "all" | "ia" | "cr" | "escalade" | "patient" | "attribution";
 const opsFilterKinds: Record<Exclude<OpsFilter, "all">, LogKind[]> = {
   ia: ["ia_utilisee", "ia_suggestion"],
   cr: ["cr_prepare", "cr_valide", "cr_disponible"],
-  escalade: ["escalade_transmise"],
+  escalade: ["compilation_preparee", "escalade_transmise"],
   patient: [
     "message_envoye",
     "patient_relance",

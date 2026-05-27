@@ -78,8 +78,9 @@ interface KovelaState {
   validateReport: (patientId: string) => void;
   publishReport: (patientId: string) => void;
 
-  openEscalation: (patientId: string, compilation: string) => void;
-  transmitEscalation: (patientId: string) => void;
+  // compilation factuelle (brouillon interne) puis transmission explicite
+  prepareCompilation: (patientId: string, compilation: string) => void;
+  transmitCompilation: (patientId: string) => void;
 
   logAi: (fn: AiFunction, decision: AiDecision, patientId?: string) => void;
 
@@ -109,7 +110,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
   const initialPatients = useMemo(() => buildPatients(), []);
   const [role, setRole] = useState<Role>("admin");
   const [patients, setPatients] = useState<Patient[]>(initialPatients);
-  const [escalations, setEscalations] = useState<Escalation[]>(() => buildEscalations(initialPatients));
+  const [escalations, setEscalations] = useState<Escalation[]>(() => buildEscalations());
   const [reports, setReports] = useState<ClinicalReport[]>(() => buildReports(initialPatients));
   const [logs, setLogs] = useState<LogEntry[]>(() => buildInitialLogs(initialPatients));
   const [aiLogs, setAiLogs] = useState<AiLog[]>([]);
@@ -371,7 +372,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
         )
       );
       updatePatient(patientId, (p) => ({ ...p, status: p.status === "cr_en_attente" ? "actif" : p.status }));
-      pushLog("cr_valide", "Brouillon de CR validé par un humain.", patientId);
+      pushLog("cr_valide", "CR validé en interne (non encore visible côté chirurgien).", patientId);
     },
 
     publishReport(patientId) {
@@ -380,34 +381,42 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
           r.patientId === patientId ? { ...r, status: "disponible", updatedAt: new Date().toISOString() } : r
         )
       );
-      pushLog("cr_disponible", "CR rendu disponible au chirurgien.", patientId);
+      pushLog("cr_disponible", "CR rendu disponible pour le chirurgien.", patientId);
     },
 
-    openEscalation(patientId, compilation) {
+    // Préparer = brouillon factuel interne. N'ouvre PAS d'escalade.
+    prepareCompilation(patientId, compilation) {
+      updatePatient(patientId, (p) => ({ ...p, compilationDraft: compilation }));
+      pushLog("compilation_preparee", "Compilation factuelle préparée (brouillon, non transmise).", patientId);
+    },
+
+    // Transmettre = action humaine explicite → escalade transmise au chirurgien.
+    transmitCompilation(patientId) {
+      const p = patients.find((x) => x.id === patientId);
+      const compilation = p?.compilationDraft ?? "";
       setEscalations((prev) => {
         const existing = prev.find((e) => e.patientId === patientId && e.status !== "cloturee");
         if (existing) {
           return prev.map((e) =>
-            e.id === existing.id ? { ...e, compilation, status: "ouverte" } : e
+            e.id === existing.id
+              ? { ...e, compilation, status: "transmise", transmittedAt: new Date().toISOString() }
+              : e
           );
         }
         return [
           ...prev,
-          { id: uid("e"), patientId, status: "ouverte", openedAt: new Date().toISOString(), compilation },
+          {
+            id: uid("e"),
+            patientId,
+            status: "transmise",
+            openedAt: new Date().toISOString(),
+            transmittedAt: new Date().toISOString(),
+            compilation,
+          },
         ];
       });
       updatePatient(patientId, (p) => ({ ...p, status: "escalade_ouverte" }));
-    },
-
-    transmitEscalation(patientId) {
-      setEscalations((prev) =>
-        prev.map((e) =>
-          e.patientId === patientId && e.status === "ouverte"
-            ? { ...e, status: "transmise", transmittedAt: new Date().toISOString() }
-            : e
-        )
-      );
-      pushLog("escalade_transmise", "Compilation factuelle transmise au chirurgien.", patientId);
+      pushLog("escalade_transmise", "Escalade transmise au chirurgien.", patientId);
     },
 
     logAi(fn, decision, patientId) {
