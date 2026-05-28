@@ -66,8 +66,8 @@ const aiFnLabel: Record<AiFunction, string> = {
 const aiDecisionStyle: Record<AiDecision, string> = {
   propose: "bg-navy-50 text-charcoal/70 ring-navy-100",
   accepte: "bg-teal-50 text-teal-700 ring-teal-200",
-  modifie: "bg-amber-50 text-amber-700 ring-amber-200",
-  refuse: "bg-rose-50 text-rose-700 ring-rose-200",
+  modifie: "bg-amber-50/70 text-amber-700 ring-amber-100",
+  refuse: "bg-rose-50 text-rose-700 ring-rose-100",
 };
 
 const aiDecisionLabel: Record<AiDecision, string> = {

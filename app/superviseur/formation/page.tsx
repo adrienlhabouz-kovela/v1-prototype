@@ -29,6 +29,26 @@ const CASES = [
       "Préparer la compilation factuelle (brouillon interne), faire valider par un humain le contenu, puis cliquer explicitement « Transmettre au chirurgien ». Vérifier le log d'escalade.",
     badAnswer: "Cliquer directement sur un bouton « urgence » qui transmettrait sans validation humaine.",
   },
+  {
+    id: "c3",
+    title: "Cas 3 — Cycle de vie d'un CR",
+    context:
+      "Vous venez de préparer un CR via l'IA assistive. Le superviseur a validé en interne. Le chirurgien vous demande où en est son CR.",
+    goodAnswer:
+      "Le CR passe par trois états : Brouillon → Validé en interne → Disponible pour le chirurgien. Cliquer explicitement « Rendre disponible pour le chirurgien » avant que le CR n'apparaisse côté chirurgien. Vérifier les logs cr_valide puis cr_disponible.",
+    badAnswer:
+      "Considérer qu'un CR validé en interne est automatiquement visible côté chirurgien — il ne l'est pas tant que la mise à disposition n'est pas faite.",
+  },
+  {
+    id: "c4",
+    title: "Cas 4 — Préparer ≠ Transmettre",
+    context:
+      "Vous avez généré une compilation factuelle via l'IA pour un patient. Le brouillon est sauvegardé.",
+    goodAnswer:
+      "Préparer la compilation = brouillon interne ; le chirurgien ne la voit pas. La transmission au chirurgien est une action humaine explicite via « Transmettre au chirurgien ». Le log compilation_preparee précède escalade_transmise.",
+    badAnswer:
+      "Confondre les deux étapes et supposer que préparer une compilation déclenche une escalade visible chirurgien.",
+  },
 ];
 
 // Quiz court — uniquement process, jamais clinique.

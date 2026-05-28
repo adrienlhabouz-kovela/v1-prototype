@@ -169,8 +169,9 @@ export default function PatientFiche() {
                           m.author === "superviseur" ? "bg-white/15" : "bg-white"
                         }`}
                       >
-                        <span>{a.kind === "photo" ? "🖼" : "🎧"}</span>
-                        <span>{a.label}</span>
+                        <span className="inline-flex h-1.5 w-1.5 rounded-full bg-current opacity-60" />
+                        <span className="font-medium">{a.kind === "photo" ? "Photo" : "Audio"}</span>
+                        <span>· {a.label}</span>
                       </div>
                     ))}
                   </div>

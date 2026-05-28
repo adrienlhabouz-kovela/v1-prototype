@@ -103,7 +103,7 @@ export default function ChirurgienDashboard() {
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     {escTransmise && (
-                      <Badge className="bg-indigo-50 text-indigo-700 ring-indigo-200">Escalade reçue</Badge>
+                      <Badge className="bg-navy-900 text-teal-100 ring-navy-900">Escalade reçue</Badge>
                     )}
                     {report && report.status === "disponible" && (
                       <Badge className="bg-teal-50 text-teal-700 ring-teal-100">CR disponible</Badge>

@@ -85,8 +85,9 @@ export default function PatientMessages() {
                   <p className="leading-relaxed">{m.text}</p>
                   {m.attachments?.map((a) => (
                     <div key={a.id} className="mt-1.5 flex items-center gap-1.5 text-xs opacity-80">
-                      <span>{a.kind === "photo" ? "🖼" : "🎧"}</span>
-                      <span>{a.label}</span>
+                      <span className="inline-flex h-1.5 w-1.5 rounded-full bg-current opacity-60" />
+                      <span className="font-medium">{a.kind === "photo" ? "Photo" : "Audio"}</span>
+                      <span>· {a.label}</span>
                     </div>
                   ))}
                   <p className="mt-1 text-[10px] opacity-60">{formatDateTime(m.at)}</p>
