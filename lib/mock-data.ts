@@ -20,12 +20,29 @@ export const PRICING = {
   perActivatedPatient: 50, // € HT / patient activé
 };
 
+// Durées de suivi opérationnel proposées par défaut selon le type d'intervention
+// (esthétique / plastique). Strictement opérationnel — ajustable patient par
+// patient. Décision opérationnelle du cabinet, jamais imposée par KOVELA.
+export const DEFAULT_INTERVENTION_DURATIONS: Record<string, string> = {
+  Blépharoplastie: "J+5 / J+8",
+  Rhinoplastie: "J+12 / J+15",
+  "Lifting cervico-facial": "J+12 / J+15",
+  "Augmentation mammaire": "J+12",
+  "Réduction mammaire": "J+12",
+  Lipoaspiration: "J+8 / J+12",
+  Abdominoplastie: "J+15",
+  Otoplastie: "J+5 / J+8",
+  "Injection / geste léger": "J+5",
+  "Autre intervention": "Personnalisé",
+};
+
 function baseConfig(over: Partial<CabinetConfig>): CabinetConfig {
   return {
     specialization: "Chirurgie esthétique / plastique",
     vertical: "Esthétique & plastique",
     locations: ["Clinique du Parc"],
     defaultProtocol: "J+8 / J+15",
+    interventionDurations: { ...DEFAULT_INTERVENTION_DURATIONS },
     followType: "standard",
     crFrequency: "CR fin de suivi",
     transmissionChannel: "Interface KOVELA",

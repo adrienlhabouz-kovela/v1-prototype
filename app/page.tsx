@@ -93,11 +93,13 @@ const supervisionPoints = [
 ];
 
 const securityPoints = [
+  "Architecture cible pensée pour un hébergement HDS",
+  "Approche conçue avec les exigences RGPD en tête",
+  "Principes CNIL : minimisation, traçabilité, information, droits des personnes, accès limités",
   "Séparation site public / application métier",
-  "Données patient uniquement dans l'environnement applicatif prévu",
-  "Accès par rôle et journalisation des actions",
-  "Liens sécurisés prévus pour la production",
-  "IA assistive désactivable, jamais autonome",
+  "Données patient destinées à rester dans l'environnement applicatif sécurisé",
+  "Accès par rôle et logs d'accès / actions en production cible",
+  "IA assistive désactivable et loggée — jamais autonome",
   "Aucune donnée patient sur ce site public",
 ];
 
@@ -330,6 +332,45 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Section 7bis — Réputation & expérience patient */}
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <Eyebrow>Expérience patient & réputation cabinet</Eyebrow>
+        <h2 className="max-w-3xl font-display text-3xl tracking-tight text-navy-900 md:text-4xl">
+          Une meilleure expérience post-op, c'est aussi une réputation mieux maîtrisée.
+        </h2>
+        <p className="mt-5 max-w-3xl text-base leading-relaxed text-charcoal/70">
+          Le post-opératoire est souvent l'un des moments qui marque le plus l'expérience patient.
+          En structurant les échanges, les relances, les comptes-rendus et la traçabilité, KOVELA
+          aide le cabinet à offrir une expérience plus claire, plus rassurante et plus
+          professionnelle — sans retirer la main au chirurgien.
+        </p>
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { t: "Patient accompagné", d: "Un patient qui se sent accompagné, informé et entendu vit mieux son parcours." },
+            { t: "Cabinet soulagé", d: "Le cabinet centralise les échanges et réduit la charge sur les assistantes." },
+            { t: "Chirurgien serein", d: "Visibilité sans charge supplémentaire ; aucun transfert de responsabilité." },
+            { t: "Historique exploitable", d: "Comptes-rendus factuels et logs : un dossier de coordination clair." },
+            { t: "Image post-op maîtrisée", d: "Une organisation plus claire du post-op peut aider à préserver la qualité perçue." },
+            { t: "Service opéré", d: "Une équipe humaine spécialisée prend en charge le flux, pas un logiciel à gérer." },
+          ].map((b) => (
+            <div key={b.t} className="rounded-2xl bg-white p-5 shadow-card ring-1 ring-navy-900/[0.05]">
+              <div className="mb-3 h-px w-8 bg-teal-400" />
+              <h3 className="text-sm font-semibold text-navy-900">{b.t}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-charcoal/60">{b.d}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-8 max-w-3xl font-display text-2xl italic tracking-tight text-navy-900">
+          Une expérience post-op mieux structurée contribue à la satisfaction patient et à la
+          réputation du cabinet.
+        </p>
+        <p className="mt-4 max-w-3xl text-[11px] leading-relaxed text-charcoal/45">
+          KOVELA ne garantit pas la satisfaction patient ni la réputation du chirurgien. KOVELA
+          organise et trace le suivi post-opératoire pour aider le cabinet à mieux maîtriser son
+          image post-opératoire.
+        </p>
+      </section>
+
       {/* Section 8 — Supervision & qualité */}
       <section className="mx-auto max-w-6xl px-6 py-20">
         <Eyebrow>Supervision & qualité</Eyebrow>
@@ -359,6 +400,11 @@ export default function Landing() {
               <h2 className="max-w-2xl font-display text-3xl tracking-tight text-navy-900 md:text-4xl">
                 Conçu pour un cadre santé exigeant.
               </h2>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-charcoal/70">
+                KOVELA est conçu pour s'inscrire dans un cadre HDS, RGPD et CNIL, avec une
+                séparation claire entre site public et application métier, une logique de
+                minimisation des données, des accès par rôle et une traçabilité des actions.
+              </p>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {securityPoints.map((p) => (
                   <div key={p} className="flex items-start gap-2 text-sm text-charcoal/75">
@@ -368,8 +414,9 @@ export default function Landing() {
                 ))}
               </div>
               <p className="mt-6 text-xs leading-relaxed text-charcoal/45">
-                Éléments d'architecture cible, à valider juridiquement avant un déploiement en
+                Architecture cible — éléments à valider juridiquement avant un déploiement en
                 production. Ce site est un démonstrateur : aucune donnée patient n'y est collectée.
+                Aucune certification revendiquée à ce stade.
               </p>
             </div>
           </div>

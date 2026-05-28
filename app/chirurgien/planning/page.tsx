@@ -98,11 +98,19 @@ function emptyInput(): PlanningInput {
 export default function PlanningPage() {
   const k = useKovela();
   const config = k.surgeon(MY_SURGEON_ID)?.config;
-  // Le planning reprend les préférences du cabinet (lieu + durée par défaut).
+  const interventionTypes = useMemo(
+    () => (config ? Object.keys(config.interventionDurations) : []),
+    [config]
+  );
+  const protocolFor = (intervention: string): string | undefined =>
+    config?.interventionDurations[intervention] ?? config?.defaultProtocol;
+  const firstType = interventionTypes[0] ?? "";
+  // Le planning reprend les préférences du cabinet (lieu + type + durée).
   const addDefaults: PlanningInput = {
     ...emptyInput(),
     clinic: config?.locations[0] ?? "Clinique du Parc",
-    protocol: config?.defaultProtocol ?? "J+8 / J+15",
+    intervention: firstType,
+    protocol: protocolFor(firstType) ?? config?.defaultProtocol ?? "J+8 / J+15",
   };
 
   const planning = useMemo(
@@ -273,6 +281,8 @@ export default function PlanningPage() {
         title="Ajouter un patient au planning"
         initial={addDefaults}
         submitLabel="Ajouter au planning"
+        interventionTypes={interventionTypes}
+        protocolFor={protocolFor}
         onClose={() => setAddOpen(false)}
         onSubmit={(input) => {
           k.addPlanningPatient(input);
@@ -300,6 +310,8 @@ export default function PlanningPage() {
             : emptyInput()
         }
         submitLabel="Enregistrer les modifications"
+        interventionTypes={interventionTypes}
+        protocolFor={protocolFor}
         onClose={() => setEditTarget(null)}
         onSubmit={(input) => {
           if (editTarget) k.updatePlanningPatient(editTarget.id, input);
@@ -379,6 +391,8 @@ function PlanningFormModal({
   title,
   initial,
   submitLabel,
+  interventionTypes,
+  protocolFor,
   onClose,
   onSubmit,
 }: {
@@ -386,6 +400,8 @@ function PlanningFormModal({
   title: string;
   initial: PlanningInput;
   submitLabel: string;
+  interventionTypes?: string[];
+  protocolFor?: (intervention: string) => string | undefined;
   onClose: () => void;
   onSubmit: (input: PlanningInput) => void;
 }) {
@@ -409,7 +425,27 @@ function PlanningFormModal({
           <input className={inputCls} value={form.name} onChange={set("name")} placeholder="Prénom Nom" />
         </Field>
         <Field label="Type d'intervention">
-          <input className={inputCls} value={form.intervention} onChange={set("intervention")} placeholder="ex : Rhinoplastie" />
+          {interventionTypes && interventionTypes.length > 0 ? (
+            <select
+              className={inputCls}
+              value={form.intervention}
+              onChange={(e) => {
+                const v = e.target.value;
+                const newProto = protocolFor?.(v);
+                setForm((f) => ({ ...f, intervention: v, protocol: newProto ?? f.protocol }));
+              }}
+            >
+              {[form.intervention, ...interventionTypes]
+                .filter((v, i, a) => v && a.indexOf(v) === i)
+                .map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+            </select>
+          ) : (
+            <input className={inputCls} value={form.intervention} onChange={set("intervention")} placeholder="ex : Rhinoplastie" />
+          )}
         </Field>
         <Field label="Date d'intervention">
           <input type="date" className={inputCls} value={form.interventionDate} onChange={set("interventionDate")} />
@@ -430,6 +466,9 @@ function PlanningFormModal({
                 </option>
               ))}
           </select>
+          <span className="mt-1 block text-[11px] text-charcoal/45">
+            Durée proposée selon les préférences de fonctionnement du cabinet. Modifiable patient par patient.
+          </span>
         </Field>
         <Field label="Téléphone (fictif)">
           <input className={inputCls} value={form.phone} onChange={set("phone")} placeholder="06 00 00 00 00" />

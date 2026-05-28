@@ -204,6 +204,63 @@ export default function ChirurgienDashboard() {
           </Card>
         </div>
       </div>
+
+      {/* Durées par type d'intervention + Cadre cible */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader
+            title="Durées de suivi par type d'intervention"
+            subtitle="Préférences de fonctionnement cabinet — ajustables patient par patient"
+            action={
+              <Link href="/chirurgien/onboarding" className="text-xs font-medium text-teal-600 hover:text-teal-700">
+                Modifier →
+              </Link>
+            }
+          />
+          <div className="p-5">
+            {config && Object.keys(config.interventionDurations).length > 0 ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {Object.entries(config.interventionDurations).map(([type, dur]) => (
+                  <div
+                    key={type}
+                    className="flex items-center justify-between rounded-xl bg-navy-50/50 px-3 py-2 text-sm"
+                  >
+                    <span className="truncate text-navy-900">{type}</span>
+                    <span className="ml-2 shrink-0 text-charcoal/70">{dur}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-charcoal/45">Aucune durée configurée pour le moment.</p>
+            )}
+            <p className="mt-3 text-[11px] text-charcoal/45">
+              Durées de suivi opérationnel proposées par défaut. Décision opérationnelle du cabinet, jamais imposée par KOVELA.
+            </p>
+          </div>
+        </Card>
+
+        <Card>
+          <CardHeader title="Cadre cible" subtitle="HDS · RGPD · principes CNIL — architecture cible" />
+          <div className="space-y-2 p-5 text-sm">
+            {[
+              "HDS pour l'application métier",
+              "RGPD",
+              "Principes CNIL (minimisation, traçabilité, droits)",
+              "Accès par rôle",
+              "Traçabilité des actions humaines et IA",
+              "Aucune donnée patient dans le CRM ou la landing",
+            ].map((p) => (
+              <div key={p} className="flex items-start gap-2 text-charcoal/75">
+                <span className="mt-0.5 text-teal-500">•</span>
+                {p}
+              </div>
+            ))}
+            <p className="mt-2 text-[11px] text-charcoal/45">
+              Architecture cible — éléments à valider juridiquement avant un déploiement en production.
+            </p>
+          </div>
+        </Card>
+      </div>
     </Shell>
   );
 }

@@ -228,6 +228,34 @@ export default function ChirurgienOnboarding() {
               </div>
 
               <div>
+                <span className="mb-2 block text-xs font-medium text-charcoal/60">
+                  Durées de suivi par type d'intervention
+                </span>
+                <div className="space-y-1.5">
+                  {Object.entries(form.interventionDurations).map(([type, dur]) => (
+                    <div key={type} className="flex items-center gap-2">
+                      <span className="flex-1 truncate text-sm text-navy-900">{type}</span>
+                      <input
+                        className="w-44 rounded-lg border border-navy-100 px-2.5 py-1.5 text-sm outline-none focus:border-teal-400"
+                        value={dur}
+                        onChange={(e) =>
+                          setForm((f) => ({
+                            ...f,
+                            interventionDurations: { ...f.interventionDurations, [type]: e.target.value },
+                          }))
+                        }
+                        placeholder="ex : J+12 / J+15"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] text-charcoal/45">
+                  Ces durées servent à organiser le suivi opérationnel. Elles peuvent être ajustées
+                  patient par patient avec le cabinet. Décision opérationnelle du cabinet, jamais imposée par KOVELA.
+                </p>
+              </div>
+
+              <div>
                 <span className="mb-2 block text-xs font-medium text-charcoal/60">Typologie de suivi souhaitée</span>
                 <div className="grid gap-2 sm:grid-cols-3">
                   {FOLLOW_TYPES.map((t) => (

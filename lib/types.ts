@@ -93,6 +93,9 @@ export interface CabinetConfig {
   vertical: string; // verticale KOVELA associée
   locations: string[]; // lieux d'intervention / cliniques
   defaultProtocol: string; // durée de suivi par défaut (J+8 / J+15…)
+  // Durées de suivi proposées par défaut selon le type d'intervention.
+  // Strictement opérationnel — décision opérationnelle du cabinet, jamais imposée par KOVELA.
+  interventionDurations: Record<string, string>;
   followType: FollowType; // typologie de suivi
   crFrequency: string; // fréquence des comptes-rendus
   transmissionChannel: string; // canal de transmission cabinet
