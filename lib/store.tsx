@@ -12,7 +12,7 @@ import {
   buildReports,
   PRICING,
   seedProspects,
-  supervisors,
+  supervisors as seedSupervisors,
   surgeons as seedSurgeons,
 } from "./mock-data";
 import { PROMPT_VERSION } from "./ai";
@@ -24,6 +24,7 @@ import type {
   CabinetConfig,
   ClinicalReport,
   Escalation,
+  FormationStatus,
   LogEntry,
   LogKind,
   MandateStatus,
@@ -31,7 +32,9 @@ import type {
   Patient,
   Prospect,
   ProspectStatus,
+  QualityStatus,
   Role,
+  Supervisor,
   Surgeon,
 } from "./types";
 
@@ -78,7 +81,7 @@ interface KovelaState {
   // sélections / contexte
   surgeons: Surgeon[];
   assistants: Assistant[];
-  supervisors: typeof supervisors;
+  supervisors: Supervisor[];
   pricing: typeof PRICING;
 
   // actions
@@ -110,6 +113,13 @@ interface KovelaState {
   saveCabinetConfig: (surgeonId: string, config: CabinetConfig) => void;
   setMandateStatus: (surgeonId: string, status: MandateStatus) => void;
   addAssistant: (surgeonId: string, name: string) => void;
+
+  // Supervision & qualité
+  setSupervisorFormation: (supervisorId: string, status: FormationStatus) => void;
+  setSupervisorQuality: (supervisorId: string, status: QualityStatus) => void;
+  logQualityReview: (label: string, status: "ok" | "a_revoir") => void;
+  logPatientConsents: (patientId: string, prefs: { photo: boolean; audio: boolean; relances: boolean; notifications: boolean }) => void;
+  reportCabinetIssue: (patientId: string) => void;
 
   // CRM chirurgiens (commercial — AUCUNE donnée patient)
   prospects: Prospect[];
@@ -156,6 +166,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
   const [logs, setLogs] = useState<LogEntry[]>(() => buildInitialLogs(initialPatients));
   const [aiLogs, setAiLogs] = useState<AiLog[]>([]);
   const [surgeonsState, setSurgeons] = useState<Surgeon[]>(() => seedSurgeons.map((s) => ({ ...s })));
+  const [supervisorsState, setSupervisorsState] = useState<Supervisor[]>(() => seedSupervisors.map((s) => ({ ...s })));
   const [assistantsState, setAssistants] = useState<Assistant[]>(() => seedAssistants.map((a) => ({ ...a })));
   const [prospects, setProspects] = useState<Prospect[]>(() => seedProspects.map((p) => ({ ...p, notes: [...p.notes] })));
 
@@ -181,7 +192,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
   const assistantsFor = (surgeonId: string) =>
     assistantsState.filter((a) => a.surgeonId === surgeonId);
   const supervisorName = (id: string | null) =>
-    id ? supervisors.find((s) => s.id === id)?.name ?? "—" : "Non assigné";
+    id ? supervisorsState.find((s) => s.id === id)?.name ?? "—" : "Non assigné";
   const reportFor = (patientId: string) => reports.find((r) => r.patientId === patientId);
   const escalationFor = (patientId: string) =>
     escalations.find((e) => e.patientId === patientId && e.status !== "cloturee");
@@ -197,7 +208,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
     aiLogs,
     surgeons: surgeonsState,
     assistants: assistantsState,
-    supervisors,
+    supervisors: supervisorsState,
     pricing: PRICING,
 
     assignSupervisor(patientId, supervisorId) {
@@ -498,6 +509,44 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
       const assistant: Assistant = { id: uid("a"), name, surgeonId };
       setAssistants((prev) => [...prev, assistant]);
       pushLog("assistante_invitee", `Assistante « ${name} » invitée (fictif).`);
+    },
+
+    setSupervisorFormation(supervisorId, status) {
+      setSupervisorsState((prev) =>
+        prev.map((s) => (s.id === supervisorId ? { ...s, formationStatus: status } : s))
+      );
+      const labelMap = { a_former: "à former", en_cours: "formation en cours", pret: "prêt à suivre des patients" };
+      const sup = supervisorsState.find((s) => s.id === supervisorId);
+      pushLog("formation_completee", `Formation superviseur ${sup?.name ?? supervisorId} — ${labelMap[status]}.`);
+    },
+
+    setSupervisorQuality(supervisorId, status) {
+      setSupervisorsState((prev) =>
+        prev.map((s) => (s.id === supervisorId ? { ...s, qualityStatus: status } : s))
+      );
+      const sup = supervisorsState.find((s) => s.id === supervisorId);
+      pushLog("qualite_revue", `Revue qualité — ${sup?.name ?? supervisorId} marqué ${status === "ok" ? "OK" : "à revoir"}.`);
+    },
+
+    logQualityReview(label, status) {
+      pushLog("qualite_revue", `Revue qualité — ${label} → ${status === "ok" ? "OK" : "à revoir"}.`);
+    },
+
+    logPatientConsents(patientId, prefs) {
+      const fmt = (b: boolean) => (b ? "✓" : "✗");
+      pushLog(
+        "consentement_patient",
+        `Préférences de suivi confirmées par le patient : photo ${fmt(prefs.photo)}, audio ${fmt(prefs.audio)}, relances ${fmt(prefs.relances)}, notifications ${fmt(prefs.notifications)}.`,
+        patientId
+      );
+    },
+
+    reportCabinetIssue(patientId) {
+      pushLog(
+        "signalement_cabinet",
+        "Patient a signalé une erreur d'information au cabinet. Vérification à faire par l'équipe KOVELA.",
+        patientId
+      );
     },
 
     prospects,

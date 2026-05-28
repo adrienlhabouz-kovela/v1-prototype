@@ -5,8 +5,79 @@ import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Badge, Card, DoctrineNote, PageHeader } from "@/components/ui";
 import { useKovela } from "@/lib/store";
-import { relativeDays, statusLabels, statusStyles } from "@/lib/format";
+import { aiEstimatedMinutes, formatMinutes } from "@/lib/ai";
+import { formationLabels, formationStyles, relativeDays, statusLabels, statusStyles } from "@/lib/format";
 import type { Patient } from "@/lib/types";
+
+function MyIndicators() {
+  const k = useKovela();
+  const myId = "sup1";
+  const me = k.supervisors.find((s) => s.id === myId);
+  const mine = k.patients.filter((p) => p.supervisorId === myId);
+  const actifs = mine.filter((p) => p.status !== "cloture").length;
+  const treated = mine.reduce((acc, p) => acc + p.messages.filter((m) => m.treated).length, 0);
+  const untreated = mine.reduce(
+    (acc, p) => acc + p.messages.filter((m) => m.author === "patient" && !m.treated).length,
+    0
+  );
+  // Délai moyen patient → réponse (h)
+  const delays: number[] = [];
+  mine.forEach((p) => {
+    for (let i = 0; i < p.messages.length - 1; i++) {
+      if (p.messages[i].author === "patient" && p.messages[i + 1].author !== "patient") {
+        const dt =
+          (new Date(p.messages[i + 1].at).getTime() - new Date(p.messages[i].at).getTime()) / 36e5;
+        if (dt >= 0) delays.push(dt);
+      }
+    }
+  });
+  const delayH = delays.length ? delays.reduce((a, b) => a + b, 0) / delays.length : 0;
+  const reportsMine = k.reports.filter((r) => mine.some((p) => p.id === r.patientId));
+  const crFinalises = reportsMine.filter((r) => r.status === "valide" || r.status === "disponible").length;
+  const crEnAttente = mine.filter((p) => p.status === "cr_en_attente").length;
+  const assignedIds = new Set(mine.map((p) => p.id));
+  const myLogs = k.aiLogs.filter((l) => l.patientId && assignedIds.has(l.patientId));
+  const usage = myLogs.filter((l) => l.decision === "propose").length;
+  const ac = myLogs.filter((l) => l.decision === "accepte").length;
+  const mo = myLogs.filter((l) => l.decision === "modifie").length;
+  const minutes = myLogs
+    .filter((l) => l.decision === "propose")
+    .reduce((acc, l) => acc + aiEstimatedMinutes(l.fn), 0);
+
+  return (
+    <Card className="mb-6 overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-navy-900/[0.06] px-5 py-3.5">
+        <div>
+          <h3 className="text-sm font-semibold text-navy-900">Mes indicateurs</h3>
+          <p className="text-[11px] text-charcoal/55">
+            Ces indicateurs aident KOVELA à maintenir une qualité de traitement homogène.
+          </p>
+        </div>
+        {me && (
+          <Badge className={formationStyles[me.formationStatus]}>{formationLabels[me.formationStatus]}</Badge>
+        )}
+      </div>
+      <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-3 lg:grid-cols-6">
+        {[
+          ["Patients actifs", String(actifs)],
+          ["Messages traités", String(treated)],
+          ["Non traités", String(untreated)],
+          ["Délai moyen", delayH ? `${delayH.toFixed(1)} h` : "—"],
+          ["CR finalisés", String(crFinalises)],
+          ["CR en attente", String(crEnAttente)],
+          ["Usage IA", String(usage)],
+          ["IA acceptées / modifiées", `${ac} / ${mo}`],
+          ["Temps estimé gagné (IA)", formatMinutes(minutes)],
+        ].map(([label, value]) => (
+          <div key={label} className="bg-white px-4 py-3">
+            <p className="text-[10px] font-medium uppercase tracking-wide text-charcoal/45">{label}</p>
+            <p className="mt-1 font-display text-lg text-navy-900">{value}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
 
 interface Section {
   key: string;
@@ -84,6 +155,8 @@ export default function SuperviseurInbox() {
       </PageHeader>
 
       <DoctrineNote className="mb-6" />
+
+      <MyIndicators />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {sections.map((section) => {

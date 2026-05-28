@@ -118,10 +118,15 @@ export interface Assistant {
   surgeonId: string;
 }
 
+export type FormationStatus = "a_former" | "en_cours" | "pret";
+export type QualityStatus = "ok" | "a_revoir";
+
 export interface Supervisor {
   id: string;
   name: string;
   initials: string;
+  formationStatus: FormationStatus;
+  qualityStatus: QualityStatus;
 }
 
 export interface Attachment {
@@ -251,7 +256,11 @@ export type LogKind =
   | "crm_demo"
   | "crm_relance"
   | "crm_onboarding_lance"
-  | "crm_active";
+  | "crm_active"
+  | "qualite_revue"
+  | "formation_completee"
+  | "consentement_patient"
+  | "signalement_cabinet";
 
 export interface LogEntry {
   id: string;

@@ -52,6 +52,28 @@ export const priorityLabels: Record<Priority, string> = {
   haute: "Haute",
 };
 
+export const formationLabels: Record<import("./types").FormationStatus, string> = {
+  a_former: "À former",
+  en_cours: "Formation en cours",
+  pret: "Prêt à suivre des patients",
+};
+
+export const formationStyles: Record<import("./types").FormationStatus, string> = {
+  a_former: "bg-amber-50/70 text-amber-700 ring-amber-100",
+  en_cours: "bg-teal-50/60 text-navy-700 ring-teal-100",
+  pret: "bg-teal-50 text-teal-700 ring-teal-100",
+};
+
+export const qualityLabels: Record<import("./types").QualityStatus, string> = {
+  ok: "OK",
+  a_revoir: "À revoir",
+};
+
+export const qualityStyles: Record<import("./types").QualityStatus, string> = {
+  ok: "bg-teal-50 text-teal-700 ring-teal-100",
+  a_revoir: "bg-amber-50/70 text-amber-700 ring-amber-100",
+};
+
 export const mandateLabels: Record<MandateStatus, string> = {
   a_creer: "À créer",
   lien_envoye: "Lien envoyé",

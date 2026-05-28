@@ -209,24 +209,33 @@ export function Modal({
 // Encadré de sortie IA — disclaimer obligatoire + actions humaines.
 export function AiSuggestion({
   output,
+  estimatedMinutesLabel,
   onAccept,
   onModify,
   onRefuse,
 }: {
   output: string;
+  estimatedMinutesLabel?: string;
   onAccept?: () => void;
   onModify?: () => void;
   onRefuse?: () => void;
 }) {
   return (
     <div className="rounded-2xl border border-teal-100 bg-teal-50/50 p-5">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-teal-500 text-[10px] font-bold text-white">
-          IA
-        </span>
-        <span className="text-xs font-semibold text-teal-700">
-          Suggestion IA — à valider par un humain
-        </span>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-teal-500 text-[10px] font-bold text-white">
+            IA
+          </span>
+          <span className="text-xs font-semibold text-teal-700">
+            Suggestion IA — à valider par un humain
+          </span>
+        </div>
+        {estimatedMinutesLabel && (
+          <span className="rounded-full bg-white px-2.5 py-0.5 text-[11px] text-charcoal/65 ring-1 ring-teal-100">
+            Estimation prototype — temps gagné estimé : {estimatedMinutesLabel}
+          </span>
+        )}
       </div>
       <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-navy-900">{output}</pre>
       {(onAccept || onModify || onRefuse) && (

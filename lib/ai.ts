@@ -12,6 +12,24 @@ export const PROMPT_VERSION = "v1.2";
 
 export const AI_DISCLAIMER = "Suggestion IA — à valider par un humain";
 
+// Temps estimé gagné par fonction IA (estimation prototype).
+// Sert à montrer la valeur opérationnelle de l'IA assistive, jamais à scorer.
+export function aiEstimatedMinutes(fn: import("./types").AiFunction): number {
+  if (fn === "resume_conversation") return 1.5;
+  if (fn === "preparation_cr") return 7;
+  if (fn === "reformulation") return 0.75;
+  if (fn === "compilation_escalade") return 6;
+  return 0;
+}
+
+export function formatMinutes(m: number): string {
+  if (m < 1) return `~${Math.round(m * 60)} sec`;
+  if (m < 60) return `~${m % 1 === 0 ? m : m.toFixed(1)} min`;
+  const h = Math.floor(m / 60);
+  const rem = Math.round(m % 60);
+  return rem ? `~${h} h ${rem} min` : `~${h} h`;
+}
+
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", {
     day: "2-digit",

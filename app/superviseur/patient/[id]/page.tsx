@@ -13,7 +13,7 @@ import {
   Modal,
 } from "@/components/ui";
 import { useKovela } from "@/lib/store";
-import { aiCompileEscalation, aiPrepareReport, aiReformulate, aiSummarize } from "@/lib/ai";
+import { aiCompileEscalation, aiEstimatedMinutes, aiPrepareReport, aiReformulate, aiSummarize, formatMinutes } from "@/lib/ai";
 import { templates } from "@/lib/templates";
 import {
   crStatusLabels,
@@ -449,6 +449,7 @@ export default function PatientFiche() {
         ) : (
           <AiSuggestion
             output={aiOutput}
+            estimatedMinutesLabel={aiKind ? formatMinutes(aiEstimatedMinutes(aiKind)) : undefined}
             onAccept={acceptAi}
             onModify={() => setEditing(true)}
             onRefuse={refuseAi}

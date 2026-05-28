@@ -107,10 +107,31 @@ export const assistants: Assistant[] = [
 ];
 
 export const supervisors: Supervisor[] = [
-  { id: "sup1", name: "Inès Carvalho", initials: "IC" },
-  { id: "sup2", name: "Thomas Berger", initials: "TB" },
-  { id: "sup3", name: "Awa Diallo", initials: "AD" },
-  { id: "sup4", name: "Julien Mercier", initials: "JM" },
+  { id: "sup1", name: "Inès Carvalho", initials: "IC", formationStatus: "pret", qualityStatus: "ok" },
+  { id: "sup2", name: "Thomas Berger", initials: "TB", formationStatus: "pret", qualityStatus: "ok" },
+  { id: "sup3", name: "Awa Diallo", initials: "AD", formationStatus: "en_cours", qualityStatus: "ok" },
+  { id: "sup4", name: "Julien Mercier", initials: "JM", formationStatus: "pret", qualityStatus: "a_revoir" },
+];
+
+// Listes seedées pour la vue « Supervision & qualité » (démonstratif).
+// Aucune donnée patient sensible : juste des références à des items existants
+// avec un libellé opérationnel.
+export const seedConversationsToReview: {
+  id: string; patientId: string; supervisorId: string; reason: string; comment: string; status: "a_relire" | "ok" | "a_revoir";
+}[] = [
+  { id: "qrv1", patientId: "p11", supervisorId: "sup1", reason: "Compilation factuelle préparée — à valider avant transmission", comment: "Bonne structure. Vérifier la chronologie avec le superviseur.", status: "a_relire" },
+  { id: "qrv2", patientId: "p10", supervisorId: "sup2", reason: "Délai de traitement long sur dernier message patient", comment: "Relance proposée — penser à logger le motif.", status: "a_relire" },
+  { id: "qrv3", patientId: "p13", supervisorId: "sup3", reason: "Suggestion IA modifiée puis envoyée", comment: "Modification cohérente, conserve la forme non médicale.", status: "ok" },
+  { id: "qrv4", patientId: "p9", supervisorId: "sup4", reason: "Patient silencieux — pas de relance enregistrée", comment: "À revoir : programmer une relance.", status: "a_revoir" },
+];
+
+export const seedCRsToControl: {
+  id: string; patientId: string; supervisorId: string; lastAction: string; status: "a_controler" | "ok" | "a_revoir";
+}[] = [
+  { id: "qcr1", patientId: "p21", supervisorId: "sup1", lastAction: "CR validé en interne — à contrôler avant mise à disposition", status: "a_controler" },
+  { id: "qcr2", patientId: "p24", supervisorId: "sup2", lastAction: "CR validé en interne — à contrôler", status: "a_controler" },
+  { id: "qcr3", patientId: "p18", supervisorId: "sup1", lastAction: "CR rendu disponible pour le chirurgien", status: "ok" },
+  { id: "qcr4", patientId: "p27", supervisorId: "sup4", lastAction: "CR validé en interne — wording à vérifier", status: "a_revoir" },
 ];
 
 const interventions = [

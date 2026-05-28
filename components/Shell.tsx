@@ -11,10 +11,12 @@ const nav: Record<Role, { href: string; label: string }[]> = {
   admin: [
     { href: "/admin", label: "Tableau de bord" },
     { href: "/admin/crm", label: "CRM Chirurgiens" },
+    { href: "/admin/supervision", label: "Supervision & qualité" },
     { href: "/logs", label: "Logs" },
   ],
   superviseur: [
     { href: "/superviseur", label: "Inbox opérationnelle" },
+    { href: "/superviseur/formation", label: "Formation" },
     { href: "/logs", label: "Logs" },
   ],
   chirurgien: [

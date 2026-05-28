@@ -37,6 +37,10 @@ const logKindLabel: Record<LogKind, string> = {
   crm_relance: "CRM — relance programmée",
   crm_onboarding_lance: "CRM — onboarding cabinet lancé",
   crm_active: "CRM — chirurgien actif",
+  qualite_revue: "Qualité — revue",
+  formation_completee: "Formation — complétée",
+  consentement_patient: "Patient — consentements confirmés",
+  signalement_cabinet: "Patient — signalement cabinet",
 };
 
 const logKindStyle: Partial<Record<LogKind, string>> = {
@@ -69,7 +73,7 @@ const aiDecisionLabel: Record<AiDecision, string> = {
   refuse: "Refusée",
 };
 
-type OpsFilter = "all" | "ia" | "cr" | "escalade" | "patient" | "attribution" | "cabinet" | "crm";
+type OpsFilter = "all" | "ia" | "cr" | "escalade" | "patient" | "attribution" | "cabinet" | "crm" | "qualite";
 
 const opsFilterKinds: Record<Exclude<OpsFilter, "all">, LogKind[]> = {
   ia: ["ia_utilisee", "ia_suggestion"],
@@ -85,6 +89,7 @@ const opsFilterKinds: Record<Exclude<OpsFilter, "all">, LogKind[]> = {
     "crm_onboarding_lance",
     "crm_active",
   ],
+  qualite: ["qualite_revue", "formation_completee"],
   patient: [
     "message_envoye",
     "patient_relance",
@@ -92,6 +97,8 @@ const opsFilterKinds: Record<Exclude<OpsFilter, "all">, LogKind[]> = {
     "onboarding_complete",
     "onboarding_envoye",
     "note_interne",
+    "consentement_patient",
+    "signalement_cabinet",
     "planning_ajout",
     "planning_modifie",
     "planning_reporte",
@@ -152,6 +159,7 @@ export default function LogsPage() {
             ["attribution", "Attribution"],
             ["cabinet", "Cabinet"],
             ["crm", "CRM"],
+            ["qualite", "Qualité"],
           ] as [OpsFilter, string][]).map(([f, label]) => (
             <button
               key={f}
