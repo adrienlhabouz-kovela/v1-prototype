@@ -438,9 +438,23 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
     },
 
     publishReport(patientId) {
+      // Au passage côté chirurgien, on retire les mentions « brouillon / à
+      // valider par un humain » (réservées à l'espace superviseur / IA) et
+      // on appose la mention de mise à disposition par l'équipe KOVELA.
+      const normalize = (raw: string): string => {
+        const lines = raw
+          .split("\n")
+          .filter((l) => !/Brouillon|à valider par un humain|synthèse opérationnelle non médicale/i.test(l));
+        while (lines.length && lines[lines.length - 1].trim() === "") lines.pop();
+        lines.push("");
+        lines.push("Compte-rendu factuel préparé et rendu disponible par l'équipe KOVELA.");
+        return lines.join("\n");
+      };
       setReports((prev) =>
         prev.map((r) =>
-          r.patientId === patientId ? { ...r, status: "disponible", updatedAt: new Date().toISOString() } : r
+          r.patientId === patientId
+            ? { ...r, status: "disponible", content: normalize(r.content), updatedAt: new Date().toISOString() }
+            : r
         )
       );
       pushLog("cr_disponible", "CR rendu disponible pour le chirurgien.", patientId);

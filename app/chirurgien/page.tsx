@@ -67,7 +67,7 @@ export default function ChirurgienDashboard() {
         subtitle="Vous ne recevez pas du bruit : un historique clair et exploitable. Vous gardez la main."
       >
         <Link href="/chirurgien/planning">
-          <Button variant="primary">Déposer / modifier mon planning opératoire</Button>
+          <Button variant="primary">Transmettre / modifier mon planning opératoire</Button>
         </Link>
       </PageHeader>
 

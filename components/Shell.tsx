@@ -2,10 +2,19 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 import { useKovela } from "@/lib/store";
 import type { Role } from "@/lib/types";
 import { Wordmark } from "@/components/Brand";
+
+// Mappe le préfixe d'URL au rôle métier correspondant.
+function roleFromPathname(pathname: string): Role | null {
+  if (pathname.startsWith("/admin")) return "admin";
+  if (pathname.startsWith("/superviseur")) return "superviseur";
+  if (pathname.startsWith("/chirurgien")) return "chirurgien";
+  if (pathname.startsWith("/patient")) return "patient";
+  return null;
+}
 
 const nav: Record<Role, { href: string; label: string }[]> = {
   admin: [
@@ -54,6 +63,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const { role, setRole, currentUser } = useKovela();
   const pathname = usePathname();
   const router = useRouter();
+
+  // Bascule automatique du rôle métier sur l'URL : éviter d'afficher
+  // « Admin KOVELA » quand l'utilisateur est sur /chirurgien, etc.
+  useEffect(() => {
+    const r = roleFromPathname(pathname);
+    if (r && r !== role) setRole(r);
+  }, [pathname, role, setRole]);
 
   const items = nav[role];
 

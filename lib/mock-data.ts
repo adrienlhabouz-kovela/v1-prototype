@@ -519,9 +519,9 @@ function defaultReportContent(name: string): string {
     "— Messages classés opérationnellement et traités.",
     "",
     "Escalades : aucune escalade ouverte sur la période.",
-    "Statut final : suivi conforme au protocole déclaré.",
+    "Statut final : suivi clôturé selon les paramètres de service définis avec le cabinet.",
     "",
-    "Note : synthèse opérationnelle non médicale. À valider par un humain.",
+    "Compte-rendu factuel préparé et rendu disponible par l'équipe KOVELA.",
   ].join("\n");
 }
 

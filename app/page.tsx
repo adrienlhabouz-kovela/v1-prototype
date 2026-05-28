@@ -56,7 +56,7 @@ const pillars = [
 ];
 
 const steps = [
-  { t: "Le cabinet est accompagné par KOVELA", d: "L'équipe KOVELA met en place le service : spécialité, préférences de fonctionnement, assistante, mandat de prélèvement (simulation)." },
+  { t: "KOVELA met en place le service avec le cabinet", d: "Le cabinet définit ses préférences avec l'équipe KOVELA : spécialité, préférences de fonctionnement, assistante, mandat de prélèvement (simulation)." },
   { t: "Le planning opératoire est déposé", d: "Ajout manuel ou import simple du planning des patients." },
   { t: "Le patient active son suivi", d: "Lien sécurisé, limites du service, messagerie." },
   { t: "KOVELA supervise et documente", d: "Messages, relances, IA assistive, traçabilité complète." },
@@ -167,6 +167,17 @@ export default function Landing() {
           </div>
 
           <p className="mt-6 text-sm text-navy-100/55">Conçu avec des chirurgiens, pour des chirurgiens.</p>
+        </div>
+      </section>
+
+      {/* Bande de positionnement « service opéré » — directement sous le hero */}
+      <section className="border-y border-navy-900/[0.06] bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-8">
+          <p className="font-display text-lg leading-relaxed text-navy-900 md:text-xl">
+            <span className="font-semibold">KOVELA est un service opéré</span> de coordination
+            post-opératoire, appuyé sur une plateforme métier, une supervision humaine
+            spécialisée et une IA assistive interne.
+          </p>
         </div>
       </section>
 
@@ -405,7 +416,35 @@ export default function Landing() {
                 séparation claire entre site public et application métier, une logique de
                 minimisation des données, des accès par rôle et une traçabilité des actions.
               </p>
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+
+              <div className="mt-8 grid gap-4 md:grid-cols-2">
+                <div className="rounded-2xl bg-[#eef1f3] p-5 ring-1 ring-navy-900/[0.05]">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-charcoal/55">
+                    Site public
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-navy-900">
+                    Hors HDS — aucune donnée patient
+                  </p>
+                  <p className="mt-2 text-xs leading-relaxed text-charcoal/65">
+                    Présentation du service, contact démo. Aucun formulaire patient, aucune
+                    collecte de donnée de santé.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-[#eef1f3] p-5 ring-1 ring-navy-900/[0.05]">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-charcoal/55">
+                    Application métier cible
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-navy-900">
+                    Pensée pour HDS, RGPD, principes CNIL
+                  </p>
+                  <p className="mt-2 text-xs leading-relaxed text-charcoal/65">
+                    Accès par rôle, traçabilité, minimisation, droits des personnes. IA assistive
+                    désactivable et loggée.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {securityPoints.map((p) => (
                   <div key={p} className="flex items-start gap-2 text-sm text-charcoal/75">
                     <span className="mt-0.5 text-teal-500">•</span>

@@ -95,7 +95,7 @@ export default function ChirurgienOnboarding() {
       <PageHeader
         eyebrow="Mise en place cabinet"
         title="Mise en place du service KOVELA"
-        subtitle="L'équipe KOVELA met en place le service pour votre cabinet. Précisez vos préférences de fonctionnement avant l'import du planning opératoire."
+        subtitle="Renseignez les informations nécessaires à l'équipe KOVELA pour mettre en place le service avec votre cabinet."
       />
 
       <div className="mx-auto max-w-3xl">
@@ -360,7 +360,7 @@ export default function ChirurgienOnboarding() {
             <div className="space-y-4">
               <h2 className="font-display text-xl text-navy-900">Assistantes / secrétariat autorisés</h2>
               <p className="text-sm text-charcoal/60">
-                Les assistantes autorisées peuvent déposer et modifier le planning opératoire du cabinet.
+                Les assistantes autorisées peuvent transmettre et modifier le planning opératoire du cabinet.
               </p>
               <div className="space-y-2">
                 {k.assistantsFor(MY_SURGEON_ID).map((a) => (

@@ -132,7 +132,7 @@ export default function PlanningPage() {
       <PageHeader
         eyebrow={k.surgeonName(MY_SURGEON_ID)}
         title="Planning opératoire"
-        subtitle="Déposez votre planning : KOVELA prépare l'onboarding patient, puis le suivi structuré et la supervision."
+        subtitle="Transmettez votre planning opératoire à KOVELA : l'équipe prépare l'onboarding patient, puis le suivi structuré et la supervision."
       >
         <Button variant="secondary" onClick={() => setImportOpen(true)}>
           Importer un planning
