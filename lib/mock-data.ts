@@ -14,6 +14,7 @@ import type {
   Patient,
   PatientStatus,
   Prospect,
+  SalesOwner,
   Supervisor,
   SupervisorSuggestion,
   Surgeon,
@@ -119,6 +120,14 @@ export const surgeons: Surgeon[] = [
     clinic: "Clinique du Parc",
     config: baseConfig({ locations: ["Clinique du Parc"], mandateStatus: "lien_envoye" }),
   },
+];
+
+// CRM Sales — propriétaires commerciaux fictifs.
+export const salesOwners: SalesOwner[] = [
+  { id: "so1", name: "Adrien", role: "Fondateur / Sales senior", email: "adrien@kovela.test" },
+  { id: "so2", name: "Sarah", role: "Sales chirurgiens esthétiques", email: "sarah@kovela.test" },
+  { id: "so3", name: "Maxime", role: "Sales verticales ambulatoires", email: "maxime@kovela.test" },
+  { id: "so4", name: "Lina", role: "Sales ops / relances", email: "lina@kovela.test" },
 ];
 
 export const assistants: Assistant[] = [
@@ -590,7 +599,7 @@ export function buildInitialLogs(patients: Patient[]): LogEntry[] {
 // Pipeline commercial : prospection → démo → onboarding cabinet → actif.
 export const seedProspects: Prospect[] = [
   {
-    id: "pr1", firstName: "Alexandre", lastName: "Bonnet", specialty: "Chirurgie esthétique / plastique",
+    id: "pr1", salesOwnerId: "so2", firstName: "Alexandre", lastName: "Bonnet", specialty: "Chirurgie esthétique / plastique",
     vertical: "Esthétique & plastique", cabinet: "Cabinet Bonnet", city: "Paris",
     email: "a.bonnet@exemple.test", phone: "06 00 00 02 10", linkedin: "linkedin.com/in/exemple-bonnet",
     source: "LinkedIn", cabinetType: "solo", monthlyVolume: 28, interest: "tiede", priority: "moyenne",
@@ -600,7 +609,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr2", firstName: "Hélène", lastName: "Lemaire", specialty: "Chirurgie esthétique / plastique",
+    id: "pr2", salesOwnerId: "so1", firstName: "Hélène", lastName: "Lemaire", specialty: "Chirurgie esthétique / plastique",
     vertical: "Esthétique & plastique", cabinet: "Institut Lemaire", city: "Neuilly-sur-Seine",
     email: "h.lemaire@exemple.test", phone: "06 00 00 02 11", linkedin: "linkedin.com/in/exemple-lemaire",
     source: "Recommandation", cabinetType: "solo", monthlyVolume: 42, interest: "chaud", priority: "haute",
@@ -610,7 +619,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr3", firstName: "Pierre", lastName: "Garcia", specialty: "Chirurgie ORL",
+    id: "pr3", salesOwnerId: "so3", firstName: "Pierre", lastName: "Garcia", specialty: "Chirurgie ORL",
     vertical: "ORL / maxillo-facial", cabinet: "Cabinet Garcia", city: "Lyon",
     email: "p.garcia@exemple.test", phone: "06 00 00 02 12", linkedin: "linkedin.com/in/exemple-garcia",
     source: "Salon", cabinetType: "groupe", monthlyVolume: 35, interest: "tiede", priority: "moyenne",
@@ -621,7 +630,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr4", firstName: "Sophie", lastName: "Marchand", specialty: "Chirurgie esthétique / plastique",
+    id: "pr4", salesOwnerId: "so2", firstName: "Sophie", lastName: "Marchand", specialty: "Chirurgie esthétique / plastique",
     vertical: "Esthétique & plastique", cabinet: "Cabinet Marchand", city: "Bordeaux",
     email: "s.marchand@exemple.test", phone: "06 00 00 02 13", linkedin: "linkedin.com/in/exemple-marchand",
     source: "Inbound site", cabinetType: "solo", monthlyVolume: 22, interest: "chaud", priority: "haute",
@@ -631,7 +640,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr5", firstName: "Thomas", lastName: "Dupuis", specialty: "Chirurgie esthétique / plastique",
+    id: "pr5", salesOwnerId: "so1", firstName: "Thomas", lastName: "Dupuis", specialty: "Chirurgie esthétique / plastique",
     vertical: "Esthétique & plastique", cabinet: "Clinique Dupuis", city: "Marseille",
     email: "t.dupuis@exemple.test", phone: "06 00 00 02 14", linkedin: "linkedin.com/in/exemple-dupuis",
     source: "Réseau", cabinetType: "clinique", monthlyVolume: 60, interest: "chaud", priority: "haute",
@@ -642,7 +651,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr6", firstName: "Léa", lastName: "Robert", specialty: "Chirurgie orthopédique",
+    id: "pr6", salesOwnerId: "so3", firstName: "Léa", lastName: "Robert", specialty: "Chirurgie orthopédique",
     vertical: "Ambulatoire orthopédique", cabinet: "Centre Robert", city: "Toulouse",
     email: "l.robert@exemple.test", phone: "06 00 00 02 15", linkedin: "linkedin.com/in/exemple-robert",
     source: "Recommandation", cabinetType: "groupe", monthlyVolume: 30, interest: "tiede", priority: "moyenne",
@@ -652,7 +661,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr7", firstName: "Antoine", lastName: "Petit", specialty: "Chirurgie esthétique / plastique",
+    id: "pr7", salesOwnerId: "so2", firstName: "Antoine", lastName: "Petit", specialty: "Chirurgie esthétique / plastique",
     vertical: "Esthétique & plastique", cabinet: "Cabinet Petit", city: "Paris",
     email: "a.petit@exemple.test", phone: "06 00 00 02 16", linkedin: "linkedin.com/in/exemple-petit",
     source: "Inbound site", cabinetType: "solo", monthlyVolume: 18, interest: "chaud", priority: "haute",
@@ -663,7 +672,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr8", firstName: "Marie", lastName: "Fournier", specialty: "Chirurgie ophtalmologique",
+    id: "pr8", salesOwnerId: "so3", firstName: "Marie", lastName: "Fournier", specialty: "Chirurgie ophtalmologique",
     vertical: "Ophtalmologie", cabinet: "Centre Fournier", city: "Nantes",
     email: "m.fournier@exemple.test", phone: "06 00 00 02 17", linkedin: "linkedin.com/in/exemple-fournier",
     source: "Salon", cabinetType: "groupe", monthlyVolume: 50, interest: "tiede", priority: "moyenne",
@@ -673,7 +682,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr9", firstName: "Julien", lastName: "Caron", specialty: "Chirurgie esthétique / plastique",
+    id: "pr9", salesOwnerId: "so4", firstName: "Julien", lastName: "Caron", specialty: "Chirurgie esthétique / plastique",
     vertical: "Esthétique & plastique", cabinet: "Cabinet Caron", city: "Lille",
     email: "j.caron@exemple.test", phone: "06 00 00 02 18", linkedin: "linkedin.com/in/exemple-caron",
     source: "LinkedIn", cabinetType: "solo", monthlyVolume: 25, interest: "tiede", priority: "moyenne",
@@ -683,7 +692,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr10", firstName: "Camille", lastName: "Bernard", specialty: "Chirurgie gynécologique",
+    id: "pr10", salesOwnerId: "so4", firstName: "Camille", lastName: "Bernard", specialty: "Chirurgie gynécologique",
     vertical: "Gynécologie", cabinet: "Cabinet Bernard", city: "Strasbourg",
     email: "c.bernard@exemple.test", phone: "06 00 00 02 19", linkedin: "linkedin.com/in/exemple-bernard",
     source: "Recommandation", cabinetType: "solo", monthlyVolume: 20, interest: "tiede", priority: "moyenne",
@@ -693,7 +702,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr11", firstName: "Élise", lastName: "Roy", specialty: "Chirurgie esthétique / plastique",
+    id: "pr11", salesOwnerId: "so2", firstName: "Élise", lastName: "Roy", specialty: "Chirurgie esthétique / plastique",
     vertical: "Esthétique & plastique", cabinet: "Institut Roy", city: "Paris",
     email: "e.roy@exemple.test", phone: "06 00 00 02 20", linkedin: "linkedin.com/in/exemple-roy",
     source: "Réseau", cabinetType: "solo", monthlyVolume: 38, interest: "chaud", priority: "haute",
@@ -704,7 +713,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
   {
-    id: "pr12", firstName: "Romain", lastName: "Lopez", specialty: "Chirurgie esthétique / plastique",
+    id: "pr12", salesOwnerId: "so2", firstName: "Romain", lastName: "Lopez", specialty: "Chirurgie esthétique / plastique",
     vertical: "Esthétique & plastique", cabinet: "Cabinet Lopez", city: "Nice",
     email: "r.lopez@exemple.test", phone: "06 00 00 02 21", linkedin: "linkedin.com/in/exemple-lopez",
     source: "Inbound site", cabinetType: "solo", monthlyVolume: 32, interest: "chaud", priority: "haute",
@@ -714,7 +723,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "lien_envoye", isActive: false,
   },
   {
-    id: "pr13", firstName: "Camille", lastName: "Aragon", specialty: "Chirurgie esthétique / plastique",
+    id: "pr13", salesOwnerId: "so1", firstName: "Camille", lastName: "Aragon", specialty: "Chirurgie esthétique / plastique",
     vertical: "Esthétique & plastique", cabinet: "Clinique du Parc", city: "Paris",
     email: "c.aragon@exemple.test", phone: "06 00 00 02 22", linkedin: "linkedin.com/in/exemple-aragon",
     source: "Inbound site", cabinetType: "solo", monthlyVolume: 40, interest: "chaud", priority: "haute",
@@ -725,7 +734,7 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "mandat_actif", isActive: true,
   },
   {
-    id: "pr14", firstName: "Pauline", lastName: "Henry", specialty: "Chirurgie urologique",
+    id: "pr14", salesOwnerId: "so4", firstName: "Pauline", lastName: "Henry", specialty: "Chirurgie urologique",
     vertical: "Urologie", cabinet: "Centre Henry", city: "Rennes",
     email: "p.henry@exemple.test", phone: "06 00 00 02 23", linkedin: "linkedin.com/in/exemple-henry",
     source: "LinkedIn", cabinetType: "groupe", monthlyVolume: 24, interest: "froid", priority: "basse",

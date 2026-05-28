@@ -13,6 +13,7 @@ function roleFromPathname(pathname: string): Role | null {
   if (pathname.startsWith("/superviseur")) return "superviseur";
   if (pathname.startsWith("/chirurgien")) return "chirurgien";
   if (pathname.startsWith("/patient")) return "patient";
+  if (pathname.startsWith("/sales")) return "admin"; // vue sales = sous-espace admin
   return null;
 }
 
@@ -20,6 +21,7 @@ const nav: Record<Role, { href: string; label: string }[]> = {
   admin: [
     { href: "/admin", label: "Tableau de bord" },
     { href: "/admin/crm", label: "CRM Chirurgiens" },
+    { href: "/sales", label: "Vue sales" },
     { href: "/admin/supervision", label: "Supervision & qualité" },
     { href: "/logs", label: "Logs" },
   ],

@@ -12,6 +12,7 @@ import {
   buildPatients,
   buildReports,
   PRICING,
+  salesOwners as seedSalesOwners,
   seedConversationsToReview,
   seedCRsToControl,
   seedProspects,
@@ -38,6 +39,7 @@ import type {
   ProspectStatus,
   QualityStatus,
   Role,
+  SalesOwner,
   Supervisor,
   SupervisorSuggestion,
   SuggestionImpact,
@@ -70,6 +72,7 @@ export interface ProspectInput {
   monthlyVolume: number;
   interest: Prospect["interest"];
   priority: Prospect["priority"];
+  salesOwnerId: string;
 }
 
 export interface PlanningInput {
@@ -153,6 +156,7 @@ interface KovelaState {
 
   // CRM chirurgiens (commercial — AUCUNE donnée patient)
   prospects: Prospect[];
+  salesOwners: SalesOwner[];
   addProspect: (input: ProspectInput) => void;
   updateProspectStatus: (id: string, status: ProspectStatus) => void;
   addProspectNote: (id: string, text: string) => void;
@@ -160,6 +164,7 @@ interface KovelaState {
   scheduleProspectRelance: (id: string, date: string, action: string) => void;
   launchProspectOnboarding: (id: string) => void;
   activateProspectAsSurgeon: (id: string) => void;
+  assignProspectSalesOwner: (id: string, salesOwnerId: string) => void;
 
   logAi: (fn: AiFunction, decision: AiDecision, patientId?: string) => void;
 
@@ -667,6 +672,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
     },
 
     prospects,
+    salesOwners: seedSalesOwners,
     addProspect(input) {
       const p: Prospect = {
         id: uid("pr"),
@@ -684,6 +690,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
         monthlyVolume: Number(input.monthlyVolume) || 0,
         interest: input.interest,
         priority: input.priority,
+        salesOwnerId: input.salesOwnerId || seedSalesOwners[0].id,
         status: "a_contacter",
         lastContactAt: null,
         nextAction: "Premier contact",
@@ -743,6 +750,16 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
       pushLog(
         "crm_onboarding_lance",
         `Onboarding cabinet lancé pour ${t?.firstName ?? ""} ${t?.lastName ?? id}.`
+      );
+    },
+
+    assignProspectSalesOwner(id, salesOwnerId) {
+      updateProspect(id, (p) => ({ ...p, salesOwnerId }));
+      const t = prospects.find((p) => p.id === id);
+      const owner = seedSalesOwners.find((o) => o.id === salesOwnerId);
+      pushLog(
+        "crm_assignation",
+        `Prospect ${t?.firstName ?? ""} ${t?.lastName ?? id} assigné à ${owner?.name ?? salesOwnerId}.`
       );
     },
 

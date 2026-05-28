@@ -9,12 +9,14 @@ import {
   CardHeader,
   Modal,
   PageHeader,
+  SectionTitle,
   StatCard,
 } from "@/components/ui";
 import { useKovela, type ProspectInput } from "@/lib/store";
 import {
   interestLabels,
   interestStyles,
+  isRelanceDueWithin,
   prospectStatusLabels,
   prospectStatusStyles,
   formatDate,
@@ -103,10 +105,12 @@ function emptyInput(): ProspectInput {
     monthlyVolume: 0,
     interest: "tiede",
     priority: "moyenne",
+    salesOwnerId: "so1",
   };
 }
 
 const closingStatuses: ProspectStatus[] = ["accord_verbal", "onboarding_cabinet", "actif"];
+
 
 export default function CRMPage() {
   const k = useKovela();
@@ -124,6 +128,8 @@ export default function CRMPage() {
   const [fDemo, setFDemo] = useState<"all" | "yes" | "no">("all");
   const [fOnboarding, setFOnboarding] = useState<"all" | "yes" | "no">("all");
   const [fActive, setFActive] = useState<"all" | "yes" | "no">("all");
+  const [fOwner, setFOwner] = useState<string>("all");
+  const [fRelanceDue, setFRelanceDue] = useState<"all" | "yes">("all");
 
   const prospects = k.prospects;
 
@@ -154,6 +160,8 @@ export default function CRMPage() {
       if (fDemo !== "all" && p.demoDone !== (fDemo === "yes")) return false;
       if (fOnboarding !== "all" && p.onboardingLaunched !== (fOnboarding === "yes")) return false;
       if (fActive !== "all" && p.isActive !== (fActive === "yes")) return false;
+      if (fOwner !== "all" && p.salesOwnerId !== fOwner) return false;
+      if (fRelanceDue === "yes" && !isRelanceDueWithin(p.nextRelanceAt, 7)) return false;
       return true;
     });
   }, [
@@ -167,7 +175,34 @@ export default function CRMPage() {
     fDemo,
     fOnboarding,
     fActive,
+    fOwner,
+    fRelanceDue,
   ]);
+
+  // Performance commerciale par sales — pilotage opérationnel.
+  const perSales = useMemo(() => {
+    return k.salesOwners.map((o) => {
+      const assigned = prospects.filter((p) => p.salesOwnerId === o.id);
+      const demos = assigned.filter((p) => p.demoDone).length;
+      const reflexion = assigned.filter((p) => p.status === "en_reflexion").length;
+      const onboardings = assigned.filter((p) => p.onboardingLaunched).length;
+      const actifs = assigned.filter((p) => p.isActive).length;
+      const closingOrActive = assigned.filter((p) => closingStatuses.includes(p.status));
+      const monthlyVolume = closingOrActive.reduce((acc, p) => acc + (p.monthlyVolume || 0), 0);
+      const caPotentiel = closingOrActive.length * k.pricing.baseMonthly + monthlyVolume * k.pricing.perActivatedPatient;
+      const relancesDues = assigned.filter((p) => isRelanceDueWithin(p.nextRelanceAt, 7)).length;
+      const nextAction =
+        assigned
+          .filter((p) => isRelanceDueWithin(p.nextRelanceAt, 7))
+          .sort((a, b) => (a.nextRelanceAt ?? "").localeCompare(b.nextRelanceAt ?? ""))[0]
+          ?.nextAction || "—";
+      return { owner: o, assigned: assigned.length, demos, reflexion, onboardings, actifs, monthlyVolume, caPotentiel, relancesDues, nextAction };
+    });
+  }, [prospects, k.salesOwners, k.pricing]);
+
+  const relancesDuesWeek = prospects.filter((p) => isRelanceDueWithin(p.nextRelanceAt, 7)).length;
+  const demoToOnboardingRate =
+    stats.demos > 0 ? Math.round((stats.onboardings / stats.demos) * 100) : 0;
 
   return (
     <Shell>
@@ -195,6 +230,58 @@ export default function CRMPage() {
         Estimation commerciale — données fictives. {k.pricing.baseMonthly} € HT × (closing + actifs) +{" "}
         {k.pricing.perActivatedPatient} € HT × volume patients estimé.
       </p>
+
+      {/* Performance commerciale */}
+      <SectionTitle hint="Pilotage commercial — indicateurs commerciaux non punitifs">
+        Performance commerciale
+      </SectionTitle>
+      <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <StatCard label="Prospects total" value={stats.total} />
+        <StatCard label="Prospects actifs" value={prospects.filter((p) => p.status !== "perdu").length} />
+        <StatCard label="Démos faites" value={stats.demos} />
+        <StatCard label="Taux démo → onboarding" value={`${demoToOnboardingRate} %`} hint="estimation" />
+        <StatCard label="Relances dues cette semaine" value={relancesDuesWeek} accent />
+      </div>
+      <Card className="mb-8 overflow-hidden">
+        <CardHeader title="Performance par sales" subtitle="Indicateurs commerciaux par responsable commercial" />
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-navy-900/[0.06] text-left text-[11px] uppercase tracking-[0.08em] text-charcoal/45">
+                <th className="px-5 py-3 font-medium">Sales</th>
+                <th className="px-5 py-3 font-medium">Prospects</th>
+                <th className="px-5 py-3 font-medium">Démos</th>
+                <th className="px-5 py-3 font-medium">En réflexion</th>
+                <th className="px-5 py-3 font-medium">Onboardings</th>
+                <th className="px-5 py-3 font-medium">Actifs</th>
+                <th className="px-5 py-3 font-medium">Vol / mois</th>
+                <th className="px-5 py-3 font-medium">CA potentiel</th>
+                <th className="px-5 py-3 font-medium">Relances dues</th>
+                <th className="px-5 py-3 font-medium">Prochaine action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {perSales.map((s) => (
+                <tr key={s.owner.id} className="border-b border-navy-900/[0.04]">
+                  <td className="px-5 py-3">
+                    <div className="font-medium text-navy-900">{s.owner.name}</div>
+                    <div className="text-[11px] text-charcoal/55">{s.owner.role}</div>
+                  </td>
+                  <td className="px-5 py-3 text-charcoal/70">{s.assigned}</td>
+                  <td className="px-5 py-3 text-charcoal/70">{s.demos}</td>
+                  <td className="px-5 py-3 text-charcoal/70">{s.reflexion}</td>
+                  <td className="px-5 py-3 text-charcoal/70">{s.onboardings}</td>
+                  <td className="px-5 py-3 text-navy-900">{s.actifs}</td>
+                  <td className="px-5 py-3 text-charcoal/70">{s.monthlyVolume}</td>
+                  <td className="px-5 py-3 text-teal-700">{s.caPotentiel} €</td>
+                  <td className="px-5 py-3 text-charcoal/70">{s.relancesDues}</td>
+                  <td className="px-5 py-3 text-charcoal/70">{s.nextAction}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
       {/* Tabs */}
       <div className="mb-4 flex gap-2">
@@ -251,6 +338,10 @@ export default function CRMPage() {
                           <Badge className={interestStyles[p.interest]}>{interestLabels[p.interest]}</Badge>
                           <span className="text-[11px] text-charcoal/60">{p.monthlyVolume}/mois</span>
                         </div>
+                        <p className="mt-2 truncate text-[11px] text-charcoal/45">
+                          Sales : {k.salesOwners.find((o) => o.id === p.salesOwnerId)?.name ?? "—"}
+                          {p.nextRelanceAt ? ` · relance ${p.nextRelanceAt}` : ""}
+                        </p>
                         {p.nextAction && (
                           <p className="mt-2 truncate text-[11px] text-charcoal/55">
                             ↳ {p.nextAction}
@@ -336,6 +427,18 @@ export default function CRMPage() {
                 <option value="yes">Oui</option>
                 <option value="no">Non</option>
               </Sel>
+              <Sel label="Sales owner" value={fOwner} onChange={setFOwner}>
+                <option value="all">Tous</option>
+                {k.salesOwners.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.name}
+                  </option>
+                ))}
+              </Sel>
+              <Sel label="Relance due (7 j)" value={fRelanceDue} onChange={(v) => setFRelanceDue(v as "all" | "yes")}>
+                <option value="all">Toutes</option>
+                <option value="yes">Oui</option>
+              </Sel>
             </div>
           </Card>
 
@@ -349,6 +452,7 @@ export default function CRMPage() {
                     <th className="px-5 py-3.5 font-medium">Spécialité</th>
                     <th className="px-5 py-3.5 font-medium">Verticale</th>
                     <th className="px-5 py-3.5 font-medium">Ville</th>
+                    <th className="px-5 py-3.5 font-medium">Sales</th>
                     <th className="px-5 py-3.5 font-medium">Statut</th>
                     <th className="px-5 py-3.5 font-medium">Volume / mois</th>
                     <th className="px-5 py-3.5 font-medium">Dernier contact</th>
@@ -373,6 +477,9 @@ export default function CRMPage() {
                       <td className="px-5 py-3.5 text-charcoal/70">{p.specialty}</td>
                       <td className="px-5 py-3.5 text-charcoal/70">{p.vertical}</td>
                       <td className="px-5 py-3.5 text-charcoal/70">{p.city}</td>
+                      <td className="px-5 py-3.5 text-charcoal/70">
+                        {k.salesOwners.find((o) => o.id === p.salesOwnerId)?.name ?? "—"}
+                      </td>
                       <td className="px-5 py-3.5">
                         <Badge className={prospectStatusStyles[p.status]}>
                           {prospectStatusLabels[p.status]}
@@ -389,7 +496,7 @@ export default function CRMPage() {
                   ))}
                   {filtered.length === 0 && (
                     <tr>
-                      <td colSpan={13} className="px-5 py-8 text-center text-sm text-charcoal/45">
+                      <td colSpan={14} className="px-5 py-8 text-center text-sm text-charcoal/45">
                         Aucun prospect ne correspond aux filtres.
                       </td>
                     </tr>
@@ -446,6 +553,7 @@ function AddProspectModal({
   onClose: () => void;
   onSubmit: (input: ProspectInput) => void;
 }) {
+  const k = useKovela();
   const [form, setForm] = useState<ProspectInput>(emptyInput());
   const [seed, setSeed] = useState("");
   if (open && seed !== "open") {
@@ -547,6 +655,15 @@ function AddProspectModal({
             <option value="haute">Haute</option>
           </select>
         </Field>
+        <Field label="Sales owner">
+          <select className={inputCls} value={form.salesOwnerId} onChange={set("salesOwnerId")}>
+            {k.salesOwners.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.name} — {o.role}
+              </option>
+            ))}
+          </select>
+        </Field>
       </div>
       <div className="mt-5 flex justify-end gap-2">
         <Button variant="ghost" onClick={onClose}>
@@ -644,6 +761,19 @@ function ProspectModal({ target, onClose }: { target: Prospect | null; onClose: 
                 {PIPELINE.map((s) => (
                   <option key={s} value={s}>
                     {prospectStatusLabels[s]}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Sales owner">
+              <select
+                className={inputCls}
+                value={p.salesOwnerId}
+                onChange={(e) => k.assignProspectSalesOwner(p.id, e.target.value)}
+              >
+                {k.salesOwners.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.name} — {o.role}
                   </option>
                 ))}
               </select>

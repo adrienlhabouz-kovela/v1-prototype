@@ -109,6 +109,16 @@ export const suggestionStatusStyles: Record<import("./types").SuggestionStatus, 
   traite: "bg-navy-50/60 text-charcoal/45 ring-navy-100",
 };
 
+// CRM : relance « due » = dans les N jours OU déjà en retard.
+export function isRelanceDueWithin(dateStr: string | null, withinDays: number): boolean {
+  if (!dateStr) return false;
+  const d = new Date(dateStr).getTime();
+  if (Number.isNaN(d)) return false;
+  const NOW = new Date("2026-05-27T00:00:00Z").getTime();
+  const diffDays = (d - NOW) / 86400000;
+  return diffDays <= withinDays;
+}
+
 // Charge opérationnelle superviseur — indicateur sobre, non punitif.
 // Seuils prototype : maîtrisée ≤ 6 · à surveiller 7–9 · élevée ≥ 10.
 export function chargeBadge(count: number): { label: string; cls: string } {

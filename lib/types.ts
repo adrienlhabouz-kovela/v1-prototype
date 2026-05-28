@@ -16,6 +16,14 @@ export type CRStatus = "brouillon" | "valide" | "disponible";
 
 export type MessageAuthor = "patient" | "superviseur" | "systeme";
 
+// CRM Sales — propriétaires commerciaux des prospects.
+export interface SalesOwner {
+  id: string;
+  name: string;
+  role: string;
+  email: string; // fictif
+}
+
 // CRM Chirurgiens — pipeline commercial. AUCUNE donnée patient.
 export type ProspectStatus =
   | "a_contacter"
@@ -53,6 +61,7 @@ export interface Prospect {
   source: string;
   cabinetType: CabinetType;
   monthlyVolume: number; // patients/mois estimés
+  salesOwnerId: string; // owner commercial KOVELA
   interest: InterestLevel;
   priority: Priority;
   status: ProspectStatus;
@@ -298,6 +307,7 @@ export type LogKind =
   | "qualite_commentaire"
   | "suggestion_cree"
   | "suggestion_statut"
+  | "crm_assignation"
   | "formation_completee"
   | "consentement_patient"
   | "signalement_cabinet";
