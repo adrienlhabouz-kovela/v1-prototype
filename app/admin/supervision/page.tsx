@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Badge, Button, Card, CardHeader, DoctrineNote, PageHeader, SectionTitle, StatCard } from "@/components/ui";
 import { useKovela } from "@/lib/store";
 import { aiEstimatedMinutes, formatMinutes } from "@/lib/ai";
 import {
+  chargeBadge,
   formationLabels,
   formationStyles,
   qualityLabels,
@@ -32,13 +34,14 @@ function patientResponseDelaysH(messages: { author: string; at: string }[]): num
 
 export default function SupervisionPage() {
   const k = useKovela();
-  // Toggles locaux pour la démo qualité (OK / à revoir), initialisés depuis le seed.
-  const [convStatuses, setConvStatuses] = useState<Record<string, "a_relire" | "ok" | "a_revoir">>(
-    () => Object.fromEntries(seedConversationsToReview.map((c) => [c.id, c.status]))
-  );
-  const [crStatuses, setCrStatuses] = useState<Record<string, "a_controler" | "ok" | "a_revoir">>(
-    () => Object.fromEntries(seedCRsToControl.map((c) => [c.id, c.status]))
-  );
+  // États partagés depuis le store (boucle qualité légère).
+  const convStatuses = k.qualityConversations;
+  const crStatuses = k.qualityCRs;
+  const comments = k.qualityComments;
+  // Brouillons de commentaire locaux (édition en cours).
+  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
+  const draftFor = (id: string) => commentDrafts[id] ?? comments[id] ?? "";
+  const setDraft = (id: string, v: string) => setCommentDrafts((p) => ({ ...p, [id]: v }));
 
   const patients = k.patients;
   const aiLogs = k.aiLogs;
@@ -130,12 +133,20 @@ export default function SupervisionPage() {
   };
 
   function markConv(id: string, status: "ok" | "a_revoir", label: string) {
-    setConvStatuses((prev) => ({ ...prev, [id]: status }));
-    k.logQualityReview(`Conversation — ${label}`, status);
+    k.setQualityConversationStatus(id, status, label);
   }
   function markCr(id: string, status: "ok" | "a_revoir", label: string) {
-    setCrStatuses((prev) => ({ ...prev, [id]: status }));
-    k.logQualityReview(`CR — ${label}`, status);
+    k.setQualityCRStatus(id, status, label);
+  }
+  function saveComment(id: string, label: string) {
+    const v = draftFor(id);
+    k.setQualityComment(id, v, label);
+    // Le brouillon redevient égal à la valeur sauvegardée — pas d'indicateur.
+    setCommentDrafts((p) => {
+      const c = { ...p };
+      delete c[id];
+      return c;
+    });
   }
 
   return (
@@ -212,7 +223,12 @@ export default function SupervisionPage() {
                         {r.sup.formationStatus === "pret" ? "Actif" : r.sup.formationStatus === "en_cours" ? "En formation" : "À former"}
                       </Badge>
                     </td>
-                    <td className="px-5 py-3.5 text-navy-900">{r.actifs}</td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-navy-900">{r.actifs}</span>
+                        <Badge className={chargeBadge(r.actifs).cls}>{chargeBadge(r.actifs).label}</Badge>
+                      </div>
+                    </td>
                     <td className="px-5 py-3.5 text-charcoal/70">{r.treated}</td>
                     <td className="px-5 py-3.5 text-charcoal/70">{r.untreated}</td>
                     <td className="px-5 py-3.5 text-charcoal/70">{r.delayH ? `${r.delayH.toFixed(1)} h` : "—"}</td>
@@ -249,22 +265,42 @@ export default function SupervisionPage() {
           <div className="divide-y divide-navy-900/[0.05]">
             {seedConversationsToReview.map((c) => {
               const st = convStatuses[c.id];
+              const label = patientName(c.patientId);
               return (
                 <div key={c.id} className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="text-sm font-medium text-navy-900">{patientName(c.patientId)}</p>
+                      <p className="text-sm font-medium text-navy-900">{label}</p>
                       <p className="text-xs text-charcoal/55">Superviseur : {supName(c.supervisorId)}</p>
                     </div>
                     <Badge className={reviewBadgeStyle[st]}>{reviewLabel[st]}</Badge>
                   </div>
                   <p className="mt-2 text-xs text-charcoal/70">Raison : {c.reason}</p>
-                  <p className="mt-1 text-xs italic text-charcoal/55">« {c.comment} »</p>
-                  <div className="mt-3 flex gap-2">
-                    <Button variant="subtle" onClick={() => markConv(c.id, "ok", patientName(c.patientId))}>
+                  <textarea
+                    className="mt-2 w-full resize-none rounded-xl border border-navy-100 p-2.5 text-xs leading-relaxed outline-none focus:border-teal-400"
+                    rows={2}
+                    value={draftFor(c.id)}
+                    onChange={(e) => setDraft(c.id, e.target.value)}
+                    placeholder="Commentaire Head of Care…"
+                  />
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link
+                      href={`/superviseur/patient/${c.patientId}`}
+                      className="rounded-xl bg-navy-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-navy-800"
+                    >
+                      Ouvrir la fiche patient ↗
+                    </Link>
+                    <Button
+                      variant="subtle"
+                      disabled={draftFor(c.id) === (comments[c.id] ?? "")}
+                      onClick={() => saveComment(c.id, label)}
+                    >
+                      Enregistrer le commentaire
+                    </Button>
+                    <Button variant="subtle" onClick={() => markConv(c.id, "ok", label)}>
                       Marquer OK
                     </Button>
-                    <Button variant="subtle" onClick={() => markConv(c.id, "a_revoir", patientName(c.patientId))}>
+                    <Button variant="subtle" onClick={() => markConv(c.id, "a_revoir", label)}>
                       Marquer à revoir
                     </Button>
                   </div>
@@ -279,21 +315,42 @@ export default function SupervisionPage() {
           <div className="divide-y divide-navy-900/[0.05]">
             {seedCRsToControl.map((c) => {
               const st = crStatuses[c.id];
+              const label = patientName(c.patientId);
               return (
                 <div key={c.id} className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="text-sm font-medium text-navy-900">{patientName(c.patientId)}</p>
+                      <p className="text-sm font-medium text-navy-900">{label}</p>
                       <p className="text-xs text-charcoal/55">Superviseur : {supName(c.supervisorId)}</p>
                     </div>
                     <Badge className={reviewBadgeStyle[st]}>{reviewLabel[st]}</Badge>
                   </div>
                   <p className="mt-2 text-xs text-charcoal/70">{c.lastAction}</p>
-                  <div className="mt-3 flex gap-2">
-                    <Button variant="subtle" onClick={() => markCr(c.id, "ok", patientName(c.patientId))}>
+                  <textarea
+                    className="mt-2 w-full resize-none rounded-xl border border-navy-100 p-2.5 text-xs leading-relaxed outline-none focus:border-teal-400"
+                    rows={2}
+                    value={draftFor(c.id)}
+                    onChange={(e) => setDraft(c.id, e.target.value)}
+                    placeholder="Commentaire Head of Care…"
+                  />
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link
+                      href={`/superviseur/patient/${c.patientId}`}
+                      className="rounded-xl bg-navy-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-navy-800"
+                    >
+                      Ouvrir la fiche patient ↗
+                    </Link>
+                    <Button
+                      variant="subtle"
+                      disabled={draftFor(c.id) === (comments[c.id] ?? "")}
+                      onClick={() => saveComment(c.id, label)}
+                    >
+                      Enregistrer le commentaire
+                    </Button>
+                    <Button variant="subtle" onClick={() => markCr(c.id, "ok", label)}>
                       Marquer OK
                     </Button>
-                    <Button variant="subtle" onClick={() => markCr(c.id, "a_revoir", patientName(c.patientId))}>
+                    <Button variant="subtle" onClick={() => markCr(c.id, "a_revoir", label)}>
                       Marquer à revoir
                     </Button>
                   </div>

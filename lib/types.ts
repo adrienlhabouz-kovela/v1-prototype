@@ -261,6 +261,7 @@ export type LogKind =
   | "crm_onboarding_lance"
   | "crm_active"
   | "qualite_revue"
+  | "qualite_commentaire"
   | "formation_completee"
   | "consentement_patient"
   | "signalement_cabinet";

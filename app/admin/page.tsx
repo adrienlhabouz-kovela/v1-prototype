@@ -15,7 +15,8 @@ import {
   StatCard,
 } from "@/components/ui";
 import { useKovela } from "@/lib/store";
-import { formatDate, relativeDays, statusLabels, statusStyles } from "@/lib/format";
+import { chargeBadge, formatDate, relativeDays, statusLabels, statusStyles } from "@/lib/format";
+import { seedConversationsToReview, seedCRsToControl } from "@/lib/mock-data";
 import type { Patient } from "@/lib/types";
 
 type Filter = "all" | "sans_superviseur" | "escalade" | "cr_a_faire" | "silencieux" | "messages";
@@ -122,6 +123,46 @@ export default function AdminPage() {
         ))}
       </div>
 
+      {/* Qualité & délais — accès rapide à Supervision & qualité */}
+      <SectionTitle hint="Pilotage qualité en 30 secondes">Qualité & délais</SectionTitle>
+      <Card className="mb-8 p-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {(() => {
+            const delays: number[] = [];
+            k.patients.forEach((p) => {
+              for (let i = 0; i < p.messages.length - 1; i++) {
+                if (p.messages[i].author === "patient" && p.messages[i + 1].author !== "patient") {
+                  const dt =
+                    (new Date(p.messages[i + 1].at).getTime() - new Date(p.messages[i].at).getTime()) /
+                    36e5;
+                  if (dt >= 0) delays.push(dt);
+                }
+              }
+            });
+            const delayH = delays.length ? delays.reduce((a, b) => a + b, 0) / delays.length : 0;
+            const crToControl = seedCRsToControl.filter((c) => k.qualityCRs[c.id] === "a_controler").length;
+            const convToReview = seedConversationsToReview.filter((c) => k.qualityConversations[c.id] === "a_relire").length;
+            const formationsEnCours = k.supervisors.filter((s) => s.formationStatus === "en_cours").length;
+            return (
+              <>
+                <QualityIndicator label="Délai moyen de traitement" value={`${delayH.toFixed(1)} h`} />
+                <QualityIndicator label="CR à contrôler" value={String(crToControl)} />
+                <QualityIndicator label="Conversations à relire" value={String(convToReview)} />
+                <QualityIndicator label="Formations en cours" value={String(formationsEnCours)} />
+              </>
+            );
+          })()}
+        </div>
+        <div className="mt-4 flex justify-end">
+          <Link
+            href="/admin/supervision"
+            className="rounded-xl bg-navy-900 px-4 py-2 text-sm font-medium text-white hover:bg-navy-800"
+          >
+            Voir Supervision & qualité →
+          </Link>
+        </div>
+      </Card>
+
       {/* Stats principales */}
       <SectionTitle hint="Vue d'ensemble">Indicateurs</SectionTitle>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -149,7 +190,10 @@ export default function AdminPage() {
                     </span>
                     <span className="font-medium text-navy-900">{s.name}</span>
                   </div>
-                  <span className="font-semibold text-navy-900">{s.count} patients actifs</span>
+                  <div className="flex items-center gap-2">
+                    <Badge className={chargeBadge(s.count).cls}>{chargeBadge(s.count).label}</Badge>
+                    <span className="font-semibold text-navy-900">{s.count} patients actifs</span>
+                  </div>
                 </div>
                 <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-navy-100/70">
                   <div
@@ -397,5 +441,14 @@ export default function AdminPage() {
         </div>
       </Modal>
     </Shell>
+  );
+}
+
+function QualityIndicator({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[10px] font-medium uppercase tracking-wide text-charcoal/45">{label}</p>
+      <p className="mt-1 font-display text-2xl text-navy-900">{value}</p>
+    </div>
   );
 }

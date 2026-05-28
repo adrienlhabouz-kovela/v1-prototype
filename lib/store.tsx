@@ -11,6 +11,8 @@ import {
   buildPatients,
   buildReports,
   PRICING,
+  seedConversationsToReview,
+  seedCRsToControl,
   seedProspects,
   supervisors as seedSupervisors,
   surgeons as seedSurgeons,
@@ -121,6 +123,14 @@ interface KovelaState {
   logPatientConsents: (patientId: string, prefs: { photo: boolean; audio: boolean; relances: boolean; notifications: boolean }) => void;
   reportCabinetIssue: (patientId: string) => void;
 
+  // Revue qualité — états partagés et éditables (boucle légère).
+  qualityConversations: Record<string, "a_relire" | "ok" | "a_revoir">;
+  qualityCRs: Record<string, "a_controler" | "ok" | "a_revoir">;
+  qualityComments: Record<string, string>;
+  setQualityConversationStatus: (id: string, status: "ok" | "a_revoir", label: string) => void;
+  setQualityCRStatus: (id: string, status: "ok" | "a_revoir", label: string) => void;
+  setQualityComment: (id: string, comment: string, label: string) => void;
+
   // CRM chirurgiens (commercial — AUCUNE donnée patient)
   prospects: Prospect[];
   addProspect: (input: ProspectInput) => void;
@@ -169,6 +179,17 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
   const [supervisorsState, setSupervisorsState] = useState<Supervisor[]>(() => seedSupervisors.map((s) => ({ ...s })));
   const [assistantsState, setAssistants] = useState<Assistant[]>(() => seedAssistants.map((a) => ({ ...a })));
   const [prospects, setProspects] = useState<Prospect[]>(() => seedProspects.map((p) => ({ ...p, notes: [...p.notes] })));
+
+  // Revue qualité (état partagé entre /admin et /admin/supervision).
+  const [qualityConversations, setQualityConversations] = useState<Record<string, "a_relire" | "ok" | "a_revoir">>(
+    () => Object.fromEntries(seedConversationsToReview.map((c) => [c.id, c.status]))
+  );
+  const [qualityCRs, setQualityCRs] = useState<Record<string, "a_controler" | "ok" | "a_revoir">>(
+    () => Object.fromEntries(seedCRsToControl.map((c) => [c.id, c.status]))
+  );
+  const [qualityComments, setQualityComments] = useState<Record<string, string>>(
+    () => Object.fromEntries(seedConversationsToReview.map((c) => [c.id, c.comment]))
+  );
 
   function updateProspect(id: string, fn: (p: Prospect) => Prospect) {
     setProspects((prev) => prev.map((p) => (p.id === id ? fn(p) : p)));
@@ -544,6 +565,28 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
 
     logQualityReview(label, status) {
       pushLog("qualite_revue", `Revue qualité — ${label} → ${status === "ok" ? "OK" : "à revoir"}.`);
+    },
+
+    qualityConversations,
+    qualityCRs,
+    qualityComments,
+    setQualityConversationStatus(id, status, label) {
+      setQualityConversations((prev) => ({ ...prev, [id]: status }));
+      pushLog(
+        "qualite_revue",
+        `Conversation à relire — ${label} → ${status === "ok" ? "OK" : "à revoir"}.`
+      );
+    },
+    setQualityCRStatus(id, status, label) {
+      setQualityCRs((prev) => ({ ...prev, [id]: status }));
+      pushLog(
+        "qualite_revue",
+        `CR à contrôler — ${label} → ${status === "ok" ? "OK" : "à revoir"}.`
+      );
+    },
+    setQualityComment(id, comment, label) {
+      setQualityComments((prev) => ({ ...prev, [id]: comment }));
+      pushLog("qualite_commentaire", `Revue qualité commentée — ${label}.`);
     },
 
     logPatientConsents(patientId, prefs) {

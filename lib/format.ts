@@ -74,6 +74,21 @@ export const qualityStyles: Record<import("./types").QualityStatus, string> = {
   a_revoir: "bg-amber-50/70 text-amber-700 ring-amber-100",
 };
 
+// Charge opérationnelle superviseur — indicateur sobre, non punitif.
+// Seuils prototype : maîtrisée ≤ 6 · à surveiller 7–9 · élevée ≥ 10.
+export function chargeBadge(count: number): { label: string; cls: string } {
+  if (count <= 6) {
+    return { label: "Charge maîtrisée", cls: "bg-teal-50 text-teal-700 ring-teal-100" };
+  }
+  if (count <= 9) {
+    return { label: "À surveiller", cls: "bg-amber-50/70 text-amber-700 ring-amber-100" };
+  }
+  return {
+    label: "Charge élevée — réallocation possible",
+    cls: "bg-amber-50 text-amber-800 ring-amber-200",
+  };
+}
+
 export const mandateLabels: Record<MandateStatus, string> = {
   a_creer: "À créer",
   lien_envoye: "Lien envoyé",
