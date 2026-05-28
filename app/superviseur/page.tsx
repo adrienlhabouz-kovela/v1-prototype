@@ -3,11 +3,159 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
-import { Badge, Card, DoctrineNote, PageHeader } from "@/components/ui";
-import { useKovela } from "@/lib/store";
+import { Badge, Button, Card, DoctrineNote, Modal, PageHeader } from "@/components/ui";
+import { useKovela, type SuggestionInput } from "@/lib/store";
 import { aiEstimatedMinutes, formatMinutes } from "@/lib/ai";
-import { formationLabels, formationStyles, relativeDays, statusLabels, statusStyles } from "@/lib/format";
-import type { Patient } from "@/lib/types";
+import {
+  formationLabels,
+  formationStyles,
+  relativeDays,
+  statusLabels,
+  statusStyles,
+  suggestionImpactLabels,
+  suggestionTypeLabels,
+} from "@/lib/format";
+import type {
+  Patient,
+  SuggestionImpact,
+  SuggestionPriority,
+  SuggestionType,
+} from "@/lib/types";
+
+const MY_SUPERVISOR_ID = "sup1";
+
+function SuggestionsBlock() {
+  const k = useKovela();
+  const [open, setOpen] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const [form, setForm] = useState<SuggestionInput>(() => ({
+    type: "template",
+    screen: "",
+    description: "",
+    impact: "gain_temps",
+    priority: "moyenne",
+  }));
+  const mine = k.suggestions.filter((s) => s.supervisorId === MY_SUPERVISOR_ID);
+
+  function reset() {
+    setForm({ type: "template", screen: "", description: "", impact: "gain_temps", priority: "moyenne" });
+  }
+  function submit() {
+    k.addSuggestion(MY_SUPERVISOR_ID, form);
+    setOpen(false);
+    reset();
+    setConfirm(true);
+    window.setTimeout(() => setConfirm(false), 2500);
+  }
+  const inputCls =
+    "w-full rounded-xl border border-navy-100 px-3 py-2 text-sm outline-none focus:border-teal-400";
+
+  return (
+    <Card className="mb-6 overflow-hidden">
+      <div className="flex items-start justify-between gap-3 border-b border-navy-900/[0.06] px-5 py-3.5">
+        <div>
+          <h3 className="text-sm font-semibold text-navy-900">Améliorations terrain</h3>
+          <p className="text-[11px] text-charcoal/55">
+            Les superviseurs utilisent KOVELA au quotidien. Leurs retours permettent d'améliorer les
+            templates, l'IA assistive, la formation et l'organisation du service opéré.
+          </p>
+        </div>
+        <Button variant="primary" onClick={() => setOpen(true)}>
+          Proposer une amélioration
+        </Button>
+      </div>
+      {confirm && (
+        <div className="border-b border-teal-100 bg-teal-50/60 px-5 py-2 text-xs text-teal-700">
+          ✓ Suggestion enregistrée. Merci — elle sera relue par l'équipe KOVELA.
+        </div>
+      )}
+      <div className="px-5 py-3 text-xs text-charcoal/55">
+        {mine.length === 0
+          ? "Aucune suggestion de votre part pour l'instant."
+          : `${mine.length} suggestion${mine.length > 1 ? "s" : ""} de votre part.`}
+      </div>
+
+      <Modal open={open} onClose={() => setOpen(false)} title="Proposer une amélioration terrain" wide>
+        <p className="mb-3 text-xs text-charcoal/55">
+          Retour superviseur — utilisé pour l'amélioration continue du service opéré. Données fictives.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-medium text-charcoal/60">Type de suggestion</span>
+            <select
+              className={inputCls}
+              value={form.type}
+              onChange={(e) => setForm((f) => ({ ...f, type: e.target.value as SuggestionType }))}
+            >
+              {(Object.keys(suggestionTypeLabels) as SuggestionType[]).map((t) => (
+                <option key={t} value={t}>
+                  {suggestionTypeLabels[t]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-medium text-charcoal/60">Écran concerné</span>
+            <input
+              className={inputCls}
+              value={form.screen}
+              onChange={(e) => setForm((f) => ({ ...f, screen: e.target.value }))}
+              placeholder="ex : Fiche patient — panneau IA"
+            />
+          </label>
+          <label className="block sm:col-span-2">
+            <span className="mb-1 block text-[11px] font-medium text-charcoal/60">Description courte</span>
+            <textarea
+              className={`${inputCls} resize-none`}
+              rows={3}
+              value={form.description}
+              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              placeholder="Décrivez la friction ou l'idée d'amélioration…"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-medium text-charcoal/60">Impact estimé</span>
+            <select
+              className={inputCls}
+              value={form.impact}
+              onChange={(e) => setForm((f) => ({ ...f, impact: e.target.value as SuggestionImpact }))}
+            >
+              {(Object.keys(suggestionImpactLabels) as SuggestionImpact[]).map((i) => (
+                <option key={i} value={i}>
+                  {suggestionImpactLabels[i]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-medium text-charcoal/60">Priorité ressentie</span>
+            <select
+              className={inputCls}
+              value={form.priority}
+              onChange={(e) => setForm((f) => ({ ...f, priority: e.target.value as SuggestionPriority }))}
+            >
+              <option value="basse">Basse</option>
+              <option value="moyenne">Moyenne</option>
+              <option value="haute">Haute</option>
+            </select>
+          </label>
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Annuler
+          </Button>
+          <Button
+            variant="primary"
+            disabled={!form.description.trim() || !form.screen.trim()}
+            onClick={submit}
+          >
+            Envoyer la suggestion
+          </Button>
+        </div>
+      </Modal>
+    </Card>
+  );
+}
 
 function MyIndicators() {
   const k = useKovela();
@@ -157,6 +305,8 @@ export default function SuperviseurInbox() {
       <DoctrineNote className="mb-6" />
 
       <MyIndicators />
+
+      <SuggestionsBlock />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {sections.map((section) => {

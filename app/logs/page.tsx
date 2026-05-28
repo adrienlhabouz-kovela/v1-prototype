@@ -39,6 +39,8 @@ const logKindLabel: Record<LogKind, string> = {
   crm_active: "CRM — chirurgien actif",
   qualite_revue: "Qualité — revue",
   qualite_commentaire: "Qualité — commentaire",
+  suggestion_cree: "Amélioration terrain — proposée",
+  suggestion_statut: "Amélioration terrain — statut",
   formation_completee: "Formation — complétée",
   consentement_patient: "Patient — consentements confirmés",
   signalement_cabinet: "Patient — signalement cabinet",
@@ -90,7 +92,13 @@ const opsFilterKinds: Record<Exclude<OpsFilter, "all">, LogKind[]> = {
     "crm_onboarding_lance",
     "crm_active",
   ],
-  qualite: ["qualite_revue", "qualite_commentaire", "formation_completee"],
+  qualite: [
+    "qualite_revue",
+    "qualite_commentaire",
+    "formation_completee",
+    "suggestion_cree",
+    "suggestion_statut",
+  ],
   patient: [
     "message_envoye",
     "patient_relance",

@@ -2,6 +2,9 @@
 // Aucune donnée réelle de patient, de chirurgien ou de santé.
 
 import type {
+  AiDecision,
+  AiFunction,
+  AiLog,
   Assistant,
   CabinetConfig,
   ClinicalReport,
@@ -12,6 +15,7 @@ import type {
   PatientStatus,
   Prospect,
   Supervisor,
+  SupervisorSuggestion,
   Surgeon,
 } from "./types";
 
@@ -731,3 +735,128 @@ export const seedProspects: Prospect[] = [
     mandateStatus: "a_creer", isActive: false,
   },
 ];
+
+// Améliorations terrain — suggestions superviseurs fictives.
+export const seedSupervisorSuggestions: SupervisorSuggestion[] = [
+  {
+    id: "sug1",
+    supervisorId: "sup1",
+    type: "template",
+    screen: "Fiche patient — zone de réponse",
+    description: "Ajouter un template « clarification pansement » : trop reformulé à la main.",
+    impact: "gain_temps",
+    priority: "moyenne",
+    status: "retenu",
+    createdAt: daysAgoISO(3, 11),
+  },
+  {
+    id: "sug2",
+    supervisorId: "sup2",
+    type: "ia",
+    screen: "Fiche patient — panneau IA",
+    description: "Le résumé pourrait surligner les messages non traités.",
+    impact: "clarte",
+    priority: "haute",
+    status: "nouveau",
+    createdAt: daysAgoISO(1, 9),
+  },
+  {
+    id: "sug3",
+    supervisorId: "sup3",
+    type: "friction",
+    screen: "Inbox opérationnelle",
+    description: "Pouvoir trier rapidement les patients silencieux par ancienneté.",
+    impact: "experience_superviseur",
+    priority: "moyenne",
+    status: "a_revoir",
+    createdAt: daysAgoISO(5, 10),
+  },
+  {
+    id: "sug4",
+    supervisorId: "sup1",
+    type: "compilation",
+    screen: "Fiche patient — compilation factuelle",
+    description: "Afficher systématiquement les horodatages des pièces jointes.",
+    impact: "tracabilite",
+    priority: "haute",
+    status: "nouveau",
+    createdAt: daysAgoISO(2, 14),
+  },
+  {
+    id: "sug5",
+    supervisorId: "sup4",
+    type: "formation",
+    screen: "Formation superviseur",
+    description: "Ajouter un cas pratique sur le gating CR (brouillon → validé → disponible).",
+    impact: "qualite",
+    priority: "moyenne",
+    status: "traite",
+    createdAt: daysAgoISO(8, 10),
+  },
+];
+
+// Logs IA réalistes pour la démo Supervision & qualité.
+// Cible : ~18 acceptées, 6 modifiées, 2 refusées ; ~2 h 40 estimées gagnées.
+export function buildInitialAiLogs(): AiLog[] {
+  const logs: AiLog[] = [];
+  const PROMPT = "v1.2";
+  let n = 0;
+  const users = ["Inès Carvalho", "Thomas Berger", "Awa Diallo", "Julien Mercier"];
+  function rec(fn: AiFunction, decision: AiDecision, daysAgo: number) {
+    n += 1;
+    const d = new Date("2026-05-27T09:00:00Z");
+    d.setDate(d.getDate() - daysAgo);
+    d.setHours(9 + (n % 9), (n * 7) % 60, 0, 0);
+    logs.push({
+      id: `ai-seed-${n}`,
+      fn,
+      promptVersion: PROMPT,
+      at: d.toISOString(),
+      user: users[n % users.length],
+      decision,
+    });
+  }
+
+  // Proposes — distribution qui donne ~158 min ≈ 2 h 38.
+  // resume (×2 = 3 min) + preparation_cr (×16 = 112 min) + reformulation (×2 = 1.5 min)
+  // + compilation_escalade (×7 = 42 min) = 158.5 min.
+  for (let i = 0; i < 2; i++) rec("resume_conversation", "propose", 1 + i);
+  for (let i = 0; i < 16; i++) rec("preparation_cr", "propose", 1 + (i % 20));
+  for (let i = 0; i < 2; i++) rec("reformulation", "propose", 2 + i);
+  for (let i = 0; i < 7; i++) rec("compilation_escalade", "propose", 1 + (i % 15));
+
+  // Décisions humaines : 18 acceptées / 6 modifiées / 2 refusées.
+  // Acceptées (18) — surtout CR + compilation + 1 reformulation + 2 résumés.
+  const accepted: AiFunction[] = [
+    "resume_conversation",
+    "resume_conversation",
+    "preparation_cr",
+    "preparation_cr",
+    "preparation_cr",
+    "preparation_cr",
+    "preparation_cr",
+    "preparation_cr",
+    "preparation_cr",
+    "preparation_cr",
+    "preparation_cr",
+    "preparation_cr",
+    "compilation_escalade",
+    "compilation_escalade",
+    "compilation_escalade",
+    "compilation_escalade",
+    "compilation_escalade",
+    "reformulation",
+  ];
+  accepted.forEach((fn, i) => rec(fn, "accepte", 1 + (i % 18)));
+
+  // Modifiées (6)
+  for (let i = 0; i < 3; i++) rec("preparation_cr", "modifie", 2 + i);
+  for (let i = 0; i < 2; i++) rec("compilation_escalade", "modifie", 3 + i);
+  rec("reformulation", "modifie", 4);
+
+  // Refusées (2)
+  rec("resume_conversation", "refuse", 4);
+  rec("preparation_cr", "refuse", 5);
+
+  return logs;
+}

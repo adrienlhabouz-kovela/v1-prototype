@@ -74,6 +74,41 @@ export const qualityStyles: Record<import("./types").QualityStatus, string> = {
   a_revoir: "bg-amber-50/70 text-amber-700 ring-amber-100",
 };
 
+// Améliorations terrain — libellés.
+export const suggestionTypeLabels: Record<import("./types").SuggestionType, string> = {
+  template: "Template à améliorer",
+  ia: "IA assistive",
+  friction: "Friction workflow",
+  formation: "Formation",
+  cr: "Compte-rendu factuel",
+  compilation: "Compilation factuelle",
+  onboarding_patient: "Onboarding patient",
+  autre: "Autre",
+};
+
+export const suggestionImpactLabels: Record<import("./types").SuggestionImpact, string> = {
+  gain_temps: "Gain de temps",
+  clarte: "Clarté",
+  qualite: "Qualité",
+  tracabilite: "Traçabilité",
+  experience_patient: "Expérience patient",
+  experience_superviseur: "Expérience superviseur",
+};
+
+export const suggestionStatusLabels: Record<import("./types").SuggestionStatus, string> = {
+  nouveau: "Nouveau",
+  a_revoir: "À revoir",
+  retenu: "Retenu",
+  traite: "Traité",
+};
+
+export const suggestionStatusStyles: Record<import("./types").SuggestionStatus, string> = {
+  nouveau: "bg-teal-50/60 text-navy-700 ring-teal-100",
+  a_revoir: "bg-amber-50/70 text-amber-700 ring-amber-100",
+  retenu: "bg-teal-50 text-teal-700 ring-teal-100",
+  traite: "bg-navy-50/60 text-charcoal/45 ring-navy-100",
+};
+
 // Charge opérationnelle superviseur — indicateur sobre, non punitif.
 // Seuils prototype : maîtrisée ≤ 6 · à surveiller 7–9 · élevée ≥ 10.
 export function chargeBadge(count: number): { label: string; cls: string } {

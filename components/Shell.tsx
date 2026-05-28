@@ -47,6 +47,15 @@ const roleLabel: Record<Role, string> = {
   patient: "Patient",
 };
 
+// Utilisateur de démo affiché dans la sidebar — dérivé du chemin pour éviter
+// tout flash SSR « Admin KOVELA » sur les autres espaces.
+const userByRoleLabel: Record<Role, string> = {
+  admin: "Admin KOVELA",
+  superviseur: "Inès Carvalho",
+  chirurgien: "Dr. Camille Aragon",
+  patient: "Camille Moreau",
+};
+
 const roleHome: Record<Role, string> = {
   admin: "/admin",
   superviseur: "/superviseur",
@@ -60,18 +69,21 @@ export function Logo({ light }: { light?: boolean }) {
 }
 
 export function Shell({ children }: { children: React.ReactNode }) {
-  const { role, setRole, currentUser } = useKovela();
+  const { role, setRole } = useKovela();
   const pathname = usePathname();
   const router = useRouter();
 
-  // Bascule automatique du rôle métier sur l'URL : éviter d'afficher
-  // « Admin KOVELA » quand l'utilisateur est sur /chirurgien, etc.
+  // Rôle/utilisateur dérivés du chemin — cohérent dès le SSR (pas de flash).
+  const displayedRole: Role = roleFromPathname(pathname) ?? role;
+  const displayedUser = userByRoleLabel[displayedRole];
+
+  // Aligne le rôle du store sur l'URL (pills + nav restent cohérents).
   useEffect(() => {
     const r = roleFromPathname(pathname);
     if (r && r !== role) setRole(r);
   }, [pathname, role, setRole]);
 
-  const items = nav[role];
+  const items = nav[displayedRole];
 
   const activeHref = items
     .filter((x) => pathname === x.href || pathname.startsWith(x.href + "/"))
@@ -115,7 +127,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="mt-auto">
           <div className="rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/10">
             <p className="text-[10px] uppercase tracking-[0.14em] text-navy-100/45">Rôle (démo)</p>
-            <p className="mt-1 text-sm font-medium text-white">{currentUser}</p>
+            <p className="mt-1 text-sm font-medium text-white">{displayedUser}</p>
             <Link href="/login" className="mt-2.5 inline-block text-xs text-teal-300 hover:text-teal-200">
               Changer de rôle →
             </Link>
@@ -139,7 +151,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 key={r}
                 onClick={() => switchRole(r)}
                 className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
-                  role === r
+                  displayedRole === r
                     ? "bg-navy-900 text-white"
                     : "bg-navy-50 text-charcoal/70 hover:bg-navy-100"
                 }`}

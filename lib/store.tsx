@@ -7,6 +7,7 @@ import React, { createContext, useContext, useMemo, useState } from "react";
 import {
   assistants as seedAssistants,
   buildEscalations,
+  buildInitialAiLogs,
   buildInitialLogs,
   buildPatients,
   buildReports,
@@ -14,6 +15,7 @@ import {
   seedConversationsToReview,
   seedCRsToControl,
   seedProspects,
+  seedSupervisorSuggestions,
   supervisors as seedSupervisors,
   surgeons as seedSurgeons,
 } from "./mock-data";
@@ -37,8 +39,21 @@ import type {
   QualityStatus,
   Role,
   Supervisor,
+  SupervisorSuggestion,
+  SuggestionImpact,
+  SuggestionPriority,
+  SuggestionStatus,
+  SuggestionType,
   Surgeon,
 } from "./types";
+
+export interface SuggestionInput {
+  type: SuggestionType;
+  screen: string;
+  description: string;
+  impact: SuggestionImpact;
+  priority: SuggestionPriority;
+}
 
 export interface ProspectInput {
   firstName: string;
@@ -131,6 +146,11 @@ interface KovelaState {
   setQualityCRStatus: (id: string, status: "ok" | "a_revoir", label: string) => void;
   setQualityComment: (id: string, comment: string, label: string) => void;
 
+  // Améliorations terrain (suggestions superviseurs).
+  suggestions: SupervisorSuggestion[];
+  addSuggestion: (supervisorId: string, input: SuggestionInput) => void;
+  setSuggestionStatus: (id: string, status: SuggestionStatus) => void;
+
   // CRM chirurgiens (commercial — AUCUNE donnée patient)
   prospects: Prospect[];
   addProspect: (input: ProspectInput) => void;
@@ -174,7 +194,8 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
   const [escalations, setEscalations] = useState<Escalation[]>(() => buildEscalations());
   const [reports, setReports] = useState<ClinicalReport[]>(() => buildReports(initialPatients));
   const [logs, setLogs] = useState<LogEntry[]>(() => buildInitialLogs(initialPatients));
-  const [aiLogs, setAiLogs] = useState<AiLog[]>([]);
+  // Logs IA seedés pour la démo (~2 h 40 estimées gagnées, 18 / 6 / 2).
+  const [aiLogs, setAiLogs] = useState<AiLog[]>(() => buildInitialAiLogs());
   const [surgeonsState, setSurgeons] = useState<Surgeon[]>(() => seedSurgeons.map((s) => ({ ...s })));
   const [supervisorsState, setSupervisorsState] = useState<Supervisor[]>(() => seedSupervisors.map((s) => ({ ...s })));
   const [assistantsState, setAssistants] = useState<Assistant[]>(() => seedAssistants.map((a) => ({ ...a })));
@@ -189,6 +210,10 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
   );
   const [qualityComments, setQualityComments] = useState<Record<string, string>>(
     () => Object.fromEntries(seedConversationsToReview.map((c) => [c.id, c.comment]))
+  );
+
+  const [suggestions, setSuggestions] = useState<SupervisorSuggestion[]>(
+    () => seedSupervisorSuggestions.map((s) => ({ ...s }))
   );
 
   function updateProspect(id: string, fn: (p: Prospect) => Prospect) {
@@ -587,6 +612,41 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
     setQualityComment(id, comment, label) {
       setQualityComments((prev) => ({ ...prev, [id]: comment }));
       pushLog("qualite_commentaire", `Revue qualité commentée — ${label}.`);
+    },
+
+    suggestions,
+    addSuggestion(supervisorId, input) {
+      const sup = supervisorsState.find((s) => s.id === supervisorId);
+      const s: SupervisorSuggestion = {
+        id: uid("sug"),
+        supervisorId,
+        type: input.type,
+        screen: input.screen,
+        description: input.description,
+        impact: input.impact,
+        priority: input.priority,
+        status: "nouveau",
+        createdAt: new Date().toISOString(),
+      };
+      setSuggestions((prev) => [s, ...prev]);
+      pushLog(
+        "suggestion_cree",
+        `Amélioration terrain proposée par ${sup?.name ?? supervisorId} — ${input.screen}.`
+      );
+    },
+    setSuggestionStatus(id, status) {
+      const target = suggestions.find((s) => s.id === id);
+      setSuggestions((prev) => prev.map((s) => (s.id === id ? { ...s, status } : s)));
+      const labelMap: Record<SuggestionStatus, string> = {
+        nouveau: "nouveau",
+        a_revoir: "à revoir",
+        retenu: "retenu",
+        traite: "traité",
+      };
+      pushLog(
+        "suggestion_statut",
+        `Amélioration terrain — ${target?.screen ?? id} → ${labelMap[status]}.`
+      );
     },
 
     logPatientConsents(patientId, prefs) {

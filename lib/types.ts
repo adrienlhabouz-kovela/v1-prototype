@@ -69,6 +69,40 @@ export interface Prospect {
   isActive: boolean;
 }
 
+// Améliorations terrain — retours superviseurs (lean, démonstratif).
+export type SuggestionType =
+  | "template"
+  | "ia"
+  | "friction"
+  | "formation"
+  | "cr"
+  | "compilation"
+  | "onboarding_patient"
+  | "autre";
+
+export type SuggestionImpact =
+  | "gain_temps"
+  | "clarte"
+  | "qualite"
+  | "tracabilite"
+  | "experience_patient"
+  | "experience_superviseur";
+
+export type SuggestionPriority = "basse" | "moyenne" | "haute";
+export type SuggestionStatus = "nouveau" | "a_revoir" | "retenu" | "traite";
+
+export interface SupervisorSuggestion {
+  id: string;
+  supervisorId: string;
+  type: SuggestionType;
+  screen: string;
+  description: string;
+  impact: SuggestionImpact;
+  priority: SuggestionPriority;
+  status: SuggestionStatus;
+  createdAt: string;
+}
+
 export type FollowType = "standard" | "renforce" | "premium";
 
 export type MandateStatus = "a_creer" | "lien_envoye" | "mandat_actif" | "prelevement_pret";
@@ -262,6 +296,8 @@ export type LogKind =
   | "crm_active"
   | "qualite_revue"
   | "qualite_commentaire"
+  | "suggestion_cree"
+  | "suggestion_statut"
   | "formation_completee"
   | "consentement_patient"
   | "signalement_cabinet";

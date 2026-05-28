@@ -12,6 +12,10 @@ import {
   formationStyles,
   qualityLabels,
   qualityStyles,
+  suggestionImpactLabels,
+  suggestionStatusLabels,
+  suggestionStatusStyles,
+  suggestionTypeLabels,
 } from "@/lib/format";
 import { seedConversationsToReview, seedCRsToControl } from "@/lib/mock-data";
 
@@ -361,6 +365,9 @@ export default function SupervisionPage() {
         </Card>
       </div>
 
+      {/* Retours terrain superviseurs */}
+      <FieldReturnsBlock />
+
       {/* Socle qualité KOVELA */}
       <div className="mt-8">
         <SectionTitle hint="Préparation à une organisation qualité structurée">Socle qualité KOVELA</SectionTitle>
@@ -393,5 +400,70 @@ export default function SupervisionPage() {
         </Card>
       </div>
     </Shell>
+  );
+}
+
+function FieldReturnsBlock() {
+  const k = useKovela();
+  const open = k.suggestions.filter((s) => s.status === "nouveau" || s.status === "a_revoir").length;
+  return (
+    <div className="mt-8">
+      <SectionTitle hint="Boucle d'amélioration continue — service opéré">
+        Retours terrain superviseurs
+      </SectionTitle>
+      <Card>
+        <CardHeader
+          title={`${open} suggestion${open > 1 ? "s" : ""} ouverte${open > 1 ? "s" : ""}`}
+          subtitle="Suggestions récentes — issues des superviseurs au quotidien"
+        />
+        <div className="divide-y divide-navy-900/[0.05]">
+          {k.suggestions.map((s) => (
+            <FieldReturnRow key={s.id} suggestionId={s.id} />
+          ))}
+          {k.suggestions.length === 0 && (
+            <p className="px-5 py-6 text-sm text-charcoal/45">Aucune suggestion pour l'instant.</p>
+          )}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function FieldReturnRow({ suggestionId }: { suggestionId: string }) {
+  const k = useKovela();
+  const s = k.suggestions.find((x) => x.id === suggestionId);
+  if (!s) return null;
+  const sup = k.supervisors.find((x) => x.id === s.supervisorId);
+  return (
+    <div className="p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="bg-navy-50 text-charcoal/70 ring-navy-100">
+              {suggestionTypeLabels[s.type]}
+            </Badge>
+            <Badge className="bg-teal-50/60 text-navy-700 ring-teal-100">
+              {suggestionImpactLabels[s.impact]}
+            </Badge>
+            <span className="text-[11px] text-charcoal/55">
+              {sup?.name ?? s.supervisorId} · {s.screen}
+            </span>
+          </div>
+          <p className="mt-2 text-sm text-navy-900">{s.description}</p>
+        </div>
+        <Badge className={suggestionStatusStyles[s.status]}>{suggestionStatusLabels[s.status]}</Badge>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button variant="subtle" onClick={() => k.setSuggestionStatus(s.id, "a_revoir")}>
+          Marquer « à revoir »
+        </Button>
+        <Button variant="subtle" onClick={() => k.setSuggestionStatus(s.id, "retenu")}>
+          Marquer « retenu »
+        </Button>
+        <Button variant="subtle" onClick={() => k.setSuggestionStatus(s.id, "traite")}>
+          Marquer « traité »
+        </Button>
+      </div>
+    </div>
   );
 }
