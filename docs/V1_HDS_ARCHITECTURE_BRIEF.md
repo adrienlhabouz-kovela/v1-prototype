@@ -409,3 +409,170 @@ Backend → IA Gateway → LLM provider (Anthropic / Mistral / etc.)
 6. **Stratégie i18n** : démarrer V1 100 % FR ou prévoir EN dès le départ.
 7. **Mobile** : web responsive uniquement, PWA, ou app native ?
 8. **CRM** : interne (réutiliser le prototype) ou intégration externe (HubSpot / Pipedrive) ?
+
+---
+
+## 19. Automatisations cible V1
+
+> Le prototype simule visuellement ces automatisations. Aucune notification réelle n'est
+> envoyée. La V1 doit implémenter les automatisations ci-dessous, en respectant les
+> contraintes RGPD / HDS dès qu'il y a une donnée patient.
+
+### 19.1 Onboarding patient
+- **Génération d'un lien sécurisé** unique par patient (UUID + signature).
+- **Expiration** du lien (proposition : 14 jours, configurable cabinet).
+- **Envoi** via email + SMS (ou WhatsApp, si validé juridiquement Aumans) — **canal final
+  à arbitrer**.
+- **Relances** programmées (proposition : J-7, J-3, J-1 avant intervention, paramètres
+  ajustables Head of Care).
+- **Log** de chaque envoi (canal, destinataire, résultat).
+- **Statuts patient** : `lien_envoyé` / `relance_programmée` / `onboarding_complété` /
+  `erreur_envoi`.
+
+### 19.2 Planning opératoire
+- **Import CSV / Excel** : parser robuste avec validation par colonne attendue.
+- **Détection de doublons** (même patient + même date d'intervention).
+- **Détection de champs manquants** (téléphone, email, type d'intervention, date) avec
+  signalement à l'assistante avant validation.
+- **Liaison automatique** cabinet → chirurgien → type d'intervention → durée de suivi.
+- **Pré-remplissage de la durée** depuis `CabinetConfig.interventionDurations`.
+- **Activation patient** au moment de la complétion de l'onboarding patient (statut bascule
+  → patient activé, déclenche la facturation variable).
+
+### 19.3 Supervision
+- **Attribution superviseur** automatique par règle (charge, disponibilité, verticale) +
+  réattribution manuelle Head of Care.
+- **Détection patient silencieux** (règle : pas de message patient depuis N jours
+  configurables).
+- **Détection message non traité** (message patient sans réponse superviseur dans X heures).
+- **Détection CR en attente** (suivi clôturé sans CR finalisé après N jours).
+- **Transmission ouverte** : la préparation d'une compilation factuelle n'ouvre pas
+  l'escalade — l'humain transmet explicitement (cf. `PRODUCT_SCOPE.md` §11).
+- **Clôture de suivi** automatique après N jours de silence post-protocole (configurable).
+- **Relances internes** : signalement Head of Care si délai moyen superviseur dépasse seuil.
+
+### 19.4 Notifications
+
+| Destinataire | Événement | Canal recommandé | Contrainte |
+|---|---|---|---|
+| **Patient** | Lien onboarding | Email + SMS | RGPD : minimisation, opt-out possible |
+| Patient | Relances onboarding (J-7, J-3, J-1) | Email | À valider Aumans |
+| Patient | Confirmation envoi message | UI (déjà fait) | Pas de canal externe |
+| **Superviseur** | Message patient non traité depuis X h | UI + email digest | Pas en push (anti-stress) |
+| Superviseur | CR à faire (suivi clôturé sans CR) | UI + email digest | — |
+| **Chirurgien** | CR rendu disponible | Email avec lien sécurisé app | URL à expiration courte |
+| Chirurgien | Compilation factuelle transmise | Email avec lien sécurisé app | URL à expiration courte |
+| **Admin / HoC** | Charge superviseur élevée | UI + email digest | Pas d'alerte temps réel V1 |
+| Admin / HoC | Qualité « à revoir » signalée | UI + email digest | — |
+| **Sales** | Relance CRM due | UI + email digest matinal | — |
+
+**Choix prestataires** :
+- Email transactionnel : **Postmark** (UE), **Sendinblue**, **Mailjet** — DPA RGPD signé.
+- SMS : **OVHcloud SMS**, **Twilio** (zone UE, DPA RGPD).
+- WhatsApp Business : **uniquement après validation Aumans** (conformité RGPD + business
+  rules Meta).
+
+**Précisions importantes** :
+- **Aucune notification réelle dans le prototype** — tout est simulé en log.
+- **À développer en V1** avec services compatibles RGPD / HDS dès qu'il y a une donnée
+  patient dans le contenu de la notification.
+- **Métadonnées patient** dans les notifications externes : minimiser (pas de contenu de
+  message dans l'email ; un lien sécurisé vers l'app pour consulter).
+
+---
+
+## 20. Schéma de données cible — entités V1
+
+> Les types métier du prototype (`lib/types.ts`) servent de base. La V1 doit poser un schéma
+> Prisma (ou Drizzle) explicite avec relations, indexes et soft-delete.
+
+### Entités principales
+
+| Entité | Issu du prototype | Notes V1 |
+|---|---|---|
+| **User** | `Role` + utilisateur démo | Auth + MFA + audit `last_login`, `password_changed_at` |
+| **Role** | enum `Role` | Table de référence avec permissions associées |
+| **Cabinet** | inféré de `Surgeon` / `CabinetConfig` | Entité à part : un cabinet peut avoir plusieurs chirurgiens |
+| **Surgeon** | `Surgeon` | Rattaché à un ou plusieurs cabinets |
+| **Assistant** | `Assistant` | Rattaché à un cabinet, permissions limitées |
+| **Patient** | `Patient` (à séparer) | Voir note ci-dessous sur la séparation |
+| **Intervention** | `Patient.intervention*` | Entité à part : un patient peut avoir N interventions |
+| **FollowUp** | `Patient.status` + suivi | Entité dédiée par intervention, contient le protocole et le statut opérationnel |
+| **Message** | `Message` | Rattaché au FollowUp |
+| **Attachment** | `Attachment` | Stocké en object storage HDS, URL signée |
+| **Report** (CR) | `ClinicalReport` | Versioning (chaque édition crée une nouvelle version) |
+| **Escalation** | `Escalation` | Statuts `ouverte` / `transmise` / `cloturee` |
+| **Supervisor** | `Supervisor` | Étend User avec formationStatus, qualityStatus, charge cible |
+| **QualityReview** | `seedConversationsToReview` + `seedCRsToControl` | Persister statuts + commentaires + historique |
+| **TrainingProgress** | quiz formation | Une ligne par superviseur, statut + score quiz + horodatage |
+| **ProductSuggestion** | `SupervisorSuggestion` | Persister + statut + commentaires Head of Care |
+| **Prospect** | `Prospect` | CRM, **aucune donnée patient** |
+| **SalesOwner** | `SalesOwner` | Étend User avec rôle sales |
+| **PaymentMandate** | `Surgeon.config.mandateStatus` | Vraie intégration GoCardless |
+| **InvoiceLine** | facturation variable | Une ligne par patient activé du mois |
+| **Notification** | logs internes simulés | Table de queue de notifications, statut envoi |
+| **AuditLog** | `LogEntry` | **Append-only avec hash chaining**, jamais modifié |
+| **AiLog** | `AiLog` | Append-only, chaîné, conservation à confirmer DPO |
+
+### Note importante : séparation `Patient`
+
+Dans le prototype, `Patient` mélange :
+- identité,
+- planning opératoire,
+- suivi opérationnel (statut, messages, notes),
+- préférences / consentements,
+- compilation factuelle de l'escalade en cours.
+
+**En V1** : séparer en au moins 3 entités :
+- `Patient` (identité, coordonnées, consentements).
+- `Intervention` (un patient peut avoir plusieurs interventions dans le temps).
+- `FollowUp` (un suivi par intervention, contient les messages, statut, CR, escalade).
+
+Cela permet de modéliser proprement les patients récurrents (chirurgie en plusieurs temps,
+re-intervention, etc.) sans rétro-compatibilité douloureuse.
+
+---
+
+## 21. Formation, qualité et amélioration continue — trajectoire V1 / V2
+
+### Périmètre V1 (lean, déjà couvert produit prototype)
+- **Formation superviseur** persistée par utilisateur (TrainingProgress).
+- **Checklist de démarrage**, **règles KOVELA**, **lexique autorisé / à éviter**, **templates**,
+  **cas pratiques non cliniques**, **quiz process** → contenu versionné en base, modifiable
+  par le Head of Care.
+- **Statut formation** : `a_former` / `en_cours` / `pret` (table `TrainingProgress`).
+- **Indicateurs opérationnels** par superviseur (lecture seule, déjà couvert).
+- **CR à contrôler** + **Conversations à relire** : persistance des statuts (`ok`,
+  `a_revoir`) + **commentaires Head of Care éditables** (déjà couvert produit).
+- **Retours terrain superviseurs** (`ProductSuggestion`) : modal de proposition + vue Head
+  of Care (déjà couvert produit).
+- **Amélioration continue** : boucle implicite via les retours terrain + audit log + revue
+  qualité.
+- **Socle qualité KOVELA inspiré ISO 9001 / ISO 27001** documenté côté UI (sans revendication
+  de certification).
+
+### Wording obligatoire (rappel)
+Ne **jamais** présenter cela comme :
+- formation médicale ;
+- certification médicale ;
+- score clinique ;
+- classement punitif.
+
+Présenter comme :
+- *« indicateurs opérationnels »* ;
+- *« complétude formation »* ;
+- *« revue qualité »* ;
+- *« amélioration continue »*.
+
+### Périmètre V2
+- **Workflow qualité avancé** : assignation de revues, historique d'évaluations, calibration
+  inter-superviseurs.
+- **Historique formation** versionné, recertification périodique automatique.
+- **Calibration** : croisement des décisions IA acceptées / modifiées / refusées avec les
+  retours qualité pour identifier les besoins de formation.
+- **Documentation qualité** structurée : politiques, procédures, instructions, enregistrements
+  (modèle inspiré ISO 9001).
+- **Audit externe** : démarche ISO 9001 (organisation qualité) et / ou ISO 27001 (sécurité
+  information) **à étudier formellement** avec une société de conseil qualité avant
+  engagement financier.
+

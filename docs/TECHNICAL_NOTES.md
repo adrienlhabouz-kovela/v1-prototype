@@ -318,3 +318,126 @@ KovelaProvider
    Superviseur fiche patient, Cabinet onboarding, Patient messagerie).
 8. **Bandeau de version** : conserver le badge `build <SHA>` en bas ou en haut, c'est très
    utile pour les utilisateurs de support.
+
+---
+
+## 12. Questions techniques à trancher avec Émilien
+
+> Liste des décisions techniques à arbitrer avant de cadrer le budget et la timeline V1.
+> Chaque question est ouverte : il n'y a pas de bonne réponse théorique, seulement un
+> arbitrage à faire en équipe avec contraintes (budget, délai, ressources).
+
+### Front
+1. **Quelle partie du front est réutilisable ?**
+   - Réutilisable tel quel : design system (`components/ui.tsx`), Tailwind config, polices,
+     pages layout, wording (`lib/format.ts`, `lib/templates.ts`), structure des wizards
+     (onboarding cabinet, onboarding patient).
+   - À adapter : appels au store → appels API ; gestion des formulaires (validation,
+     erreurs, optimistic UI).
+
+2. **Qu'est-ce qui doit être refactoré ?**
+   - Store React Context → TanStack Query + tRPC ou React Query + REST.
+   - Modèle `Patient` (à séparer en Patient / Intervention / FollowUp — cf.
+     `V1_HDS_ARCHITECTURE_BRIEF.md` §20).
+   - Identités hardcodées (p1, sup1, s1) → contexte utilisateur réel via auth.
+   - Logique métier dans les pages → extraire en services / hooks dédiés pour testabilité.
+
+### Backend
+3. **Quelle stack backend recommander ?**
+   - Option A : **NestJS + Prisma + PostgreSQL** (rigueur, DI, modules — recommandé pour
+     santé).
+   - Option B : **Hono / Fastify + Drizzle + PostgreSQL** (plus léger, plus rapide).
+   - Option C : **Next.js Route Handlers + tRPC + Prisma** (monorepo, typage end-to-end, mais
+     moins adapté aux contraintes audit / observabilité).
+
+4. **Quelle base de données ?**
+   - **PostgreSQL** (recommandé) — RLS natif, JSON, full-text, écosystème mature.
+   - Drizzle ORM ou Prisma — choix par préférence d'équipe.
+
+5. **Quelle stratégie auth / RBAC ?**
+   - **Clerk** : ultra-rapide, MFA out-of-the-box, magic link patient, SOC2.
+   - **Auth.js** : open-source, plus de travail mais 100 % sous contrôle.
+   - **Keycloak** : si exigences SSO d'entreprise dès V1.
+
+### Hébergement & données
+6. **Quel hébergeur HDS ?**
+   - **OVH HDS** (référence FR, écosystème mature).
+   - **Outscale HDS** (Dassault, souverain).
+   - **Scaleway HDS** (Iliad, souverain).
+   - **AWS Health Europe** (à valider compatibilité HDS française).
+
+7. **Où stocker photos / audios patient ?**
+   - Object storage HDS-compatible (Scaleway Object Storage HDS).
+   - **SSE-KMS** + URLs présignées + antivirus à l'upload.
+   - Bucket par tenant ou prefix par cabinet.
+
+### Notifications
+8. **Quelle stratégie notifications ?**
+   - Email : **Postmark** (UE) recommandé.
+   - SMS : **OVHcloud SMS** ou **Twilio** (zone UE, DPA RGPD).
+   - WhatsApp : **uniquement après validation Aumans** (RGPD + business rules Meta).
+   - Pas de push V1 (sauf PWA en V2).
+
+### IA
+9. **Quelle stratégie IA gateway ?**
+   - Service dédié (NestJS module ou microservice).
+   - Redaction PII en entrée + sortie.
+   - Logging immuable.
+   - Kill-switch par fonction.
+   - Cf. `docs/AI_REQUIREMENTS.md` §5 pour le schéma complet.
+
+10. **Comment versionner les prompts IA ?**
+    - Table `PromptVersion` en base : `id`, `function`, `version`, `content`, `createdAt`,
+      `createdBy`, `isActive`.
+    - Chaque `AiLog` référence un `promptVersionId`.
+    - A/B testing possible en activant deux versions en parallèle.
+
+11. **Comment rendre les logs immuables ?**
+    - Hash chaining : chaque log contient le hash SHA-256 de l'enregistrement précédent.
+    - Pas de droit `UPDATE` ni `DELETE` au niveau Postgres (rôle dédié).
+    - Export régulier vers stockage WORM (Write Once Read Many) pour archivage long terme.
+    - Audit régulier de la cohérence de la chaîne.
+
+### Métier
+12. **Comment gérer GoCardless ?**
+    - Création mandat SEPA via lien envoyé au chirurgien.
+    - Webhook → mise à jour statut en base.
+    - Prélèvements automatiques (abonnement le 1er, variable le dernier jour du mois).
+    - Gestion des échecs : relance N3 / N7 / N14, suspension service après N tentatives.
+
+13. **Comment gérer l'import planning ?**
+    - Parser CSV / Excel (xlsx) côté serveur uniquement.
+    - Validation par schéma Zod sur chaque ligne.
+    - Détection doublons (patient + date intervention).
+    - Aperçu validation avant insertion en base.
+    - Logs détaillés (succès / lignes en erreur).
+
+14. **Comment séparer CRM et données patient ?**
+    - **Stricte séparation à la base** : tables CRM (`Prospect`, `SalesOwner`,
+      `prospect_notes`) sans aucune FK vers `Patient`, `Message`, `Report`, `Escalation`.
+    - **Cloisonnement applicatif** : modules backend distincts, permissions séparées.
+    - **Sales ne voit jamais les données patient.** Ils voient le **statut agrégé** du
+      cabinet (ex. nombre de patients activés du mois, sans détails patient).
+    - **Documenté** dans `REGULATORY_REVIEW_NOTES.md` (question Aumans dédiée).
+
+### Cadrage
+15. **Quel MVP réaliste en 8 / 12 / 16 semaines ?**
+    - **8 semaines** : auth + RBAC + onboarding cabinet + planning + messagerie patient. Pas
+      d'IA, pas de CR, pas de qualité. Très restreint, pour bêta privée 1 cabinet.
+    - **12 semaines** : ajoute CR (gating) + escalade + supervision Head of Care basique +
+      logs. Pas d'IA encore. Bêta privée 2-3 cabinets.
+    - **16 semaines** : ajoute IA assistive (3-4 fonctions via gateway) + qualité lean +
+      formation lean + facturation GoCardless. Bêta privée élargie.
+    - **Version cible V1 complète** : ~10 mois (cf. timeline `V1_HDS_ARCHITECTURE_BRIEF.md`
+      §17).
+
+16. **Quel budget estimatif ?**
+    - **Équipe** : 1 lead dev senior + 1 dev senior fullstack + 1 designer + 0.3 DPO + 0.2
+      avocat e-santé = ~3.5 ETP.
+    - **Infrastructure HDS** : 500 € à 2 500 € / mois selon hébergeur et volumétrie.
+    - **LLM provider** : 100 € à 1 000 € / mois selon usage (à monitorer dès le début).
+    - **Auth (Clerk)** : 0 € jusqu'à 10 000 MAU puis ~25 $ / mois par 1 000 MAU.
+    - **Services tiers** (Sentry, Postmark, Twilio) : ~200 € à 500 € / mois cumulés.
+    - **Coût de build V1 complet** : à arbitrer selon TJM de l'équipe et durée (estimation
+      typique 250-400 k€ pour 10 mois, hors avocats / DPO).
+

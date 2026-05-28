@@ -335,3 +335,106 @@ score médical · score patient · protocole médical · protocole clinique.
 - Capture d'écran de l'onboarding patient (étapes 1 à 5).
 - Capture d'écran de la fiche superviseur avec l'IA assistive en évidence.
 - Capture d'écran de la mention CRM « Aucune donnée patient ».
+
+---
+
+## 13. Checklist juridique synthèse pour validation Aumans
+
+> Synthèse opérationnelle des thèmes à valider lors de la revue Aumans. Complète la liste
+> détaillée de la section 11.
+
+### 13.1 Qualification du service
+- [ ] Statut juridique de KOVELA (service de coordination opérationnelle non médical).
+- [ ] **Absence de dispositif médical** (à formaliser).
+- [ ] Position vis-à-vis du Code de la santé publique (article L4111-1 et suivants).
+
+### 13.2 IA assistive
+- [ ] **Limites de l'IA assistive** : valider que le périmètre (résumer / préparer CR /
+      reformuler / compiler) reste hors champ médical.
+- [ ] **AIPD (Analyse d'impact à la protection des données)** obligatoire ou non ?
+- [ ] **Information patient** explicite sur l'usage d'une IA en interne.
+- [ ] **AI Act européen** : catégorisation de KOVELA (a priori risque limité).
+- [ ] Choix du LLM provider : DPA, transferts hors UE, BCR.
+
+### 13.3 Wording commercial
+- [ ] Validation du wording **« peut contribuer à »** pour la réputation cabinet.
+- [ ] Validation du wording **« architecture cible »** / **« pensé pour »** sur HDS/RGPD/CNIL.
+- [ ] Mentions interdites en communication (cf. section 7 ci-dessus).
+
+### 13.4 Onboarding patient
+- [ ] Forme suffisante du **consentement** (case à cocher + horodatage + log).
+- [ ] **Information préalable** : modèle à fournir au patient.
+- [ ] **Cas particuliers** : mineurs, majeurs protégés, urgences.
+
+### 13.5 Consentements / information
+- [ ] Format des consentements (catalogue : utilisation messages, photos, audios, relances,
+      notifications, IA interne).
+- [ ] Modalités de retrait du consentement.
+- [ ] **Droit à l'effacement** : effacement physique vs anonymisation.
+- [ ] **Droit à la portabilité** : format d'export.
+
+### 13.6 HDS / RGPD / Principes CNIL
+- [ ] Choix de l'hébergeur HDS et calendrier de certification fournisseur.
+- [ ] Calendrier d'annonce publique du « hébergé HDS » (passage du wording prudent au wording
+      affirmatif).
+- [ ] Déclaration / consultation préalable CNIL si nécessaire.
+
+### 13.7 Sous-traitants
+- [ ] **DPA** signés avec : LLM provider, hébergeur HDS, Postmark / Twilio, GoCardless,
+      Sentry / Datadog, Clerk si retenu.
+- [ ] **Transferts hors UE** : encadrés par clauses contractuelles type ou BCR.
+
+### 13.8 Canaux de communication
+- [ ] **WhatsApp** : faisable RGPD ? (a priori non sans contrat Business + DPA).
+- [ ] **SMS** : prestataire UE retenu, contenu minimisé (pas de contenu patient dans le SMS).
+- [ ] **Email** : prestataire UE retenu, DPA en place.
+
+### 13.9 Conservation des données
+- [ ] Durée de conservation : **messages, photos, audios, CR, logs IA, audit log**.
+- [ ] **Logs comptables / GoCardless** : 10 ans (obligation légale).
+- [ ] Modalités d'archivage / purge / anonymisation après expiration.
+
+### 13.10 Responsabilités
+- [ ] **Chirurgien** : responsable médical, décisionnaire ; KOVELA prépare et trace.
+- [ ] **KOVELA** : responsable de la coordination organisationnelle, de la qualité du service
+      opéré, de la traçabilité.
+- [ ] **Rôle superviseur** : limites strictement organisationnelles, jamais médicales.
+- [ ] **Patient** : information complète, consentement éclairé, urgence relevant du 15 / 112.
+
+### 13.11 Spécificités opérationnelles
+- [ ] **Formation superviseur** : pas de revendication de certification médicale (wording
+      « complétude formation interne »).
+- [ ] **Compte-rendu factuel** : qualifier juridiquement la nature du document (≠ rapport
+      médical, ≠ courrier confraternel).
+- [ ] **Transmission au chirurgien** : matérialiser la responsabilité (notification reçue,
+      lue, action).
+- [ ] **Patients silencieux** : modalités de relance et de clôture, durée maximale de
+      « silence opérationnel » sans escalade.
+
+### 13.12 Photos / audios patient
+- [ ] Périmètre des photos autorisées (parties opérées, pansements ; pas de photos
+      d'identification, pas de captures écran).
+- [ ] **Anonymisation des métadonnées EXIF** à l'upload.
+- [ ] **Pas d'analyse photo** (rappel doctrine) : confirmation que ce point doit être
+      explicitement écrit dans les CGU patient.
+
+### 13.13 Logs / audit trail
+- [ ] **Caractère probant** : un log immuable avec hash chaining a-t-il valeur probatoire
+      auprès des autorités ?
+- [ ] **Accès patient** à ses propres logs : oui / non / sur demande RGPD ?
+- [ ] **Conservation** des logs après résiliation du service par le cabinet.
+
+### 13.14 Assurance
+- [ ] Assurance **RC professionnelle** KOVELA (responsabilité civile en cas d'erreur
+      opérationnelle de la coordination).
+- [ ] **Cyber-assurance** (incident de sécurité, fuite de données).
+- [ ] **Articulation** avec l'assurance RC du chirurgien (qui couvre quoi).
+
+### Annexes à fournir à Aumans
+- Liste des routes du prototype (`docs/README_DEMO.md`).
+- Liste des types métier (`lib/types.ts` du repo).
+- Schéma d'architecture cible V1 HDS (`docs/V1_HDS_ARCHITECTURE_BRIEF.md`).
+- Spécification IA assistive (`docs/AI_REQUIREMENTS.md`).
+- Captures d'écran clés (à produire — landing sécurité, onboarding patient, fiche
+  superviseur avec IA, mention CRM « Aucune donnée patient »).
+

@@ -404,3 +404,100 @@ en 4 grandes zones :
 - Chatbot patient autonome (banni).
 - Classement punitif des superviseurs (banni).
 - Toute revendication ISO / HDS / CNIL non acquise.
+
+---
+
+## 18. Couverture du brief tech initial
+
+> Tableau de couverture du brief tech KOVELA. Sert de référence pour vérifier que la V1
+> traite l'ensemble du périmètre métier prévu, et identifier ce qui est reporté en V2.
+
+| Élément du brief | Couvert | Partiel | Non couvert | À faire V1 | À reporter V2 | Commentaire |
+|---|:-:|:-:|:-:|:-:|:-:|---|
+| Site public hors HDS | ✅ | | | | | Landing publique, aucune donnée patient, CTA mailto. |
+| Application métier cible HDS | | ✅ | | ✅ | | Wording prudent dans le prototype ; vraie certification HDS en V1. |
+| Rôle Admin | ✅ | | | ✅ | | Vue + actions ; à brancher sur auth + RBAC réels. |
+| Rôle Head of Care | ✅ | | | ✅ | | `/admin/supervision` ; mêmes permissions que Admin en V1. |
+| Rôle Chirurgien | ✅ | | | ✅ | | Espace `/chirurgien` complet. |
+| Rôle Assistante / secrétariat | | ✅ | | ✅ | | Mockée dans CabinetConfig ; espace dédié en V1. |
+| Rôle Superviseur | ✅ | | | ✅ | | Inbox + fiche + formation. |
+| Rôle Patient | ✅ | | | ✅ | | Onboarding mobile-first + messagerie. |
+| Rôle Sales | ✅ | | | ✅ | | `/sales` avec sélecteur de persona. |
+| Onboarding chirurgien / cabinet | ✅ | | | ✅ | | Wizard 6 étapes. |
+| Planning opératoire | ✅ | | | ✅ | | Ajout, import simulé, modif, report, annulation, renvoi lien. |
+| Onboarding patient | ✅ | | | ✅ | | 5 étapes + écran « Mon suivi en bref ». |
+| Messagerie patient texte / photo / audio | ✅ | | | ✅ | | Placeholders en prototype, stockage HDS en V1. |
+| Supervision humaine | ✅ | | | ✅ | | Inbox 6 sections + attribution + traçabilité. |
+| IA assistive (4 fonctions) | ✅ | | | ✅ | | Voir `docs/AI_REQUIREMENTS.md`. |
+| Compte-rendu factuel | ✅ | | | ✅ | | Gating 3 états (brouillon / validé interne / disponible). |
+| Compilation factuelle | ✅ | | | ✅ | | Dissociation préparation ≠ transmission. |
+| Escalade / transmission au chirurgien | ✅ | | | ✅ | | Action humaine explicite, log dédié. |
+| Logs / audit trail | | ✅ | | ✅ | | Logs typés en prototype ; immuables (hash chaining) en V1. |
+| CRM Chirurgiens | ✅ | | | ✅ | | Pipeline 9 stages, 14 prospects. |
+| Dashboard sales | ✅ | | | ✅ | | `/sales` avec KPI + table. |
+| GoCardless fictif | ✅ | | | ✅ | | Statuts mandat, actions Envoyer lien / Simuler actif. |
+| Formation superviseur | ✅ | | | ✅ | | Checklist + règles + lexique + templates + 4 cas + quiz + badge. |
+| Qualité / performance | ✅ | | | ✅ | | KPI IA seedés, conv à relire, CR à contrôler, retours terrain. |
+| Retours terrain superviseurs | ✅ | | | ✅ | | Bloc dédié, modal de proposition, vue Head of Care. |
+| Sécurité / rôles / permissions | | ✅ | | ✅ | | Sélecteur fictif en prototype ; auth + RBAC complets en V1. |
+| Notifications réelles (email/SMS) | | | ✅ | ✅ | | Aucune notification dans le prototype, V1 via Postmark/Twilio. |
+| Stockage HDS pour photos / audios | | | ✅ | ✅ | | Placeholders en prototype, V1 sur S3 HDS-compatible. |
+| Tests E2E | | | ✅ | ✅ | | Playwright recommandé V1 (cf. TECHNICAL_NOTES.md). |
+| i18n | | | ✅ | | ✅ | FR uniquement en V1, EN en V2. |
+| App mobile native | | | ✅ | | ✅ | Web responsive en V1, PWA / native éventuel en V2. |
+
+### Synthèse de couverture
+- **Métier couvert à 100 %** dans le prototype pour la démonstration des flux.
+- **Architecture cible** documentée pour la V1 (cf. `V1_HDS_ARCHITECTURE_BRIEF.md`).
+- **Briques techniques** à construire en V1 : auth, DB, API, IA gateway, stockage HDS,
+  notifications réelles, GoCardless réel, audit trail immuable.
+
+---
+
+## 19. Synthèse Prototype / V1 / V2
+
+### 🧪 Prototype (état actuel — démonstration uniquement)
+- Front Next.js 14 (App Router) + TypeScript + Tailwind.
+- Données mockées dans `lib/mock-data.ts`.
+- État en mémoire (React Context) — **volatile, un refresh = reset**.
+- **Pas de vraie auth** (sélecteur de rôle uniquement).
+- **Pas de DB** (tout in-memory).
+- **Pas de HDS réel** (déclaratif, wording prudent).
+- **Pas de notifications réelles** (logs internes simulés).
+- **IA simulée** localement (sorties déterministes, `lib/ai.ts`).
+- **GoCardless fictif** (4 statuts, actions simulées).
+- **CRM fictif** avec 14 prospects seedés et 4 sales owners.
+
+### 🚀 V1 (production HDS — ~10 mois, équipe 3-4 personnes)
+- Backend (NestJS recommandé) + PostgreSQL HDS-certifié.
+- **Auth + RBAC** (Clerk recommandé ou Auth.js).
+- **API** typée (tRPC pour Next.js, ou REST/GraphQL).
+- **Stockage fichiers HDS** (Scaleway Object Storage HDS) chiffré, URLs présignées,
+  antivirus.
+- **Logs immuables** (audit trail append-only + hash chaining).
+- **Notifications réelles** (Postmark / Twilio, DPA UE).
+- **IA assistive serveur** via IA Gateway (redaction PII, kill-switch, logging immuable).
+- **GoCardless réel** (mandats SEPA + webhooks + relances).
+- **CRM Chirurgiens** opérationnel + RBAC sales.
+- **Supervision qualité lean** (lecture + commentaire + statut).
+- **Formation superviseur lean** (checklist + cas + quiz + badge persisté).
+- **Hébergement HDS** (OVH HDS ou Scaleway HDS).
+- **Tests E2E** (Playwright sur 4 parcours critiques).
+- **Monitoring** (Sentry, Datadog, alertes).
+
+### 🔭 V2 (au-delà de V1 — itérations selon besoin)
+- **Intégrations avancées** : sync calendrier bidirectionnelle, HubSpot/Pipedrive (optionnel),
+  WhatsApp Business si conformité validée.
+- **Analytics** : tableaux de bord temporels (jour/semaine/mois), exports PDF audit.
+- **Workflow qualité complet** : assignation revues, historique, calibration inter-superviseurs.
+- **Formation avancée** : modules vidéo, certification interne, recertification périodique.
+- **Démarche ISO** à étudier : ISO 9001 organisation qualité, ISO 27001 sécurité.
+- **Multi-cabinet avancé** : un chirurgien sur plusieurs sites, gestion fine des permissions.
+- **IA plus contextualisée** : fine-tuning sur templates KOVELA, spécialisation par
+  verticale.
+- **App mobile** : PWA installable ou native (iOS / Android) — décision V2.
+- **i18n** : EN dans un premier temps, puis ES / IT / DE selon expansion.
+- **Multi-devise** pour expansion internationale.
+- **Alertes proactives** Head of Care (saturation, retards, refus IA atypiques).
+- **Espace assistante dédié** avec permissions différenciées.
+
