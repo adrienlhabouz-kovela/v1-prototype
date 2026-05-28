@@ -323,9 +323,10 @@ KovelaProvider
 
 ## 12. Questions techniques à trancher avec Émilien
 
-> Liste des décisions techniques à arbitrer avant de cadrer le budget et la timeline V1.
-> Chaque question est ouverte : il n'y a pas de bonne réponse théorique, seulement un
-> arbitrage à faire en équipe avec contraintes (budget, délai, ressources).
+> Liste des décisions techniques à arbitrer pour cadrer la V1 par **lots**, **complexité**,
+> **dépendances** et **risques techniques**. Chaque question est ouverte : il n'y a pas de
+> bonne réponse théorique, seulement un arbitrage à faire en équipe avec contraintes
+> (délai, ressources, dépendances).
 
 ### Front
 1. **Quelle partie du front est réutilisable ?**
@@ -431,13 +432,12 @@ KovelaProvider
     - **Version cible V1 complète** : ~10 mois (cf. timeline `V1_HDS_ARCHITECTURE_BRIEF.md`
       §17).
 
-16. **Quel budget estimatif ?**
-    - **Équipe** : 1 lead dev senior + 1 dev senior fullstack + 1 designer + 0.3 DPO + 0.2
-      avocat e-santé = ~3.5 ETP.
-    - **Infrastructure HDS** : 500 € à 2 500 € / mois selon hébergeur et volumétrie.
-    - **LLM provider** : 100 € à 1 000 € / mois selon usage (à monitorer dès le début).
-    - **Auth (Clerk)** : 0 € jusqu'à 10 000 MAU puis ~25 $ / mois par 1 000 MAU.
-    - **Services tiers** (Sentry, Postmark, Twilio) : ~200 € à 500 € / mois cumulés.
-    - **Coût de build V1 complet** : à arbitrer selon TJM de l'équipe et durée (estimation
-      typique 250-400 k€ pour 10 mois, hors avocats / DPO).
+16. **Quels lots techniques doivent être priorisés pour cadrer une V1 réaliste ?**
+    - Cf. `V1_HDS_ARCHITECTURE_BRIEF.md` §22 *« Lots techniques cible V1 »* qui propose un
+      découpage en 8 lots avec dépendances, complexité relative, risques et hypothèses de
+      scope.
+    - À arbitrer en équipe : ordre de priorité, parallélisation possible, **MVP en
+      8 / 12 / 16 semaines** (cf. question 15 ci-dessus).
+    - Pas de chiffrage financier dans cette documentation : la priorisation des lots
+      structure l'effort, le chiffrage relève d'un cadrage d'équipe ultérieur.
 

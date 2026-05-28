@@ -141,7 +141,7 @@ Chaque interaction IA produit **deux logs distincts** :
 | `finalContent` | text (optionnel) | contenu final après décision humaine |
 | `estimatedMinutesSaved` | number | estimation prototype (1.5 / 7 / 0.75 / 6) |
 | `latencyMs` | number | temps de réponse du LLM |
-| `costEur` | number (optionnel) | coût d'appel |
+| `usageUnits` | number (optionnel) | unités de consommation par appel (suivi interne, hors documentation technique) |
 | `at` | timestamp | horodatage |
 
 ### Conservation
@@ -183,7 +183,7 @@ Chaque interaction IA produit **deux logs distincts** :
 │  7. Redaction PII en sortie                                      │
 │  8. Linter wording interdit (rejette si terme banni détecté)     │
 │  9. Logging immuable de la réponse + hash chaining               │
-│ 10. Monitoring : latence, coût, taux d'erreur                    │
+│ 10. Monitoring : latence, usage, taux d'erreur                   │
 └──────────────┬───────────────────────────────────────────────────┘
                │
 ┌──────────────▼───────────────────────────────────────────────────┐
@@ -209,8 +209,9 @@ Chaque interaction IA produit **deux logs distincts** :
    précise. Aucune modification rétroactive.
 6. **Kill switch.** Activable par l'admin KOVELA en quelques secondes, sans déploiement.
 7. **Audit log.** Chaque interaction est tracée de manière immuable (hash chaining).
-8. **Monitoring coût / usage.** Tableau de bord interne : appels / jour, coût / appel,
-   taux d'acceptation, taux d'erreur, latence p95.
+8. **Monitoring usage.** Tableau de bord interne : appels / jour, taux d'acceptation,
+   taux d'erreur, latence p95. La tarification fournisseur est suivie en interne, hors
+   documentation technique.
 9. **Fournisseur IA interchangeable.** L'abstraction du gateway permet de changer de LLM
    provider en quelques heures. Aucun couplage fort dans le code métier.
 
@@ -218,7 +219,7 @@ Chaque interaction IA produit **deux logs distincts** :
 
 | Fournisseur | Avantages | Contraintes |
 |---|---|---|
-| **Anthropic Claude** (Bedrock UE) | Qualité top, raisonnement, alignement | Coût ; DPA via AWS |
+| **Anthropic Claude** (Bedrock UE) | Qualité top, raisonnement, alignement | DPA via AWS, tarification à surveiller en interne |
 | **Mistral** (FR) | Souveraineté, hébergement FR, DPA direct | Qualité variable selon modèle |
 | **OpenAI Azure** (Europe) | Qualité top, écosystème | Transferts hors UE à clarifier |
 
@@ -237,7 +238,8 @@ prototype) :
 - **Qualité humaine perçue** : taux acceptation / modification / refus par fonction.
 - **Temps estimé gagné** (estimation prototype basée sur barème par fonction).
 - **Latence** : médiane et p95 par fonction.
-- **Coût** : € / appel et € / jour.
+- **Usage** : volume d'appels par fonction et par jour (consommation à monitorer en interne,
+  sans affichage de chiffrage dans cette documentation).
 - **Conformité wording** : 0 occurrence de mot interdit dans les sorties (linter
   automatique).
 

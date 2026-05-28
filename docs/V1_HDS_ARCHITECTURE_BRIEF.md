@@ -228,7 +228,7 @@ Backend → IA Gateway → LLM provider (Anthropic / Mistral / etc.)
               ├ redaction PII en entrée (regex + ML léger)
               ├ injection des templates / prompts versionnés
               ├ rate limiting global + par superviseur
-              ├ logging immuable (requête, réponse, latence, coût)
+              ├ logging immuable (requête, réponse, latence, usage)
               ├ redaction PII en sortie
               ├ filtrage wording interdit (linter automatique)
               └ kill-switch on/off par fonction et par tenant
@@ -268,8 +268,10 @@ Backend → IA Gateway → LLM provider (Anthropic / Mistral / etc.)
 ### Intégration V1
 - Création de mandat SEPA via lien envoyé au chirurgien.
 - Webhook GoCardless reçu côté backend → mise à jour du statut.
-- Prélèvement automatique : **abonnement** (690 € HT) le 1er du mois, **variable** (50 € ×
-  patients activés) le dernier jour du mois.
+- Prélèvement automatique : **abonnement mensuel** le 1er du mois, **variable** indexée sur
+  les patients activés le dernier jour du mois. Les montants sont portés par le code
+  (`lib/mock-data.ts`, constante `PRICING`) et par les CGV cabinet — hors documentation
+  technique.
 - Gestion des échecs : relance, suspension du service après N tentatives.
 
 ### Logs financiers
@@ -575,4 +577,107 @@ Présenter comme :
 - **Audit externe** : démarche ISO 9001 (organisation qualité) et / ou ISO 27001 (sécurité
   information) **à étudier formellement** avec une société de conseil qualité avant
   engagement financier.
+
+
+---
+
+## 22. Lots techniques cible V1
+
+> Découpage du build V1 en **8 lots**. Pas de chiffrage financier dans cette documentation —
+> chaque lot est qualifié par **complexité relative**, **dépendances**, **risques** et
+> **hypothèses de scope**. La priorisation et la parallélisation sont à arbitrer en équipe.
+
+### Lot 1 — Socle technique
+**Périmètre** : repo + CI/CD + infrastructure de base + design system migré + linter wording
+en CI + observabilité de départ.
+- **Complexité relative** : moyenne.
+- **Dépendances** : choix hébergeur HDS, choix framework backend (cf. `TECHNICAL_NOTES.md`
+  §12 Q3-4).
+- **Risques** : délai de mise en place du compte hébergeur HDS, négociation DPA.
+- **Hypothèses de scope** : un seul environnement (dev) au démarrage, prod en lot ultérieur.
+
+### Lot 2 — Auth / RBAC
+**Périmètre** : intégration Clerk ou Auth.js, schéma utilisateurs / rôles, RBAC déclaratif
+sur les endpoints, MFA Admin/HoC/Superviseur, magic link patient.
+- **Complexité relative** : moyenne.
+- **Dépendances** : Lot 1.
+- **Risques** : matrice RBAC complète à valider (cf. brief §5), DPA fournisseur auth si
+  retenu.
+- **Hypothèses de scope** : 7 rôles, pas de SSO entreprise V1.
+
+### Lot 3 — Patients / messages / fichiers
+**Périmètre** : entités Patient / Intervention / FollowUp / Message / Attachment, stockage
+HDS chiffré, URLs présignées, antivirus à l'upload, messagerie texte / photo / audio,
+consentements patient.
+- **Complexité relative** : **élevée** (séparation Patient/Intervention/FollowUp à modéliser
+  proprement, stockage HDS, antivirus).
+- **Dépendances** : Lots 1 et 2.
+- **Risques** : forme du consentement (validation Aumans), durée de conservation (validation
+  DPO), métadonnées EXIF photos.
+- **Hypothèses de scope** : pas de notifications push V1, pas d'i18n.
+
+### Lot 4 — Supervision / CR / logs
+**Périmètre** : inbox superviseur, attribution, fiche patient, templates de réponse, gating
+CR (brouillon → validé interne → disponible), compilation factuelle dissociée, transmission
+explicite, audit trail immuable (hash chaining).
+- **Complexité relative** : **élevée** (logique de gating, journalisation immuable).
+- **Dépendances** : Lots 1, 2, 3.
+- **Risques** : implémentation correcte du hash chaining, performance des requêtes inbox
+  sur gros volumes.
+- **Hypothèses de scope** : pas de temps réel WebSocket V1 (V2), inbox lisible avec rafraîchissement
+  manuel.
+
+### Lot 5 — IA assistive
+**Périmètre** : IA Gateway server-side, redaction PII en entrée/sortie, prompt versioning,
+kill-switch par fonction, logging immuable IA, 4 fonctions assistives (résumé, CR, reformulation,
+compilation), human-in-the-loop systématique.
+- **Complexité relative** : **élevée** (gateway, redaction, conformité wording, choix LLM
+  provider).
+- **Dépendances** : Lots 1, 2, 3, 4.
+- **Risques** : qualité variable des sorties LLM, transferts hors UE, AIPD obligatoire
+  (Aumans), conformité AI Act, consommation à monitorer en interne.
+- **Hypothèses de scope** : 4 fonctions assistives V1 (cf. `AI_REQUIREMENTS.md`), pas de
+  fine-tuning V1.
+
+### Lot 6 — Automatisations
+**Périmètre** : lien sécurisé onboarding patient + expiration, relances programmées,
+détection patient silencieux / message non traité / CR en retard, clôtures automatiques,
+parser CSV/Excel planning, détection de doublons, pré-remplissage durées.
+- **Complexité relative** : moyenne.
+- **Dépendances** : Lots 2, 3, 4.
+- **Risques** : règles de relance à valider Head of Care, fiabilité du parser CSV
+  (variabilité des formats cabinet), conformité notifications externes (email/SMS).
+- **Hypothèses de scope** : pas de sync calendrier bidirectionnelle V1 (V2).
+
+### Lot 7 — GoCardless / facturation
+**Périmètre** : intégration GoCardless mandats SEPA, webhooks, prélèvements automatiques
+(abonnement + variable), gestion échecs, dashboard facturation Admin.
+- **Complexité relative** : moyenne.
+- **Dépendances** : Lots 1, 2.
+- **Risques** : KYC GoCardless, conformité comptable, conservation 10 ans des logs financiers.
+- **Hypothèses de scope** : EUR uniquement V1, multi-devise V2.
+
+### Lot 8 — Sécurité / HDS / monitoring
+**Périmètre** : durcissement infrastructure (headers, CSP, secrets management), pen test,
+audit conformité HDS, monitoring (Sentry, Datadog, alerting), sauvegardes + tests de
+restauration, documentation sécurité.
+- **Complexité relative** : moyenne (mais critique en santé).
+- **Dépendances** : tous les lots précédents (durcissement final).
+- **Risques** : findings pen test bloquants pour la mise en prod, délais d'audit externe.
+- **Hypothèses de scope** : pas de certification ISO V1 (V2), HDS certifié via hébergeur
+  retenu.
+
+### Cross-références
+- Pour la matrice RBAC et l'auth : §4-5.
+- Pour les entités DB : §20.
+- Pour l'IA Gateway : §9 et `AI_REQUIREMENTS.md` §5.
+- Pour les automatisations : §19.
+- Pour la timeline indicative en mois (sans chiffrage) : §17.
+
+### Décisions de cadrage à prendre avec Émilien
+- **Ordre des lots** (séquentiel vs parallélisable) selon la taille et la séniorité de
+  l'équipe.
+- **Profondeur de chaque lot V1** (lean vs complet — cf. les hypothèses de scope ci-dessus).
+- **MVP intermédiaire** (8 / 12 / 16 semaines) : quels lots réduits embarquer pour une bêta
+  privée rapide ? (cf. `TECHNICAL_NOTES.md` §12 Q15).
 

@@ -77,7 +77,8 @@ en 4 grandes zones :
 - Carte verticales (répartition + tags chirurgiens).
 - Table patients filtrable (6 filtres dont *Messages non traités*, *Silencieux*) + attribution
   / réattribution.
-- Facturation simulée (abonnement, mandat GoCardless, montant estimé du mois).
+- Facturation simulée (abonnement, mandat GoCardless, agrégation du mois ; montants portés
+  par le code, hors documentation).
 
 ### V1
 - Conserver les widgets et les calculs (charge superviseur, délai moyen, KPI). À reconstruire
@@ -172,7 +173,7 @@ en 4 grandes zones :
 - CTA *Transmettre / modifier mon planning opératoire*.
 - *Patients suivis* : liste filtrée (onboarding complété, hors annulés).
 - **Mise en place cabinet** (config en lecture + boutons *Mettre en place / Voir-modifier*).
-- Abonnement (mandat GoCardless en clair, montant estimé).
+- Abonnement (mandat GoCardless en clair, agrégation du mois).
 - **Durées de suivi par type d'intervention** (récap éditable depuis l'onboarding).
 - **Cadre cible** (HDS / RGPD / principes CNIL — wording prudent).
 
@@ -272,7 +273,7 @@ en 4 grandes zones :
 ### V1
 - Vraie IA derrière un **gateway serveur** : redaction PII en entrée, redaction en sortie,
   rate limiting, kill-switch, logs immutables.
-- Modèle versionné, prompt versionné, métriques (latence, coût, taux d'acceptation).
+- Modèle versionné, prompt versionné, métriques (latence, usage, taux d'acceptation).
 - Conformité : pas d'envoi de données patient à un fournisseur hors UE / hors HDS sans
   contrat adapté (cf. avis Aumans).
 
@@ -339,7 +340,9 @@ en 4 grandes zones :
 
 ### V1
 - Vraie intégration GoCardless (mandat SEPA, webhooks, réconciliation).
-- Facturation automatisée : 690 € HT / mois + 50 € HT × patients activés du mois.
+- Facturation automatisée : modèle économique KOVELA (abonnement mensuel + variable par
+  patient activé). Le détail des montants est porté par le code (`lib/mock-data.ts`
+  constante `PRICING`) et par les CGV cabinet, pas par cette documentation technique.
 - Gestion des échecs de prélèvement, relances, suspension.
 
 ### V2
