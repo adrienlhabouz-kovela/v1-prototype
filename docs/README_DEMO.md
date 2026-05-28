@@ -83,6 +83,9 @@ et les pills en haut.
 ## 5. Parcours de démo en 7 à 10 minutes
 
 > Enchaîner **sans recharger la page** (état volatile en mémoire).
+>
+> Pour des **scripts détaillés par audience** (Émilien lead dev, chirurgien, investisseur,
+> cabinet Aumans — versions courtes et complètes), voir [`DEMO_SCRIPTS.md`](./DEMO_SCRIPTS.md).
 
 1. **Landing** (`/`) — *« Un service opéré, pas un logiciel de plus. »* Hero, problème, solution,
    comment ça marche, IA encadrée, réputation, sécurité prudente, CTA *Demander une démo*.
