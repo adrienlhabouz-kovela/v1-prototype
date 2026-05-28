@@ -1,0 +1,406 @@
+# KOVELA — Périmètre produit (prototype) et trajectoire V1 / V2
+
+> **Lecture** : chaque module liste son **état dans le prototype**, son **destin V1**
+> (à conserver / à reconstruire), et ce qui est **reporté en V2**.
+
+---
+
+## Vue d'ensemble
+
+KOVELA est un **service opéré** de coordination post-opératoire. Le périmètre se découpe
+en 4 grandes zones :
+
+1. **Acquisition cabinet** (CRM Chirurgiens + Sales).
+2. **Opération du service** (Admin / Head of Care + Superviseurs + IA assistive + Logs).
+3. **Utilisation cabinet** (Chirurgien + onboarding cabinet + planning + assistante).
+4. **Expérience patient** (onboarding + messagerie + urgence).
+
+---
+
+## 1. CRM Chirurgiens — `/admin/crm`
+
+### Prototype
+- Pipeline 9 stages : à contacter, contacté, call prévu, démo faite, en réflexion,
+  accord verbal, onboarding cabinet, actif, perdu / dormant.
+- Fiche prospect : identité, potentiel (volume / mois estimé, typologie cabinet, intérêt,
+  priorité), suivi commercial (statut, dernier contact, prochaine action, relance), activation
+  (onboarding lancé, cabinet configuré, assistante ajoutée, mandat GoCardless).
+- Actions : ajouter prospect, modifier statut, ajouter note, marquer démo faite, programmer
+  relance, lancer onboarding cabinet, transformer en chirurgien actif.
+- 14 prospects fictifs seedés. Logs CRM dédiés (7 types).
+- **Aucune donnée patient**.
+
+### V1
+- À reconstruire en backend (Postgres + API). Le schéma `Prospect` est solide et réutilisable.
+- Ajouter : import CSV réel, historique d'événements (audit trail), assignation multi-sales,
+  recherche full-text.
+
+### V2
+- Intégration HubSpot / Pipedrive (optionnelle).
+- Scoring engagement (pas de scoring punitif).
+- Email tracking, séquences de relance automatisées.
+
+---
+
+## 2. Sales — `/sales`
+
+### Prototype
+- Vue *« Mon portefeuille chirurgiens »* avec **sélecteur « Vu en tant que »** (Adrien /
+  Sarah / Maxime / Lina).
+- 4 profils sales fictifs assignés aux 14 prospects.
+- 8 KPI personnels (relances dues, démos prévues, prospects chauds, accords verbaux,
+  onboardings, actifs, volume patients, CA potentiel).
+- Table filtrable + modal d'actions rapides.
+- *Performance par sales* sur `/admin/crm` (vue Head of Care).
+
+### V1
+- Authentification réelle par sales (un compte = un sales).
+- RBAC : un sales voit uniquement ses prospects ; l'admin / fondateur voit tout.
+- Conserver le schéma `SalesOwner` et la relation `Prospect.salesOwnerId`.
+
+### V2
+- Objectifs commerciaux personnels (non punitifs, pilotables par le Head of Care).
+- Tableaux de bord temporels (jour / semaine / mois).
+- Intégration calendrier (sync prochaine action / relance).
+
+---
+
+## 3. Admin / Head of Care — `/admin`
+
+### Prototype
+- Actions prioritaires (5 cartes : sans superviseur, messages non traités, CR à faire,
+  escalades, silencieux) avec *Voir → filtre table + scroll*.
+- **Qualité & délais** (mini-bloc 4 indicateurs : délai moyen, CR à contrôler, conversations
+  à relire, formations en cours) + CTA vers `/admin/supervision`.
+- Indicateurs globaux (8 stats).
+- **Charge par superviseur** avec badge saturation (Charge maîtrisée / À surveiller / Élevée).
+- Carte verticales (répartition + tags chirurgiens).
+- Table patients filtrable (6 filtres dont *Messages non traités*, *Silencieux*) + attribution
+  / réattribution.
+- Facturation simulée (abonnement, mandat GoCardless, montant estimé du mois).
+
+### V1
+- Conserver les widgets et les calculs (charge superviseur, délai moyen, KPI). À reconstruire
+  côté API avec les vraies données.
+- Persister les attributions superviseur → patient en base.
+
+### V2
+- Alertes proactives (saturation, retards).
+- Filtres avancés (par chirurgien, par période).
+- Export PDF du dashboard pour audit.
+
+---
+
+## 4. Supervision & qualité — `/admin/supervision`
+
+### Prototype
+- **14 KPI globaux** : superviseurs actifs, patients actifs, messages traités / non traités,
+  délai moyen de traitement, CR finalisés / en retard, escalades transmises, IA acceptées /
+  modifiées / refusées, **temps estimé gagné par l'IA** (étiqueté *Estimation prototype*),
+  conversations à relire, CR à contrôler.
+- Tableau superviseurs avec statut formation, qualité, charge.
+- **Conversations à relire** (4 items seedés) — bouton *Ouvrir la fiche patient*, **commentaire
+  Head of Care éditable**, boutons *OK / À revoir*.
+- **CR à contrôler** (4 items seedés) — mêmes affordances.
+- **Retours terrain superviseurs** : liste des suggestions, statut (nouveau / à revoir /
+  retenu / traité), actions Head of Care.
+- **Socle qualité KOVELA** : 9 blocs (procédures, formation, logs, revue qualité, contrôle
+  CR, gestion incidents, traçabilité, amélioration continue, documentation interne).
+  Wording prudent — **aucune certification revendiquée**.
+
+### V1
+- Reconstruire le tableau superviseurs avec données serveur.
+- Persister statuts qualité + commentaires Head of Care en base, avec historique.
+- Calculer le temps estimé gagné depuis des logs IA serveur réels.
+
+### V2
+- Workflow complet d'assignation de revue qualité.
+- Calibration inter-superviseurs.
+- Module qualité formelle (ISO 9001 inspiration, sans claim).
+
+---
+
+## 5. Superviseur — `/superviseur`, `/superviseur/patient/[id]`
+
+### Prototype
+- Inbox 6 sections (messages non traités, silencieux, escalades, CR à faire, suivis du jour,
+  clôtures à faire) avec aperçu dernier message + délai + badges.
+- **Mes indicateurs** : 9 indicateurs personnels.
+- **Améliorations terrain** : modal pour proposer une suggestion (type, écran, description,
+  impact, priorité) → log.
+- Fiche patient : timeline, notes internes, IA assistive (4 boutons), CR, compilation
+  factuelle, escalade, logs liés, templates, actions (répondre, reformuler, marquer traité,
+  relancer, clôturer).
+
+### V1
+- Vrai routage par superviseur (auth + RBAC).
+- Persister messages, notes, attribution.
+- Inbox triable / filtrable serveur.
+
+### V2
+- Notifications temps réel (WebSocket / SSE).
+- Inbox partagée avec mention `@autre superviseur`.
+
+---
+
+## 6. Formation superviseur — `/superviseur/formation`
+
+### Prototype
+- Checklist démarrage (8 items).
+- Règles KOVELA (5 règles).
+- Lexique autorisé en badges.
+- 7 familles de templates listées.
+- **4 cas pratiques non cliniques** (silencieux, transmission cabinet, cycle de vie CR,
+  préparer ≠ transmettre).
+- Mini quiz 4 questions process / wording → badge *Prêt à suivre des patients*.
+
+### V1
+- Persister la progression de formation par superviseur.
+- Versionner les contenus (rules, templates) pour traçabilité.
+
+### V2
+- Modules vidéo, certification interne, recertification périodique.
+- Évaluation pratique en duo (revue qualité d'apprentissage).
+
+---
+
+## 7. Chirurgien / cabinet — `/chirurgien`
+
+### Prototype
+- Stats (Interventions à venir, Onboardings à compléter, Patients actifs, CR disponibles,
+  Escalades transmises).
+- CTA *Transmettre / modifier mon planning opératoire*.
+- *Patients suivis* : liste filtrée (onboarding complété, hors annulés).
+- **Mise en place cabinet** (config en lecture + boutons *Mettre en place / Voir-modifier*).
+- Abonnement (mandat GoCardless en clair, montant estimé).
+- **Durées de suivi par type d'intervention** (récap éditable depuis l'onboarding).
+- **Cadre cible** (HDS / RGPD / principes CNIL — wording prudent).
+
+### V1
+- Auth chirurgien (un compte). Multi-cabinet si pertinent.
+- Persister la `CabinetConfig` ; assistantes en table relationnelle.
+
+### V2
+- Espace assistante distinct avec permissions différenciées.
+- Multi-site avec préférences par site.
+
+---
+
+## 8. Onboarding cabinet — `/chirurgien/onboarding`
+
+### Prototype
+- Wizard 6 étapes :
+  1. Identité (chirurgien, cabinet, **spécialisation**, **verticale KOVELA**).
+  2. Lieux d'intervention (jusqu'à 3).
+  3. Préférences de suivi (durée défaut, **durées par type d'intervention** éditables,
+     typologie standard / renforcé / premium, fréquence CR, canal transmission, contact
+     transmission cabinet, horaires, préférences patient, message d'accueil).
+  4. Assistantes autorisées.
+  5. Facturation & prélèvement GoCardless fictif (envoyer le lien / simuler mandat actif).
+  6. Validation doctrine → enregistrement + redirection planning.
+
+### V1
+- Schéma `CabinetConfig` réutilisable tel quel.
+- Persistance via API. Validation côté serveur.
+- Vraie invitation assistante (email).
+
+### V2
+- Signature électronique des CGV / mandat.
+- Onboarding multi-spécialité (un chirurgien peut couvrir plusieurs spécialités).
+
+---
+
+## 9. Planning opératoire — `/chirurgien/planning`
+
+### Prototype
+- Bande de flux (5 étapes).
+- Table planning : patient, intervention, date + heure, lieu, suivi, onboarding,
+  superviseur, statut KOVELA, dernière MAJ, actions.
+- Actions : ajouter, importer (simulé via *Charger un exemple*), modifier, reporter,
+  annuler, renvoyer lien, voir dossier.
+- **Pré-remplissage automatique** de la durée selon le type d'intervention (config cabinet).
+
+### V1
+- Vrai parser CSV / Excel pour l'import.
+- Persistance en base ; intégration calendrier (Google / Outlook) en V1.5 ou V2.
+- Validation des données (email, téléphone, date).
+
+### V2
+- Sync bidirectionnelle agenda.
+- Détection de doublons à l'import.
+- Vue calendrier hebdomadaire.
+
+---
+
+## 10. Patient — `/patient/onboarding`, `/patient/messages`
+
+### Prototype
+- Onboarding 5 étapes : bienvenue, confirmation informations, limites du service +
+  consentement, préférences (photo / audio / relances / notifications).
+- Écran final **« Mon suivi en bref »** (chirurgien, intervention, durée, prochaine étape,
+  rappel 15 / 112).
+- Messagerie texte / photo / audio (placeholders), historique, confirmation après envoi,
+  rappel urgence permanent.
+- **Aucune IA visible côté patient** ; mention explicite *« aucune réponse automatique par IA »*.
+
+### V1
+- Auth patient sécurisée (lien magique ou OTP).
+- Stockage chiffré HDS des pièces jointes (S3-compatible avec SSE-KMS).
+- Consentement RGPD horodaté et téléchargeable par le patient.
+
+### V2
+- Notifications push web / app.
+- Espace patient web app installable (PWA).
+- Réponses asynchrones avec accusé de lecture.
+
+---
+
+## 11. IA assistive — `lib/ai.ts`
+
+### Prototype
+- 4 fonctions simulées localement (sorties déterministes) :
+  - **Résumé conversation** (~1.5 min gagnées estimées par appel).
+  - **Préparation CR** (~7 min).
+  - **Reformulation** (~45 sec).
+  - **Compilation factuelle d'escalade** (~6 min).
+- Disclaimer obligatoire affiché : *« Suggestion IA — à valider par un humain »*.
+- Boutons Accepter / Modifier / Refuser → log dédié (`ia_utilisee` + `ia_suggestion`).
+- Prompt versionné fictif `v1.2`.
+- **Jamais autonome côté patient. Jamais d'analyse photo. Jamais de décision d'escalade.
+  Aucun scoring.**
+
+### V1
+- Vraie IA derrière un **gateway serveur** : redaction PII en entrée, redaction en sortie,
+  rate limiting, kill-switch, logs immutables.
+- Modèle versionné, prompt versionné, métriques (latence, coût, taux d'acceptation).
+- Conformité : pas d'envoi de données patient à un fournisseur hors UE / hors HDS sans
+  contrat adapté (cf. avis Aumans).
+
+### V2
+- Fine-tuning sur templates KOVELA validés.
+- Détection automatique de wording risqué (linter IA en interne).
+- IA spécialisée par verticale.
+
+---
+
+## 12. Compte-rendu (CR) — gating à 3 états
+
+### Prototype
+- États : **brouillon** (visible superviseur seul) → **validé en interne** (visible
+  superviseur + admin) → **disponible pour le chirurgien** (visible chirurgien).
+- Le contenu est **normalisé à la publication** (les mentions *« Brouillon / à valider par
+  un humain »* sont retirées et remplacées par *« Compte-rendu factuel préparé et rendu
+  disponible par l'équipe KOVELA. »*).
+- Côté chirurgien : **uniquement les CR `disponible`** s'affichent.
+
+### V1
+- Schéma `ClinicalReport` à conserver. Persistance + historique (un CR peut être modifié,
+  garder les versions).
+- Génération PDF (pour transmission externe).
+
+### V2
+- Signature électronique du CR par le superviseur en charge.
+- Templates de CR par verticale.
+
+---
+
+## 13. Logs — `/logs`
+
+### Prototype
+- 30+ types de logs opérationnels (`patient_attribue`, `message_envoye`, `cr_prepare`,
+  `cr_valide`, `cr_disponible`, `compilation_preparee`, `escalade_transmise`,
+  `onboarding_complete`, `onboarding_envoye`, `patient_relance`, `suivi_cloture`,
+  `note_interne`, `planning_ajout/modifie/reporte/annule/import`, `cabinet_configure`,
+  `mandat_gocardless`, `assistante_invitee`, `crm_prospect_cree/statut/note/demo/relance/onboarding_lance/active/assignation`,
+  `qualite_revue`, `qualite_commentaire`, `suggestion_cree/statut`, `formation_completee`,
+  `consentement_patient`, `signalement_cabinet`).
+- Logs IA séparés avec décision (propose / accepte / modifie / refuse) et version de prompt.
+- **8 filtres** : Tous, IA, CR, Escalade, Patient, Attribution, Cabinet, CRM, Qualité.
+
+### V1
+- **Audit trail immuable** (append-only, hashage en chaîne ou WORM storage).
+- Conservation conforme aux obligations légales (à valider avec DPO / Aumans).
+- Export / API admin pour audit externe.
+
+### V2
+- Recherche full-text dans les logs.
+- Alertes automatiques sur patterns suspects.
+
+---
+
+## 14. GoCardless fictif
+
+### Prototype
+- 4 statuts de mandat : `a_creer`, `lien_envoye`, `mandat_actif`, `prelevement_pret`.
+- Actions fictives dans le wizard cabinet : *Envoyer le lien GoCardless* / *Simuler mandat
+  actif*.
+- Affichage en clair sur le dashboard chirurgien et dans la fiche prospect CRM.
+- **Aucune donnée bancaire, aucun paiement réel, aucune clé API.**
+
+### V1
+- Vraie intégration GoCardless (mandat SEPA, webhooks, réconciliation).
+- Facturation automatisée : 690 € HT / mois + 50 € HT × patients activés du mois.
+- Gestion des échecs de prélèvement, relances, suspension.
+
+### V2
+- Multi-devise (export international).
+- Tarification dégressive par volume.
+
+---
+
+## 15. HDS / RGPD / CNIL — architecture cible
+
+### Prototype
+- Wording **prudent** partout : *« architecture cible »*, *« pensé pour »*, *« principes
+  CNIL »*, *« à valider juridiquement »*.
+- Section dédiée sur la landing avec double bloc *Site public (hors HDS) / Application
+  métier cible (pensée pour HDS, RGPD, principes CNIL)*.
+- Bloc *Cadre cible* sur le dashboard chirurgien.
+- **Aucune certification revendiquée à ce stade.**
+
+### V1
+- Hébergement HDS certifié (OVH HDS, Outscale, Scaleway HDS, AWS Health pour international).
+- RGPD : DPO désigné, registre des traitements, base légale documentée, durée de conservation,
+  droit à l'effacement opérationnel.
+- CNIL : déclaration / consultation préalable selon classification.
+
+### V2
+- Certification HDS / ISO 27001 du fournisseur (audit annuel).
+- Audit RGPD externe annuel.
+
+---
+
+## 16. Ce qui est V1 / V2 — synthèse
+
+| Module | V1 | V2 |
+|---|---|---|
+| Landing + site public | ✅ | i18n, blog, ressources |
+| Auth + RBAC | ✅ | SSO entreprise |
+| CRM Chirurgiens | ✅ | Intégrations HubSpot/Pipedrive |
+| Sales (RBAC) | ✅ | Objectifs / coaching |
+| Admin Head of Care | ✅ | Alertes proactives |
+| Supervision qualité (lecture) | ✅ | Workflow assignation |
+| Superviseur (inbox + fiche) | ✅ | Temps réel / WebSocket |
+| Formation superviseur | ✅ | Vidéos / certification |
+| Chirurgien | ✅ | Multi-cabinet |
+| Onboarding cabinet | ✅ | Signature électronique |
+| Planning opératoire | ✅ | Sync agenda bidirectionnelle |
+| Patient onboarding + messagerie | ✅ | Push / PWA |
+| IA assistive (4 fonctions) | ✅ avec gateway | Fine-tuning par verticale |
+| CR avec gating | ✅ | Versioning + signature |
+| Logs (audit trail immuable) | ✅ | Recherche full-text |
+| GoCardless | ✅ | Multi-devise |
+| HDS / RGPD / CNIL | ✅ certifié | ISO 27001 |
+| Suggestions superviseurs | ✅ persistance | Tags, priorisation auto |
+
+---
+
+## 17. Ce qu'il **ne faut pas** mettre en V1
+
+- Scoring patient (banni par la doctrine).
+- Réponse autonome IA au patient (bannie).
+- Analyse photo médicale (bannie).
+- Tri médical / décision clinique automatique (banni).
+- Chatbot patient autonome (banni).
+- Classement punitif des superviseurs (banni).
+- Toute revendication ISO / HDS / CNIL non acquise.
