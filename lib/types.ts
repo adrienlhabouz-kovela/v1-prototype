@@ -16,6 +16,59 @@ export type CRStatus = "brouillon" | "valide" | "disponible";
 
 export type MessageAuthor = "patient" | "superviseur" | "systeme";
 
+// CRM Chirurgiens — pipeline commercial. AUCUNE donnée patient.
+export type ProspectStatus =
+  | "a_contacter"
+  | "contacte"
+  | "call_prevu"
+  | "demo_faite"
+  | "en_reflexion"
+  | "accord_verbal"
+  | "onboarding_cabinet"
+  | "actif"
+  | "perdu";
+
+export type InterestLevel = "froid" | "tiede" | "chaud";
+export type Priority = "basse" | "moyenne" | "haute";
+export type CabinetType = "solo" | "groupe" | "clinique";
+
+export interface ProspectNote {
+  id: string;
+  text: string;
+  author: string;
+  at: string;
+}
+
+export interface Prospect {
+  id: string;
+  firstName: string;
+  lastName: string;
+  specialty: string;
+  vertical: string;
+  cabinet: string;
+  city: string;
+  email: string; // fictif
+  phone: string; // fictif
+  linkedin: string; // fictif
+  source: string;
+  cabinetType: CabinetType;
+  monthlyVolume: number; // patients/mois estimés
+  interest: InterestLevel;
+  priority: Priority;
+  status: ProspectStatus;
+  lastContactAt: string | null;
+  nextAction: string;
+  nextRelanceAt: string | null;
+  demoDone: boolean;
+  objections: string;
+  notes: ProspectNote[];
+  onboardingLaunched: boolean;
+  cabinetConfigured: boolean;
+  assistantAdded: boolean;
+  mandateStatus: MandateStatus;
+  isActive: boolean;
+}
+
 export type FollowType = "standard" | "renforce" | "premium";
 
 export type MandateStatus = "a_creer" | "lien_envoye" | "mandat_actif" | "prelevement_pret";
@@ -191,7 +244,14 @@ export type LogKind =
   | "planning_import"
   | "cabinet_configure"
   | "mandat_gocardless"
-  | "assistante_invitee";
+  | "assistante_invitee"
+  | "crm_prospect_cree"
+  | "crm_statut"
+  | "crm_note"
+  | "crm_demo"
+  | "crm_relance"
+  | "crm_onboarding_lance"
+  | "crm_active";
 
 export interface LogEntry {
   id: string;

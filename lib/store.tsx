@@ -11,6 +11,7 @@ import {
   buildPatients,
   buildReports,
   PRICING,
+  seedProspects,
   supervisors,
   surgeons as seedSurgeons,
 } from "./mock-data";
@@ -28,9 +29,28 @@ import type {
   MandateStatus,
   Message,
   Patient,
+  Prospect,
+  ProspectStatus,
   Role,
   Surgeon,
 } from "./types";
+
+export interface ProspectInput {
+  firstName: string;
+  lastName: string;
+  specialty: string;
+  vertical: string;
+  cabinet: string;
+  city: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  source: string;
+  cabinetType: Prospect["cabinetType"];
+  monthlyVolume: number;
+  interest: Prospect["interest"];
+  priority: Prospect["priority"];
+}
 
 export interface PlanningInput {
   name: string;
@@ -91,6 +111,16 @@ interface KovelaState {
   setMandateStatus: (surgeonId: string, status: MandateStatus) => void;
   addAssistant: (surgeonId: string, name: string) => void;
 
+  // CRM chirurgiens (commercial — AUCUNE donnée patient)
+  prospects: Prospect[];
+  addProspect: (input: ProspectInput) => void;
+  updateProspectStatus: (id: string, status: ProspectStatus) => void;
+  addProspectNote: (id: string, text: string) => void;
+  markProspectDemoDone: (id: string) => void;
+  scheduleProspectRelance: (id: string, date: string, action: string) => void;
+  launchProspectOnboarding: (id: string) => void;
+  activateProspectAsSurgeon: (id: string) => void;
+
   logAi: (fn: AiFunction, decision: AiDecision, patientId?: string) => void;
 
   // helpers
@@ -127,6 +157,11 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
   const [aiLogs, setAiLogs] = useState<AiLog[]>([]);
   const [surgeonsState, setSurgeons] = useState<Surgeon[]>(() => seedSurgeons.map((s) => ({ ...s })));
   const [assistantsState, setAssistants] = useState<Assistant[]>(() => seedAssistants.map((a) => ({ ...a })));
+  const [prospects, setProspects] = useState<Prospect[]>(() => seedProspects.map((p) => ({ ...p, notes: [...p.notes] })));
+
+  function updateProspect(id: string, fn: (p: Prospect) => Prospect) {
+    setProspects((prev) => prev.map((p) => (p.id === id ? fn(p) : p)));
+  }
 
   const currentUser = userByRole[role];
 
@@ -463,6 +498,102 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
       const assistant: Assistant = { id: uid("a"), name, surgeonId };
       setAssistants((prev) => [...prev, assistant]);
       pushLog("assistante_invitee", `Assistante « ${name} » invitée (fictif).`);
+    },
+
+    prospects,
+    addProspect(input) {
+      const p: Prospect = {
+        id: uid("pr"),
+        firstName: input.firstName,
+        lastName: input.lastName,
+        specialty: input.specialty,
+        vertical: input.vertical,
+        cabinet: input.cabinet,
+        city: input.city,
+        email: input.email,
+        phone: input.phone,
+        linkedin: input.linkedin,
+        source: input.source,
+        cabinetType: input.cabinetType,
+        monthlyVolume: Number(input.monthlyVolume) || 0,
+        interest: input.interest,
+        priority: input.priority,
+        status: "a_contacter",
+        lastContactAt: null,
+        nextAction: "Premier contact",
+        nextRelanceAt: null,
+        demoDone: false,
+        objections: "",
+        notes: [],
+        onboardingLaunched: false,
+        cabinetConfigured: false,
+        assistantAdded: false,
+        mandateStatus: "a_creer",
+        isActive: false,
+      };
+      setProspects((prev) => [p, ...prev]);
+      pushLog("crm_prospect_cree", `Prospect ${p.firstName} ${p.lastName} (${p.cabinet}) ajouté au CRM.`);
+    },
+
+    updateProspectStatus(id, status) {
+      const target = prospects.find((p) => p.id === id);
+      updateProspect(id, (p) => ({ ...p, status }));
+      pushLog(
+        "crm_statut",
+        `Statut CRM modifié pour ${target?.firstName ?? ""} ${target?.lastName ?? id} → ${status}.`
+      );
+    },
+
+    addProspectNote(id, text) {
+      const note = { id: uid("pn"), text, author: currentUser, at: new Date().toISOString() };
+      updateProspect(id, (p) => ({ ...p, notes: [note, ...p.notes] }));
+      pushLog("crm_note", "Note CRM ajoutée.");
+    },
+
+    markProspectDemoDone(id) {
+      updateProspect(id, (p) => ({
+        ...p,
+        demoDone: true,
+        status: p.status === "call_prevu" || p.status === "contacte" ? "demo_faite" : p.status,
+        lastContactAt: new Date().toISOString(),
+      }));
+      const t = prospects.find((p) => p.id === id);
+      pushLog("crm_demo", `Démo marquée comme faite pour ${t?.firstName ?? ""} ${t?.lastName ?? id}.`);
+    },
+
+    scheduleProspectRelance(id, date, action) {
+      updateProspect(id, (p) => ({ ...p, nextRelanceAt: date, nextAction: action || p.nextAction }));
+      pushLog("crm_relance", `Relance programmée le ${date}${action ? ` — ${action}` : ""}.`);
+    },
+
+    launchProspectOnboarding(id) {
+      updateProspect(id, (p) => ({
+        ...p,
+        onboardingLaunched: true,
+        status: p.isActive ? p.status : "onboarding_cabinet",
+        mandateStatus: p.mandateStatus === "a_creer" ? "lien_envoye" : p.mandateStatus,
+      }));
+      const t = prospects.find((p) => p.id === id);
+      pushLog(
+        "crm_onboarding_lance",
+        `Onboarding cabinet lancé pour ${t?.firstName ?? ""} ${t?.lastName ?? id}.`
+      );
+    },
+
+    activateProspectAsSurgeon(id) {
+      updateProspect(id, (p) => ({
+        ...p,
+        isActive: true,
+        status: "actif",
+        cabinetConfigured: true,
+        onboardingLaunched: true,
+        mandateStatus: p.mandateStatus === "mandat_actif" ? p.mandateStatus : "mandat_actif",
+      }));
+      const t = prospects.find((p) => p.id === id);
+      pushLog(
+        "crm_active",
+        `${t?.firstName ?? ""} ${t?.lastName ?? id} transformé(e) en chirurgien actif KOVELA.`
+      );
     },
 
     logAi(fn, decision, patientId) {

@@ -1,11 +1,56 @@
 import type {
   CRStatus,
   FollowType,
+  InterestLevel,
   MandateStatus,
   OnboardingStatus,
   PatientStatus,
   PlanningStatus,
+  Priority,
+  ProspectStatus,
 } from "./types";
+
+export const prospectStatusLabels: Record<ProspectStatus, string> = {
+  a_contacter: "À contacter",
+  contacte: "Contacté",
+  call_prevu: "Call prévu",
+  demo_faite: "Démo faite",
+  en_reflexion: "En réflexion",
+  accord_verbal: "Accord verbal",
+  onboarding_cabinet: "Onboarding cabinet",
+  actif: "Actif",
+  perdu: "Perdu / dormant",
+};
+
+export const prospectStatusStyles: Record<ProspectStatus, string> = {
+  a_contacter: "bg-navy-50 text-charcoal/60 ring-navy-100",
+  contacte: "bg-navy-50 text-navy-700 ring-navy-100",
+  call_prevu: "bg-teal-50/60 text-navy-700 ring-teal-100",
+  demo_faite: "bg-teal-50 text-teal-700 ring-teal-100",
+  en_reflexion: "bg-amber-50/70 text-amber-700 ring-amber-100",
+  accord_verbal: "bg-teal-50 text-teal-700 ring-teal-100",
+  onboarding_cabinet: "bg-teal-100/70 text-teal-700 ring-teal-100",
+  actif: "bg-navy-900 text-teal-100 ring-navy-900",
+  perdu: "bg-navy-50/60 text-charcoal/45 ring-navy-100",
+};
+
+export const interestLabels: Record<InterestLevel, string> = {
+  froid: "Froid",
+  tiede: "Tiède",
+  chaud: "Chaud",
+};
+
+export const interestStyles: Record<InterestLevel, string> = {
+  froid: "bg-navy-50 text-charcoal/60 ring-navy-100",
+  tiede: "bg-teal-50/60 text-navy-700 ring-teal-100",
+  chaud: "bg-teal-50 text-teal-700 ring-teal-100",
+};
+
+export const priorityLabels: Record<Priority, string> = {
+  basse: "Basse",
+  moyenne: "Moyenne",
+  haute: "Haute",
+};
 
 export const mandateLabels: Record<MandateStatus, string> = {
   a_creer: "À créer",

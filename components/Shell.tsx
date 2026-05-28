@@ -10,6 +10,7 @@ import { Wordmark } from "@/components/Brand";
 const nav: Record<Role, { href: string; label: string }[]> = {
   admin: [
     { href: "/admin", label: "Tableau de bord" },
+    { href: "/admin/crm", label: "CRM Chirurgiens" },
     { href: "/logs", label: "Logs" },
   ],
   superviseur: [

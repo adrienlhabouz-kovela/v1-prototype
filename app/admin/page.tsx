@@ -90,7 +90,11 @@ export default function AdminPage() {
         eyebrow="Admin KOVELA"
         title="Tableau de bord"
         subtitle="Pilotage opérationnel de la coordination post-opératoire. Données fictives."
-      />
+      >
+        <Link href="/admin/crm">
+          <Button variant="primary">Voir le CRM chirurgiens</Button>
+        </Link>
+      </PageHeader>
 
       <DoctrineNote className="mb-6" />
 

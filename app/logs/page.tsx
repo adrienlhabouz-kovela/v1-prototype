@@ -30,6 +30,13 @@ const logKindLabel: Record<LogKind, string> = {
   cabinet_configure: "Cabinet — configuration",
   mandat_gocardless: "Mandat GoCardless (fictif)",
   assistante_invitee: "Assistante invitée",
+  crm_prospect_cree: "CRM — prospect créé",
+  crm_statut: "CRM — statut modifié",
+  crm_note: "CRM — note ajoutée",
+  crm_demo: "CRM — démo faite",
+  crm_relance: "CRM — relance programmée",
+  crm_onboarding_lance: "CRM — onboarding cabinet lancé",
+  crm_active: "CRM — chirurgien actif",
 };
 
 const logKindStyle: Partial<Record<LogKind, string>> = {
@@ -62,13 +69,22 @@ const aiDecisionLabel: Record<AiDecision, string> = {
   refuse: "Refusée",
 };
 
-type OpsFilter = "all" | "ia" | "cr" | "escalade" | "patient" | "attribution" | "cabinet";
+type OpsFilter = "all" | "ia" | "cr" | "escalade" | "patient" | "attribution" | "cabinet" | "crm";
 
 const opsFilterKinds: Record<Exclude<OpsFilter, "all">, LogKind[]> = {
   ia: ["ia_utilisee", "ia_suggestion"],
   cr: ["cr_prepare", "cr_valide", "cr_disponible"],
   escalade: ["compilation_preparee", "escalade_transmise"],
   cabinet: ["cabinet_configure", "mandat_gocardless", "assistante_invitee"],
+  crm: [
+    "crm_prospect_cree",
+    "crm_statut",
+    "crm_note",
+    "crm_demo",
+    "crm_relance",
+    "crm_onboarding_lance",
+    "crm_active",
+  ],
   patient: [
     "message_envoye",
     "patient_relance",
@@ -135,6 +151,7 @@ export default function LogsPage() {
             ["patient", "Patient"],
             ["attribution", "Attribution"],
             ["cabinet", "Cabinet"],
+            ["crm", "CRM"],
           ] as [OpsFilter, string][]).map(([f, label]) => (
             <button
               key={f}
