@@ -123,8 +123,12 @@ export default function ChirurgienDashboard() {
           {/* Configuration cabinet */}
           <Card>
             <CardHeader
-              title="Configuration cabinet"
-              subtitle={config?.configured ? "Cabinet configuré" : "Configuration à compléter"}
+              title="Mise en place cabinet"
+              subtitle={
+                config?.configured
+                  ? "Service KOVELA en place — paramètres de service cabinet"
+                  : "Mise en place à finaliser avec l'équipe KOVELA"
+              }
               action={
                 <Link href="/chirurgien/onboarding" className="text-xs font-medium text-teal-600 hover:text-teal-700">
                   Modifier →
@@ -155,8 +159,8 @@ export default function ChirurgienDashboard() {
               <Link href="/chirurgien/onboarding" className="block">
                 <Button variant="primary" className="mt-1 w-full">
                   {config?.configured
-                    ? "Voir / modifier la configuration cabinet"
-                    : "Configurer mon cabinet"}
+                    ? "Voir / modifier les paramètres de service cabinet"
+                    : "Mettre en place le service pour mon cabinet"}
                 </Button>
               </Link>
               <div className="mt-1 rounded-lg bg-navy-50 px-3 py-2 text-xs text-charcoal/70">

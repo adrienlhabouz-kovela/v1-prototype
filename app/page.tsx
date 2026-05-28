@@ -56,7 +56,7 @@ const pillars = [
 ];
 
 const steps = [
-  { t: "Le cabinet configure KOVELA", d: "Spécialité, préférences de suivi, assistante, mandat de prélèvement (simulation)." },
+  { t: "Le cabinet est accompagné par KOVELA", d: "L'équipe KOVELA met en place le service : spécialité, préférences de fonctionnement, assistante, mandat de prélèvement (simulation)." },
   { t: "Le planning opératoire est déposé", d: "Ajout manuel ou import simple du planning des patients." },
   { t: "Le patient active son suivi", d: "Lien sécurisé, limites du service, messagerie." },
   { t: "KOVELA supervise et documente", d: "Messages, relances, IA assistive, traçabilité complète." },
@@ -146,9 +146,13 @@ export default function Landing() {
           </h1>
 
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-navy-100/80">
-            KOVELA aide les chirurgiens libéraux à organiser le suivi post-opératoire de leurs
-            patients : messagerie sécurisée, supervision humaine, IA assistive, comptes-rendus
-            factuels et traçabilité.
+            KOVELA est un service opéré de coordination post-opératoire pour chirurgiens libéraux :
+            messagerie sécurisée, supervision humaine spécialisée, IA assistive interne,
+            comptes-rendus factuels et traçabilité.
+          </p>
+
+          <p className="mt-3 font-display text-base italic text-teal-200/90">
+            Un service opéré, pas un logiciel de plus.
           </p>
 
           <div className="mt-9 flex flex-wrap gap-3">
@@ -203,7 +207,15 @@ export default function Landing() {
               </div>
             ))}
           </div>
-          <p className="mt-10 font-display text-2xl italic tracking-tight text-navy-900">
+          <blockquote className="mt-10 rounded-2xl border-l-4 border-teal-500 bg-[#eef1f3] p-6">
+            <p className="text-base leading-relaxed text-navy-900 md:text-lg">
+              KOVELA n'est pas un logiciel que le chirurgien doit gérer. C'est un{" "}
+              <span className="font-semibold">service opéré</span> qui structure le suivi
+              post-opératoire pour son cabinet, avec une équipe de supervision humaine spécialisée
+              et une IA assistive interne.
+            </p>
+          </blockquote>
+          <p className="mt-6 font-display text-2xl italic tracking-tight text-navy-900">
             Le patient se sent accompagné. Le cabinet respire. Le chirurgien garde la main.
           </p>
         </div>

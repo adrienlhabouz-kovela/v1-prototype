@@ -666,7 +666,7 @@ export const seedProspects: Prospect[] = [
     vertical: "Esthétique & plastique", cabinet: "Cabinet Lopez", city: "Nice",
     email: "r.lopez@exemple.test", phone: "06 00 00 02 21", linkedin: "linkedin.com/in/exemple-lopez",
     source: "Inbound site", cabinetType: "solo", monthlyVolume: 32, interest: "chaud", priority: "haute",
-    status: "onboarding_cabinet", lastContactAt: daysAgoISO(1, 10), nextAction: "Suivre configuration cabinet",
+    status: "onboarding_cabinet", lastContactAt: daysAgoISO(1, 10), nextAction: "Suivre la mise en place cabinet",
     nextRelanceAt: daysFromNowISO(1, 10).slice(0, 10), demoDone: true, objections: "",
     notes: [], onboardingLaunched: true, cabinetConfigured: false, assistantAdded: false,
     mandateStatus: "lien_envoye", isActive: false,

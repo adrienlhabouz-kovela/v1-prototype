@@ -698,7 +698,7 @@ function ProspectModal({ target, onClose }: { target: Prospect | null; onClose: 
                 rel="noreferrer"
                 className="rounded-xl border border-navy-100 px-3 py-2 text-sm text-navy-900 hover:bg-teal-50/40"
               >
-                Ouvrir configuration cabinet ↗
+                Ouvrir mise en place cabinet ↗
               </a>
             )}
           </div>
@@ -714,7 +714,7 @@ function ProspectModal({ target, onClose }: { target: Prospect | null; onClose: 
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-charcoal/55">Activation</h3>
           <div className="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
             <Pill ok={p.onboardingLaunched} label="Onboarding cabinet lancé" />
-            <Pill ok={p.cabinetConfigured} label="Cabinet configuré" />
+            <Pill ok={p.cabinetConfigured} label="Service en place" />
             <Pill ok={p.assistantAdded} label="Assistante ajoutée" />
             <div className="rounded-xl border border-navy-100 px-3 py-2 text-xs">
               <span className="text-charcoal/55">Mandat GoCardless · </span>

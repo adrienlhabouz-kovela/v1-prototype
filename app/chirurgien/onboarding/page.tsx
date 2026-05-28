@@ -93,9 +93,9 @@ export default function ChirurgienOnboarding() {
   return (
     <Shell>
       <PageHeader
-        eyebrow="Configuration cabinet"
-        title="Onboarding chirurgien / cabinet"
-        subtitle="Configurez votre cabinet et vos préférences de suivi avant d'importer votre planning opératoire."
+        eyebrow="Mise en place cabinet"
+        title="Mise en place du service KOVELA"
+        subtitle="L'équipe KOVELA met en place le service pour votre cabinet. Précisez vos préférences de fonctionnement avant l'import du planning opératoire."
       />
 
       <div className="mx-auto max-w-3xl">
@@ -454,7 +454,7 @@ export default function ChirurgienOnboarding() {
               </Button>
             ) : (
               <Button variant="primary" onClick={finish}>
-                Enregistrer la configuration et importer mon planning
+                Enregistrer et accéder au planning opératoire
               </Button>
             )}
           </div>

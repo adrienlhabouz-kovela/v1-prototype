@@ -237,7 +237,7 @@ export default function AdminPage() {
                 <div className="flex shrink-0 items-center gap-2">
                   <Badge className="bg-teal-50/60 text-navy-700 ring-teal-100">{s.config.vertical}</Badge>
                   {!s.config.configured && (
-                    <Badge className="bg-amber-50/70 text-amber-700 ring-amber-100">À configurer</Badge>
+                    <Badge className="bg-amber-50/70 text-amber-700 ring-amber-100">Mise en place à finaliser</Badge>
                   )}
                 </div>
               </div>
