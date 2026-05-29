@@ -120,13 +120,13 @@ export default function ChirurgienDashboard() {
         </Card>
 
         <div className="space-y-6">
-          {/* Configuration cabinet */}
+          {/* Service cabinet */}
           <Card>
             <CardHeader
-              title="Mise en place cabinet"
+              title="Service cabinet"
               subtitle={
                 config?.configured
-                  ? "Service KOVELA en place — paramètres de service cabinet"
+                  ? "Espace de pilotage du service opéré par KOVELA"
                   : "Mise en place à finaliser avec l'équipe KOVELA"
               }
               action={
@@ -136,12 +136,33 @@ export default function ChirurgienDashboard() {
               }
             />
             <div className="space-y-2.5 p-5 text-sm">
+              <Row
+                label="Statut"
+                value={
+                  config?.configured ? (
+                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Service activé</Badge>
+                  ) : (
+                    <Badge className="bg-amber-50 text-amber-700 ring-amber-100">
+                      Mise en place à finaliser
+                    </Badge>
+                  )
+                }
+              />
               <Row label="Spécialisation" value={config?.specialization ?? "—"} />
               <Row label="Verticale" value={<Badge className="bg-navy-50 text-charcoal/70 ring-navy-100">{config?.vertical ?? "—"}</Badge>} />
-              <Row label="Durée de suivi par défaut" value={config?.defaultProtocol ?? "—"} />
+              <Row
+                label="Référentiel de suivi"
+                value={
+                  config && Object.keys(config.interventionDurations).length > 0 ? (
+                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Renseigné</Badge>
+                  ) : (
+                    <Badge className="bg-amber-50 text-amber-700 ring-amber-100">À compléter</Badge>
+                  )
+                }
+              />
               <Row label="Typologie de suivi" value={config ? followTypeLabels[config.followType] : "—"} />
               <Row label="Fréquence CR" value={config?.crFrequency ?? "—"} />
-              <Row label="Assistante autorisée" value={assistant?.name ?? "—"} />
+              <Row label="Contact cabinet autorisé" value={assistant?.name ?? "—"} />
               <Row
                 label="Mandat GoCardless"
                 value={
@@ -159,14 +180,14 @@ export default function ChirurgienDashboard() {
               <Link href="/chirurgien/onboarding" className="block">
                 <Button variant="primary" className="mt-1 w-full">
                   {config?.configured
-                    ? "Voir / modifier les paramètres de service cabinet"
+                    ? "Modifier les paramètres de service cabinet"
                     : "Mettre en place le service pour mon cabinet"}
                 </Button>
               </Link>
               <div className="mt-1 rounded-lg bg-navy-50 px-3 py-2 text-xs text-charcoal/70">
                 Prochaine étape :{" "}
                 <Link href="/chirurgien/planning" className="font-medium text-teal-600 hover:text-teal-700">
-                  importer mon planning opératoire →
+                  transmettre mon planning opératoire →
                 </Link>
               </div>
             </div>
@@ -210,7 +231,7 @@ export default function ChirurgienDashboard() {
         <Card className="lg:col-span-2">
           <CardHeader
             title="Durées de suivi par type d'intervention"
-            subtitle="Préférences de fonctionnement cabinet — ajustables patient par patient"
+            subtitle="Référentiel de suivi cabinet — ajustables patient par patient"
             action={
               <Link href="/chirurgien/onboarding" className="text-xs font-medium text-teal-600 hover:text-teal-700">
                 Modifier →

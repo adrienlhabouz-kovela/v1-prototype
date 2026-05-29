@@ -209,7 +209,7 @@ export default function CRMPage() {
       <PageHeader
         eyebrow="Admin KOVELA"
         title="CRM Chirurgiens"
-        subtitle="Prospection, démos, onboarding cabinet et activation des chirurgiens. Aucune donnée patient."
+        subtitle="Prospection, démos, mise en place cabinet et activation des chirurgiens. Aucune donnée patient."
       >
         <Button variant="primary" onClick={() => setAddOpen(true)}>
           Ajouter un prospect
@@ -812,7 +812,7 @@ function ProspectModal({ target, onClose }: { target: Prospect | null; onClose: 
               onClick={() => k.launchProspectOnboarding(p.id)}
               disabled={p.onboardingLaunched || p.isActive}
             >
-              Lancer onboarding cabinet
+              Envoyer le lien de mise en place
             </Button>
             <Button
               variant="primary"
@@ -843,8 +843,8 @@ function ProspectModal({ target, onClose }: { target: Prospect | null; onClose: 
         <section className="md:col-span-2">
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-charcoal/55">Activation</h3>
           <div className="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
-            <Pill ok={p.onboardingLaunched} label="Onboarding cabinet lancé" />
-            <Pill ok={p.cabinetConfigured} label="Service en place" />
+            <Pill ok={p.onboardingLaunched} label="Lien de mise en place envoyé" />
+            <Pill ok={p.cabinetConfigured} label="Service activé" />
             <Pill ok={p.assistantAdded} label="Assistante ajoutée" />
             <div className="rounded-xl border border-navy-100 px-3 py-2 text-xs">
               <span className="text-charcoal/55">Mandat GoCardless · </span>
@@ -852,7 +852,7 @@ function ProspectModal({ target, onClose }: { target: Prospect | null; onClose: 
             </div>
           </div>
           <p className="mt-2 text-[11px] text-charcoal/45">
-            État reflété depuis l'onboarding cabinet (lecture). Aucune donnée patient ne transite par le CRM.
+            État reflété depuis la mise en place cabinet (lecture). Aucune donnée patient ne transite par le CRM.
           </p>
         </section>
 

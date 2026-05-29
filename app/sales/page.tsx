@@ -318,7 +318,7 @@ function SalesActionsModal({ target, onClose }: { target: Prospect | null; onClo
           onClick={() => k.launchProspectOnboarding(p.id)}
           disabled={p.onboardingLaunched || p.isActive}
         >
-          Lancer onboarding cabinet
+          Envoyer le lien de mise en place
         </Button>
         <Button variant="primary" onClick={() => k.activateProspectAsSurgeon(p.id)} disabled={p.isActive}>
           Transformer en chirurgien actif

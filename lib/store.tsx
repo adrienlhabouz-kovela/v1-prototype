@@ -554,7 +554,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
             : s
         )
       );
-      pushLog("cabinet_configure", `Configuration du cabinet enregistrée (${config.vertical || config.specialization}).`);
+      pushLog("cabinet_configure", `Mise en place du service cabinet validée (${config.vertical || config.specialization}).`);
     },
 
     setMandateStatus(surgeonId, status) {
@@ -749,7 +749,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
       const t = prospects.find((p) => p.id === id);
       pushLog(
         "crm_onboarding_lance",
-        `Onboarding cabinet lancé pour ${t?.firstName ?? ""} ${t?.lastName ?? id}.`
+        `Lien de mise en place cabinet envoyé à ${t?.firstName ?? ""} ${t?.lastName ?? id}.`
       );
     },
 

@@ -17,7 +17,7 @@ export const prospectStatusLabels: Record<ProspectStatus, string> = {
   demo_faite: "Démo faite",
   en_reflexion: "En réflexion",
   accord_verbal: "Accord verbal",
-  onboarding_cabinet: "Onboarding cabinet",
+  onboarding_cabinet: "Mise en place cabinet",
   actif: "Actif",
   perdu: "Perdu / dormant",
 };

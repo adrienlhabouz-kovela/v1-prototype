@@ -59,7 +59,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-const STEPS = ["Identité", "Lieux", "Préférences de suivi", "Assistantes", "Facturation", "Validation"];
+const STEPS = ["Identité", "Lieux", "Référentiel de suivi", "Contacts cabinet", "Prélèvement", "Validation"];
 
 export default function ChirurgienOnboarding() {
   const k = useKovela();
@@ -87,18 +87,24 @@ export default function ChirurgienOnboarding() {
 
   function finish() {
     k.saveCabinetConfig(MY_SURGEON_ID, form);
-    router.push("/chirurgien/planning");
+    router.push("/chirurgien");
   }
 
   return (
     <Shell>
       <PageHeader
         eyebrow="Mise en place cabinet"
-        title="Mise en place du service KOVELA"
-        subtitle="Renseignez les informations nécessaires à l'équipe KOVELA pour mettre en place le service avec votre cabinet."
+        title="Mettre en place le service KOVELA pour votre cabinet"
+        subtitle="Ce lien vous a été transmis après un échange avec l'équipe KOVELA. Il permet de préparer la mise en place du service : informations cabinet, préférences de suivi, contacts autorisés et mandat de prélèvement."
       />
 
       <div className="mx-auto max-w-3xl">
+        <p className="mb-5 rounded-xl bg-teal-50/50 px-4 py-3 text-xs leading-relaxed text-navy-900 ring-1 ring-teal-100">
+          Comptez quelques minutes. Ces informations restent modifiables ensuite depuis votre espace
+          chirurgien. L'équipe KOVELA exploite ces éléments pour opérer le service avec votre
+          cabinet.
+        </p>
+
         {/* Progression */}
         <div className="mb-6 flex flex-wrap items-center gap-x-2 gap-y-2 text-xs">
           {STEPS.map((label, i) => (
@@ -186,10 +192,15 @@ export default function ChirurgienOnboarding() {
             </div>
           )}
 
-          {/* Étape 3 — Préférences de suivi */}
+          {/* Étape 3 — Référentiel de suivi cabinet */}
           {step === 2 && (
             <div className="space-y-5">
-              <h2 className="font-display text-xl text-navy-900">Préférences de suivi</h2>
+              <h2 className="font-display text-xl text-navy-900">Référentiel de suivi cabinet</h2>
+              <p className="text-sm leading-relaxed text-charcoal/65">
+                Indiquez les durées et préférences de suivi utilisées par votre cabinet selon les
+                types d'intervention. Ces informations servent à organiser le service KOVELA et
+                restent ajustables patient par patient.
+              </p>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field
@@ -355,12 +366,13 @@ export default function ChirurgienOnboarding() {
             </div>
           )}
 
-          {/* Étape 4 — Assistantes */}
+          {/* Étape 4 — Contacts cabinet autorisés */}
           {step === 3 && (
             <div className="space-y-4">
-              <h2 className="font-display text-xl text-navy-900">Assistantes / secrétariat autorisés</h2>
+              <h2 className="font-display text-xl text-navy-900">Contacts cabinet autorisés</h2>
               <p className="text-sm text-charcoal/60">
-                Les assistantes autorisées peuvent transmettre et modifier le planning opératoire du cabinet.
+                Assistantes, secrétariat ou contacts de transmission autorisés à transmettre et
+                modifier le planning opératoire du cabinet.
               </p>
               <div className="space-y-2">
                 {k.assistantsFor(MY_SURGEON_ID).map((a) => (
@@ -446,10 +458,10 @@ export default function ChirurgienOnboarding() {
             </div>
           )}
 
-          {/* Étape 6 — Validation */}
+          {/* Étape 6 — Validation de la mise en place */}
           {step === 5 && (
             <div className="space-y-4">
-              <h2 className="font-display text-xl text-navy-900">Validation du fonctionnement KOVELA</h2>
+              <h2 className="font-display text-xl text-navy-900">Validation de la mise en place</h2>
               <div className="rounded-xl bg-navy-50/60 p-4 text-sm leading-relaxed text-charcoal/75">
                 KOVELA assure la <span className="font-medium">coordination</span> et la{" "}
                 <span className="font-medium">continuité post-opératoire</span> sous supervision humaine.
@@ -482,7 +494,7 @@ export default function ChirurgienOnboarding() {
               </Button>
             ) : (
               <Button variant="primary" onClick={finish}>
-                Enregistrer et accéder au planning opératoire
+                Valider la mise en place du service
               </Button>
             )}
           </div>

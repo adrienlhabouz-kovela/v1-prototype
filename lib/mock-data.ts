@@ -596,7 +596,7 @@ export function buildInitialLogs(patients: Patient[]): LogEntry[] {
 }
 
 // CRM Chirurgiens — prospects fictifs (AUCUNE donnée patient).
-// Pipeline commercial : prospection → démo → onboarding cabinet → actif.
+// Pipeline commercial : prospection → démo → mise en place cabinet → actif.
 export const seedProspects: Prospect[] = [
   {
     id: "pr1", salesOwnerId: "so2", firstName: "Alexandre", lastName: "Bonnet", specialty: "Chirurgie esthétique / plastique",
