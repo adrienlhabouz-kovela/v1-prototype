@@ -4,17 +4,21 @@
 
 html,
 body {
-  background-color: #eef1f3;
+  background-color: #f4f1ec;
   color: #0a1f2d;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11";
 }
 
 @layer base {
   h1,
   h2,
   h3 {
-    letter-spacing: -0.01em;
+    letter-spacing: -0.018em;
+  }
+  h1 {
+    letter-spacing: -0.025em;
   }
 }
 

@@ -97,28 +97,34 @@ export function Shell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#eef1f3]">
+    <div className="flex min-h-screen bg-bone">
       {/* Sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col bg-navy-depth px-4 py-6 md:flex">
-        <Link href={roleHome[role]} className="px-2">
+      <aside className="hidden w-[260px] shrink-0 flex-col border-r border-navy-950/20 bg-navy-depth px-5 py-7 md:flex">
+        <Link href={roleHome[role]} className="px-1.5">
           <Wordmark light tagline />
         </Link>
 
-        <nav className="mt-10 flex flex-col gap-1">
+        <div className="mt-9 px-1.5">
+          <p className="text-[9.5px] font-semibold uppercase tracking-[0.22em] text-navy-100/40">
+            Navigation
+          </p>
+        </div>
+
+        <nav className="mt-3 flex flex-col gap-0.5">
           {items.map((it) => {
             const active = activeHref === it.href;
             return (
               <Link
                 key={it.href}
                 href={it.href}
-                className={`relative rounded-xl px-3 py-2.5 text-sm transition-colors ${
+                className={`relative rounded-lg px-3 py-2 text-[13px] tracking-tight transition-colors ${
                   active
-                    ? "bg-white/10 font-medium text-white"
-                    : "text-navy-100/65 hover:bg-white/5 hover:text-white"
+                    ? "bg-white/[0.07] font-medium text-white"
+                    : "text-navy-100/60 hover:bg-white/[0.04] hover:text-white"
                 }`}
               >
                 {active && (
-                  <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-teal-400" />
+                  <span className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-full bg-teal-400" />
                 )}
                 {it.label}
               </Link>
@@ -127,14 +133,21 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="mt-auto">
-          <div className="rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/10">
-            <p className="text-[10px] uppercase tracking-[0.14em] text-navy-100/45">Rôle (démo)</p>
-            <p className="mt-1 text-sm font-medium text-white">{displayedUser}</p>
-            <Link href="/login" className="mt-2.5 inline-block text-xs text-teal-300 hover:text-teal-200">
+          <div className="rounded-xl bg-white/[0.04] p-4 ring-1 ring-white/[0.06]">
+            <p className="text-[9.5px] font-semibold uppercase tracking-[0.22em] text-navy-100/45">
+              Rôle (démo)
+            </p>
+            <p className="mt-2 text-[13px] font-medium tracking-tight text-white">
+              {displayedUser}
+            </p>
+            <Link
+              href="/login"
+              className="mt-3 inline-block text-[11.5px] text-teal-300/90 hover:text-teal-200"
+            >
               Changer de rôle →
             </Link>
           </div>
-          <p className="mt-3 px-1 text-[10px] leading-tight text-navy-100/35">
+          <p className="mt-4 px-1.5 text-[10px] leading-relaxed text-navy-100/30">
             Prototype — données fictives. Pas une plateforme de production HDS.
           </p>
         </div>
@@ -142,41 +155,45 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       {/* Main */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-navy-900/[0.07] bg-white/85 px-4 py-3 backdrop-blur-md md:px-8">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-navy-900/[0.06] bg-bone/85 px-4 py-3 backdrop-blur-md md:px-9">
           <div className="md:hidden">
             <Wordmark />
           </div>
-          <div className="hidden items-center gap-2 md:flex">
-            <span className="text-xs text-charcoal/45">Vue&nbsp;:</span>
+          <div className="hidden items-center gap-1.5 md:flex">
+            <span className="mr-1 text-[10.5px] font-medium uppercase tracking-[0.16em] text-charcoal/45">
+              Vue
+            </span>
             {(Object.keys(roleLabel) as Role[]).map((r) => (
               <button
                 key={r}
                 onClick={() => switchRole(r)}
-                className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                className={`rounded-md px-3 py-1.5 text-[11.5px] font-medium tracking-tight transition-colors ${
                   displayedRole === r
-                    ? "bg-navy-900 text-white"
-                    : "bg-navy-50 text-charcoal/70 hover:bg-navy-100"
+                    ? "bg-navy-900 text-white shadow-soft"
+                    : "bg-white/60 text-charcoal/70 ring-1 ring-navy-900/[0.06] hover:bg-white hover:text-navy-900"
                 }`}
               >
                 {roleLabel[r]}
               </button>
             ))}
           </div>
-          <Link href="/login" className="text-xs font-medium text-teal-600 md:hidden">
+          <Link href="/login" className="text-xs font-medium text-teal-700 md:hidden">
             Rôle
           </Link>
         </header>
 
         {/* Navigation mobile — onglets du rôle */}
-        <nav className="flex gap-1.5 overflow-x-auto border-b border-navy-900/[0.06] bg-white px-4 py-2 md:hidden">
+        <nav className="flex gap-1.5 overflow-x-auto border-b border-navy-900/[0.06] bg-bone/85 px-4 py-2 md:hidden">
           {items.map((it) => {
             const active = activeHref === it.href;
             return (
               <Link
                 key={it.href}
                 href={it.href}
-                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                  active ? "bg-navy-900 text-white" : "bg-navy-50 text-charcoal/70"
+                className={`whitespace-nowrap rounded-md px-3 py-1.5 text-[11.5px] font-medium transition-colors ${
+                  active
+                    ? "bg-navy-900 text-white"
+                    : "bg-white/60 text-charcoal/70 ring-1 ring-navy-900/[0.05]"
                 }`}
               >
                 {it.label}
@@ -185,17 +202,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        {/* Bandeau prototype — état non persistant + SHA de build pour traçabilité */}
-        <div className="flex items-center gap-2 border-b border-navy-900/[0.06] bg-navy-50/60 px-4 py-1.5 text-[11px] text-charcoal/55 md:px-8">
-          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500" />
+        {/* Bandeau prototype — discret, traçabilité du build */}
+        <div className="flex items-center gap-2.5 border-b border-navy-900/[0.05] bg-bone/60 px-4 py-1.5 text-[10.5px] tracking-tight text-charcoal/50 md:px-9">
+          <span className="h-1 w-1 shrink-0 rounded-full bg-teal-500/80" />
           <span>
             Prototype — build{" "}
-            <span className="font-mono text-charcoal/75">{process.env.BUILD_SHA}</span> — données
-            fictives, état non persistant. Un rafraîchissement peut réinitialiser la démo.
+            <span className="font-mono text-charcoal/65">{process.env.BUILD_SHA}</span> — données
+            fictives, état non persistant.
           </span>
         </div>
 
-        <main className="flex-1 px-4 py-7 md:px-8 md:py-9">{children}</main>
+        <main className="flex-1 px-4 py-8 md:px-9 md:py-10">{children}</main>
       </div>
     </div>
   );

@@ -124,9 +124,9 @@ export default function SupervisionPage() {
   const supName = (id: string) => k.supervisors.find((s) => s.id === id)?.name ?? id;
 
   const reviewBadgeStyle: Record<string, string> = {
-    a_relire: "bg-amber-50/70 text-amber-700 ring-amber-100",
-    a_controler: "bg-amber-50/70 text-amber-700 ring-amber-100",
-    ok: "bg-teal-50 text-teal-700 ring-teal-100",
+    a_relire: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
+    a_controler: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
+    ok: "bg-teal-50/60 text-teal-700 ring-teal-100/70",
     a_revoir: "bg-navy-50 text-navy-700 ring-navy-100",
   };
   const reviewLabel: Record<string, string> = {

@@ -72,22 +72,29 @@ export default function ChirurgienDashboard() {
       </PageHeader>
 
       {config && !config.referentielComplete && (
-        <Card className="mb-6 border border-amber-200 bg-amber-50/50 p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="font-display text-lg text-navy-900">
-                Référentiel de suivi cabinet à compléter
-              </p>
-              <p className="mt-1 text-sm text-charcoal/70">
-                Indiquez vos préférences de suivi par type d'intervention pour permettre à l'équipe
-                KOVELA de préparer les parcours patients selon les habitudes de votre cabinet.
-              </p>
+        <div className="mb-6 overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
+          <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <span className="mt-1 h-9 w-[2px] shrink-0 rounded-full bg-amber-400/60" />
+              <div>
+                <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-amber-700/90">
+                  Action requise
+                </p>
+                <p className="mt-1.5 font-display text-[16px] font-semibold tracking-tight text-navy-900">
+                  Référentiel de suivi cabinet à compléter
+                </p>
+                <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-charcoal/65">
+                  Indiquez vos préférences de suivi par type d'intervention pour permettre à
+                  l'équipe KOVELA de préparer les parcours patients selon les habitudes de votre
+                  cabinet.
+                </p>
+              </div>
             </div>
-            <Link href="/chirurgien/referentiel-suivi">
-              <Button variant="primary">Compléter le référentiel de suivi</Button>
+            <Link href="/chirurgien/referentiel-suivi" className="shrink-0">
+              <Button variant="primary">Compléter le référentiel</Button>
             </Link>
           </div>
-        </Card>
+        </div>
       )}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-5">
@@ -125,7 +132,7 @@ export default function ChirurgienDashboard() {
                       <Badge className="bg-navy-900 text-teal-100 ring-navy-900">Escalade reçue</Badge>
                     )}
                     {report && report.status === "disponible" && (
-                      <Badge className="bg-teal-50 text-teal-700 ring-teal-100">CR disponible</Badge>
+                      <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">CR disponible</Badge>
                     )}
                     <Badge className={statusStyles[p.status]}>{statusLabels[p.status]}</Badge>
                     <Link href={`/chirurgien/patient/${p.id}`}>
@@ -159,9 +166,9 @@ export default function ChirurgienDashboard() {
                 label="Statut"
                 value={
                   config?.configured ? (
-                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Service activé</Badge>
+                    <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">Service activé</Badge>
                   ) : (
-                    <Badge className="bg-amber-50 text-amber-700 ring-amber-100">
+                    <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
                       Mise en place à finaliser
                     </Badge>
                   )
@@ -171,9 +178,9 @@ export default function ChirurgienDashboard() {
                 label="Mise en place guidée"
                 value={
                   config?.configured ? (
-                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Complétée</Badge>
+                    <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">Complétée</Badge>
                   ) : (
-                    <Badge className="bg-amber-50 text-amber-700 ring-amber-100">À finaliser</Badge>
+                    <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">À finaliser</Badge>
                   )
                 }
               />
@@ -181,9 +188,9 @@ export default function ChirurgienDashboard() {
                 label="Documents de service"
                 value={
                   config?.documentsAcceptedAt ? (
-                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Validés</Badge>
+                    <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">Validés</Badge>
                   ) : (
-                    <Badge className="bg-amber-50 text-amber-700 ring-amber-100">À finaliser</Badge>
+                    <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">À finaliser</Badge>
                   )
                 }
               />
@@ -211,14 +218,14 @@ export default function ChirurgienDashboard() {
                 </>
               )}
               <Row label="Spécialisation" value={config?.specialization ?? "—"} />
-              <Row label="Verticale" value={<Badge className="bg-navy-50 text-charcoal/70 ring-navy-100">{config?.vertical ?? "—"}</Badge>} />
+              <Row label="Verticale" value={<Badge className="bg-navy-900/[0.04] text-charcoal/70 ring-navy-900/[0.06]">{config?.vertical ?? "—"}</Badge>} />
               <Row
                 label="Référentiel de suivi"
                 value={
                   config?.referentielComplete ? (
-                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Complété</Badge>
+                    <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">Complété</Badge>
                   ) : (
-                    <Badge className="bg-amber-50 text-amber-700 ring-amber-100">À compléter</Badge>
+                    <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">À compléter</Badge>
                   )
                 }
               />
@@ -249,9 +256,12 @@ export default function ChirurgienDashboard() {
                     : "Mettre en place le service pour mon cabinet"}
                 </Button>
               </Link>
-              <div className="mt-1 rounded-lg bg-navy-50 px-3 py-2 text-xs text-charcoal/70">
-                Prochaine étape :{" "}
-                <Link href="/chirurgien/planning" className="font-medium text-teal-600 hover:text-teal-700">
+              <div className="mt-2 rounded-lg bg-bone/60 px-3.5 py-2.5 text-[12px] tracking-tight text-charcoal/70 ring-1 ring-navy-900/[0.04]">
+                Prochaine étape —{" "}
+                <Link
+                  href="/chirurgien/planning"
+                  className="font-medium text-teal-700 transition-colors hover:text-teal-800"
+                >
                   transmettre mon planning opératoire →
                 </Link>
               </div>
@@ -264,7 +274,7 @@ export default function ChirurgienDashboard() {
             <div className="space-y-3 p-5 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-charcoal/55">Statut</span>
-                <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Actif</Badge>
+                <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">Actif</Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-charcoal/55">Mandat GoCardless</span>
@@ -279,9 +289,13 @@ export default function ChirurgienDashboard() {
                 <span className="text-charcoal/55">Patients activés (mois)</span>
                 <span className="font-medium text-navy-900">{stats.activesMois}</span>
               </div>
-              <div className="flex items-center justify-between rounded-lg bg-navy-50 px-3 py-2">
-                <span className="font-semibold text-navy-900">Montant estimé</span>
-                <span className="text-lg font-semibold text-teal-600">{montant} € HT</span>
+              <div className="flex items-center justify-between rounded-lg bg-bone/60 px-3.5 py-2.5 ring-1 ring-navy-900/[0.04]">
+                <span className="text-[12.5px] font-medium tracking-tight text-navy-900">
+                  Montant estimé
+                </span>
+                <span className="font-display text-[18px] font-medium tracking-tight text-teal-700">
+                  {montant} € HT
+                </span>
               </div>
               <p className="text-[11px] text-charcoal/45">
                 {k.pricing.baseMonthly} € HT / mois + {k.pricing.perActivatedPatient} € HT / patient activé.
@@ -309,7 +323,7 @@ export default function ChirurgienDashboard() {
                 {Object.entries(config.interventionDurations).map(([type, dur]) => (
                   <div
                     key={type}
-                    className="flex items-center justify-between rounded-xl bg-navy-50/50 px-3 py-2 text-sm"
+                    className="flex items-center justify-between rounded-lg bg-bone/60 px-3.5 py-2 text-[13px] tracking-tight ring-1 ring-navy-900/[0.04]"
                   >
                     <span className="truncate text-navy-900">{type}</span>
                     <span className="ml-2 shrink-0 text-charcoal/70">{dur}</span>

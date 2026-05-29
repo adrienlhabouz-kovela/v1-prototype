@@ -143,30 +143,38 @@ export default function PlanningPage() {
       </PageHeader>
 
       {/* Flux d'entrée KOVELA */}
-      <Card className="mb-6 p-4">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-xs text-charcoal/60">
+      <Card className="mb-6 px-5 py-4">
+        <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/50">
+          Flux d'entrée KOVELA
+        </p>
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-2 text-[11.5px] tracking-tight text-charcoal/65">
           {FLOW.map((step, i) => (
-            <span key={step} className="flex items-center gap-2">
-              <span className="rounded-full bg-navy-50 px-2.5 py-1 font-medium text-navy-900">{step}</span>
-              {i < FLOW.length - 1 && <span className="text-teal-500">→</span>}
+            <span key={step} className="flex items-center gap-1.5">
+              <span className="rounded-md bg-bone/70 px-2.5 py-1 font-medium text-navy-900 ring-1 ring-navy-900/[0.05]">
+                {step}
+              </span>
+              {i < FLOW.length - 1 && <span className="text-teal-600/60">›</span>}
             </span>
           ))}
         </div>
       </Card>
 
       {config && !config.referentielComplete && (
-        <Card className="mb-6 border border-amber-200 bg-amber-50/40 p-4">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm leading-relaxed text-charcoal/75">
-              Le planning peut être transmis, mais KOVELA aura besoin du{" "}
-              <span className="font-medium text-navy-900">référentiel de suivi cabinet</span> pour
-              préparer les parcours patients selon les habitudes de votre cabinet.
-            </p>
-            <Link href="/chirurgien/referentiel-suivi">
+        <div className="mb-6 overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
+          <div className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <span className="mt-1 h-7 w-[2px] shrink-0 rounded-full bg-amber-400/60" />
+              <p className="text-[13px] leading-relaxed text-charcoal/75">
+                Le planning peut être transmis, mais KOVELA aura besoin du{" "}
+                <span className="font-medium text-navy-900">référentiel de suivi cabinet</span>{" "}
+                pour préparer les parcours patients selon les habitudes de votre cabinet.
+              </p>
+            </div>
+            <Link href="/chirurgien/referentiel-suivi" className="shrink-0">
               <Button variant="subtle">Compléter le référentiel</Button>
             </Link>
           </div>
-        </Card>
+        </div>
       )}
 
       <Card className="overflow-hidden">

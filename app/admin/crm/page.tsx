@@ -284,23 +284,20 @@ export default function CRMPage() {
       </Card>
 
       {/* Tabs */}
-      <div className="mb-4 flex gap-2">
-        <button
-          onClick={() => setTab("pipeline")}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium ${
-            tab === "pipeline" ? "bg-navy-900 text-white" : "bg-white text-charcoal/70 ring-1 ring-navy-100"
-          }`}
-        >
-          Pipeline
-        </button>
-        <button
-          onClick={() => setTab("table")}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium ${
-            tab === "table" ? "bg-navy-900 text-white" : "bg-white text-charcoal/70 ring-1 ring-navy-100"
-          }`}
-        >
-          Table
-        </button>
+      <div className="mb-5 flex gap-2">
+        {(["pipeline", "table"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`rounded-md px-4 py-2 text-[12.5px] font-medium tracking-tight transition-colors ${
+              tab === t
+                ? "bg-navy-900 text-white shadow-soft"
+                : "bg-white text-charcoal/70 ring-1 ring-navy-900/[0.06] hover:text-navy-900"
+            }`}
+          >
+            {t === "pipeline" ? "Pipeline" : "Table"}
+          </button>
+        ))}
       </div>
 
       {/* Pipeline */}
@@ -918,7 +915,7 @@ function Pill({ ok, label }: { ok: boolean; label: string }) {
   return (
     <div
       className={`flex items-center gap-2 rounded-xl px-3 py-2 text-xs ring-1 ${
-        ok ? "bg-teal-50 text-teal-700 ring-teal-100" : "bg-navy-50 text-charcoal/55 ring-navy-100"
+        ok ? "bg-teal-50/60 text-teal-700 ring-teal-100/70" : "bg-navy-50 text-charcoal/55 ring-navy-100"
       }`}
     >
       <span>{ok ? "✓" : "—"}</span>

@@ -50,11 +50,11 @@ const logKindLabel: Record<LogKind, string> = {
 };
 
 const logKindStyle: Partial<Record<LogKind, string>> = {
-  ia_utilisee: "bg-teal-50 text-teal-700 ring-teal-100",
-  ia_suggestion: "bg-teal-50 text-teal-700 ring-teal-100",
-  compilation_preparee: "bg-amber-50/70 text-amber-700 ring-amber-100",
+  ia_utilisee: "bg-teal-50/60 text-teal-700 ring-teal-100/70",
+  ia_suggestion: "bg-teal-50/60 text-teal-700 ring-teal-100/70",
+  compilation_preparee: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
   escalade_transmise: "bg-navy-900 text-teal-100 ring-navy-900",
-  cr_disponible: "bg-teal-50 text-teal-700 ring-teal-100",
+  cr_disponible: "bg-teal-50/60 text-teal-700 ring-teal-100/70",
   cr_valide: "bg-navy-50 text-navy-700 ring-navy-100",
 };
 
@@ -68,8 +68,8 @@ const aiFnLabel: Record<AiFunction, string> = {
 const aiDecisionStyle: Record<AiDecision, string> = {
   propose: "bg-navy-50 text-charcoal/70 ring-navy-100",
   accepte: "bg-teal-50 text-teal-700 ring-teal-200",
-  modifie: "bg-amber-50/70 text-amber-700 ring-amber-100",
-  refuse: "bg-rose-50 text-rose-700 ring-rose-100",
+  modifie: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
+  refuse: "bg-rose-50/60 text-rose-700 ring-rose-200/60",
 };
 
 const aiDecisionLabel: Record<AiDecision, string> = {
@@ -145,16 +145,20 @@ export default function LogsPage() {
       <div className="mb-4 flex gap-2">
         <button
           onClick={() => setTab("ops")}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium ${
-            tab === "ops" ? "bg-navy-900 text-white" : "bg-white text-charcoal/70 ring-1 ring-navy-100"
+          className={`rounded-md px-4 py-2 text-[12.5px] font-medium tracking-tight transition-colors ${
+            tab === "ops"
+              ? "bg-navy-900 text-white shadow-soft"
+              : "bg-white text-charcoal/70 ring-1 ring-navy-900/[0.06] hover:text-navy-900"
           }`}
         >
           Logs opérationnels ({k.logs.length})
         </button>
         <button
           onClick={() => setTab("ia")}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium ${
-            tab === "ia" ? "bg-navy-900 text-white" : "bg-white text-charcoal/70 ring-1 ring-navy-100"
+          className={`rounded-md px-4 py-2 text-[12.5px] font-medium tracking-tight transition-colors ${
+            tab === "ia"
+              ? "bg-navy-900 text-white shadow-soft"
+              : "bg-white text-charcoal/70 ring-1 ring-navy-900/[0.06] hover:text-navy-900"
           }`}
         >
           Logs IA ({k.aiLogs.length})
@@ -177,10 +181,10 @@ export default function LogsPage() {
             <button
               key={f}
               onClick={() => setOpsFilter(f)}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+              className={`rounded-md px-3.5 py-1.5 text-[11.5px] font-medium tracking-tight transition-colors ${
                 opsFilter === f
-                  ? "bg-navy-900 text-white"
-                  : "bg-white text-charcoal/65 ring-1 ring-navy-100 hover:bg-teal-50/50 hover:text-navy-900"
+                  ? "bg-navy-900 text-white shadow-soft"
+                  : "bg-white text-charcoal/65 ring-1 ring-navy-900/[0.06] hover:text-navy-900"
               }`}
             >
               {label}

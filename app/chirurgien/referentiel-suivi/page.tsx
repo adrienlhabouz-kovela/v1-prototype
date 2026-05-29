@@ -98,24 +98,24 @@ export default function ReferentielSuiviPage() {
       </PageHeader>
 
       <div className="mx-auto max-w-3xl space-y-6">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl bg-teal-50/50 px-4 py-3 text-xs leading-relaxed text-navy-900 ring-1 ring-teal-100">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl bg-white px-5 py-4 text-[12.5px] leading-relaxed text-charcoal/70 shadow-soft ring-1 ring-navy-900/[0.05]">
           <Badge
             className={
               alreadyComplete
-                ? "bg-teal-100 text-teal-800 ring-teal-200"
-                : "bg-amber-100 text-amber-800 ring-amber-200"
+                ? "bg-teal-50/60 text-teal-700 ring-teal-100/70"
+                : "bg-amber-50/50 text-amber-800 ring-amber-200/50"
             }
           >
             {alreadyComplete ? "Référentiel : complété" : "Référentiel : à compléter"}
           </Badge>
-          <span className="text-charcoal/75">
+          <span className="flex-1 min-w-[260px]">
             Informations utilisées par l'équipe KOVELA pour organiser le suivi, modifiables à tout
             moment.
           </span>
         </div>
 
         <Card className="p-6 space-y-5">
-          <h2 className="font-display text-xl text-navy-900">Durées et fréquence</h2>
+          <h2 className="font-display text-[1.35rem] font-medium tracking-tight text-navy-900">Durées et fréquence</h2>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
@@ -186,7 +186,7 @@ export default function ReferentielSuiviPage() {
         </Card>
 
         <Card className="p-6 space-y-5">
-          <h2 className="font-display text-xl text-navy-900">Typologie et organisation</h2>
+          <h2 className="font-display text-[1.35rem] font-medium tracking-tight text-navy-900">Typologie et organisation</h2>
 
           <div>
             <span className="mb-2 block text-xs font-medium text-charcoal/60">
@@ -283,7 +283,7 @@ export default function ReferentielSuiviPage() {
         </Card>
 
         <Card className="p-6 space-y-4">
-          <h2 className="font-display text-xl text-navy-900">Préférences patient</h2>
+          <h2 className="font-display text-[1.35rem] font-medium tracking-tight text-navy-900">Préférences patient</h2>
 
           <div>
             <span className="mb-2 block text-xs font-medium text-charcoal/60">

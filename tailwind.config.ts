@@ -31,6 +31,10 @@ const config: Config = {
           600: "#178F89",
           700: "#137C76",
         },
+        // Neutres chauds — fonds, surfaces alternatives, séparateurs
+        ivory: "#FAF8F4",
+        bone: "#F4F1EC",
+        sand: "#EAE5DC",
         offwhite: "#E6E9EC",
         charcoal: "#1B1F23",
         ink: "#0A1F2D",
@@ -43,10 +47,11 @@ const config: Config = {
         brand: "0.18em",
       },
       boxShadow: {
-        // Ombres très douces
-        soft: "0 1px 2px rgba(10,31,45,0.04)",
-        card: "0 1px 2px rgba(10,31,45,0.03), 0 6px 24px -12px rgba(10,31,45,0.10)",
-        lift: "0 12px 40px -16px rgba(10,31,45,0.22)",
+        // Ombres très douces — registre premium / B2B santé
+        soft: "0 1px 1px rgba(10,31,45,0.03)",
+        card: "0 1px 2px rgba(10,31,45,0.025), 0 4px 14px -8px rgba(10,31,45,0.08)",
+        lift: "0 8px 28px -14px rgba(10,31,45,0.18)",
+        hairline: "inset 0 0 0 1px rgba(10,31,45,0.04)",
       },
       borderRadius: {
         xl: "0.875rem",

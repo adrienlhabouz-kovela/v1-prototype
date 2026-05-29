@@ -356,7 +356,7 @@ export default function PatientFiche() {
                 </>
               ) : patient.compilationDraft ? (
                 <>
-                  <Badge className="bg-amber-50/70 text-amber-700 ring-amber-100">
+                  <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
                     Compilation factuelle préparée (brouillon)
                   </Badge>
                   <p className="mt-2 text-[11px] text-charcoal/55">

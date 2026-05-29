@@ -77,10 +77,10 @@ export default function PatientOnboarding() {
             </div>
           )}
           {infoStatus === "confirmed" && (
-            <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Informations confirmées</Badge>
+            <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">Informations confirmées</Badge>
           )}
           {infoStatus === "reported" && (
-            <Badge className="bg-amber-50/70 text-amber-700 ring-amber-100">
+            <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
               Signalement envoyé à l'équipe KOVELA
             </Badge>
           )}

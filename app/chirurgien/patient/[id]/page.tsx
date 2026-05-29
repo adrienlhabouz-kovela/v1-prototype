@@ -71,7 +71,7 @@ export default function ChirurgienPatient() {
           <div className="p-5">
             {visibleReport ? (
               <>
-                <Badge className="mb-3 bg-teal-50 text-teal-700 ring-teal-100">
+                <Badge className="mb-3 bg-teal-50/60 text-teal-700 ring-teal-100/70">
                   CR disponible pour le chirurgien
                 </Badge>
                 <pre className="whitespace-pre-wrap rounded-xl bg-navy-50/50 p-4 font-sans text-sm leading-relaxed text-navy-900">

@@ -42,38 +42,43 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-navy-depth px-4 py-12 text-white">
+    <div className="flex min-h-screen items-center justify-center bg-navy-depth px-4 py-14 text-white">
       <div className="w-full max-w-2xl">
-        <div className="mb-9 flex flex-col items-center text-center">
+        <div className="mb-11 flex flex-col items-center text-center">
           <Logo light />
-          <h1 className="mt-7 font-display text-3xl tracking-tight text-white">
-            Sélection du rôle de démonstration
+          <p className="mt-9 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-teal-300/85">
+            Espace de démonstration
+          </p>
+          <h1 className="mt-3 font-display text-[2rem] font-medium leading-tight tracking-tight text-white md:text-[2.2rem]">
+            Sélection du rôle
           </h1>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-navy-100/70">
-            Authentification fictive. Choisissez un espace pour explorer le prototype.
-            Aucune donnée réelle, aucune vraie authentification.
+          <p className="mt-4 max-w-md text-[13.5px] leading-relaxed text-navy-100/65">
+            Authentification fictive. Choisissez un espace pour explorer le prototype. Aucune
+            donnée réelle, aucune vraie authentification.
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-2.5 sm:grid-cols-2">
           {roles.map((r) => (
             <button
               key={r.role}
               onClick={() => choose(r.role, r.href)}
-              className="group rounded-2xl bg-white/[0.04] p-5 text-left ring-1 ring-white/10 backdrop-blur-sm transition-all hover:bg-white/[0.08] hover:ring-teal-400/40"
+              className="group rounded-xl bg-white/[0.04] p-5 text-left ring-1 ring-white/10 backdrop-blur-sm transition-all hover:bg-white/[0.07] hover:ring-teal-400/40"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-semibold text-white">{r.label}</h3>
-                <span className="text-teal-300 transition-transform group-hover:translate-x-0.5">
+                <h3 className="font-display text-[15px] font-semibold tracking-tight text-white">
+                  {r.label}
+                </h3>
+                <span className="text-teal-300/80 transition-transform group-hover:translate-x-0.5">
                   →
                 </span>
               </div>
-              <p className="mt-1.5 text-sm leading-relaxed text-navy-100/65">{r.desc}</p>
+              <p className="mt-2 text-[12.5px] leading-relaxed text-navy-100/60">{r.desc}</p>
             </button>
           ))}
         </div>
 
-        <p className="mt-9 text-center text-xs text-navy-100/40">
+        <p className="mt-11 text-center text-[10.5px] tracking-tight text-navy-100/40">
           Prototype KOVELA — pas une plateforme de production HDS.
         </p>
       </div>

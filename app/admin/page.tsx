@@ -110,9 +110,11 @@ export default function AdminPage() {
           ["silencieux", stats.silencieux, "Patients silencieux", "à relancer"],
         ] as [Filter, number, string, string][]).map(([f, count, label, desc]) => (
           <Card key={f} className="flex flex-col p-5">
-            <p className="font-display text-[2rem] leading-none text-navy-900">{count}</p>
-            <p className="mt-2 text-sm font-medium text-navy-900">{label}</p>
-            <p className="mt-0.5 text-xs text-charcoal/50">{desc}</p>
+            <p className="font-display text-[2rem] font-medium leading-none tracking-tight text-navy-900">
+              {count}
+            </p>
+            <p className="mt-3 text-[13px] font-medium tracking-tight text-navy-900">{label}</p>
+            <p className="mt-0.5 text-[11.5px] text-charcoal/50">{desc}</p>
             <button
               onClick={() => focusTable(f)}
               className="mt-3 inline-flex w-fit items-center gap-1 text-xs font-medium text-teal-600 hover:text-teal-700"
@@ -218,7 +220,7 @@ export default function AdminPage() {
           <div className="space-y-3 p-5 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-charcoal/55">Statut abonnement</span>
-              <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Actif</Badge>
+              <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">Actif</Badge>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-charcoal/55">Mandat GoCardless</span>
@@ -281,7 +283,7 @@ export default function AdminPage() {
                 <div className="flex shrink-0 items-center gap-2">
                   <Badge className="bg-teal-50/60 text-navy-700 ring-teal-100">{s.config.vertical}</Badge>
                   {!s.config.configured && (
-                    <Badge className="bg-amber-50/70 text-amber-700 ring-amber-100">Mise en place à finaliser</Badge>
+                    <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">Mise en place à finaliser</Badge>
                   )}
                 </div>
               </div>
@@ -305,10 +307,10 @@ export default function AdminPage() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+              className={`rounded-md px-3.5 py-1.5 text-[11.5px] font-medium tracking-tight transition-colors ${
                 filter === f
-                  ? "bg-navy-900 text-white"
-                  : "bg-white text-charcoal/65 ring-1 ring-navy-100 hover:bg-teal-50/50 hover:text-navy-900"
+                  ? "bg-navy-900 text-white shadow-soft"
+                  : "bg-white text-charcoal/65 ring-1 ring-navy-900/[0.06] hover:text-navy-900"
               }`}
             >
               {label}
@@ -447,8 +449,12 @@ export default function AdminPage() {
 function QualityIndicator({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] font-medium uppercase tracking-wide text-charcoal/45">{label}</p>
-      <p className="mt-1 font-display text-2xl text-navy-900">{value}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
+        {label}
+      </p>
+      <p className="mt-2 font-display text-[22px] font-medium tracking-tight text-navy-900">
+        {value}
+      </p>
     </div>
   );
 }

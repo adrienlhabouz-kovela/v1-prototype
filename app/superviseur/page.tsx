@@ -217,9 +217,13 @@ function MyIndicators() {
           ["IA acceptées / modifiées", `${ac} / ${mo}`],
           ["Temps estimé gagné (IA)", formatMinutes(minutes)],
         ].map(([label, value]) => (
-          <div key={label} className="bg-white px-4 py-3">
-            <p className="text-[10px] font-medium uppercase tracking-wide text-charcoal/45">{label}</p>
-            <p className="mt-1 font-display text-lg text-navy-900">{value}</p>
+          <div key={label} className="bg-white px-4 py-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
+              {label}
+            </p>
+            <p className="mt-2 font-display text-[20px] font-medium tracking-tight text-navy-900">
+              {value}
+            </p>
           </div>
         ))}
       </div>
@@ -348,7 +352,7 @@ export default function SuperviseurInbox() {
                       <div className="mt-2 flex items-center justify-between gap-2">
                         <div className="flex flex-wrap items-center gap-1.5">
                           {n > 0 && (
-                            <Badge className="bg-amber-50 text-amber-700 ring-amber-100">
+                            <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
                               {n} non traité
                             </Badge>
                           )}

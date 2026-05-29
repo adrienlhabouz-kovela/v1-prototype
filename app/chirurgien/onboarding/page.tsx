@@ -161,11 +161,12 @@ export default function ChirurgienOnboarding() {
       />
 
       <div className="mx-auto max-w-3xl">
-        <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl bg-teal-50/50 px-4 py-3 text-xs leading-relaxed text-navy-900 ring-1 ring-teal-100">
-          <Badge className="bg-teal-100 text-teal-800 ring-teal-200">
+        <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl bg-white px-5 py-4 text-[12.5px] leading-relaxed text-charcoal/70 shadow-soft ring-1 ring-navy-900/[0.05]">
+          <span className="flex items-center gap-2 rounded-md bg-teal-50/60 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-teal-700 ring-1 ring-teal-100/70">
+            <span className="h-1 w-1 rounded-full bg-teal-500" />
             Temps estimé : 5 à 7 minutes
-          </Badge>
-          <span className="text-charcoal/75">
+          </span>
+          <span className="flex-1 min-w-[260px]">
             Ces informations permettent à l'équipe KOVELA de préparer le service avec votre cabinet.
             Elles restent modifiables ensuite depuis votre espace chirurgien. Le référentiel de suivi
             détaillé sera complété après activation.
@@ -173,21 +174,32 @@ export default function ChirurgienOnboarding() {
         </div>
 
         {/* Progression */}
-        <div className="mb-6 flex flex-wrap items-center gap-x-2 gap-y-2 text-xs">
+        <div className="mb-7 flex flex-wrap items-center gap-x-1.5 gap-y-2 text-[11px] tracking-tight">
           {STEPS.map((label, i) => (
-            <span key={label} className="flex items-center gap-2">
+            <span key={label} className="flex items-center gap-1.5">
               <span
-                className={`flex h-6 items-center gap-1.5 rounded-full px-2.5 font-medium ${
+                className={`flex h-7 items-center gap-2 rounded-md px-2.5 font-medium ${
                   i === step
-                    ? "bg-navy-900 text-white"
+                    ? "bg-navy-900 text-white shadow-soft"
                     : i < step
-                    ? "bg-teal-50 text-teal-700 ring-1 ring-teal-100"
-                    : "bg-navy-50 text-charcoal/55"
+                    ? "bg-teal-50/60 text-teal-700 ring-1 ring-teal-100/70"
+                    : "bg-white text-charcoal/55 ring-1 ring-navy-900/[0.06]"
                 }`}
               >
-                {i < step ? "✓" : i + 1} {label}
+                <span
+                  className={`flex h-[15px] w-[15px] items-center justify-center rounded text-[9px] font-bold ${
+                    i === step
+                      ? "bg-white/20 text-white"
+                      : i < step
+                      ? "bg-teal-600 text-white"
+                      : "bg-navy-900/[0.06] text-charcoal/55"
+                  }`}
+                >
+                  {i < step ? "✓" : i + 1}
+                </span>
+                {label}
               </span>
-              {i < STEPS.length - 1 && <span className="text-charcoal/30">→</span>}
+              {i < STEPS.length - 1 && <span className="text-charcoal/25">›</span>}
             </span>
           ))}
         </div>
@@ -196,7 +208,7 @@ export default function ChirurgienOnboarding() {
           {/* Étape 1 — Identité & spécialisation */}
           {step === 0 && (
             <div className="space-y-4">
-              <h2 className="font-display text-xl text-navy-900">Identité du cabinet</h2>
+              <h2 className="font-display text-[1.35rem] font-medium tracking-tight text-navy-900">Identité du cabinet</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Chirurgien">
                   <input className={inputCls} value={me.name} disabled />
@@ -244,7 +256,7 @@ export default function ChirurgienOnboarding() {
           {/* Étape 2 — Lieux */}
           {step === 1 && (
             <div className="space-y-4">
-              <h2 className="font-display text-xl text-navy-900">Lieux d'intervention</h2>
+              <h2 className="font-display text-[1.35rem] font-medium tracking-tight text-navy-900">Lieux d'intervention</h2>
               <p className="text-sm text-charcoal/60">Cliniques / établissements où vous opérez (jusqu'à 3).</p>
               {[0, 1, 2].map((i) => (
                 <Field key={i} label={`Lieu ${i + 1}${i === 0 ? "" : " (optionnel)"}`}>
@@ -262,7 +274,7 @@ export default function ChirurgienOnboarding() {
           {/* Étape 3 — Contacts cabinet autorisés */}
           {step === 2 && (
             <div className="space-y-4">
-              <h2 className="font-display text-xl text-navy-900">Contacts cabinet autorisés</h2>
+              <h2 className="font-display text-[1.35rem] font-medium tracking-tight text-navy-900">Contacts cabinet autorisés</h2>
               <p className="text-sm text-charcoal/60">
                 Assistantes, secrétariat ou contacts de transmission autorisés à transmettre et
                 modifier le planning opératoire du cabinet.
@@ -271,7 +283,7 @@ export default function ChirurgienOnboarding() {
                 {k.assistantsFor(MY_SURGEON_ID).map((a) => (
                   <div key={a.id} className="flex items-center justify-between rounded-xl border border-navy-100 px-4 py-2.5">
                     <span className="text-sm text-navy-900">{a.name}</span>
-                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Autorisé</Badge>
+                    <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">Autorisé</Badge>
                   </div>
                 ))}
                 {k.assistantsFor(MY_SURGEON_ID).length === 0 && (
@@ -296,7 +308,7 @@ export default function ChirurgienOnboarding() {
                   Ajouter
                 </Button>
               </div>
-              <p className="rounded-xl bg-navy-50/60 p-3 text-[11px] leading-relaxed text-charcoal/65">
+              <p className="rounded-xl bg-bone/60 px-4 py-3 text-[12px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
                 Le référentiel de suivi détaillé (durées par type d'intervention, fréquence des CR,
                 préférences photo / audio / relances…) pourra être complété après activation du
                 service depuis votre espace chirurgien.
@@ -307,12 +319,14 @@ export default function ChirurgienOnboarding() {
           {/* Étape 4 — Documents de service */}
           {step === 3 && (
             <div className="space-y-5">
-              <h2 className="font-display text-xl text-navy-900">Documents de service</h2>
-              <p className="text-sm text-charcoal/65">
+              <h2 className="font-display text-[1.35rem] font-medium tracking-tight text-navy-900">
+                Documents de service
+              </h2>
+              <p className="text-[13.5px] leading-relaxed text-charcoal/65">
                 Avant activation du service, le cabinet prend connaissance des documents KOVELA et
                 confirme leur acceptation.
               </p>
-              <p className="rounded-xl bg-navy-50/60 p-3 text-[11px] leading-relaxed text-charcoal/65">
+              <p className="rounded-xl bg-bone/60 px-4 py-3 text-[12px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
                 Cette étape permet de préparer la preuve d'acceptation qui devra être horodatée et
                 versionnée en V1. Prototype : aucune valeur juridique définitive.
               </p>
@@ -321,17 +335,23 @@ export default function ChirurgienOnboarding() {
                 {DOCS.map((d) => (
                   <div
                     key={d.key}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-navy-100 px-3 py-2.5"
+                    className="flex items-center justify-between gap-3 rounded-xl bg-white px-4 py-3 ring-1 ring-navy-900/[0.06] transition-colors hover:ring-navy-900/[0.12]"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-navy-900">{d.title}</p>
-                      <p className="text-[11px] text-charcoal/50">Version {d.version}</p>
+                      <p className="truncate text-[13px] font-medium tracking-tight text-navy-900">
+                        {d.title}
+                      </p>
+                      <p className="mt-0.5 text-[10.5px] font-medium uppercase tracking-[0.12em] text-charcoal/45">
+                        Version {d.version}
+                      </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                       {docsRead[d.key] ? (
-                        <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Lu</Badge>
+                        <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">Lu</Badge>
                       ) : (
-                        <Badge className="bg-amber-50 text-amber-700 ring-amber-100">À lire</Badge>
+                        <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
+                          À lire
+                        </Badge>
                       )}
                       <Button variant="subtle" onClick={() => setOpenDoc(d.key)}>
                         {docsRead[d.key] ? "Relire" : "Lire"}
@@ -344,17 +364,23 @@ export default function ChirurgienOnboarding() {
                 Lecture jusqu'en bas requise pour chaque document avant acceptation.
               </p>
 
-              <div className="rounded-xl border border-navy-100 p-4">
-                <p className="mb-2 text-xs font-medium text-navy-900">Acceptation</p>
-                <div className="space-y-1.5">
+              <div className="rounded-xl bg-white p-5 ring-1 ring-navy-900/[0.06]">
+                <p className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+                  Acceptation
+                </p>
+                <div className="space-y-0.5">
                   {ACCEPTANCE_ITEMS.map((label, i) => (
                     <label
                       key={i}
-                      className="flex cursor-pointer items-start gap-2 rounded-lg px-2 py-1.5 text-[13px] text-charcoal/80 hover:bg-navy-50/50"
+                      className={`flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-1.5 text-[13px] leading-relaxed transition-colors ${
+                        allDocsRead
+                          ? "text-charcoal/80 hover:bg-bone/60"
+                          : "text-charcoal/45"
+                      }`}
                     >
                       <input
                         type="checkbox"
-                        className="mt-0.5 h-4 w-4 rounded border-navy-200 text-teal-600"
+                        className="mt-[3px] h-4 w-4 rounded border-navy-200 text-teal-600"
                         checked={acceptances[i]}
                         disabled={!allDocsRead}
                         onChange={(e) => {
@@ -368,7 +394,7 @@ export default function ChirurgienOnboarding() {
                   ))}
                 </div>
                 {!allDocsRead && (
-                  <p className="mt-2 text-[11px] text-amber-700">
+                  <p className="mt-3 text-[11px] text-amber-800/80">
                     Lire tous les documents pour activer l'acceptation.
                   </p>
                 )}
@@ -379,7 +405,7 @@ export default function ChirurgienOnboarding() {
                   Valider les documents de service
                 </Button>
                 {docsValidatedAt && (
-                  <Badge className="bg-teal-50 text-teal-700 ring-teal-100">
+                  <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">
                     Documents validés — horodatage prototype :{" "}
                     {new Date(docsValidatedAt).toLocaleString("fr-FR")}
                   </Badge>
@@ -387,13 +413,15 @@ export default function ChirurgienOnboarding() {
               </div>
 
               {docsValidatedAt && (
-                <div className="rounded-xl bg-navy-50/60 p-3 text-[11px] leading-relaxed text-charcoal/65">
+                <div className="rounded-xl bg-bone/60 px-4 py-3 text-[11.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
                   Chirurgien : {me.name} · Cabinet : {form.locations[0] ?? "—"} · Email contact :{" "}
                   {form.cabinetContact.email || "—"} · CGS v0.1 · Confidentialité v0.1 · DPA v0.1 ·
                   Annexe v0.1 · Règles v0.1.
                   <br />
-                  En V1, cette acceptation devra être horodatée, versionnée et enregistrée dans
-                  l'audit log.
+                  <span className="text-charcoal/55">
+                    En V1, cette acceptation devra être horodatée, versionnée et enregistrée dans
+                    l'audit log.
+                  </span>
                 </div>
               )}
             </div>
@@ -402,50 +430,81 @@ export default function ChirurgienOnboarding() {
           {/* Étape 5 — Facturation & prélèvement */}
           {step === 4 && (
             <div className="space-y-5">
-              <h2 className="font-display text-xl text-navy-900">Facturation & prélèvement</h2>
+              <h2 className="font-display text-[1.35rem] font-medium tracking-tight text-navy-900">Facturation & prélèvement</h2>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl bg-navy-50/50 p-4">
-                  <p className="text-xs uppercase tracking-wide text-charcoal/50">Abonnement</p>
-                  <p className="mt-1 font-display text-2xl text-navy-900">{k.pricing.baseMonthly} € HT</p>
-                  <p className="text-xs text-charcoal/55">par mois — prélevé le 1er de chaque mois</p>
+                <div className="rounded-xl bg-bone/60 p-5 ring-1 ring-navy-900/[0.04]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/50">
+                    Abonnement
+                  </p>
+                  <p className="mt-3 font-display text-[26px] font-medium tracking-tight text-navy-900">
+                    {k.pricing.baseMonthly} € HT
+                  </p>
+                  <p className="mt-1 text-[11.5px] text-charcoal/55">
+                    par mois — prélevé le 1er de chaque mois
+                  </p>
                 </div>
-                <div className="rounded-xl bg-navy-50/50 p-4">
-                  <p className="text-xs uppercase tracking-wide text-charcoal/50">Variable</p>
-                  <p className="mt-1 font-display text-2xl text-navy-900">{k.pricing.perActivatedPatient} € HT</p>
-                  <p className="text-xs text-charcoal/55">par patient activé — prélevé le dernier jour du mois</p>
+                <div className="rounded-xl bg-bone/60 p-5 ring-1 ring-navy-900/[0.04]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/50">
+                    Variable
+                  </p>
+                  <p className="mt-3 font-display text-[26px] font-medium tracking-tight text-navy-900">
+                    {k.pricing.perActivatedPatient} € HT
+                  </p>
+                  <p className="mt-1 text-[11.5px] text-charcoal/55">
+                    par patient activé — prélevé le dernier jour du mois
+                  </p>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-navy-100 p-4 text-xs leading-relaxed text-charcoal/70">
-                <p><span className="font-semibold text-navy-900">Patient activé</span> = onboarding patient validé + suivi lancé.</p>
-                <ul className="mt-2 list-disc space-y-1 pl-5">
-                  <li>L'abonnement mensuel de {k.pricing.baseMonthly} € HT est prélevé le 1er de chaque mois.</li>
-                  <li>La part variable est calculée selon le nombre de patients activés dans le mois.</li>
-                  <li>La part variable est prélevée le dernier jour de chaque mois.</li>
-                  <li>Les prélèvements sont opérés via GoCardless (simulation — aucun paiement réel).</li>
+              <div className="rounded-xl bg-white px-5 py-4 text-[12.5px] leading-relaxed text-charcoal/70 ring-1 ring-navy-900/[0.06]">
+                <p>
+                  <span className="font-semibold text-navy-900">Patient activé</span> = onboarding
+                  patient validé + suivi lancé.
+                </p>
+                <ul className="mt-2.5 space-y-1.5 pl-1">
+                  {[
+                    `L'abonnement mensuel de ${k.pricing.baseMonthly} € HT est prélevé le 1er de chaque mois.`,
+                    "La part variable est calculée selon le nombre de patients activés dans le mois.",
+                    "La part variable est prélevée le dernier jour de chaque mois.",
+                    "Les prélèvements sont opérés via GoCardless (simulation — aucun paiement réel).",
+                  ].map((x) => (
+                    <li key={x} className="flex gap-3">
+                      <span className="mt-2 h-[3px] w-[3px] shrink-0 rounded-full bg-charcoal/40" />
+                      {x}
+                    </li>
+                  ))}
                 </ul>
               </div>
 
-              <div className="rounded-xl bg-navy-depth p-5 text-white">
-                <div className="flex items-center justify-between">
+              <div className="rounded-xl bg-navy-depth p-6 text-white ring-1 ring-white/[0.06]">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-navy-100/60">Mandat GoCardless (fictif)</p>
-                    <Badge className={`mt-2 ${mandateStyles[form.mandateStatus]}`}>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-navy-100/55">
+                      Mandat GoCardless (fictif)
+                    </p>
+                    <Badge className={`mt-2.5 ${mandateStyles[form.mandateStatus]}`}>
                       {mandateLabels[form.mandateStatus]}
                     </Badge>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Button variant="subtle" onClick={() => set("mandateStatus", "lien_envoye" as MandateStatus)}>
+                    <button
+                      onClick={() => set("mandateStatus", "lien_envoye" as MandateStatus)}
+                      className="rounded-lg bg-white/[0.06] px-3.5 py-2 text-[12px] font-medium tracking-tight text-white ring-1 ring-white/[0.1] transition-colors hover:bg-white/[0.1]"
+                    >
                       Envoyer le lien GoCardless
-                    </Button>
-                    <Button variant="primary" onClick={() => set("mandateStatus", "mandat_actif" as MandateStatus)}>
+                    </button>
+                    <button
+                      onClick={() => set("mandateStatus", "mandat_actif" as MandateStatus)}
+                      className="rounded-lg bg-teal-500 px-3.5 py-2 text-[12px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-teal-600"
+                    >
                       Simuler mandat actif
-                    </Button>
+                    </button>
                   </div>
                 </div>
-                <p className="mt-3 text-[11px] text-navy-100/50">
-                  Simulation — aucune vraie intégration GoCardless, aucune donnée bancaire, aucun paiement réel.
+                <p className="mt-4 text-[10.5px] leading-relaxed text-navy-100/50">
+                  Simulation — aucune vraie intégration GoCardless, aucune donnée bancaire, aucun
+                  paiement réel.
                 </p>
               </div>
             </div>
@@ -453,34 +512,47 @@ export default function ChirurgienOnboarding() {
 
           {/* Étape 6 — Validation de la mise en place */}
           {step === 5 && (
-            <div className="space-y-4">
-              <h2 className="font-display text-xl text-navy-900">Validation de la mise en place</h2>
-              <div className="rounded-xl bg-navy-50/60 p-4 text-sm leading-relaxed text-charcoal/75">
+            <div className="space-y-5">
+              <h2 className="font-display text-[1.35rem] font-medium tracking-tight text-navy-900">
+                Validation de la mise en place
+              </h2>
+              <div className="rounded-xl bg-bone/60 px-5 py-4 text-[13.5px] leading-relaxed text-charcoal/75 ring-1 ring-navy-900/[0.04]">
                 KOVELA assure la <span className="font-medium">coordination</span> et la{" "}
-                <span className="font-medium">continuité post-opératoire</span> sous supervision humaine.
-                KOVELA ne décide pas médicalement : toute décision relève du chirurgien.
+                <span className="font-medium">continuité post-opératoire</span> sous supervision
+                humaine. KOVELA ne décide pas médicalement : toute décision relève du chirurgien.
               </div>
-              <div className="rounded-xl border border-navy-100 p-4 text-sm">
-                <p className="mb-2 font-medium text-navy-900">Récapitulatif</p>
-                <ul className="space-y-1 text-xs text-charcoal/70">
-                  <li>Chirurgien : {me.name}</li>
-                  <li>Spécialisation : {form.specialization}</li>
-                  <li>Verticale : {form.vertical}</li>
-                  <li>Lieux : {form.locations.filter(Boolean).join(", ") || "—"}</li>
-                  <li>
-                    Contacts autorisés :{" "}
-                    {k.assistantsFor(MY_SURGEON_ID).map((a) => a.name).join(", ") || "—"}
-                  </li>
-                  <li>
-                    Documents de service :{" "}
-                    {docsValidatedAt
-                      ? `validés (${new Date(docsValidatedAt).toLocaleDateString("fr-FR")})`
-                      : "à valider"}
-                  </li>
-                  <li>Mandat GoCardless : {mandateLabels[form.mandateStatus]}</li>
-                </ul>
+              <div className="rounded-xl bg-white p-5 ring-1 ring-navy-900/[0.06]">
+                <p className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+                  Récapitulatif
+                </p>
+                <dl className="grid gap-x-6 gap-y-2 text-[12.5px] sm:grid-cols-2">
+                  {[
+                    ["Chirurgien", me.name],
+                    ["Spécialisation", form.specialization],
+                    ["Verticale", form.vertical],
+                    ["Lieux", form.locations.filter(Boolean).join(", ") || "—"],
+                    [
+                      "Contacts autorisés",
+                      k.assistantsFor(MY_SURGEON_ID).map((a) => a.name).join(", ") || "—",
+                    ],
+                    [
+                      "Documents de service",
+                      docsValidatedAt
+                        ? `validés (${new Date(docsValidatedAt).toLocaleDateString("fr-FR")})`
+                        : "à valider",
+                    ],
+                    ["Mandat GoCardless", mandateLabels[form.mandateStatus]],
+                  ].map(([label, value]) => (
+                    <div key={label as string} className="flex justify-between gap-3 border-b border-navy-900/[0.04] pb-1.5 last:border-0">
+                      <dt className="text-charcoal/55">{label}</dt>
+                      <dd className="text-right font-medium tracking-tight text-navy-900">
+                        {value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
-              <p className="rounded-xl bg-navy-50/60 p-3 text-[11px] leading-relaxed text-charcoal/65">
+              <p className="rounded-xl bg-bone/60 px-4 py-3 text-[11.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
                 Après validation : le service cabinet est activé. Vous pourrez ensuite compléter le
                 référentiel de suivi cabinet depuis votre espace chirurgien, puis transmettre votre
                 planning opératoire.
@@ -489,7 +561,7 @@ export default function ChirurgienOnboarding() {
           )}
 
           {/* Navigation */}
-          <div className="mt-6 flex items-center justify-between border-t border-navy-900/[0.06] pt-5">
+          <div className="mt-7 flex items-center justify-between border-t border-navy-900/[0.05] pt-6">
             <Button variant="ghost" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0}>
               Retour
             </Button>
