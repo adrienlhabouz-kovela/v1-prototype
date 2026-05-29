@@ -92,15 +92,21 @@ et les pills en haut.
 2. **Admin** (`/admin`) — bloc *Qualité & délais* (30 s pour piloter), Actions prioritaires
    *Voir → Sans superviseur* → **Attribuer** un patient à un superviseur.
 3. **CRM** (`/admin/crm`) — *Performance commerciale* (KPI globaux + table par sales) ; ouvrir
-   une fiche prospect (statut, sales owner, note, démo, relance, *Lancer onboarding cabinet*).
+   une fiche prospect (statut, sales owner, note, démo, relance, *Envoyer le lien de mise en place*).
 4. **Sales** (`/sales`) — *Vu en tant que Sarah* → 8 KPI personnels, table de portefeuille,
    relances dues. Basculer *Vu en tant que Maxime* pour montrer une autre verticale.
-5. **Mise en place cabinet** (`/chirurgien/onboarding`) — wizard 6 étapes ; à l'étape 5
-   *Facturation*, cliquer **Simuler mandat actif**. Étape 6 *Validation* → bouton
-   *Enregistrer et accéder au planning opératoire*.
-6. **Planning** (`/chirurgien/planning`) — **Ajouter un patient** : la durée se pré-remplit
-   selon le type d'intervention (config cabinet). **Importer un planning** → *Charger un
-   exemple* → *Valider l'import*.
+5. **Mise en place cabinet** (`/chirurgien/onboarding`) — wizard court (5 à 7 min, 6 étapes :
+   Votre cabinet, Lieux, Contacts autorisés, Documents de service, Prélèvement, Validation).
+   À l'étape *Documents de service*, ouvrir un doc → *Marquer comme lu* (répéter) → cocher
+   les acceptations → *Valider les documents de service*. À l'étape *Prélèvement*, cliquer
+   **Simuler mandat actif**. Étape *Validation* → *Valider la mise en place du service*
+   (redirection vers `/chirurgien`).
+6. **Référentiel post-activation** (`/chirurgien` → `/chirurgien/referentiel-suivi`) —
+   bandeau *Référentiel de suivi cabinet à compléter* → *Compléter le référentiel de suivi*
+   → ajuster durées par type d'intervention → *Valider le référentiel de suivi*.
+7. **Planning** (`/chirurgien/planning`) — **Ajouter un patient** : la durée se pré-remplit
+   selon le type d'intervention (référentiel cabinet). **Importer un planning** → *Charger
+   un exemple* → *Valider l'import*.
 7. **Superviseur** (`/superviseur`) — *Mes indicateurs* + *Améliorations terrain* + Inbox.
    Ouvrir `/superviseur/patient/p11` (patient en escalade, compilation déjà préparée).
 8. **IA assistive** — sur p11 : *Résumer* (badge *~1.5 min gagnées*) → Accepter ;

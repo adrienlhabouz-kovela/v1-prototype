@@ -182,11 +182,13 @@ décisions ouvertes §18 du brief HDS. »*
    interventions à venir, vos patients en suivi actif, et surtout — vos CR factuels
    disponibles et vos escalades transmises avec contexte. Vous gardez la main, KOVELA
    structure et trace. »* Montrer les 5 StatCards, la mention *« Vous ne recevez pas du
-   bruit »*, le bloc Mise en place cabinet et le Cadre cible (HDS / RGPD / CNIL).
+   bruit »*, le bloc **Service cabinet** (statut activé, documents validés, mandat actif)
+   et le bandeau **Référentiel de suivi à compléter** (post-activation). Montrer le Cadre
+   cible (HDS / RGPD / CNIL).
 3. **`/chirurgien/planning`** *(1,5 min)* — *« Votre planning opératoire. Votre assistante
    peut le transmettre à KOVELA, en saisie manuelle ou en import. La durée de suivi est
-   pré-remplie selon le type d'intervention que vous avez configuré. C'est ajustable
-   patient par patient. »* Cliquer **Ajouter un patient** → changer le type d'intervention
+   pré-remplie selon le type d'intervention indiqué dans le référentiel cabinet. C'est
+   ajustable patient par patient. »* Cliquer **Ajouter un patient** → changer le type d'intervention
    → montrer la durée qui change. Fermer.
 4. **`/chirurgien/patient/p18`** *(1,5 min)* — *« Voici un CR rendu disponible par l'équipe
    KOVELA. Il est factuel, lisible, exploitable. Vous le recevez quand l'équipe a vérifié

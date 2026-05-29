@@ -56,8 +56,8 @@ const pillars = [
 ];
 
 const steps = [
-  { t: "KOVELA met en place le service avec le cabinet", d: "Le cabinet définit ses préférences avec l'équipe KOVELA : spécialité, préférences de fonctionnement, assistante, mandat de prélèvement (simulation)." },
-  { t: "Le planning opératoire est déposé", d: "Ajout manuel ou import simple du planning des patients." },
+  { t: "KOVELA met en place le service avec le cabinet", d: "Après validation, le cabinet reçoit un lien de mise en place. L'activation guidée prend quelques minutes ; le référentiel de suivi peut ensuite être complété depuis l'espace chirurgien." },
+  { t: "Le cabinet transmet son planning opératoire", d: "Ajout manuel ou import simple du planning des patients à transmettre à l'équipe KOVELA." },
   { t: "Le patient active son suivi", d: "Lien sécurisé, limites du service, messagerie." },
   { t: "KOVELA supervise et documente", d: "Messages, relances, IA assistive, traçabilité complète." },
   { t: "Le chirurgien consulte les CR", d: "Compte-rendu factuel, escalades transmises avec contexte, visibilité claire." },

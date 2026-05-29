@@ -109,7 +109,8 @@ export default function ReferentielSuiviPage() {
             {alreadyComplete ? "Référentiel : complété" : "Référentiel : à compléter"}
           </Badge>
           <span className="text-charcoal/75">
-            Modifiable à tout moment. Décision opérationnelle du cabinet, jamais imposée par KOVELA.
+            Informations utilisées par l'équipe KOVELA pour organiser le suivi, modifiables à tout
+            moment.
           </span>
         </div>
 
@@ -178,8 +179,8 @@ export default function ReferentielSuiviPage() {
               ))}
             </div>
             <p className="mt-2 text-[11px] text-charcoal/45">
-              Ajustables patient par patient avec le cabinet. Décision opérationnelle du cabinet,
-              jamais imposée par KOVELA.
+              Préférences de fonctionnement déclarées par le cabinet, ajustables patient par
+              patient.
             </p>
           </div>
         </Card>

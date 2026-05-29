@@ -21,7 +21,7 @@ const roles: { role: Role; label: string; desc: string; href: string }[] = [
   {
     role: "chirurgien",
     label: "Chirurgien",
-    desc: "Vue claire : CR disponibles, escalades reçues, dossiers résumés.",
+    desc: "Mise en place du service, planning opératoire, référentiel de suivi, CR factuels et transmissions.",
     href: "/chirurgien",
   },
   {

@@ -320,7 +320,7 @@ export default function ChirurgienDashboard() {
               <p className="text-sm text-charcoal/45">Aucune durée configurée pour le moment.</p>
             )}
             <p className="mt-3 text-[11px] text-charcoal/45">
-              Durées de suivi opérationnel proposées par défaut. Décision opérationnelle du cabinet, jamais imposée par KOVELA.
+              Préférences de fonctionnement déclarées par le cabinet, ajustables patient par patient.
             </p>
           </div>
         </Card>

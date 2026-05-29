@@ -88,9 +88,9 @@ export const surgeons: Surgeon[] = [
       locations: ["Clinique du Parc", "Institut Lutèce"],
       followType: "premium",
       crFrequency: "CR fin de suivi + CR si escalade transmise",
-      mandateStatus: "lien_envoye", // à finaliser — démontrable
-      // Démo : service activé + documents validés, mais référentiel à compléter
-      // pour exposer le CTA prominent sur le dashboard.
+      // Démo : service entièrement activé (mandat actif, documents validés)
+      // mais référentiel de suivi non complété pour exposer le CTA prominent.
+      mandateStatus: "mandat_actif",
       referentielComplete: false,
     }),
   },
