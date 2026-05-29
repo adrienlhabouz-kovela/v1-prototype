@@ -361,6 +361,10 @@ export default function Landing() {
               sont renseignées rapidement, puis le référentiel de suivi cabinet peut être complété
               depuis l'espace chirurgien.
             </p>
+            <p className="mt-3 text-[12.5px] leading-relaxed text-charcoal/60">
+              <span className="font-medium text-navy-900">Modèle simple :</span> abonnement mensuel
+              cabinet + variable par patient activé. Détail présenté lors de la démo.
+            </p>
             <Link
               href="/chirurgien"
               className="mt-7 inline-block rounded-lg bg-navy-900 px-5 py-3 text-[13px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
