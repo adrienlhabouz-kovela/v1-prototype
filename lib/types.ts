@@ -148,6 +148,12 @@ export interface CabinetConfig {
   welcomeMessage: string; // message d'accueil cabinet (non médical)
   mandateStatus: MandateStatus; // mandat GoCardless fictif
   configured: boolean;
+  // Acceptation simulée des documents de service (prototype).
+  // En V1 : à horodater, versionner et stocker dans l'audit log.
+  documentsAcceptedAt: string | null;
+  documentVersions: Record<string, string>;
+  // Référentiel de suivi cabinet complété après activation initiale.
+  referentielComplete: boolean;
 }
 
 export interface Surgeon {
@@ -310,7 +316,9 @@ export type LogKind =
   | "crm_assignation"
   | "formation_completee"
   | "consentement_patient"
-  | "signalement_cabinet";
+  | "signalement_cabinet"
+  | "documents_acceptes"
+  | "referentiel_suivi";
 
 export interface LogEntry {
   id: string;

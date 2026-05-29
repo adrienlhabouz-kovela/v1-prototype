@@ -302,6 +302,11 @@ export default function Landing() {
               Un service pensé pour les chirurgiens libéraux : le cabinet respire, le chirurgien
               garde la main.
             </p>
+            <p className="mt-4 rounded-xl bg-teal-50/50 px-4 py-3 text-sm leading-relaxed text-navy-900 ring-1 ring-teal-100">
+              Activation guidée en 5 à 7 minutes : après validation, le cabinet reçoit un lien de
+              mise en place. Les informations essentielles sont renseignées rapidement, puis le
+              référentiel de suivi cabinet peut être complété depuis l'espace chirurgien.
+            </p>
             <Link href="/chirurgien" className="mt-6 inline-block rounded-xl bg-navy-900 px-5 py-3 text-sm font-medium text-white hover:bg-navy-800">
               Voir l'espace chirurgien
             </Link>

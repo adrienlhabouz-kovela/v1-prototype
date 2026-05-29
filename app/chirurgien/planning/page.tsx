@@ -154,6 +154,21 @@ export default function PlanningPage() {
         </div>
       </Card>
 
+      {config && !config.referentielComplete && (
+        <Card className="mb-6 border border-amber-200 bg-amber-50/40 p-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm leading-relaxed text-charcoal/75">
+              Le planning peut être transmis, mais KOVELA aura besoin du{" "}
+              <span className="font-medium text-navy-900">référentiel de suivi cabinet</span> pour
+              préparer les parcours patients selon les habitudes de votre cabinet.
+            </p>
+            <Link href="/chirurgien/referentiel-suivi">
+              <Button variant="subtle">Compléter le référentiel</Button>
+            </Link>
+          </div>
+        </Card>
+      )}
+
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shell } from "@/components/Shell";
-import { Badge, Button, Card, PageHeader } from "@/components/ui";
+import { Badge, Button, Card, Modal, PageHeader } from "@/components/ui";
 import { useKovela } from "@/lib/store";
 import { mandateLabels, mandateStyles } from "@/lib/format";
-import type { CabinetConfig, FollowType, MandateStatus } from "@/lib/types";
+import type { CabinetConfig, MandateStatus } from "@/lib/types";
 
 const MY_SURGEON_ID = "s1";
 
@@ -30,22 +30,6 @@ const VERTICALS = [
   "Gynécologie",
 ];
 
-const PROTOCOLS = ["J+5", "J+8", "J+12", "J+15", "Personnalisé"];
-const CR_FREQUENCIES = [
-  "CR fin de suivi",
-  "CR hebdomadaire",
-  "CR à la demande",
-  "CR si escalade transmise",
-];
-const CHANNELS = ["Email cabinet", "Interface KOVELA", "Contact cabinet référent", "Autre canal"];
-const HOURS = ["Jours ouvrés — 9h à 18h (indicatif)", "7j/7 — plage indicative", "Plage personnalisée"];
-
-const FOLLOW_TYPES: { value: FollowType; label: string; desc: string }[] = [
-  { value: "standard", label: "Standard", desc: "Suivi structuré + CR de fin de suivi." },
-  { value: "renforce", label: "Renforcé", desc: "Suivi structuré + relances plus fréquentes + CR intermédiaire." },
-  { value: "premium", label: "Premium cabinet", desc: "Suivi structuré + CR plus détaillé + vigilance opérationnelle renforcée." },
-];
-
 const inputCls =
   "w-full rounded-xl border border-navy-100 px-3 py-2 text-sm outline-none focus:border-teal-400";
 
@@ -59,7 +43,64 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-const STEPS = ["Identité", "Lieux", "Référentiel de suivi", "Contacts cabinet", "Prélèvement", "Validation"];
+const STEPS = [
+  "Votre cabinet",
+  "Lieux",
+  "Contacts autorisés",
+  "Documents de service",
+  "Prélèvement",
+  "Validation",
+];
+
+type DocKey = "cgs" | "confidentialite" | "dpa" | "annexe" | "regles";
+
+const DOCS: { key: DocKey; title: string; version: string; placeholder: string }[] = [
+  {
+    key: "cgs",
+    title: "Conditions Générales de Services KOVELA",
+    version: "v0.1",
+    placeholder:
+      "Conditions générales du service opéré de coordination post-opératoire KOVELA : objet, périmètre, modalités, obligations réciproques, durée, résiliation. Document de démonstration — version prototype v0.1, à valider juridiquement avant la V1.",
+  },
+  {
+    key: "confidentialite",
+    title: "Politique de confidentialité",
+    version: "v0.1",
+    placeholder:
+      "Politique relative au traitement des données personnelles : finalités, base légale, durées de conservation, droits des personnes, sécurité des accès. Document de démonstration — version prototype v0.1, à valider juridiquement avant la V1.",
+  },
+  {
+    key: "dpa",
+    title: "Accord de traitement des données (DPA)",
+    version: "v0.1",
+    placeholder:
+      "Accord de traitement des données entre le cabinet (responsable de traitement) et KOVELA (sous-traitant) : périmètre, mesures techniques et organisationnelles, sous-traitants ultérieurs, audit. Document de démonstration — version prototype v0.1.",
+  },
+  {
+    key: "annexe",
+    title: "Annexe opérationnelle de service",
+    version: "v0.1",
+    placeholder:
+      "Annexe détaillant les modalités opérationnelles du service KOVELA : supervision humaine, IA assistive interne, gating des comptes-rendus, escalades vers le cabinet, plages de traitement indicatives. Document de démonstration — version prototype v0.1.",
+  },
+  {
+    key: "regles",
+    title: "Règles de fonctionnement du service",
+    version: "v0.1",
+    placeholder:
+      "Règles de fonctionnement entre KOVELA et le cabinet : non-substitution au chirurgien, décisions opérationnelles côté cabinet, traçabilité, gestion des incidents, modalités d'évolution. Document de démonstration — version prototype v0.1.",
+  },
+];
+
+const ACCEPTANCE_ITEMS: string[] = [
+  "J'ai pris connaissance des Conditions Générales de Services KOVELA.",
+  "J'ai pris connaissance de la politique de confidentialité.",
+  "J'ai pris connaissance de l'accord de traitement des données.",
+  "J'ai pris connaissance de l'annexe opérationnelle de service.",
+  "J'ai compris que KOVELA est un service opéré de coordination post-opératoire.",
+  "J'ai compris que KOVELA ne se substitue pas au chirurgien.",
+  "J'ai compris que les modalités opérationnelles du service sont définies avec le cabinet.",
+];
 
 export default function ChirurgienOnboarding() {
   const k = useKovela();
@@ -70,20 +111,41 @@ export default function ChirurgienOnboarding() {
   const [assistantName, setAssistantName] = useState("");
   const [form, setForm] = useState<CabinetConfig>(() => ({ ...(me?.config as CabinetConfig) }));
 
+  // Étape Documents de service : lecture + acceptation simulée.
+  const [docsRead, setDocsRead] = useState<Record<DocKey, boolean>>({
+    cgs: false,
+    confidentialite: false,
+    dpa: false,
+    annexe: false,
+    regles: false,
+  });
+  const [acceptances, setAcceptances] = useState<boolean[]>(
+    ACCEPTANCE_ITEMS.map(() => false)
+  );
+  const [openDoc, setOpenDoc] = useState<DocKey | null>(null);
+  const [docsValidatedAt, setDocsValidatedAt] = useState<string | null>(
+    me?.config.documentsAcceptedAt ?? null
+  );
+
   if (!me) return null;
+
+  const allDocsRead = (Object.values(docsRead) as boolean[]).every(Boolean);
+  const allAccepted = acceptances.every(Boolean);
+  const canValidateDocs = allDocsRead && allAccepted;
 
   const set = <K extends keyof CabinetConfig>(key: K, val: CabinetConfig[K]) =>
     setForm((f) => ({ ...f, [key]: val }));
-  const setContact = (key: keyof CabinetConfig["cabinetContact"], val: string) =>
-    setForm((f) => ({ ...f, cabinetContact: { ...f.cabinetContact, [key]: val } }));
-  const setPref = (key: keyof CabinetConfig["patientPrefs"], val: boolean) =>
-    setForm((f) => ({ ...f, patientPrefs: { ...f.patientPrefs, [key]: val } }));
   const setLocation = (i: number, val: string) =>
     setForm((f) => {
       const locations = [...f.locations];
       locations[i] = val;
       return { ...f, locations };
     });
+
+  function validateDocs() {
+    k.acceptCabinetDocuments(MY_SURGEON_ID);
+    setDocsValidatedAt(new Date().toISOString());
+  }
 
   function finish() {
     k.saveCabinetConfig(MY_SURGEON_ID, form);
@@ -95,15 +157,20 @@ export default function ChirurgienOnboarding() {
       <PageHeader
         eyebrow="Mise en place cabinet"
         title="Mettre en place le service KOVELA pour votre cabinet"
-        subtitle="Ce lien vous a été transmis après un échange avec l'équipe KOVELA. Il permet de préparer la mise en place du service : informations cabinet, préférences de suivi, contacts autorisés et mandat de prélèvement."
+        subtitle="Ce lien vous a été transmis après un échange avec l'équipe KOVELA. Il permet de préparer l'activation du service : informations cabinet, contacts autorisés, documents de service et prélèvement."
       />
 
       <div className="mx-auto max-w-3xl">
-        <p className="mb-5 rounded-xl bg-teal-50/50 px-4 py-3 text-xs leading-relaxed text-navy-900 ring-1 ring-teal-100">
-          Comptez quelques minutes. Ces informations restent modifiables ensuite depuis votre espace
-          chirurgien. L'équipe KOVELA exploite ces éléments pour opérer le service avec votre
-          cabinet.
-        </p>
+        <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl bg-teal-50/50 px-4 py-3 text-xs leading-relaxed text-navy-900 ring-1 ring-teal-100">
+          <Badge className="bg-teal-100 text-teal-800 ring-teal-200">
+            Temps estimé : 5 à 7 minutes
+          </Badge>
+          <span className="text-charcoal/75">
+            Ces informations permettent à l'équipe KOVELA de préparer le service avec votre cabinet.
+            Elles restent modifiables ensuite depuis votre espace chirurgien. Le référentiel de suivi
+            détaillé sera complété après activation.
+          </span>
+        </div>
 
         {/* Progression */}
         <div className="mb-6 flex flex-wrap items-center gap-x-2 gap-y-2 text-xs">
@@ -192,182 +259,8 @@ export default function ChirurgienOnboarding() {
             </div>
           )}
 
-          {/* Étape 3 — Référentiel de suivi cabinet */}
+          {/* Étape 3 — Contacts cabinet autorisés */}
           {step === 2 && (
-            <div className="space-y-5">
-              <h2 className="font-display text-xl text-navy-900">Référentiel de suivi cabinet</h2>
-              <p className="text-sm leading-relaxed text-charcoal/65">
-                Indiquez les durées et préférences de suivi utilisées par votre cabinet selon les
-                types d'intervention. Ces informations servent à organiser le service KOVELA et
-                restent ajustables patient par patient.
-              </p>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field
-                  label="Durée de suivi par défaut"
-                  hint="Cette durée sert à préparer le suivi opérationnel par défaut. Elle pourra être ajustée patient par patient."
-                >
-                  <select
-                    className={inputCls}
-                    value={form.defaultProtocol}
-                    onChange={(e) => set("defaultProtocol", e.target.value)}
-                  >
-                    {[form.defaultProtocol, ...PROTOCOLS]
-                      .filter((v, i, a) => a.indexOf(v) === i)
-                      .map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))}
-                  </select>
-                </Field>
-                <Field label="Fréquence des comptes-rendus">
-                  <select
-                    className={inputCls}
-                    value={form.crFrequency}
-                    onChange={(e) => set("crFrequency", e.target.value)}
-                  >
-                    {[form.crFrequency, ...CR_FREQUENCIES]
-                      .filter((v, i, a) => a.indexOf(v) === i)
-                      .map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                  </select>
-                </Field>
-              </div>
-
-              <div>
-                <span className="mb-2 block text-xs font-medium text-charcoal/60">
-                  Durées de suivi par type d'intervention
-                </span>
-                <div className="space-y-1.5">
-                  {Object.entries(form.interventionDurations).map(([type, dur]) => (
-                    <div key={type} className="flex items-center gap-2">
-                      <span className="flex-1 truncate text-sm text-navy-900">{type}</span>
-                      <input
-                        className="w-44 rounded-lg border border-navy-100 px-2.5 py-1.5 text-sm outline-none focus:border-teal-400"
-                        value={dur}
-                        onChange={(e) =>
-                          setForm((f) => ({
-                            ...f,
-                            interventionDurations: { ...f.interventionDurations, [type]: e.target.value },
-                          }))
-                        }
-                        placeholder="ex : J+12 / J+15"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-2 text-[11px] text-charcoal/45">
-                  Ces durées servent à organiser le suivi opérationnel. Elles peuvent être ajustées
-                  patient par patient avec le cabinet. Décision opérationnelle du cabinet, jamais imposée par KOVELA.
-                </p>
-              </div>
-
-              <div>
-                <span className="mb-2 block text-xs font-medium text-charcoal/60">Typologie de suivi souhaitée</span>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {FOLLOW_TYPES.map((t) => (
-                    <button
-                      key={t.value}
-                      type="button"
-                      onClick={() => set("followType", t.value)}
-                      className={`rounded-xl border p-3 text-left transition-colors ${
-                        form.followType === t.value
-                          ? "border-teal-300 bg-teal-50/50"
-                          : "border-navy-100 hover:bg-navy-50/50"
-                      }`}
-                    >
-                      <span className="text-sm font-medium text-navy-900">{t.label}</span>
-                      <span className="mt-1 block text-[11px] leading-snug text-charcoal/55">{t.desc}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Canal de transmission cabinet">
-                  <select
-                    className={inputCls}
-                    value={form.transmissionChannel}
-                    onChange={(e) => set("transmissionChannel", e.target.value)}
-                  >
-                    {[form.transmissionChannel, ...CHANNELS]
-                      .filter((v, i, a) => a.indexOf(v) === i)
-                      .map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                  </select>
-                </Field>
-                <Field
-                  label="Horaires de traitement souhaités"
-                  hint="Les horaires servent à organiser les flux opérationnels. Ils ne modifient pas les consignes d'urgence du patient."
-                >
-                  <select
-                    className={inputCls}
-                    value={form.workingHours}
-                    onChange={(e) => set("workingHours", e.target.value)}
-                  >
-                    {[form.workingHours, ...HOURS]
-                      .filter((v, i, a) => a.indexOf(v) === i)
-                      .map((h) => (
-                        <option key={h} value={h}>
-                          {h}
-                        </option>
-                      ))}
-                  </select>
-                </Field>
-              </div>
-
-              <div className="rounded-xl bg-navy-50/50 p-4">
-                <p className="mb-2 text-xs font-medium text-charcoal/60">Contact de transmission cabinet</p>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <input className={inputCls} placeholder="Nom" value={form.cabinetContact.name} onChange={(e) => setContact("name", e.target.value)} />
-                  <input className={inputCls} placeholder="Rôle" value={form.cabinetContact.role} onChange={(e) => setContact("role", e.target.value)} />
-                  <input className={inputCls} placeholder="Email (fictif)" value={form.cabinetContact.email} onChange={(e) => setContact("email", e.target.value)} />
-                  <input className={inputCls} placeholder="Téléphone (fictif)" value={form.cabinetContact.phone} onChange={(e) => setContact("phone", e.target.value)} />
-                </div>
-              </div>
-
-              <div>
-                <span className="mb-2 block text-xs font-medium text-charcoal/60">Préférences de suivi opérationnel</span>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {([
-                    ["photo", "Autoriser l'ajout de photos"],
-                    ["audio", "Autoriser l'ajout d'audios"],
-                    ["relancesOnboarding", "Autoriser les relances d'onboarding"],
-                    ["rappelSilencieux", "Autoriser le rappel patient silencieux"],
-                  ] as [keyof CabinetConfig["patientPrefs"], string][]).map(([key, label]) => (
-                    <label key={key} className="flex items-center gap-2 rounded-xl border border-navy-100 px-3 py-2 text-sm text-charcoal/75">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-navy-200 text-teal-600"
-                        checked={form.patientPrefs[key]}
-                        onChange={(e) => setPref(key, e.target.checked)}
-                      />
-                      {label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <Field label="Message d'accueil personnalisé du cabinet (non médical)">
-                <textarea
-                  className={`${inputCls} resize-none`}
-                  rows={3}
-                  value={form.welcomeMessage}
-                  onChange={(e) => set("welcomeMessage", e.target.value)}
-                />
-              </Field>
-            </div>
-          )}
-
-          {/* Étape 4 — Contacts cabinet autorisés */}
-          {step === 3 && (
             <div className="space-y-4">
               <h2 className="font-display text-xl text-navy-900">Contacts cabinet autorisés</h2>
               <p className="text-sm text-charcoal/60">
@@ -378,17 +271,17 @@ export default function ChirurgienOnboarding() {
                 {k.assistantsFor(MY_SURGEON_ID).map((a) => (
                   <div key={a.id} className="flex items-center justify-between rounded-xl border border-navy-100 px-4 py-2.5">
                     <span className="text-sm text-navy-900">{a.name}</span>
-                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Autorisée</Badge>
+                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Autorisé</Badge>
                   </div>
                 ))}
                 {k.assistantsFor(MY_SURGEON_ID).length === 0 && (
-                  <p className="text-xs text-charcoal/45">Aucune assistante pour le moment.</p>
+                  <p className="text-xs text-charcoal/45">Aucun contact autorisé pour le moment.</p>
                 )}
               </div>
               <div className="flex gap-2">
                 <input
                   className={inputCls}
-                  placeholder="Nom de l'assistante"
+                  placeholder="Nom du contact (assistante, secrétariat…)"
                   value={assistantName}
                   onChange={(e) => setAssistantName(e.target.value)}
                 />
@@ -400,9 +293,109 @@ export default function ChirurgienOnboarding() {
                     setAssistantName("");
                   }}
                 >
-                  Inviter
+                  Ajouter
                 </Button>
               </div>
+              <p className="rounded-xl bg-navy-50/60 p-3 text-[11px] leading-relaxed text-charcoal/65">
+                Le référentiel de suivi détaillé (durées par type d'intervention, fréquence des CR,
+                préférences photo / audio / relances…) pourra être complété après activation du
+                service depuis votre espace chirurgien.
+              </p>
+            </div>
+          )}
+
+          {/* Étape 4 — Documents de service */}
+          {step === 3 && (
+            <div className="space-y-5">
+              <h2 className="font-display text-xl text-navy-900">Documents de service</h2>
+              <p className="text-sm text-charcoal/65">
+                Avant activation du service, le cabinet prend connaissance des documents KOVELA et
+                confirme leur acceptation.
+              </p>
+              <p className="rounded-xl bg-navy-50/60 p-3 text-[11px] leading-relaxed text-charcoal/65">
+                Cette étape permet de préparer la preuve d'acceptation qui devra être horodatée et
+                versionnée en V1. Prototype : aucune valeur juridique définitive.
+              </p>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                {DOCS.map((d) => (
+                  <div
+                    key={d.key}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-navy-100 px-3 py-2.5"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-navy-900">{d.title}</p>
+                      <p className="text-[11px] text-charcoal/50">Version {d.version}</p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      {docsRead[d.key] ? (
+                        <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Lu</Badge>
+                      ) : (
+                        <Badge className="bg-amber-50 text-amber-700 ring-amber-100">À lire</Badge>
+                      )}
+                      <Button variant="subtle" onClick={() => setOpenDoc(d.key)}>
+                        {docsRead[d.key] ? "Relire" : "Lire"}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] text-charcoal/45">
+                Lecture jusqu'en bas requise pour chaque document avant acceptation.
+              </p>
+
+              <div className="rounded-xl border border-navy-100 p-4">
+                <p className="mb-2 text-xs font-medium text-navy-900">Acceptation</p>
+                <div className="space-y-1.5">
+                  {ACCEPTANCE_ITEMS.map((label, i) => (
+                    <label
+                      key={i}
+                      className="flex cursor-pointer items-start gap-2 rounded-lg px-2 py-1.5 text-[13px] text-charcoal/80 hover:bg-navy-50/50"
+                    >
+                      <input
+                        type="checkbox"
+                        className="mt-0.5 h-4 w-4 rounded border-navy-200 text-teal-600"
+                        checked={acceptances[i]}
+                        disabled={!allDocsRead}
+                        onChange={(e) => {
+                          const next = [...acceptances];
+                          next[i] = e.target.checked;
+                          setAcceptances(next);
+                        }}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+                {!allDocsRead && (
+                  <p className="mt-2 text-[11px] text-amber-700">
+                    Lire tous les documents pour activer l'acceptation.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <Button variant="primary" disabled={!canValidateDocs} onClick={validateDocs}>
+                  Valider les documents de service
+                </Button>
+                {docsValidatedAt && (
+                  <Badge className="bg-teal-50 text-teal-700 ring-teal-100">
+                    Documents validés — horodatage prototype :{" "}
+                    {new Date(docsValidatedAt).toLocaleString("fr-FR")}
+                  </Badge>
+                )}
+              </div>
+
+              {docsValidatedAt && (
+                <div className="rounded-xl bg-navy-50/60 p-3 text-[11px] leading-relaxed text-charcoal/65">
+                  Chirurgien : {me.name} · Cabinet : {form.locations[0] ?? "—"} · Email contact :{" "}
+                  {form.cabinetContact.email || "—"} · CGS v0.1 · Confidentialité v0.1 · DPA v0.1 ·
+                  Annexe v0.1 · Règles v0.1.
+                  <br />
+                  En V1, cette acceptation devra être horodatée, versionnée et enregistrée dans
+                  l'audit log.
+                </div>
+              )}
             </div>
           )}
 
@@ -470,16 +463,28 @@ export default function ChirurgienOnboarding() {
               <div className="rounded-xl border border-navy-100 p-4 text-sm">
                 <p className="mb-2 font-medium text-navy-900">Récapitulatif</p>
                 <ul className="space-y-1 text-xs text-charcoal/70">
+                  <li>Chirurgien : {me.name}</li>
                   <li>Spécialisation : {form.specialization}</li>
                   <li>Verticale : {form.vertical}</li>
                   <li>Lieux : {form.locations.filter(Boolean).join(", ") || "—"}</li>
-                  <li>Durée de suivi par défaut : {form.defaultProtocol}</li>
-                  <li>Typologie : {FOLLOW_TYPES.find((t) => t.value === form.followType)?.label}</li>
-                  <li>Fréquence CR : {form.crFrequency}</li>
-                  <li>Assistantes : {k.assistantsFor(MY_SURGEON_ID).map((a) => a.name).join(", ") || "—"}</li>
+                  <li>
+                    Contacts autorisés :{" "}
+                    {k.assistantsFor(MY_SURGEON_ID).map((a) => a.name).join(", ") || "—"}
+                  </li>
+                  <li>
+                    Documents de service :{" "}
+                    {docsValidatedAt
+                      ? `validés (${new Date(docsValidatedAt).toLocaleDateString("fr-FR")})`
+                      : "à valider"}
+                  </li>
                   <li>Mandat GoCardless : {mandateLabels[form.mandateStatus]}</li>
                 </ul>
               </div>
+              <p className="rounded-xl bg-navy-50/60 p-3 text-[11px] leading-relaxed text-charcoal/65">
+                Après validation : le service cabinet est activé. Vous pourrez ensuite compléter le
+                référentiel de suivi cabinet depuis votre espace chirurgien, puis transmettre votre
+                planning opératoire.
+              </p>
             </div>
           )}
 
@@ -489,7 +494,11 @@ export default function ChirurgienOnboarding() {
               Retour
             </Button>
             {step < STEPS.length - 1 ? (
-              <Button variant="primary" onClick={() => setStep((s) => s + 1)}>
+              <Button
+                variant="primary"
+                onClick={() => setStep((s) => s + 1)}
+                disabled={step === 3 && !docsValidatedAt}
+              >
                 Continuer
               </Button>
             ) : (
@@ -500,6 +509,53 @@ export default function ChirurgienOnboarding() {
           </div>
         </Card>
       </div>
+
+      {/* Modal lecture document */}
+      <Modal
+        open={openDoc !== null}
+        onClose={() => setOpenDoc(null)}
+        title={
+          openDoc
+            ? `${DOCS.find((d) => d.key === openDoc)?.title} — ${DOCS.find((d) => d.key === openDoc)?.version}`
+            : ""
+        }
+        wide
+      >
+        {openDoc && (
+          <div className="space-y-4">
+            <p className="rounded-xl bg-amber-50/60 px-3 py-2 text-[11px] leading-relaxed text-amber-800">
+              Document de démonstration — contenu placeholder. Aucune valeur juridique définitive ;
+              à valider juridiquement avant la V1.
+            </p>
+            <div className="max-h-72 overflow-y-auto rounded-xl border border-navy-100 bg-navy-50/30 p-4 text-sm leading-relaxed text-charcoal/75">
+              {DOCS.find((d) => d.key === openDoc)?.placeholder}
+              <div className="mt-4 border-t border-navy-900/[0.06] pt-3 text-[11px] text-charcoal/45">
+                — Fin du document {DOCS.find((d) => d.key === openDoc)?.version} —
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] text-charcoal/55">
+                Lecture jusqu'en bas requise. Vous pourrez cocher l'acceptation après avoir marqué le
+                document comme lu.
+              </span>
+              <div className="flex gap-2">
+                <Button variant="ghost" onClick={() => setOpenDoc(null)}>
+                  Fermer
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    if (openDoc) setDocsRead((prev) => ({ ...prev, [openDoc]: true }));
+                    setOpenDoc(null);
+                  }}
+                >
+                  Marquer comme lu
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </Shell>
   );
 }

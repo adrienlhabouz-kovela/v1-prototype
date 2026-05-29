@@ -71,6 +71,25 @@ export default function ChirurgienDashboard() {
         </Link>
       </PageHeader>
 
+      {config && !config.referentielComplete && (
+        <Card className="mb-6 border border-amber-200 bg-amber-50/50 p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-display text-lg text-navy-900">
+                Référentiel de suivi cabinet à compléter
+              </p>
+              <p className="mt-1 text-sm text-charcoal/70">
+                Indiquez vos préférences de suivi par type d'intervention pour permettre à l'équipe
+                KOVELA de préparer les parcours patients selon les habitudes de votre cabinet.
+              </p>
+            </div>
+            <Link href="/chirurgien/referentiel-suivi">
+              <Button variant="primary">Compléter le référentiel de suivi</Button>
+            </Link>
+          </div>
+        </Card>
+      )}
+
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-5">
         <StatCard label="Interventions à venir" value={stats.aVenir} />
         <StatCard label="Onboardings à compléter" value={stats.onboardingsACompleter} />
@@ -148,13 +167,56 @@ export default function ChirurgienDashboard() {
                   )
                 }
               />
+              <Row
+                label="Mise en place guidée"
+                value={
+                  config?.configured ? (
+                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Complétée</Badge>
+                  ) : (
+                    <Badge className="bg-amber-50 text-amber-700 ring-amber-100">À finaliser</Badge>
+                  )
+                }
+              />
+              <Row
+                label="Documents de service"
+                value={
+                  config?.documentsAcceptedAt ? (
+                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Validés</Badge>
+                  ) : (
+                    <Badge className="bg-amber-50 text-amber-700 ring-amber-100">À finaliser</Badge>
+                  )
+                }
+              />
+              {config?.documentsAcceptedAt && (
+                <>
+                  <Row
+                    label="Dernière validation"
+                    value={
+                      <span className="text-xs text-charcoal/70">
+                        {new Date(config.documentsAcceptedAt).toLocaleString("fr-FR")}
+                      </span>
+                    }
+                  />
+                  <Row
+                    label="Versions"
+                    value={
+                      <span className="text-[11px] text-charcoal/65">
+                        CGS {config.documentVersions.cgs ?? "—"} · Confidentialité{" "}
+                        {config.documentVersions.confidentialite ?? "—"} · DPA{" "}
+                        {config.documentVersions.dpa ?? "—"} · Annexe{" "}
+                        {config.documentVersions.annexe ?? "—"}
+                      </span>
+                    }
+                  />
+                </>
+              )}
               <Row label="Spécialisation" value={config?.specialization ?? "—"} />
               <Row label="Verticale" value={<Badge className="bg-navy-50 text-charcoal/70 ring-navy-100">{config?.vertical ?? "—"}</Badge>} />
               <Row
                 label="Référentiel de suivi"
                 value={
-                  config && Object.keys(config.interventionDurations).length > 0 ? (
-                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Renseigné</Badge>
+                  config?.referentielComplete ? (
+                    <Badge className="bg-teal-50 text-teal-700 ring-teal-100">Complété</Badge>
                   ) : (
                     <Badge className="bg-amber-50 text-amber-700 ring-amber-100">À compléter</Badge>
                   )
@@ -177,10 +239,13 @@ export default function ChirurgienDashboard() {
                   )
                 }
               />
+              <p className="pt-1 text-[11px] text-charcoal/45">
+                Informations modifiables à tout moment.
+              </p>
               <Link href="/chirurgien/onboarding" className="block">
                 <Button variant="primary" className="mt-1 w-full">
                   {config?.configured
-                    ? "Modifier les paramètres de service cabinet"
+                    ? "Modifier les paramètres de service"
                     : "Mettre en place le service pour mon cabinet"}
                 </Button>
               </Link>
@@ -233,7 +298,7 @@ export default function ChirurgienDashboard() {
             title="Durées de suivi par type d'intervention"
             subtitle="Référentiel de suivi cabinet — ajustables patient par patient"
             action={
-              <Link href="/chirurgien/onboarding" className="text-xs font-medium text-teal-600 hover:text-teal-700">
+              <Link href="/chirurgien/referentiel-suivi" className="text-xs font-medium text-teal-600 hover:text-teal-700">
                 Modifier →
               </Link>
             }

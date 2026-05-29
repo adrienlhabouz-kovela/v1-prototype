@@ -45,6 +45,8 @@ const logKindLabel: Record<LogKind, string> = {
   formation_completee: "Formation — complétée",
   consentement_patient: "Patient — consentements confirmés",
   signalement_cabinet: "Patient — signalement cabinet",
+  documents_acceptes: "Cabinet — documents de service acceptés (simulation)",
+  referentiel_suivi: "Cabinet — référentiel de suivi complété",
 };
 
 const logKindStyle: Partial<Record<LogKind, string>> = {
@@ -83,7 +85,7 @@ const opsFilterKinds: Record<Exclude<OpsFilter, "all">, LogKind[]> = {
   ia: ["ia_utilisee", "ia_suggestion"],
   cr: ["cr_prepare", "cr_valide", "cr_disponible"],
   escalade: ["compilation_preparee", "escalade_transmise"],
-  cabinet: ["cabinet_configure", "mandat_gocardless", "assistante_invitee"],
+  cabinet: ["cabinet_configure", "mandat_gocardless", "assistante_invitee", "documents_acceptes", "referentiel_suivi"],
   crm: [
     "crm_prospect_cree",
     "crm_statut",

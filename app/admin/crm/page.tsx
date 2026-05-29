@@ -844,8 +844,9 @@ function ProspectModal({ target, onClose }: { target: Prospect | null; onClose: 
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-charcoal/55">Activation</h3>
           <div className="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
             <Pill ok={p.onboardingLaunched} label="Lien de mise en place envoyé" />
+            <Pill ok={p.cabinetConfigured} label="Documents de service validés" />
             <Pill ok={p.cabinetConfigured} label="Service activé" />
-            <Pill ok={p.assistantAdded} label="Assistante ajoutée" />
+            <Pill ok={p.assistantAdded} label="Contact cabinet ajouté" />
             <div className="rounded-xl border border-navy-100 px-3 py-2 text-xs">
               <span className="text-charcoal/55">Mandat GoCardless · </span>
               <Badge className={mandateStyles[p.mandateStatus]}>{mandateLabels[p.mandateStatus]}</Badge>

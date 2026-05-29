@@ -133,6 +133,8 @@ interface KovelaState {
   saveCabinetConfig: (surgeonId: string, config: CabinetConfig) => void;
   setMandateStatus: (surgeonId: string, status: MandateStatus) => void;
   addAssistant: (surgeonId: string, name: string) => void;
+  acceptCabinetDocuments: (surgeonId: string) => void;
+  markReferentielComplete: (surgeonId: string) => void;
 
   // Supervision & qualité
   setSupervisorFormation: (supervisorId: string, status: FormationStatus) => void;
@@ -574,6 +576,45 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
       const assistant: Assistant = { id: uid("a"), name, surgeonId };
       setAssistants((prev) => [...prev, assistant]);
       pushLog("assistante_invitee", `Assistante « ${name} » invitée (fictif).`);
+    },
+
+    acceptCabinetDocuments(surgeonId) {
+      const now = new Date().toISOString();
+      const versions = {
+        cgs: "v0.1",
+        confidentialite: "v0.1",
+        dpa: "v0.1",
+        annexe: "v0.1",
+        regles: "v0.1",
+      };
+      setSurgeons((prev) =>
+        prev.map((s) =>
+          s.id === surgeonId
+            ? {
+                ...s,
+                config: {
+                  ...s.config,
+                  documentsAcceptedAt: now,
+                  documentVersions: versions,
+                },
+              }
+            : s
+        )
+      );
+      const versionsLabel = `CGS ${versions.cgs} · Confidentialité ${versions.confidentialite} · DPA ${versions.dpa} · Annexe ${versions.annexe}`;
+      pushLog(
+        "documents_acceptes",
+        `Documents de service acceptés (simulation prototype) — ${versionsLabel}.`
+      );
+    },
+
+    markReferentielComplete(surgeonId) {
+      setSurgeons((prev) =>
+        prev.map((s) =>
+          s.id === surgeonId ? { ...s, config: { ...s.config, referentielComplete: true } } : s
+        )
+      );
+      pushLog("referentiel_suivi", "Référentiel de suivi cabinet complété.");
     },
 
     setSupervisorFormation(supervisorId, status) {

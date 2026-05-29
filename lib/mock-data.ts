@@ -63,6 +63,15 @@ function baseConfig(over: Partial<CabinetConfig>): CabinetConfig {
       "Votre chirurgien a mis en place un suivi organisé avec KOVELA afin de centraliser vos échanges post-opératoires.",
     mandateStatus: "mandat_actif",
     configured: true,
+    documentsAcceptedAt: "2026-04-15T09:30:00.000Z",
+    documentVersions: {
+      cgs: "v0.1",
+      confidentialite: "v0.1",
+      dpa: "v0.1",
+      annexe: "v0.1",
+      regles: "v0.1",
+    },
+    referentielComplete: true,
     ...over,
   };
 }
@@ -80,6 +89,9 @@ export const surgeons: Surgeon[] = [
       followType: "premium",
       crFrequency: "CR fin de suivi + CR si escalade transmise",
       mandateStatus: "lien_envoye", // à finaliser — démontrable
+      // Démo : service activé + documents validés, mais référentiel à compléter
+      // pour exposer le CTA prominent sur le dashboard.
+      referentielComplete: false,
     }),
   },
   {
