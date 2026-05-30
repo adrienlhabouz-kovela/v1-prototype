@@ -596,7 +596,7 @@ function ImportModal({
       </div>
 
       <div className="mt-5 rounded-2xl border border-dashed border-navy-200 bg-navy-50/40 p-6 text-center">
-        <p className="text-sm text-charcoal/60">Déposez un fichier CSV / Excel (simulation)</p>
+        <p className="text-sm text-charcoal/60">Transmettez un fichier CSV / Excel à l'équipe KOVELA (simulation)</p>
         <div className="mt-3 flex justify-center gap-2">
           <Button variant="subtle" disabled>
             Choisir un fichier
