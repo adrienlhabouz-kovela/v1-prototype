@@ -1,5 +1,7 @@
 # KOVELA V1 — Brief architecture cible HDS
 
+> **Dernière mise à jour** : 2026-06-01 · **Référence décisions** : [`DECISIONS_LOG.md`](./DECISIONS_LOG.md).
+>
 > **Audience** : Émilien (lead dev V1), DPO, avocat e-santé (Aumans).
 > **Statut** : architecture **cible**, à valider juridiquement et techniquement avant build.
 > **Pas une promesse, pas un engagement réglementaire — un plan de travail.**
@@ -191,8 +193,10 @@ humaine est la couche de responsabilité ; l'IA assistive est un outil interne.
   `sizeBytes`, `clamavScannedAt`, `clamavStatus`.
 
 ### Rétention
-- À définir avec DPO : généralement aligné sur la durée légale du suivi médical (et donc
-  des CR associés). Période proposée : durée du suivi + N années, à confirmer.
+- **À arbitrer avec DPO / avocat santé avant V1 production.** Aucune durée définitive
+  n'est fixée dans cette documentation. Si un exemple de travail (par ex. durée du suivi
+  + N années) est utilisé en interne, le marquer explicitement comme **exemple non
+  validé**, pas comme politique active.
 
 ---
 
@@ -225,14 +229,20 @@ humaine est la couche de responsabilité ; l'IA assistive est un outil interne.
 ```
 Backend → IA Gateway → LLM provider (Anthropic / Mistral / etc.)
               │
-              ├ redaction PII en entrée (regex + ML léger)
+              ├ minimisation / redaction PII en entrée (mécanisme à spécifier V1)
               ├ injection des templates / prompts versionnés
               ├ rate limiting global + par superviseur
               ├ logging immuable (requête, réponse, latence, usage)
-              ├ redaction PII en sortie
+              ├ minimisation / redaction PII en sortie (mécanisme à spécifier V1)
               ├ filtrage wording interdit (linter automatique)
               └ kill-switch on/off par fonction et par tenant
 ```
+
+> **Exigence V1 à spécifier avec CTO / DPO** : mécanisme de minimisation / redaction PII
+> avant usage IA (regex, ML, hybride — non figé à ce stade), **fallback si redaction
+> insuffisante** (par exemple bloquer la requête LLM), **métriques de couverture à définir**
+> (par ex. taux de PII détecté, taux de faux négatifs). Aucune solution n'est arrêtée dans
+> cette documentation.
 
 ### Choix de fournisseur LLM
 - **Anthropic Claude** via offre Bedrock (zone UE) ou directement Anthropic avec DPA RGPD.

@@ -1,10 +1,17 @@
 # KOVELA — Besoins IA assistive (V1 & cible)
 
+> **Dernière mise à jour** : 2026-06-01 · **Référence décisions** : [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) ·
+> **Commit landing V1** : `3c9bf22`.
+>
 > **Public visé** : lead dev V1, DPO, avocat e-santé (Aumans), Head of Care.
 > **Statut** : spécification fonctionnelle et architecturale de l'IA assistive — à valider
 > juridiquement avant développement.
 > **Doctrine produit (rappel)** : *« KOVELA ne décide pas médicalement. L'IA est assistive,
 > interne, loggée et human-in-the-loop. »*
+>
+> **Note wording** : le mot « escalade » est conservé ici comme **terme technique interne**
+> (enum `compilation_escalade`, logs IA). Côté UI utilisateur et côté démo, on parle de
+> **« transmission cabinet »** ou **« compilation factuelle pour transmission cabinet »**.
 
 ---
 

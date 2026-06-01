@@ -1,5 +1,9 @@
 # KOVELA — Prototype V1 (démonstration)
 
+> **Dernière mise à jour** : 2026-06-01 · **Référence décisions** : [`docs/DECISIONS_LOG.md`](docs/DECISIONS_LOG.md)
+> · **Commit landing V1 de référence** : `3c9bf22`. Les arbitrages canoniques (pricing, workflow CR,
+> wording validé, prochaine priorité produit) sont dans `DECISIONS_LOG.md`.
+
 > **Avertissement.** Ce dépôt est un **prototype front-end de démonstration**.
 > Ce n'est **pas** une plateforme de production HDS. Il ne contient **aucune donnée réelle** :
 > toutes les données (patients, chirurgiens, messages, CR, transmissions cabinet) sont **fictives et mockées localement**.
@@ -100,7 +104,7 @@ app/
   login/page.tsx                     # Sélecteur de rôle fictif
   admin/page.tsx                     # Dashboard Admin KOVELA
   superviseur/page.tsx               # Inbox opérationnelle (cœur du proto)
-  superviseur/patient/[id]/page.tsx  # Fiche patient superviseur + IA + CR + escalade
+  superviseur/patient/[id]/page.tsx  # Fiche patient superviseur + IA + CR + transmission cabinet
   chirurgien/page.tsx                # Dashboard chirurgien
   chirurgien/patient/[id]/page.tsx   # Dossier patient / CR côté chirurgien
   patient/onboarding/page.tsx        # Onboarding mobile-first + consentement
@@ -139,12 +143,15 @@ lib/
 ## 5. Composants clés
 
 - **`KovelaProvider` / `useKovela`** (`lib/store.tsx`) — source unique de vérité en mémoire.
-  Porte tout l'état (patients, escalades, CR, logs, logs IA) et **toutes les actions** (attribuer,
-  envoyer un message, valider/publier un CR, ouvrir/transmettre une escalade, logger l'IA…).
+  Porte tout l'état (patients, transmissions cabinet, CR, logs, logs IA) et **toutes les actions** (attribuer,
+  envoyer un message, valider/rendre disponible un CR, préparer/transmettre une compilation factuelle, logger l'IA…).
   Les écrans sont réactifs : une action sur la fiche patient se reflète immédiatement sur le dashboard admin.
 - **`Shell`** — layout commun, navigation par rôle, **sélecteur de rôle** (pills en haut + page `/login`).
-- **`AiSuggestion`** — encadré de sortie IA imposant le disclaimer *« Suggestion IA — à valider par un humain »*
-  et les 3 actions humaines **Accepter / Modifier / Refuser**.
+- **`AiSuggestion`** (suggestion IA générique, hors modale CR) — encadré de sortie IA imposant le disclaimer
+  *« Suggestion IA — à valider par un humain »* et 3 actions humaines **Accepter / Modifier / Refuser**.
+- **Modale brouillon CR** (vue dédiée pour `preparation_cr`) — structure A. Résumé patient · B. Brouillon CR
+  factuel structuré · C. Checklist avant validation · D. Rappel doctrine. Boutons :
+  **Relire et valider** · **Modifier le brouillon** · **Rejeter**. Cf. [`docs/DECISIONS_LOG.md`](docs/DECISIONS_LOG.md) § 7.
 - **`DoctrineNote`** / **`UrgencyBanner`** — rappels permanents du périmètre non médical et de l'urgence 15/112.
 
 ---
@@ -156,14 +163,20 @@ lib/
    *coordination, continuité post-opératoire, classement opérationnel, message non traité, patient silencieux,
    CR en attente, compilation factuelle, transmission au chirurgien…* — jamais *diagnostic, tri médical, gravité,
    urgence détectée, patient à risque, recommandation médicale*, etc.
-3. **IA jamais autonome** : aucune fonction IA ne s'exécute sans clic humain ; toute sortie passe par
-   Accepter / Modifier / Refuser et est **journalisée** (fonction, version de prompt, date, utilisateur, décision).
+3. **IA jamais autonome** : aucune fonction IA ne s'exécute sans clic humain ; toute sortie passe par une
+   validation humaine et est **journalisée** (fonction, version de prompt, date, utilisateur, décision).
+   La modale brouillon CR utilise **Relire et valider / Modifier le brouillon / Rejeter** ; les suggestions
+   IA génériques (résumé, reformulation, compilation factuelle) utilisent **Accepter / Modifier / Refuser**.
 4. **Pas de chatbot patient** : côté patient, la messagerie indique explicitement « traité par une équipe humaine,
    aucune réponse automatique par IA ».
-5. **CR = brouillon par défaut** (« Brouillon de CR à valider ») ; le chirurgien ne voit **que** les CR
-   **validés ou rendus disponibles**, jamais les brouillons.
-6. **Escalade = compilation factuelle** : chronologie + pièces jointes + actions faites ; le chirurgien ne reçoit
-   la compilation **que lorsqu'elle est transmise**.
+5. **Workflow CR canonique** : IA prépare / préremplit le brouillon → superviseuse relit → corrige si
+   nécessaire → valide → CR **disponible chirurgien**. Le wording validé est **« Brouillon IA — à relire
+   et valider »** puis **« CR validé KOVELA »** puis **« CR disponible chirurgien »**. Le chirurgien ne voit
+   **que** les CR **disponibles**, jamais les brouillons. Cf. [`docs/DECISIONS_LOG.md`](docs/DECISIONS_LOG.md) § 6.
+6. **Transmission cabinet = compilation factuelle** : chronologie + pièces jointes + actions faites ; le
+   chirurgien ne reçoit la compilation **que lorsqu'elle est transmise** par la superviseuse. Le mot
+   « escalade » est réservé au vocabulaire technique interne ; côté UI et côté démo, on utilise
+   **« transmission cabinet »** ou **« transmission prioritaire »**.
 7. **Classement opérationnel uniquement** dans l'inbox (non-lu, ancienneté, silencieux, CR en attente,
    escalade ouverte, onboarding incomplet) — **aucun** tri par gravité/risque.
 8. **Sélecteur de rôle global** pour démontrer les 4 espaces en 5 minutes sans logout.
@@ -175,12 +188,12 @@ lib/
 | Fonction | Où | Effet simulé |
 |---|---|---|
 | **Résumer la conversation** | Fiche patient superviseur | Synthèse opérationnelle factuelle (`aiSummarize`) |
-| **Préparer le CR** | Fiche patient superviseur | Brouillon de CR factuel à valider (`aiPrepareReport`) |
+| **Préparer brouillon IA** (modale CR) | Fiche patient superviseur | Brouillon IA — à relire et valider (`aiPrepareReport`) |
 | **Reformuler** | Zone de réponse | Reformulation de forme, non médicale (`aiReformulate`) |
-| **Préparer compilation d'escalade** | Fiche patient superviseur | Chronologie factuelle pour le chirurgien (`aiCompileEscalation`) |
-| Détection opérationnelle | Badges | message non traité / silencieux / CR en attente / onboarding incomplet |
+| **Préparer compilation factuelle** (transmission cabinet) | Fiche patient superviseur | Chronologie factuelle pour le chirurgien (`aiCompileEscalation` — nom technique interne) |
+| Détection opérationnelle | Badges | message non traité / silencieux / CR en file de validation / onboarding incomplet |
 | Attribution / réattribution | Admin | met à jour le superviseur + log |
-| Validation / publication CR | Superviseur | brouillon → validé → disponible (+ logs) |
+| Validation / mise à disposition CR | Superviseur | brouillon → validé KOVELA → disponible chirurgien (+ logs) |
 | Transmission d'escalade | Superviseur → Chirurgien | rend la compilation visible au chirurgien (+ log) |
 | Onboarding patient | Patient | marque le patient comme **activé** (impacte la facturation) |
 | Paiement / mandat GoCardless | Admin & Chirurgien | **affichage uniquement**, aucun paiement réel |
@@ -192,10 +205,12 @@ Chaque usage IA crée une entrée dans **`/logs` → onglet « Logs IA »** (fon
 ## 8. Parcours de démonstration (≈ 5 min)
 
 1. `/login` → **Admin** : stats, **charge par superviseur**, table patients, **attribuer** un patient sans superviseur.
-2. **Superviseur** (`/superviseur`) : inbox opérationnelle → ouvrir une **fiche patient** (ex. un patient en escalade).
-3. Sur la fiche : **Résumer** (IA) → Accepter ; **Préparer le CR** (IA) → Accepter (brouillon) → **Valider** → **Rendre disponible**.
-4. **Préparer compilation d'escalade** (IA) → Accepter → **Transmettre au chirurgien**.
-5. Bascule **Chirurgien** : le CR et la compilation factuelle apparaissent côté chirurgien.
+2. **Superviseur** (`/superviseur`) : inbox opérationnelle → ouvrir une **fiche patient** (ex. un patient avec
+   transmission cabinet en cours).
+3. Sur la fiche : **Résumer** la conversation (IA générique) → Accepter ; **Préparer brouillon IA** (modale CR) →
+   **Relire et valider** → **Rendre disponible chirurgien**.
+4. **Préparer une compilation factuelle pour le cabinet** (IA) → Accepter → **Transmettre au chirurgien**.
+5. Bascule **Chirurgien** : le CR (disponible chirurgien) et la compilation factuelle apparaissent côté chirurgien.
 6. Bascule **Patient** : onboarding + messagerie (photo/audio placeholders, rappel urgence permanent).
 7. `/logs` : traçabilité opérationnelle + logs IA (accepté/modifié/refusé).
 

@@ -1,5 +1,7 @@
 # KOVELA — Notes de revue réglementaire
 
+> **Dernière mise à jour** : 2026-06-01 · **Référence décisions** : [`DECISIONS_LOG.md`](./DECISIONS_LOG.md).
+>
 > **Audience** : Adrien (fondateur), Aumans (avocat e-santé), DPO interne.
 > **Statut** : notes préparatoires à la revue Aumans. **Pas un avis juridique**.
 > Ces notes capturent la doctrine produit, les choix de wording prudents et la liste des
@@ -92,7 +94,9 @@ L'IA KOVELA **aide à** :
 
 ### Points sensibles
 - L'IA est appelée sur des **contenus patient** (messages, métadonnées de pièces jointes).
-  → Le **gateway IA V1** devra réaliser une **redaction PII** systématique.
+  → **Exigence V1 à spécifier avec CTO / DPO** : mécanisme de minimisation / redaction PII
+  avant usage IA, fallback si redaction insuffisante, métriques de couverture à définir.
+  Aucun mécanisme (regex, ML, hybride) n'est figé à ce stade.
 - Le **prompt est versionné** (`v1.2` en prototype). En V1, chaque version de prompt sera
   archivée en base.
 - Un **kill-switch par fonction** est prévu (cf. brief architecture V1).
@@ -365,6 +369,9 @@ score médical · score patient · protocole médical · protocole clinique.
 - [ ] Forme suffisante du **consentement** (case à cocher + horodatage + log).
 - [ ] **Information préalable** : modèle à fournir au patient.
 - [ ] **Cas particuliers** : mineurs, majeurs protégés, urgences.
+  → **Posture V1** : **P0 V1 — non supporté au lancement** tant que le cadre représentant
+  légal / consentement éclairé / vérification d'âge n'est pas formalisé avec Aumans et DPO.
+  Ne pas inventer le mécanisme final ; cadrer en amont du go-live V1.
 
 ### 13.5 Consentements / information
 - [ ] Format des consentements (catalogue : utilisation messages, photos, audios, relances,
@@ -385,12 +392,18 @@ score médical · score patient · protocole médical · protocole clinique.
 - [ ] **Transferts hors UE** : encadrés par clauses contractuelles type ou BCR.
 
 ### 13.8 Canaux de communication
-- [ ] **WhatsApp** : faisable RGPD ? (a priori non sans contrat Business + DPA).
+- [ ] **WhatsApp** : **canal à cadrer juridiquement et techniquement** ; ne pas considérer
+  WhatsApp comme conforme par défaut. Pas d'usage produit tant que contrat Business + DPA +
+  arbitrage Aumans n'ont pas validé.
 - [ ] **SMS** : prestataire UE retenu, contenu minimisé (pas de contenu patient dans le SMS).
 - [ ] **Email** : prestataire UE retenu, DPA en place.
 
 ### 13.9 Conservation des données
 - [ ] Durée de conservation : **messages, photos, audios, CR, logs IA, audit log**.
+  → **À arbitrer avec DPO / avocat santé avant V1 production.** Aucune durée définitive
+  n'est fixée dans cette documentation. Si une proposition de travail est utilisée à un
+  moment, elle doit être marquée explicitement comme **exemple non validé**, pas comme
+  politique active.
 - [ ] **Logs comptables / GoCardless** : 10 ans (obligation légale).
 - [ ] Modalités d'archivage / purge / anonymisation après expiration.
 

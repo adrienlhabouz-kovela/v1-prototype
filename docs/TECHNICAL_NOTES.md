@@ -1,8 +1,48 @@
 # KOVELA — Notes techniques (prototype)
 
+> **Dernière mise à jour** : 2026-06-01 · **Référence décisions** : [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) ·
+> **Commit landing V1** : `3c9bf22`.
+>
 > **Public visé** : lead dev qui doit transformer ce prototype en V1 production HDS.
 > **Objectif** : comprendre ce qui est réutilisable, ce qui est jetable, et où poser les bonnes
 > questions d'architecture.
+
+---
+
+## 0. Couverture produit fine à connaître
+
+Avant tout démarrage V1, lire `docs/DECISIONS_LOG.md` (source canonique des arbitrages
+produit, messaging et pricing du 2026-06-01). Points qu'un lead dev doit absolument intégrer
+au plan technique :
+
+- **Modale brouillon CR refondue** (`app/superviseur/patient/[id]/page.tsx` · composant
+  `CrPreparationView`) : structure A. Résumé patient · B. Brouillon CR factuel structuré en
+  sections (Messages principaux, Relances, Actions KOVELA, Transmission cabinet, Statut
+  final) · C. Checklist avant validation · D. Rappel doctrine. Boutons : **Relire et
+  valider** · **Modifier le brouillon** · **Rejeter**. Cf. `DECISIONS_LOG.md` § 7.
+- **Workflow CR canonique** : IA prépare → superviseuse relit → corrige → valide → CR
+  disponible chirurgien. États techniques : `brouillon` → `valide` → `disponible`. Cf.
+  `DECISIONS_LOG.md` § 6.
+- **Messages programmés patient** (6 types : début de suivi, point, photo, relance, pré-clôture,
+  clôture). Pas d'envoi réel externe en prototype, validation humaine obligatoire en V1. Cf.
+  `DECISIONS_LOG.md` § 8.
+- **MedicalGuard sur référentiel** (`app/chirurgien/referentiel/page.tsx`) : encart de cadrage
+  permanent + warning soft si mots-clés médicaux détectés (prescription, ordonnance,
+  antibiotique, dose, diagnostic, infection, complication, urgence médicale, traitement,
+  médicament, arrêter, commencer, modifier). Ne **jamais bloquer** la saisie ; KOVELA relit
+  avant tout usage opérationnel. Cf. `DECISIONS_LOG.md` § 5.
+- **Statuts référentiel** (4 états visuels) : Brouillon → À relire avec KOVELA → Validé
+  KOVELA → Actif. Cf. `DECISIONS_LOG.md` § 5.
+- **Baseline terrain** : 60 à 90 minutes de travail humain par patient sur 3 à 15 jours
+  (mode manuel WhatsApp / audio). Aucun gain chiffré n'est promis à ce stade. Cf.
+  `DECISIONS_LOG.md` § 11.
+- **Pricing canonique** : 690 € HT/mois (accès service, 1er du mois) + 80 € HT/patient activé
+  (variable d'usage, fin de mois). Patient activé = onboarding validé + suivi lancé. Cf.
+  `DECISIONS_LOG.md` § 2.
+- **Prochaine priorité produit V1** : **inbox superviseur scalable** (recherche, filtres
+  statut / retard / J+, tri par urgence opérationnelle, séparation CR brouillon IA / à
+  relire / à rendre disponible, capacité 60 / 80 / 120 patients par superviseuse). Cf.
+  `DECISIONS_LOG.md` § 13.
 
 ---
 

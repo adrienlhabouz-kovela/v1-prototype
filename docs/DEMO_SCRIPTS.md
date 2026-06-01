@@ -1,12 +1,37 @@
 # KOVELA — Scripts de démonstration (4 audiences)
 
+> **Dernière mise à jour** : 2026-06-01 · **Référence décisions** : [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) ·
+> **Commit landing V1** : `3c9bf22`.
+>
 > **Statut** : guide opérationnel pour celui qui présente le prototype. À garder ouvert
 > pendant la démo.
 > **Audiences couvertes** : Émilien (lead dev V1) · Chirurgien (futur client) · Investisseur
 > healthtech · Aumans (avocat e-santé).
-> **Cross-référence** : `docs/README_DEMO.md` (résumé) · `docs/PRODUCT_SCOPE.md` (périmètre) ·
-> `docs/TECHNICAL_NOTES.md` (technique) · `docs/V1_HDS_ARCHITECTURE_BRIEF.md` (architecture
-> cible) · `docs/AI_REQUIREMENTS.md` (IA) · `docs/REGULATORY_REVIEW_NOTES.md` (juridique).
+> **Cross-référence** : `docs/DECISIONS_LOG.md` (source canonique) · `docs/README_DEMO.md`
+> (résumé) · `docs/PRODUCT_SCOPE.md` (périmètre) · `docs/TECHNICAL_NOTES.md` (technique) ·
+> `docs/V1_HDS_ARCHITECTURE_BRIEF.md` (architecture cible) · `docs/AI_REQUIREMENTS.md` (IA) ·
+> `docs/REGULATORY_REVIEW_NOTES.md` (juridique).
+
+---
+
+## ⚠️ À ne pas dire en démo (wording interdit)
+
+À **éviter** en démonstration, quelle que soit l'audience :
+- « CR en retard » seul → dire **« CR en retard de validation »** ou **« CR non disponible dans le délai attendu »**.
+- « Validation médicale » → c'est une **validation KOVELA** (humaine, opérationnelle, non médicale).
+- « Escalade » côté UI utilisateur → préférer **« transmission cabinet »** ou **« transmission prioritaire »**.
+- « IA autonome » → l'IA est **assistive**, validée par une superviseuse à chaque étape.
+- « 50 € / patient » → ancien pricing. Le pricing actuel est **690 € HT/mois + 80 € HT/patient activé**.
+- « Forfait illimité », « patients illimités », « sur devis », « gratuit » lié au pricing.
+- « Réputation maîtrisée », « image maîtrisée » → dire **« qualité perçue du suivi mieux structurée »** ou
+  **« expérience patient mieux structurée »**.
+- « Diagnostic », « avis médical », « interprétation clinique », « tri clinique », « surveillance médicale ».
+
+À **dire** systématiquement :
+- « L'IA prépare. L'humain valide. Le chirurgien décide. »
+- « Le chirurgien garde la main. KOVELA organise le flux. »
+- « Architecture cible HDS / RGPD — aucune certification revendiquée à ce stade. »
+- Workflow CR : « IA prépare un brouillon → superviseuse relit → corrige → valide → CR disponible chirurgien. »
 
 ---
 
@@ -65,11 +90,15 @@ des décisions à trancher.
    Montrer Actions prioritaires + Qualité & délais + Charge superviseur.
 3. **`/superviseur/patient/p11`** *(2 min)* — *« Fiche critique. L'IA est simulée localement
    dans `lib/ai.ts` ; en V1 elle passe par un gateway serveur (redaction PII, kill-switch,
-   audit log). Cf. AI_REQUIREMENTS.md. »* Cliquer **Résumer** → badge *Estimation prototype —
-   temps gagné*. Puis **Préparer le CR** → Accepter → **Valider en interne** → **Rendre
-   disponible**. Insister sur le gating 3 états.
-4. **`/chirurgien/patient/p11`** *(45 s)* — *« Côté chirurgien : uniquement les CR publiés
-   et les escalades transmises. Contenu normalisé à la publication. »*
+   audit log). Cf. AI_REQUIREMENTS.md. »* Cliquer **Résumer la conversation** (suggestion IA
+   générique) → Accepter ; badge *Estimation prototype — temps gagné*. Puis **Préparer
+   brouillon IA** : la modale CR refondue s'ouvre (Résumé patient · Brouillon CR factuel
+   en sections · Checklist avant validation · Rappel doctrine). Cliquer **Relire et valider**
+   → **Rendre disponible chirurgien**. Insister sur le workflow IA → humain → chirurgien
+   (cf. `DECISIONS_LOG.md` § 6 et § 7).
+4. **`/chirurgien/patient/p11`** *(45 s)* — *« Côté chirurgien : uniquement les CR disponibles
+   chirurgien et les transmissions cabinet effectivement transmises. Contenu normalisé à la
+   mise à disposition. »*
 5. **`/logs`** *(45 s)* — *« 30+ types de logs typés. En V1 : append-only avec hash
    chaining. Filtres IA / CR / Escalade / Qualité / CRM. »* Filtrer **IA** puis **Qualité**.
 
@@ -254,20 +283,29 @@ contextualisée — c'est vous qui décidez médicalement. »*
    l'humain valide, le chirurgien décide. Trois niveaux de responsabilité, traçabilité
    complète. Le CR est gating 3 états — c'est ce qui sécurise juridiquement le service. »*
 6. **`/chirurgien`** *(1 min)* — *« Le chirurgien — notre client payant — voit un
-   dashboard ultra-simple. Modèle économique : abonnement mensuel par chirurgien +
-   variable par patient activé. Prélèvement GoCardless automatisé. »* Pointer le bloc
-   *Abonnement*.
+   dashboard ultra-simple. Modèle économique : **690 € HT / mois** d'accès au service
+   opéré (facturé le 1er du mois) + **80 € HT / patient activé** (facturé en fin de mois,
+   sur les patients réellement suivis). Patient activé = onboarding validé + suivi lancé.
+   Prélèvement GoCardless automatisé. »* Pointer le bloc *Abonnement*.
 
 ### Messages clés à dire
 - *« Le post-op est un angle mort de l'expérience cabinet aujourd'hui. KOVELA est le
   premier service opéré sur ce moment-clé. »*
+- *« Baseline terrain mesurée : en suivi manuel WhatsApp / audio, un patient post-op
+  représente 60 à 90 minutes de travail humain sur 3 à 15 jours. KOVELA structure ce
+  temps via référentiel cabinet, supervision humaine, comptes-rendus factuels et IA
+  assistive. Aucun gain chiffré n'est promis à ce stade — à mesurer et affiner en pilote. »*
+- *« Positionnement pricing : moins qu'un mi-temps interne dédié, plus qu'un outil. Le
+  fixe donne accès au service. Le variable suit l'usage réel. »*
 - *« Différenciation : service opéré (pas SaaS), supervision humaine spécialisée (pas IA
   autonome), traçabilité complète (pas boîte noire). »*
 - *« On démarre par la verticale esthétique / plastique, mais la plateforme est
   multi-verticales : ORL / maxillo, ortho ambulatoire, ophtalmologie, urologie,
   gynécologie. »*
 - *« Le scale qualitatif est explicitement pensé : formation superviseur, indicateurs
-  opérationnels (non punitifs), revue qualité, retours terrain. »*
+  opérationnels (non punitifs), revue qualité, retours terrain. **Prochaine priorité
+  produit : inbox superviseur scalable** (recherche, filtres, capacité 60–80–120
+  patients par superviseuse). Cf. DECISIONS_LOG.md § 13. »*
 
 ### Pièges à éviter
 - ❌ **Jamais dire** *« on est certifié HDS »* — *« architecture cible »*.
@@ -311,11 +349,14 @@ ce qui rend KOVELA unique. »*
    *« Vos messages sont traités par une équipe humaine. Aucune réponse automatique par
    IA. »*
 3. **`/superviseur/patient/p11`** *(2 min)* — *« Voici comment l'IA est encadrée. Chaque
-   sortie passe par Accepter / Modifier / Refuser. Disclaimer obligatoire 'Suggestion IA —
-   à valider par un humain'. Logs doubles. »* Cliquer **Résumer** → montrer le panneau IA.
-   Fermer pour montrer **Refuser** fonctionne. Puis montrer la carte *Compilation factuelle
-   d'escalade* : *« Préparer ne déclenche pas la transmission. La transmission au
-   chirurgien est une action humaine explicite. C'est le point critique de
+   suggestion IA générique (résumé conversation, reformulation, compilation factuelle pour
+   transmission cabinet) passe par Accepter / Modifier / Refuser. La modale brouillon CR,
+   elle, utilise Relire et valider / Modifier le brouillon / Rejeter. Disclaimer obligatoire
+   'Suggestion IA — à valider par un humain'. Logs doubles. »* Cliquer **Résumer la
+   conversation** → montrer le panneau IA générique. Fermer pour montrer **Refuser**
+   fonctionne. Puis montrer la carte *Compilation factuelle pour transmission cabinet* :
+   *« Préparer ne déclenche pas la transmission. La transmission au chirurgien est une
+   action humaine explicite. C'est le point critique de
    non-substitution. »*
 4. **`/chirurgien/patient/p11`** *(1 min)* — *« Côté chirurgien, on ne voit que le CR
    explicitement 'disponible' et l'escalade 'transmise'. Le contenu est normalisé à la

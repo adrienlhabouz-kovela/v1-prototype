@@ -1,5 +1,8 @@
 # KOVELA — Prototype de démonstration
 
+> **Dernière mise à jour** : 2026-06-01 · **Référence décisions** : [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) ·
+> **Commit landing V1** : `3c9bf22`.
+>
 > **Statut :** prototype front-end de démonstration — pas une plateforme de production HDS.
 > **Données :** 100 % fictives, état non persistant (en mémoire).
 
@@ -112,15 +115,21 @@ et les pills en haut.
 7. **Planning** (`/chirurgien/planning`) — **Ajouter un patient** : la durée se pré-remplit
    selon le type d'intervention (référentiel cabinet). **Importer un planning** → *Charger
    un exemple* → *Valider l'import*.
-7. **Superviseur** (`/superviseur`) — *Mes indicateurs* + *Améliorations terrain* + Inbox.
-   Ouvrir `/superviseur/patient/p11` (patient en escalade, compilation déjà préparée).
-8. **IA assistive** — sur p11 : *Résumer* (badge *~1.5 min gagnées*) → Accepter ;
-   *Préparer le CR* → Accepter (brouillon) → *Valider en interne* → *Rendre disponible pour
-   le chirurgien*. Toucher au gating CR.
-9. **Compilation → escalade explicite** — sur p11 : la compilation est déjà préparée
-   (brouillon interne). Cliquer **Transmettre au chirurgien** → escalade transmise.
-10. **Chirurgien** (`/chirurgien/patient/p11`) — l'escalade apparaît avec son contexte
-    factuel. Aller sur `/chirurgien/patient/p18` pour voir un CR disponible.
+7. **Superviseur** (`/superviseur`) — *Mes indicateurs* + *Améliorations terrain* + Inbox
+   action-first par statut opérationnel. Ouvrir `/superviseur/patient/p11` (patient avec
+   transmission cabinet en cours, compilation factuelle déjà préparée).
+8. **IA assistive — workflow CR** — sur p11 : *Résumer la conversation* (suggestion IA
+   générique, badge *~1,5 min gagnées*) → Accepter ; *Préparer brouillon IA* — la modale
+   CR refondue s'ouvre (Résumé patient · Brouillon CR factuel en sections · Checklist avant
+   validation · Rappel doctrine) → **Relire et valider** → **Rendre disponible chirurgien**.
+   Insister sur la chaîne *IA prépare → superviseuse relit → corrige si besoin → valide
+   → CR disponible chirurgien* (cf. `DECISIONS_LOG.md` § 6 et § 7).
+9. **Compilation factuelle → transmission cabinet explicite** — sur p11 : la compilation
+   est déjà préparée (brouillon interne). Cliquer **Transmettre au chirurgien** → la
+   transmission cabinet est effective.
+10. **Chirurgien** (`/chirurgien/patient/p11`) — la transmission cabinet apparaît avec son
+    contexte factuel. Aller sur `/chirurgien/patient/p18` pour voir un CR disponible
+    chirurgien.
 11. **Patient mobile** (`/patient/onboarding` → `/patient/messages`, vue étroite) — 5 étapes,
     rappel 15 / 112 permanent, confirmation après envoi.
 12. **Supervision & qualité** (`/admin/supervision`) — KPI IA seedés (~2 h 39 min estimées
