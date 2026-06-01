@@ -51,7 +51,7 @@ const heroBadges = [
 
 const pains = [
   { t: "Messages dispersés", d: "WhatsApp, appels, SMS, emails, secrétariat : les échanges patients arrivent partout, sans fil conducteur." },
-  { t: "Charge cabinet", d: "Relances manuelles, photos à classer, doutes à apaiser. L'assistante absorbe le bruit." },
+  { t: "Charge cabinet", d: "Relances manuelles, photos à classer, doutes à apaiser. Le cabinet absorbe le bruit." },
   { t: "Sollicitations non structurées", d: "Le chirurgien est sollicité trop tôt, trop tard, ou sans dossier structuré." },
   { t: "Historique éclaté", d: "La responsabilité reste au chirurgien, mais l'historique se reconstitue entre canaux." },
 ];
@@ -97,17 +97,6 @@ const aiDoesNever = [
   "Pas d'interprétation des photos",
   "Pas de transmission cabinet sans validation humaine",
   "Pas d'évaluation chiffrée du patient",
-];
-
-const supervisionPoints = [
-  "Superviseurs assignés",
-  "Charge suivie",
-  "Messages non traités visibles",
-  "CR à contrôler",
-  "Usage de l'IA assistive tracé",
-  "Qualité suivie par le Head of Care",
-  "Formation des superviseurs",
-  "Logs complets",
 ];
 
 const doctrinePoints = [
@@ -338,6 +327,17 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Bande preuve terrain — prudente, non chiffrée, non datée. */}
+      <section className="border-b border-navy-900/[0.06] bg-bone/40">
+        <div className="mx-auto max-w-6xl px-6 py-5">
+          <p className="text-[12.5px] leading-relaxed text-charcoal/65">
+            <span className="font-semibold text-navy-900">Construit à partir de retours terrain</span>
+            {" "}de chirurgiens esthétiques et d&apos;une expérience opérationnelle post-opératoire
+            manuelle.
+          </p>
+        </div>
+      </section>
+
       {/* Section F — Comment ça marche */}
       <section id="etapes" className="mx-auto max-w-6xl px-6 py-24">
         <Eyebrow>Comment ça marche</Eyebrow>
@@ -416,24 +416,27 @@ export default function Landing() {
       </section>
 
       {/* Section bonus — Supervision & qualité (compact) */}
-      <section className="mx-auto max-w-6xl px-6 py-24">
-        <Eyebrow>Supervision &amp; qualité</Eyebrow>
-        <h2 className="max-w-2xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
-          Une supervision pilotée, formée et traçable.
-        </h2>
-        <div className="mt-12 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
-          {supervisionPoints.map((p) => (
-            <div
-              key={p}
-              className="rounded-xl bg-white p-4 text-[13px] tracking-tight text-navy-900 shadow-soft ring-1 ring-navy-900/[0.05]"
+      <section className="mx-auto max-w-6xl px-6 py-14">
+        <Eyebrow>Supervision &amp; qualité opérationnelle</Eyebrow>
+        <p className="mt-3 max-w-3xl text-[14px] leading-relaxed text-charcoal/70">
+          KOVELA ne scale pas seulement par la tech. La charge, les CR, les transmissions cabinet
+          et la qualité opérationnelle sont suivis dans l&apos;interface.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {[
+            "Charge superviseurs",
+            "CR en file de validation",
+            "Transmissions cabinet",
+            "Qualité opérationnelle",
+          ].map((c) => (
+            <span
+              key={c}
+              className="rounded-md bg-white px-2.5 py-1 text-[11px] font-medium tracking-tight text-navy-700 ring-1 ring-navy-100"
             >
-              {p}
-            </div>
+              {c}
+            </span>
           ))}
         </div>
-        <p className="mt-10 max-w-3xl font-display text-[22px] italic leading-tight tracking-[-0.01em] text-navy-900">
-          KOVELA scale par une supervision formée, assistée et contrôlée — pas seulement par la tech.
-        </p>
       </section>
 
       {/* Section H — Sécurité / doctrine (cadre clair) */}
