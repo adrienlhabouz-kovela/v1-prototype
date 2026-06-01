@@ -161,15 +161,21 @@ export default function ChirurgienOnboarding() {
       />
 
       <div className="mx-auto max-w-3xl">
-        <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl bg-white px-5 py-4 text-[12.5px] leading-relaxed text-charcoal/70 shadow-soft ring-1 ring-navy-900/[0.05]">
-          <span className="flex items-center gap-2 rounded-md bg-teal-50/60 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-teal-700 ring-1 ring-teal-100/70">
-            <span className="h-1 w-1 rounded-full bg-teal-500" />
-            Temps estimé : 5 à 7 minutes
-          </span>
+        <div className="mb-6 flex flex-wrap items-start gap-x-4 gap-y-3 rounded-xl bg-white px-5 py-4 text-[12.5px] leading-relaxed text-charcoal/70 shadow-soft ring-1 ring-navy-900/[0.05]">
+          <div className="flex flex-col gap-1.5">
+            <span className="flex w-fit items-center gap-2 rounded-md bg-teal-50/60 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-teal-700 ring-1 ring-teal-100/70">
+              <span className="h-1 w-1 rounded-full bg-teal-500" />
+              15 min · mise en place initiale du cabinet
+            </span>
+            <span className="flex w-fit items-center gap-2 rounded-md bg-navy-50 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-navy-700 ring-1 ring-navy-100">
+              <span className="h-1 w-1 rounded-full bg-navy-700/60" />
+              30–60 min · référentiel essentiel accompagné par KOVELA
+            </span>
+          </div>
           <span className="flex-1 min-w-[260px]">
-            Ces informations permettent à l'équipe KOVELA de préparer le service avec votre cabinet.
-            Elles restent modifiables ensuite depuis votre espace chirurgien. Le référentiel de suivi
-            détaillé sera complété après activation.
+            Objectif : activer proprement 2 ou 3 interventions prioritaires, pas tout formaliser
+            d'un coup. Cette étape prépare le service avec votre cabinet ; le référentiel essentiel
+            est ensuite construit avec l'équipe KOVELA depuis votre espace chirurgien.
           </span>
         </div>
 

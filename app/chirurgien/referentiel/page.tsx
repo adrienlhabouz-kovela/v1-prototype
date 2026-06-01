@@ -354,6 +354,49 @@ function Field({
   );
 }
 
+// Garde-fou discret pour les zones de saisie libre du référentiel.
+// Affiche systématiquement un encart de cadrage et, si certains mots
+// potentiellement médicaux sont détectés dans la valeur, un warning soft.
+// Ne bloque jamais la saisie — la relecture KOVELA reste obligatoire.
+const MEDICAL_KEYWORDS = [
+  "prescription",
+  "ordonnance",
+  "antibiotique",
+  "dose",
+  "diagnostic",
+  "infection",
+  "complication",
+  "urgence médicale",
+  "traitement",
+  "médicament",
+  "arrêter",
+  "commencer",
+  "modifier",
+];
+
+function hasMedicalWording(value: string): boolean {
+  const v = value.toLowerCase();
+  return MEDICAL_KEYWORDS.some((k) => v.includes(k));
+}
+
+function MedicalGuard({ value }: { value: string }) {
+  const flagged = hasMedicalWording(value);
+  return (
+    <div className="mt-1.5 space-y-1">
+      <p className="text-[10.5px] leading-relaxed text-charcoal/55">
+        À renseigner sous forme de règles opérationnelles. Ne pas saisir de prescription,
+        diagnostic, conseil médical personnalisé ou interprétation clinique. KOVELA relit ce
+        référentiel avant usage.
+      </p>
+      {flagged && (
+        <p className="rounded-md bg-amber-50/70 px-2 py-1 text-[10.5px] leading-relaxed text-amber-800 ring-1 ring-amber-100">
+          À relire avec KOVELA — formulation potentiellement médicale.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function SubSection({
   title,
   hint,
@@ -767,7 +810,7 @@ export default function ReferentielFonctionnementPage() {
       <PageHeader
         eyebrow="Référentiel essentiel"
         title="Préparer votre référentiel de suivi"
-        subtitle="Nous commençons par vos 2 ou 3 interventions les plus fréquentes. L'équipe KOVELA vous accompagne pour transformer vos habitudes en règles simples, opérables et modifiables."
+        subtitle="Ce référentiel sert à transformer votre manière de travailler en règles opérationnelles simples pour l'équipe KOVELA. Il est généralement complété avec nous, puis relu avant usage."
       >
         <Link href="/chirurgien">
           <Button variant="ghost">Retour à l'espace chirurgien</Button>
@@ -775,13 +818,41 @@ export default function ReferentielFonctionnementPage() {
       </PageHeader>
 
       <div className="mx-auto max-w-4xl space-y-6">
-        {/* Bandeau de cadrage */}
+        {/* Bandeau de cadrage — session accompagnée, pas un formulaire en solo. */}
         <div className="rounded-2xl border border-teal-200/40 bg-teal-50/40 px-5 py-4 text-[12.5px] leading-relaxed text-navy-900">
-          <p className="font-medium">Étape post-onboarding — cabinet activé</p>
-          <p className="mt-1 text-charcoal/75">
-            L'objectif est de démarrer proprement, pas de tout formaliser d'un coup. Le référentiel
-            pourra être enrichi progressivement avec l'équipe KOVELA.
-          </p>
+          <p className="font-medium">Session de cadrage accompagnée — pas un formulaire à remplir seul</p>
+          <ul className="mt-2 space-y-1 text-charcoal/75">
+            <li>— Vous commencez par 2 ou 3 interventions prioritaires.</li>
+            <li>— KOVELA prépare une trame et vous aide à la formaliser.</li>
+            <li>— Vous validez ou ajustez ; KOVELA relit avant tout usage opérationnel.</li>
+            <li>— Le reste s'enrichit progressivement avec l'équipe.</li>
+          </ul>
+        </div>
+
+        {/* Statut référentiel — lecture simple, prototype visuel. */}
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-[11.5px] leading-relaxed text-charcoal/70 ring-1 ring-navy-900/[0.06]">
+          <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+            Statut référentiel
+          </span>
+          <span className="flex items-center gap-1.5 rounded-md bg-amber-50/70 px-2 py-0.5 text-[10.5px] font-semibold text-amber-800 ring-1 ring-amber-100">
+            <span className="h-1 w-1 rounded-full bg-amber-500" />
+            Brouillon
+          </span>
+          <span className="text-charcoal/30">→</span>
+          <span className="rounded-md bg-navy-50 px-2 py-0.5 text-[10.5px] font-medium text-navy-700 ring-1 ring-navy-100">
+            À relire avec KOVELA
+          </span>
+          <span className="text-charcoal/30">→</span>
+          <span className="rounded-md bg-navy-50 px-2 py-0.5 text-[10.5px] font-medium text-navy-700/70 ring-1 ring-navy-100">
+            Validé KOVELA
+          </span>
+          <span className="text-charcoal/30">→</span>
+          <span className="rounded-md bg-navy-50 px-2 py-0.5 text-[10.5px] font-medium text-navy-700/50 ring-1 ring-navy-100">
+            Actif
+          </span>
+          <span className="flex-1 min-w-[240px] text-charcoal/55">
+            Statut prototype : brouillon — relecture KOVELA obligatoire avant usage opérationnel.
+          </span>
         </div>
 
         {/* Bandeau prototype + doctrine */}
@@ -1171,6 +1242,7 @@ export default function ReferentielFonctionnementPage() {
                                   updateJalon(i.key, j.id, { suitesAttendues: e.target.value })
                                 }
                               />
+                              <MedicalGuard value={j.suitesAttendues} />
                             </Field>
                             <Field label="À transmettre au cabinet" className="sm:col-span-2">
                               <textarea
@@ -1181,6 +1253,7 @@ export default function ReferentielFonctionnementPage() {
                                   updateJalon(i.key, j.id, { aTransmettre: e.target.value })
                                 }
                               />
+                              <MedicalGuard value={j.aTransmettre} />
                             </Field>
                           </div>
                         </div>
@@ -1208,6 +1281,7 @@ export default function ReferentielFonctionnementPage() {
                           setIntervention(i.key, { pointsRappelables: e.target.value })
                         }
                       />
+                      <MedicalGuard value={i.pointsRappelables} />
                     </Field>
                     <Field label="Sujets à transmettre au cabinet" className="sm:col-span-2">
                       <textarea
@@ -1218,6 +1292,7 @@ export default function ReferentielFonctionnementPage() {
                           setIntervention(i.key, { sujetsTransmissionCabinet: e.target.value })
                         }
                       />
+                      <MedicalGuard value={i.sujetsTransmissionCabinet} />
                     </Field>
                     <Field
                       label="Copier depuis une autre intervention prioritaire"
@@ -1337,6 +1412,7 @@ export default function ReferentielFonctionnementPage() {
                             })
                           }
                         />
+                        <MedicalGuard value={i.suiviHabituel.conduiteKovela} />
                       </Field>
                     </div>
                   </div>
@@ -1361,6 +1437,7 @@ export default function ReferentielFonctionnementPage() {
                             setReglesBlock(i.key, "aTransmettre", { situations: e.target.value })
                           }
                         />
+                        <MedicalGuard value={i.aTransmettre.situations} />
                       </Field>
                       <Field label="Délai souhaité">
                         <input
@@ -1417,6 +1494,7 @@ export default function ReferentielFonctionnementPage() {
                             setReglesBlock(i.key, "prioritaire", { situations: e.target.value })
                           }
                         />
+                        <MedicalGuard value={i.prioritaire.situations} />
                       </Field>
                       <Field label="Canal prioritaire">
                         <input
@@ -1476,6 +1554,7 @@ export default function ReferentielFonctionnementPage() {
                       value={r.consignes.kovelaPeutRappeler}
                       onChange={(e) => setConsignes("kovelaPeutRappeler", e.target.value)}
                     />
+                    <MedicalGuard value={r.consignes.kovelaPeutRappeler} />
                   </Field>
                   <Field label="Ce que KOVELA ne doit jamais interpréter ou reformuler">
                     <textarea
@@ -1484,6 +1563,7 @@ export default function ReferentielFonctionnementPage() {
                       value={r.consignes.kovelaNeDoitPasReformuler}
                       onChange={(e) => setConsignes("kovelaNeDoitPasReformuler", e.target.value)}
                     />
+                    <MedicalGuard value={r.consignes.kovelaNeDoitPasReformuler} />
                   </Field>
                   <Field label="Les sujets qui doivent toujours revenir au cabinet">
                     <textarea
@@ -1494,6 +1574,7 @@ export default function ReferentielFonctionnementPage() {
                         setConsignes("questionsATransmettreCabinet", e.target.value)
                       }
                     />
+                    <MedicalGuard value={r.consignes.questionsATransmettreCabinet} />
                   </Field>
                 </div>
               </SubSection>
@@ -1565,6 +1646,7 @@ export default function ReferentielFonctionnementPage() {
                                   setIntervention(i.key, { photoFloueConduite: e.target.value })
                                 }
                               />
+                              <MedicalGuard value={i.photoFloueConduite} />
                             </Field>
                           </div>
                         )}
@@ -1852,6 +1934,7 @@ export default function ReferentielFonctionnementPage() {
                               setCas(c.key, { conduiteAutorisee: e.target.value })
                             }
                           />
+                          <MedicalGuard value={c.conduiteAutorisee} />
                         </Field>
                         <Field label="Transmettre au cabinet">
                           <Toggle

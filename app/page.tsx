@@ -195,6 +195,22 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Baseline terrain — repère opérationnel, pas une promesse de résultat. */}
+      <section className="border-b border-navy-900/[0.06] bg-bone/60">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-5 text-[12.5px] leading-relaxed text-charcoal/70">
+          <span className="rounded-md bg-white px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-navy-700 ring-1 ring-navy-100">
+            Baseline terrain
+          </span>
+          <span className="flex-1 min-w-[280px]">
+            En suivi manuel WhatsApp / audio, un patient post-opératoire représente environ
+            <span className="font-medium text-navy-900"> 60 à 90 minutes</span> de travail humain
+            sur <span className="font-medium text-navy-900">3 à 15 jours</span> selon l'intervention.
+            KOVELA structure ce temps via référentiel cabinet, interface superviseur, comptes-rendus
+            factuels et IA assistive.
+          </span>
+        </div>
+      </section>
+
       {/* Section 2 — Le problème */}
       <section id="probleme" className="mx-auto max-w-6xl px-6 py-24">
         <Eyebrow>Le constat</Eyebrow>
@@ -415,11 +431,11 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section 7bis — Réputation & expérience patient */}
+      {/* Section 7bis — Expérience patient & qualité du suivi */}
       <section className="mx-auto max-w-6xl px-6 py-24">
-        <Eyebrow>Expérience patient & réputation cabinet</Eyebrow>
+        <Eyebrow>Expérience patient & qualité du suivi</Eyebrow>
         <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
-          Une meilleure expérience post-op, c'est aussi une réputation mieux maîtrisée.
+          Une meilleure expérience post-op, c'est aussi une qualité perçue du suivi mieux structurée.
         </h2>
         <p className="mt-6 max-w-3xl text-[14.5px] leading-relaxed text-charcoal/70">
           Le post-opératoire est souvent l'un des moments qui marque le plus l'expérience patient.
@@ -433,7 +449,7 @@ export default function Landing() {
             { t: "Cabinet soulagé", d: "Le cabinet centralise les échanges et réduit la charge sur les assistantes." },
             { t: "Chirurgien serein", d: "Visibilité sans charge supplémentaire ; aucun transfert de responsabilité." },
             { t: "Historique exploitable", d: "Comptes-rendus factuels et logs : un dossier de coordination clair." },
-            { t: "Image post-op maîtrisée", d: "Une organisation plus claire du post-op peut aider à préserver la qualité perçue." },
+            { t: "Suivi post-op structuré", d: "Une organisation plus claire du post-op aide à préserver la qualité perçue du suivi." },
             { t: "Service opéré", d: "Une équipe humaine spécialisée prend en charge le flux, pas un logiciel à gérer." },
           ].map((b) => (
             <div
@@ -450,12 +466,11 @@ export default function Landing() {
         </div>
         <p className="mt-10 max-w-3xl font-display text-[24px] italic leading-tight tracking-[-0.01em] text-navy-900">
           Une expérience post-op mieux structurée contribue à la satisfaction patient et à la
-          réputation du cabinet.
+          qualité perçue du suivi par le cabinet.
         </p>
         <p className="mt-5 max-w-3xl text-[11px] leading-relaxed text-charcoal/45">
-          KOVELA ne garantit pas la satisfaction patient ni la réputation du chirurgien. KOVELA
-          organise et trace le suivi post-opératoire pour aider le cabinet à mieux maîtriser son
-          image post-opératoire.
+          KOVELA ne garantit pas la satisfaction patient. KOVELA organise et trace le suivi
+          post-opératoire pour aider le cabinet à mieux structurer la qualité perçue de son suivi.
         </p>
       </section>
 
