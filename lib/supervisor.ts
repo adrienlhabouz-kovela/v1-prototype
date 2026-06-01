@@ -786,7 +786,12 @@ export type ScheduledMessageKind =
   | "pre_cloture"
   | "cloture";
 
-export type ScheduledMessageStatus = "prevu" | "a_valider" | "envoye" | "annule";
+export type ScheduledMessageStatus =
+  | "prevu"
+  | "a_valider"
+  | "en_retard"
+  | "envoye"
+  | "annule";
 
 export interface ScheduledMessage {
   id: string;
@@ -811,13 +816,15 @@ export const scheduledMessageKindLabels: Record<ScheduledMessageKind, string> = 
 export const scheduledMessageStatusLabels: Record<ScheduledMessageStatus, string> = {
   prevu: "Prévu",
   a_valider: "À valider",
-  envoye: "Envoyé",
+  en_retard: "En retard",
+  envoye: "Envoyé (simulation)",
   annule: "Annulé",
 };
 
 export const scheduledMessageStatusStyles: Record<ScheduledMessageStatus, string> = {
   prevu: "bg-navy-900/[0.04] text-charcoal/70 ring-navy-900/[0.06]",
   a_valider: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
+  en_retard: "bg-amber-100/70 text-amber-900 ring-amber-400/40",
   envoye: "bg-teal-50/60 text-teal-700 ring-teal-100/70",
   annule: "bg-navy-900/[0.04] text-charcoal/45 ring-navy-900/[0.06]",
 };
@@ -876,12 +883,15 @@ export function getScheduledMessages(
     .map((s) => parseInt(s.replace("J+", ""), 10))
     .filter((n) => Number.isFinite(n));
 
+  // Statut dérivé — un message dépassé non envoyé reste visible :
+  // future > 24h → prevu, fenêtre ±24h → a_valider, dépassé → en_retard.
+  // Le statut "envoye" n'est jamais inféré : il est appliqué uniquement
+  // lorsque la superviseuse simule l'envoi (set local côté composant).
   const computeStatus = (targetMs: number): ScheduledMessageStatus => {
-    if (patient.status === "cloture") return "envoye";
     const diffH = (targetMs - now) / 3_600_000;
     if (diffH > 24) return "prevu";
     if (diffH >= -24) return "a_valider";
-    return "envoye";
+    return "en_retard";
   };
 
   const make = (
@@ -971,7 +981,7 @@ export function getScheduledMessages(
   return messages;
 }
 
-// Prochain message à actionner (prevu ou a_valider, le plus proche).
+// Prochain message à actionner — priorité : en retard > à valider > prévu.
 export function getNextScheduledMessage(
   patient: Patient,
   ctx: SupervisorCtx,
@@ -979,25 +989,28 @@ export function getNextScheduledMessage(
 ): ScheduledMessage | null {
   const all = getScheduledMessages(patient, ctx, surgeon);
   return (
+    all.find((m) => m.status === "en_retard") ??
     all.find((m) => m.status === "a_valider") ??
     all.find((m) => m.status === "prevu") ??
     null
   );
 }
 
-// Étiquette courte pour l'inbox — uniquement si un message est prévu
-// aujourd'hui (fenêtre ±24h). Retourne null sinon pour ne pas surcharger.
+// Étiquette courte pour l'inbox — affichée si un message est à valider
+// aujourd'hui OU si un message est en retard. Retourne null sinon.
 export function getTodayScheduledLabel(
   patient: Patient,
   ctx: SupervisorCtx
 ): string | null {
-  const now = ctx.now ?? Date.now();
   const messages = getScheduledMessages(patient, ctx);
-  const today = messages.find((m) => {
-    if (m.status !== "a_valider") return false;
-    const t = new Date(m.targetDate).getTime();
-    return Math.abs(now - t) <= 36 * 3_600_000; // tolérance large pour le prototype
-  });
+  const late = messages.find((m) => m.status === "en_retard");
+  if (late) {
+    if (late.kind === "relance_silencieux") return "Relance en retard";
+    if (late.kind === "cloture" || late.kind === "pre_cloture")
+      return "Clôture en retard";
+    return "Message en retard";
+  }
+  const today = messages.find((m) => m.status === "a_valider");
   if (!today) return null;
   if (today.kind === "relance_silencieux") return "Relance prévue";
   if (today.kind === "cloture" || today.kind === "pre_cloture") return "Clôture prévue";

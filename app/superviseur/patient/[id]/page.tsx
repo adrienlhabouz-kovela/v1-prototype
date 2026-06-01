@@ -163,8 +163,12 @@ export default function PatientFiche() {
     sentScheduledIds.has(m.id) ? { ...m, status: "envoye" as const } : m
   );
   const nextScheduled = getNextScheduledMessage(patient, ctx, surgeon);
+  // Ouvre le bloc messages programmés automatiquement si action requise :
+  // un message à valider aujourd'hui OU un message en retard non envoyé.
   const hasTodayScheduled = scheduledMessages.some(
-    (m) => m.status === "a_valider" && !sentScheduledIds.has(m.id)
+    (m) =>
+      (m.status === "a_valider" || m.status === "en_retard") &&
+      !sentScheduledIds.has(m.id)
   );
 
   function sendScheduledNow(m: ScheduledMessage) {
@@ -903,14 +907,15 @@ export default function PatientFiche() {
             </summary>
             <div className="space-y-2 border-t border-navy-900/[0.05] px-5 py-4">
               <p className="rounded-lg bg-bone/60 px-3 py-2 text-[11px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
-                Prototype — messages dérivés du référentiel et de la fenêtre de suivi.
-                Aucun envoi automatique. La superviseuse prévisualise puis déclenche
-                manuellement.
+                Messages programmés selon le référentiel du chirurgien (jalons,
+                jours de contact, pré-clôture, clôture). Prototype : aucun envoi
+                automatique. Chaque envoi est simulé et ajouté à la timeline locale.
               </p>
               {scheduledMessages.map((m) => {
                 const dt = new Date(m.targetDate);
                 const dateLabel = dt.toLocaleDateString("fr-FR");
                 const sent = m.status === "envoye";
+                const late = m.status === "en_retard";
                 return (
                   <div
                     key={m.id}
@@ -925,7 +930,8 @@ export default function PatientFiche() {
                       </Badge>
                     </div>
                     <p className="mt-1 text-[11px] tracking-tight text-charcoal/55">
-                      Prévu le {dateLabel} · template {m.templateKey}
+                      {late ? "Échéance dépassée le " : "Prévu le "}
+                      {dateLabel} · template {m.templateKey}
                     </p>
                     <div className="mt-2.5 flex flex-wrap gap-2">
                       <Button variant="subtle" onClick={() => setScheduledPreview(m)}>
@@ -933,7 +939,7 @@ export default function PatientFiche() {
                       </Button>
                       {!sent && (
                         <Button variant="primary" onClick={() => sendScheduledNow(m)}>
-                          Envoyer maintenant
+                          Simuler l'envoi
                         </Button>
                       )}
                     </div>
@@ -1190,7 +1196,9 @@ export default function PatientFiche() {
                 {scheduledMessageStatusLabels[scheduledPreview.status]}
               </Badge>
               <span className="text-[11.5px] tracking-tight text-charcoal/55">
-                Prévu le{" "}
+                {scheduledPreview.status === "en_retard"
+                  ? "Échéance dépassée le "
+                  : "Prévu le "}
                 {new Date(scheduledPreview.targetDate).toLocaleDateString("fr-FR")} · template{" "}
                 {scheduledPreview.templateKey}
               </span>
@@ -1198,9 +1206,9 @@ export default function PatientFiche() {
             <pre className="whitespace-pre-wrap rounded-xl bg-bone/60 p-4 font-sans text-[13px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.04]">
               {scheduledPreview.template}
             </pre>
-            <p className="rounded-lg bg-bone/60 px-3 py-2 text-[11px] leading-relaxed text-charcoal/60 ring-1 ring-navy-900/[0.04]">
-              Prototype — aucun envoi automatique. L'envoi via &laquo; Envoyer maintenant
-              &raquo; ajoute ce texte à la timeline du patient.
+            <p className="rounded-lg bg-amber-50/40 px-3 py-2 text-[11.5px] leading-relaxed text-amber-900 ring-1 ring-amber-200/50">
+              <span className="font-semibold">Prototype :</span> ce message est
+              ajouté à la timeline locale. Aucun envoi réel n'est effectué.
             </p>
             <div className="flex flex-wrap justify-end gap-2">
               <Button variant="ghost" onClick={() => setScheduledPreview(null)}>
@@ -1211,7 +1219,7 @@ export default function PatientFiche() {
                   variant="primary"
                   onClick={() => sendScheduledNow(scheduledPreview)}
                 >
-                  Envoyer maintenant
+                  Simuler l'envoi
                 </Button>
               )}
             </div>
