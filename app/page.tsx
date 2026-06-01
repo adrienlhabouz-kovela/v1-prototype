@@ -586,8 +586,8 @@ export default function Landing() {
               {[
                 "Recherche de profil",
                 "Recrutement",
-                "Formation et montée en compétence",
-                "Congés et indisponibilités",
+                "Formation initiale et montée en compétence",
+                "Congés, absences et indisponibilités",
                 "Remplacement",
                 "Management quotidien",
                 "Coût fixe déconnecté du volume patient",
@@ -625,9 +625,9 @@ export default function Landing() {
         </div>
 
         <p className="mt-8 max-w-3xl text-[11.5px] leading-relaxed text-charcoal/55">
-          Le cabinet n&apos;a pas toujours la bande passante pour structurer seul ce flux. Les
-          conditions peuvent être ajustées selon le volume patient, le niveau d&apos;accompagnement
-          et la configuration du cabinet.
+          Le cabinet conserve la main, sans porter seul la charge d&apos;organisation du suivi.
+          Les conditions pilotes peuvent être ajustées selon le volume patient, le niveau
+          d&apos;accompagnement et la configuration du cabinet.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-2.5">
