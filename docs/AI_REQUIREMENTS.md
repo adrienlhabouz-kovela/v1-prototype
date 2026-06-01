@@ -27,10 +27,18 @@ Les **5 fonctions** suivantes constituent le périmètre IA pour la V1. Toutes s
 ### 1.2 Préparation de compte-rendu factuel
 - **Entrée** : messages principaux + relances + actions KOVELA réalisées sur la période.
 - **Sortie attendue** : brouillon de CR structuré (patient, période, messages principaux,
-  relances, actions KOVELA, escalades éventuelles, statut final à compléter).
-- **Wording obligatoire** : *« Brouillon de CR à valider »* — **jamais** *« Compte-rendu
-  médical automatique »*.
-- **Gating produit** : brouillon → validé en interne → disponible pour le chirurgien (cf.
+  relances, actions KOVELA, **transmission cabinet**, statut final à compléter).
+- **Wording obligatoire en sortie IA** : *« Brouillon IA — à relire, corriger si besoin, puis
+  valider (KOVELA) »* — **jamais** *« Compte-rendu médical automatique »*.
+- **Modale UX validée** (cf. `DECISIONS_LOG.md` § 7) :
+  - **Structure** : A. Résumé patient · B. Brouillon CR factuel structuré (Messages
+    principaux, Relances, Actions KOVELA, Transmission cabinet, Statut final) · C. Checklist
+    avant validation · D. Rappel doctrine.
+  - **Boutons** : **Relire et valider** (primary) · **Modifier le brouillon** (secondary) ·
+    **Rejeter** (ghost). Pas de bouton « Accepter ». Pas de mention « escalade » côté UI.
+- **Workflow canonique** : IA prépare → superviseuse relit → corrige si besoin → valide →
+  CR disponible chirurgien. Cf. `DECISIONS_LOG.md` § 6.
+- **Gating produit** : brouillon → validé KOVELA → disponible chirurgien (cf.
   PRODUCT_SCOPE.md §12).
 - **Temps estimé gagné** : ~7 min.
 

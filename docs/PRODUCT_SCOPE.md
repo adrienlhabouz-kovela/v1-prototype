@@ -2,6 +2,14 @@
 
 > **Lecture** : chaque module liste son **état dans le prototype**, son **destin V1**
 > (à conserver / à reconstruire), et ce qui est **reporté en V2**.
+>
+> **Décisions canoniques** : [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) (mise à jour 2026-06-01).
+> Tous les arbitrages messaging, pricing, workflow CR et priorités produit y figurent.
+>
+> **Prochaine priorité produit (suite à l'audit du 2026-06-01)** : **inbox superviseur scalable**
+> (recherche, filtres statut / retard / J+, tri par urgence opérationnelle, séparation CR
+> brouillon IA / à relire / à rendre disponible, capacité 60–80–120 patients par
+> superviseuse). Cf. `DECISIONS_LOG.md` § 13.
 
 ---
 
@@ -265,10 +273,16 @@ en 4 grandes zones :
   - **Reformulation** (~45 sec).
   - **Compilation factuelle d'escalade** (~6 min).
 - Disclaimer obligatoire affiché : *« Suggestion IA — à valider par un humain »*.
-- Boutons Accepter / Modifier / Refuser → log dédié (`ia_utilisee` + `ia_suggestion`).
+- Modale brouillon CR (workflow validé) : structure A. Résumé patient · B. Brouillon CR
+  factuel structuré · C. Checklist avant validation · D. Rappel doctrine.
+- Boutons modale brouillon CR : **Relire et valider** · **Modifier le brouillon** · **Rejeter**
+  → log dédié (`ia_utilisee` + `ia_suggestion`).
 - Prompt versionné fictif `v1.2`.
-- **Jamais autonome côté patient. Jamais d'analyse photo. Jamais de décision d'escalade.
-  Aucun scoring.**
+- **Jamais autonome côté patient. Jamais d'analyse photo. Jamais de transmission cabinet
+  sans validation humaine. Aucun scoring.**
+
+> Workflow CR canonique : `IA prépare → superviseuse relit → corrige si besoin → valide →
+> CR disponible chirurgien`. Cf. [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) § 6 et § 7.
 
 ### V1
 - Vraie IA derrière un **gateway serveur** : redaction PII en entrée, redaction en sortie,
@@ -284,15 +298,21 @@ en 4 grandes zones :
 
 ---
 
-## 12. Compte-rendu (CR) — gating à 3 états
+## 12. Compte-rendu (CR) — workflow IA → superviseuse → chirurgien
 
 ### Prototype
-- États : **brouillon** (visible superviseur seul) → **validé en interne** (visible
-  superviseur + admin) → **disponible pour le chirurgien** (visible chirurgien).
+- **Chaîne canonique** : *IA prépare / préremplit le brouillon → superviseuse relit →
+  corrige si nécessaire → valide → CR disponible chirurgien*.
+- **États / wording validés** : `Aucun CR préparé` · `Brouillon IA — à relire et valider` ·
+  `CR validé KOVELA` · `CR disponible chirurgien`. Côté agrégats : `CR en file de validation`
+  et `CR en retard de validation` (jamais « CR en retard » seul).
+- États techniques `ClinicalReport` (`lib/types.ts`) : `brouillon` → `valide` → `disponible`.
 - Le contenu est **normalisé à la publication** (les mentions *« Brouillon / à valider par
   un humain »* sont retirées et remplacées par *« Compte-rendu factuel préparé et rendu
   disponible par l'équipe KOVELA. »*).
 - Côté chirurgien : **uniquement les CR `disponible`** s'affichent.
+
+> Référence canonique : [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) § 6.
 
 ### V1
 - Schéma `ClinicalReport` à conserver. Persistance + historique (un CR peut être modifié,
@@ -338,11 +358,24 @@ en 4 grandes zones :
 - Affichage en clair sur le dashboard chirurgien et dans la fiche prospect CRM.
 - **Aucune donnée bancaire, aucun paiement réel, aucune clé API.**
 
+### Pricing landing validé (référence canonique)
+> Voir [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) § 2 pour le détail et les règles d'écriture.
+
+- **690 € HT / mois** — accès mensuel au service opéré KOVELA, facturé le 1er du mois.
+- **+ 80 € HT / patient activé** — part variable d'usage, facturée en fin de mois selon les
+  patients réellement suivis.
+- **Définition canonique** : *Patient activé = onboarding validé + suivi lancé.*
+- **Angle pricing** : « Moins qu'un mi-temps. Plus qu'un outil. »
+- **Phrase clé** : « Le fixe donne accès au service. Le variable suit l'usage réel. »
+
+**Wording interdit** : 50 € / patient (ancienne hypothèse), abonnement SaaS, forfait illimité,
+patients illimités, sur devis (section pricing), gratuit lié au pricing.
+
 ### V1
 - Vraie intégration GoCardless (mandat SEPA, webhooks, réconciliation).
-- Facturation automatisée : modèle économique KOVELA (abonnement mensuel + variable par
-  patient activé). Le détail des montants est porté par le code (`lib/mock-data.ts`
-  constante `PRICING`) et par les CGV cabinet, pas par cette documentation technique.
+- Facturation automatisée alignée sur le pricing canonique ci-dessus. Le détail des montants
+  est porté par le code (`lib/mock-data.ts` constante `PRICING`) et par les CGV cabinet, pas
+  par cette documentation technique.
 - Gestion des échecs de prélèvement, relances, suspension.
 
 ### V2

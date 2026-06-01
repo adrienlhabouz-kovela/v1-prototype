@@ -87,15 +87,20 @@ et les pills en haut.
 > Pour des **scripts détaillés par audience** (Émilien lead dev, chirurgien, investisseur,
 > cabinet Aumans — versions courtes et complètes), voir [`DEMO_SCRIPTS.md`](./DEMO_SCRIPTS.md).
 
-1. **Landing** (`/`) — *« Un service opéré, pas un logiciel de plus. »* Hero, problème, solution,
-   comment ça marche, IA encadrée, réputation, sécurité prudente, CTA *Demander une démo*.
+1. **Landing V1 validée** (`/`) — *« Le suivi post-opératoire, opéré pour votre cabinet. »* Hero,
+   constat cabinet, solution (5 piliers), ce qui change pour votre cabinet, baseline terrain
+   (60 à 90 min / patient sur 3 à 15 jours), comment ça marche (5 étapes), IA assistive
+   encadrée, supervision compacte, cadre clair, **tarification** (690 € HT/mois + 80 € HT/patient
+   activé · « Moins qu'un mi-temps. Plus qu'un outil. »), CTA *Demander une démo* / *Discuter
+   du pilote*. Référence canonique : [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) § 1.
 2. **Admin** (`/admin`) — bloc *Qualité & délais* (30 s pour piloter), Actions prioritaires
    *Voir → Sans superviseur* → **Attribuer** un patient à un superviseur.
 3. **CRM** (`/admin/crm`) — *Performance commerciale* (KPI globaux + table par sales) ; ouvrir
    une fiche prospect (statut, sales owner, note, démo, relance, *Envoyer le lien de mise en place*).
 4. **Sales** (`/sales`) — *Vu en tant que Sarah* → 8 KPI personnels, table de portefeuille,
    relances dues. Basculer *Vu en tant que Maxime* pour montrer une autre verticale.
-5. **Mise en place cabinet** (`/chirurgien/onboarding`) — wizard court (5 à 7 min, 6 étapes :
+5. **Mise en place cabinet** (`/chirurgien/onboarding`) — wizard 6 étapes (**15 min** ·
+   mise en place initiale, puis **30–60 min** · référentiel essentiel accompagné par KOVELA :
    Votre cabinet, Lieux, Contacts autorisés, Documents de service, Prélèvement, Validation).
    À l'étape *Documents de service*, ouvrir un doc → *Marquer comme lu* (répéter) → cocher
    les acceptations → *Valider les documents de service*. À l'étape *Prélèvement*, cliquer

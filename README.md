@@ -2,14 +2,16 @@
 
 > **Avertissement.** Ce dépôt est un **prototype front-end de démonstration**.
 > Ce n'est **pas** une plateforme de production HDS. Il ne contient **aucune donnée réelle** :
-> toutes les données (patients, chirurgiens, messages, CR, escalades) sont **fictives et mockées localement**.
+> toutes les données (patients, chirurgiens, messages, CR, transmissions cabinet) sont **fictives et mockées localement**.
 > Il sert à **visualiser, tester et démontrer** les parcours clés avant développement industriel.
 
 **Doctrine produit (rappelée dans toute l'UI) :**
-KOVELA ne décide pas médicalement. KOVELA **structure, trace, priorise opérationnellement et escalade**.
+KOVELA ne décide pas médicalement. KOVELA **organise les échanges, documente le suivi et transmet au cabinet selon les règles définies**.
 L'IA est **uniquement assistive, interne, loggée, désactivable et human-in-the-loop**.
 Elle ne répond jamais seule au patient, ne diagnostique jamais, ne qualifie jamais un symptôme,
-n'analyse jamais médicalement les photos et ne décide jamais d'escalader.
+n'analyse jamais médicalement les photos et ne décide jamais de transmission cabinet sans validation humaine.
+
+> **Décisions canoniques** : voir [`docs/DECISIONS_LOG.md`](docs/DECISIONS_LOG.md) — source de vérité unique des arbitrages produit, messaging et pricing validés (mise à jour 2026-06-01).
 
 ---
 
@@ -128,8 +130,9 @@ lib/
   - 4 onboarding incomplet, 5 silencieux, 3 escalade ouverte, 5 CR en attente, 3 clôturés, 10 actifs ;
   - ~4 patients **sans superviseur** (à attribuer côté admin).
 - Messages, **photos/audios placeholders**, notes internes, escalades, CR.
-- Pricing : **690 € HT / mois + 50 € HT / patient activé** (`PRICING`).
-  *Patient activé = onboarding validé + suivi lancé.*
+- Pricing landing validé : **690 € HT / mois + 80 € HT / patient activé** (offre pilote).
+  *Patient activé = onboarding validé + suivi lancé.* Référence canonique :
+  [`docs/DECISIONS_LOG.md`](docs/DECISIONS_LOG.md) § 2.
 
 ---
 
