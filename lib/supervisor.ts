@@ -770,3 +770,236 @@ export function getStructuredTimeline(
   events.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
   return events;
 }
+
+// ---------------------------------------------------------------------------
+// Messages programmés — dérivés du référentiel chirurgien + fenêtre de suivi.
+// Prototype uniquement : aucun envoi automatique, aucun backend, aucune
+// automatisation. Permet à la superviseuse de visualiser, prévisualiser et
+// déclencher manuellement les contacts patient programmés.
+// ---------------------------------------------------------------------------
+
+export type ScheduledMessageKind =
+  | "debut_suivi"
+  | "point_suivi"
+  | "photo_attendue"
+  | "relance_silencieux"
+  | "pre_cloture"
+  | "cloture";
+
+export type ScheduledMessageStatus = "prevu" | "a_valider" | "envoye" | "annule";
+
+export interface ScheduledMessage {
+  id: string;
+  kind: ScheduledMessageKind;
+  label: string; // ex : "Point de suivi · J+5"
+  targetDay: number; // jour post-op cible
+  targetDate: string; // ISO
+  status: ScheduledMessageStatus;
+  templateKey: string;
+  template: string; // texte interpolé prêt à envoyer
+}
+
+export const scheduledMessageKindLabels: Record<ScheduledMessageKind, string> = {
+  debut_suivi: "Début de suivi",
+  point_suivi: "Point de suivi",
+  photo_attendue: "Demande de photo",
+  relance_silencieux: "Relance patient",
+  pre_cloture: "Pré-clôture",
+  cloture: "Clôture",
+};
+
+export const scheduledMessageStatusLabels: Record<ScheduledMessageStatus, string> = {
+  prevu: "Prévu",
+  a_valider: "À valider",
+  envoye: "Envoyé",
+  annule: "Annulé",
+};
+
+export const scheduledMessageStatusStyles: Record<ScheduledMessageStatus, string> = {
+  prevu: "bg-navy-900/[0.04] text-charcoal/70 ring-navy-900/[0.06]",
+  a_valider: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
+  envoye: "bg-teal-50/60 text-teal-700 ring-teal-100/70",
+  annule: "bg-navy-900/[0.04] text-charcoal/45 ring-navy-900/[0.06]",
+};
+
+// Templates — sobres, humains, non médicaux. Pas de qualification d'état
+// patient, pas de diagnostic, pas d'instructions médicales. Rappel 15/112
+// dans le message de début uniquement.
+const SCHEDULED_TEMPLATES: Record<ScheduledMessageKind, string> = {
+  debut_suivi: `Bonjour [Prénom],
+Nous sommes l'équipe KOVELA, en lien avec le cabinet du Dr [Nom] pour votre suivi post-opératoire.
+Nous reviendrons vers vous aux moments prévus afin de prendre de vos nouvelles et transmettre au cabinet les éléments utiles si nécessaire.
+En cas de situation urgente ou inquiétante, contactez directement les services d'urgence au 15 / 112.`,
+  point_suivi: `Bonjour [Prénom],
+Comment vous sentez-vous aujourd'hui ?
+Pouvez-vous nous indiquer si tout se passe comme prévu depuis votre intervention ?`,
+  photo_attendue: `Bonjour [Prénom],
+Dans le cadre du suivi prévu par le cabinet, pouvez-vous nous transmettre la photo attendue aujourd'hui, si cela vous a bien été demandé ?
+KOVELA la transmettra selon les règles définies par le cabinet.`,
+  relance_silencieux: `Bonjour [Prénom],
+Nous revenons vers vous dans le cadre de votre suivi post-opératoire.
+Pouvez-vous simplement nous confirmer que vous avez bien reçu notre message ?`,
+  pre_cloture: `Bonjour [Prénom],
+Votre période de suivi KOVELA arrive à son terme.
+Si vous souhaitez nous signaler un dernier élément utile pour le cabinet, vous pouvez le faire ici.`,
+  cloture: `Merci pour vos retours.
+Votre suivi KOVELA est désormais clôturé.
+Pour toute question ultérieure, vous pouvez vous rapprocher directement du cabinet du Dr [Nom].`,
+};
+
+function interpolateTemplate(
+  tpl: string,
+  patient: Patient,
+  surgeon: Surgeon | undefined
+): string {
+  const firstName = patient.name.split(" ")[0] ?? patient.name;
+  const surgeonLastName = (surgeon?.name ?? "").replace(/^Dr\.?\s*/i, "");
+  return tpl
+    .replaceAll("[Prénom]", firstName)
+    .replaceAll("[Nom]", surgeonLastName || "—");
+}
+
+// Dérive la liste de messages programmés pour un patient, à partir de la
+// fenêtre de suivi et du protocole. Le statut est dérivé approximativement :
+// - targetDate dans > 24h → prevu
+// - targetDate dans les ±24h → a_valider
+// - targetDate dépassée → envoye (approximation prototype)
+export function getScheduledMessages(
+  patient: Patient,
+  ctx: SupervisorCtx,
+  surgeon?: Surgeon
+): ScheduledMessage[] {
+  const now = ctx.now ?? Date.now();
+  const startMs = new Date(patient.interventionDate).getTime();
+  const window = getFollowUpWindow(patient, now);
+  const jalons = (patient.protocol.match(/J\+(\d+)/g) ?? [])
+    .map((s) => parseInt(s.replace("J+", ""), 10))
+    .filter((n) => Number.isFinite(n));
+
+  const computeStatus = (targetMs: number): ScheduledMessageStatus => {
+    if (patient.status === "cloture") return "envoye";
+    const diffH = (targetMs - now) / 3_600_000;
+    if (diffH > 24) return "prevu";
+    if (diffH >= -24) return "a_valider";
+    return "envoye";
+  };
+
+  const make = (
+    suffix: string,
+    kind: ScheduledMessageKind,
+    label: string,
+    targetDay: number,
+    targetMs: number,
+    overrideStatus?: ScheduledMessageStatus
+  ): ScheduledMessage => ({
+    id: `${patient.id}-${suffix}`,
+    kind,
+    label,
+    targetDay,
+    targetDate: new Date(targetMs).toISOString(),
+    status: overrideStatus ?? computeStatus(targetMs),
+    templateKey: kind,
+    template: interpolateTemplate(SCHEDULED_TEMPLATES[kind], patient, surgeon),
+  });
+
+  const messages: ScheduledMessage[] = [];
+
+  // 1. Début de suivi — à J+0.
+  messages.push(make("debut", "debut_suivi", "Début de suivi · J+0", 0, startMs));
+
+  // 2. Points de suivi aux jalons protocole.
+  jalons.forEach((j) => {
+    messages.push(
+      make(
+        `jalon-${j}`,
+        "point_suivi",
+        `Point de suivi · J+${j}`,
+        j,
+        startMs + j * 86_400_000
+      )
+    );
+  });
+
+  // 3. Photo attendue — sur le 1er jalon si présent.
+  if (jalons.length > 0) {
+    const j = jalons[0];
+    messages.push(
+      make(
+        `photo-${j}`,
+        "photo_attendue",
+        `Demande de photo · J+${j}`,
+        j,
+        startMs + j * 86_400_000
+      )
+    );
+  }
+
+  // 4. Relance patient silencieux — uniquement si statut actuel le justifie.
+  if (patient.status === "silencieux") {
+    messages.push(
+      make("relance", "relance_silencieux", "Relance patient", window.currentDay, now, "a_valider")
+    );
+  }
+
+  // 5. Pré-clôture — à J+(endDay - 1).
+  const preDay = Math.max(0, window.plannedEndDay - 1);
+  messages.push(
+    make(
+      "pre-cloture",
+      "pre_cloture",
+      `Pré-clôture · J+${preDay}`,
+      preDay,
+      startMs + preDay * 86_400_000
+    )
+  );
+
+  // 6. Clôture — à J+endDay.
+  messages.push(
+    make(
+      "cloture",
+      "cloture",
+      `Clôture · J+${window.plannedEndDay}`,
+      window.plannedEndDay,
+      startMs + window.plannedEndDay * 86_400_000
+    )
+  );
+
+  // Tri chronologique.
+  messages.sort(
+    (a, b) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime()
+  );
+  return messages;
+}
+
+// Prochain message à actionner (prevu ou a_valider, le plus proche).
+export function getNextScheduledMessage(
+  patient: Patient,
+  ctx: SupervisorCtx,
+  surgeon?: Surgeon
+): ScheduledMessage | null {
+  const all = getScheduledMessages(patient, ctx, surgeon);
+  return (
+    all.find((m) => m.status === "a_valider") ??
+    all.find((m) => m.status === "prevu") ??
+    null
+  );
+}
+
+// Étiquette courte pour l'inbox — uniquement si un message est prévu
+// aujourd'hui (fenêtre ±24h). Retourne null sinon pour ne pas surcharger.
+export function getTodayScheduledLabel(
+  patient: Patient,
+  ctx: SupervisorCtx
+): string | null {
+  const now = ctx.now ?? Date.now();
+  const messages = getScheduledMessages(patient, ctx);
+  const today = messages.find((m) => {
+    if (m.status !== "a_valider") return false;
+    const t = new Date(m.targetDate).getTime();
+    return Math.abs(now - t) <= 36 * 3_600_000; // tolérance large pour le prototype
+  });
+  if (!today) return null;
+  if (today.kind === "relance_silencieux") return "Relance prévue";
+  if (today.kind === "cloture" || today.kind === "pre_cloture") return "Clôture prévue";
+  return "Message prévu aujourd'hui";
+}

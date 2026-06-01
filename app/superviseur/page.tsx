@@ -20,6 +20,7 @@ import {
   getPostOpDay,
   getRecommendedAction,
   getFollowUpWindow,
+  getTodayScheduledLabel,
   getUrgence,
   getUrgenceLabelDetailed,
   operationalStatusHints,
@@ -290,8 +291,8 @@ function PatientCard({ patient }: { patient: Patient }) {
         {k.surgeonName(patient.surgeonId)}
       </p>
 
-      {/* Ligne 3 : Dernier événement */}
-      <p className="mt-1.5 flex items-center gap-2 text-[12px] tracking-tight text-charcoal/65">
+      {/* Ligne 3 : Dernier événement + label message prévu si pertinent */}
+      <p className="mt-1.5 flex flex-wrap items-center gap-x-2 text-[12px] tracking-tight text-charcoal/65">
         <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-navy-900/30" />
         <span className="truncate">
           {last.label}
@@ -299,6 +300,15 @@ function PatientCard({ patient }: { patient: Patient }) {
             <span className="ml-1 text-charcoal/45">— {last.ageLabel}</span>
           )}
         </span>
+        {(() => {
+          const today = getTodayScheduledLabel(patient, ctx);
+          if (!today) return null;
+          return (
+            <span className="text-[11px] tracking-tight text-teal-700/80">
+              · {today}
+            </span>
+          );
+        })()}
       </p>
 
       {/* Ligne 4 : Prochaine action + délai */}

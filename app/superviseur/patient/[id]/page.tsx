@@ -27,11 +27,16 @@ import {
   getStructuredTimeline,
   followUpStatusStyles,
   getFollowUpWindow,
+  getNextScheduledMessage,
+  getScheduledMessages,
   getUrgence,
   getUrgenceLabelDetailed,
   operationalStatusLabels,
+  scheduledMessageStatusLabels,
+  scheduledMessageStatusStyles,
   timelineFilterLabels,
   urgenceStyles,
+  type ScheduledMessage,
   type ApplicableReferentiel,
   type TimelineEvent,
   type TimelineFilter,
@@ -101,8 +106,11 @@ export default function PatientFiche() {
   const [editing, setEditing] = useState(false);
   const [showAI, setShowAI] = useState(false);
   const [showTransmission, setShowTransmission] = useState(false);
+  const [showScheduled, setShowScheduled] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
+  const [scheduledPreview, setScheduledPreview] = useState<ScheduledMessage | null>(null);
+  const [sentScheduledIds, setSentScheduledIds] = useState<Set<string>>(() => new Set());
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
 
   const ctx = useMemo(
@@ -148,6 +156,28 @@ export default function PatientFiche() {
   const urgence = getUrgence(patient, ctx);
   const urgenceLabel = getUrgenceLabelDetailed(patient, ctx);
   const followUp = getFollowUpWindow(patient);
+
+  // Messages programmés — dérivés du référentiel chirurgien + fenêtre de suivi.
+  // Le statut "envoye" peut être augmenté par le set local (envois prototype).
+  const scheduledMessages = getScheduledMessages(patient, ctx, surgeon).map((m) =>
+    sentScheduledIds.has(m.id) ? { ...m, status: "envoye" as const } : m
+  );
+  const nextScheduled = getNextScheduledMessage(patient, ctx, surgeon);
+  const hasTodayScheduled = scheduledMessages.some(
+    (m) => m.status === "a_valider" && !sentScheduledIds.has(m.id)
+  );
+
+  function sendScheduledNow(m: ScheduledMessage) {
+    if (!patient) return;
+    // Prototype : on envoie le template directement dans la timeline existante.
+    k.sendMessage(patient.id, m.template, "superviseur");
+    setSentScheduledIds((prev) => {
+      const next = new Set(prev);
+      next.add(m.id);
+      return next;
+    });
+    setScheduledPreview(null);
+  }
   const recommended = getRecommendedAction(patient, ctx);
   const day = getPostOpDay(patient);
   const last = getLastEvent(patient, ctx);
@@ -731,6 +761,14 @@ export default function PatientFiche() {
                     ["Jours de contact", refl.jours_contact.join(" · ")],
                     ["Photos attendues", refl.photos_attendues],
                     ["Format CR attendu", refl.format_cr_attendu],
+                    [
+                      "Prochain message prévu",
+                      nextScheduled
+                        ? `${nextScheduled.label} · ${new Date(
+                            nextScheduled.targetDate
+                          ).toLocaleDateString("fr-FR")}`
+                        : "—",
+                    ],
                   ].map(([label, value]) => (
                     <div
                       key={label}
@@ -838,7 +876,74 @@ export default function PatientFiche() {
             </div>
           </Card>
 
-          {/* 4. Transmission cabinet — accordéon, ouvert si action en cours */}
+          {/* 4. Messages programmés — accordéon, ouvert si message à valider aujourd'hui */}
+          <details
+            open={showScheduled || hasTodayScheduled}
+            onToggle={(e) =>
+              setShowScheduled((e.target as HTMLDetailsElement).open)
+            }
+            className="rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]"
+          >
+            <summary className="flex cursor-pointer items-center justify-between gap-2 list-none px-5 py-4">
+              <div>
+                <p className="font-display text-[14px] font-semibold tracking-tight text-navy-900">
+                  Messages programmés
+                </p>
+                <p className="mt-0.5 text-[11px] tracking-tight text-charcoal/55">
+                  {nextScheduled
+                    ? `Prochain : ${nextScheduled.label} · ${new Date(
+                        nextScheduled.targetDate
+                      ).toLocaleDateString("fr-FR")}`
+                    : "Aucun message prévu"}
+                </p>
+              </div>
+              <span className="text-[12px] text-charcoal/45 transition-transform [details[open]>summary>&]:rotate-90">
+                ›
+              </span>
+            </summary>
+            <div className="space-y-2 border-t border-navy-900/[0.05] px-5 py-4">
+              <p className="rounded-lg bg-bone/60 px-3 py-2 text-[11px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
+                Prototype — messages dérivés du référentiel et de la fenêtre de suivi.
+                Aucun envoi automatique. La superviseuse prévisualise puis déclenche
+                manuellement.
+              </p>
+              {scheduledMessages.map((m) => {
+                const dt = new Date(m.targetDate);
+                const dateLabel = dt.toLocaleDateString("fr-FR");
+                const sent = m.status === "envoye";
+                return (
+                  <div
+                    key={m.id}
+                    className="rounded-xl bg-white px-4 py-3 ring-1 ring-navy-900/[0.06] transition-colors hover:ring-navy-900/[0.1]"
+                  >
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="font-display text-[13px] font-semibold tracking-tight text-navy-900">
+                        {m.label}
+                      </p>
+                      <Badge className={scheduledMessageStatusStyles[m.status]}>
+                        {scheduledMessageStatusLabels[m.status]}
+                      </Badge>
+                    </div>
+                    <p className="mt-1 text-[11px] tracking-tight text-charcoal/55">
+                      Prévu le {dateLabel} · template {m.templateKey}
+                    </p>
+                    <div className="mt-2.5 flex flex-wrap gap-2">
+                      <Button variant="subtle" onClick={() => setScheduledPreview(m)}>
+                        Prévisualiser
+                      </Button>
+                      {!sent && (
+                        <Button variant="primary" onClick={() => sendScheduledNow(m)}>
+                          Envoyer maintenant
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </details>
+
+          {/* 5. Transmission cabinet — accordéon, ouvert si action en cours */}
           <details
             open={
               showTransmission ||
@@ -904,7 +1009,7 @@ export default function PatientFiche() {
             </div>
           </details>
 
-          {/* 5. IA assistive — repliée par défaut */}
+          {/* 6. IA assistive — repliée par défaut */}
           <details
             open={showAI}
             onToggle={(e) => setShowAI((e.target as HTMLDetailsElement).open)}
@@ -961,7 +1066,7 @@ export default function PatientFiche() {
             </div>
           </details>
 
-          {/* 6. Notes internes — repliées */}
+          {/* 7. Notes internes — repliées */}
           <details
             open={showNotes}
             onToggle={(e) => setShowNotes((e.target as HTMLDetailsElement).open)}
@@ -1026,7 +1131,7 @@ export default function PatientFiche() {
             </div>
           </details>
 
-          {/* 7. Logs — repliés */}
+          {/* 8. Logs — repliés */}
           <details
             open={showLogs}
             onToggle={(e) => setShowLogs((e.target as HTMLDetailsElement).open)}
@@ -1068,6 +1173,51 @@ export default function PatientFiche() {
           </details>
         </aside>
       </div>
+
+      {/* Modal prévisualisation message programmé */}
+      <Modal
+        open={scheduledPreview !== null}
+        onClose={() => setScheduledPreview(null)}
+        title={scheduledPreview ? `Prévisualisation — ${scheduledPreview.label}` : ""}
+        wide
+      >
+        {scheduledPreview && (
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge
+                className={scheduledMessageStatusStyles[scheduledPreview.status]}
+              >
+                {scheduledMessageStatusLabels[scheduledPreview.status]}
+              </Badge>
+              <span className="text-[11.5px] tracking-tight text-charcoal/55">
+                Prévu le{" "}
+                {new Date(scheduledPreview.targetDate).toLocaleDateString("fr-FR")} · template{" "}
+                {scheduledPreview.templateKey}
+              </span>
+            </div>
+            <pre className="whitespace-pre-wrap rounded-xl bg-bone/60 p-4 font-sans text-[13px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.04]">
+              {scheduledPreview.template}
+            </pre>
+            <p className="rounded-lg bg-bone/60 px-3 py-2 text-[11px] leading-relaxed text-charcoal/60 ring-1 ring-navy-900/[0.04]">
+              Prototype — aucun envoi automatique. L'envoi via &laquo; Envoyer maintenant
+              &raquo; ajoute ce texte à la timeline du patient.
+            </p>
+            <div className="flex flex-wrap justify-end gap-2">
+              <Button variant="ghost" onClick={() => setScheduledPreview(null)}>
+                Fermer
+              </Button>
+              {scheduledPreview.status !== "envoye" && (
+                <Button
+                  variant="primary"
+                  onClick={() => sendScheduledNow(scheduledPreview)}
+                >
+                  Envoyer maintenant
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Modal templates */}
       <Modal
