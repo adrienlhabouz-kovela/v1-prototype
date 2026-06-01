@@ -14,7 +14,12 @@ const MY_SURGEON_ID = "s1";
 // pour KOVELA (priorité V1).
 // ---------------------------------------------------------------------------
 
-type FamilyKey = "visage_cou" | "seins" | "silhouette" | "medecine_esthetique";
+type FamilyKey =
+  | "visage_cou"
+  | "seins"
+  | "silhouette"
+  | "combinees"
+  | "medecine_esthetique";
 
 const INTERVENTION_FAMILIES: {
   key: FamilyKey;
@@ -81,6 +86,19 @@ const INTERVENTION_FAMILIES: {
     ],
   },
   {
+    key: "combinees",
+    label: "Interventions combinées",
+    hint: "Les interventions combinées peuvent nécessiter des règles de suivi spécifiques (jalons, photos, transmission).",
+    items: [
+      "Augmentation mammaire + mastopexie",
+      "Abdominoplastie + liposuccion",
+      "Mommy makeover",
+      "Lifting + blépharoplastie",
+      "Liposuccion + BBL",
+      "Autre combinaison",
+    ],
+  },
+  {
     key: "medecine_esthetique",
     label: "Médecine esthétique",
     hint: "Optionnel / later — le wedge V1 KOVELA reste la chirurgie esthétique post-op.",
@@ -96,31 +114,82 @@ const INTERVENTION_FAMILIES: {
   },
 ];
 
-const CAS_TRANSVERSES_DEFS: string[] = [
-  "Patient silencieux",
-  "Photo absente",
-  "Photo floue",
-  "Message répété",
-  "Patient anxieux",
-  "Demande d'avis médical",
-  "Demande de modification de traitement",
-  "Question médicament",
-  "Douleur rapportée",
-  "Saignement rapporté",
-  "Gonflement rapporté",
-  "Fièvre rapportée",
-  "Écoulement / pansement",
-  "Patient hors période de suivi",
-  "Patient hors horaires",
-  "Proche / accompagnant qui écrit",
-  "Patient contacte plusieurs canaux",
+type CasGroup = "communication" | "elements_rapportes" | "medicaments_soins" | "organisation";
+
+interface CasDef {
+  label: string;
+  group: CasGroup;
+}
+
+const CAS_TRANSVERSES_DEFS: CasDef[] = [
+  // Communication & comportement
+  { label: "Patient silencieux", group: "communication" },
+  { label: "Message répété", group: "communication" },
+  { label: "Patient anxieux", group: "communication" },
+  { label: "Demande d'avis médical", group: "communication" },
+  { label: "Demande de modification de traitement", group: "communication" },
+  { label: "Proche / accompagnant qui écrit", group: "communication" },
+  { label: "Patient contacte plusieurs canaux", group: "communication" },
+  // Éléments rapportés par le patient
+  { label: "Photo absente", group: "elements_rapportes" },
+  { label: "Photo floue", group: "elements_rapportes" },
+  { label: "Douleur rapportée", group: "elements_rapportes" },
+  { label: "Saignement rapporté", group: "elements_rapportes" },
+  { label: "Gonflement rapporté", group: "elements_rapportes" },
+  { label: "Fièvre rapportée", group: "elements_rapportes" },
+  { label: "Écoulement / pansement", group: "elements_rapportes" },
+  // Médicaments, soins & ordonnances
+  { label: "Question sur ordonnance", group: "medicaments_soins" },
+  { label: "Question sur antidouleur", group: "medicaments_soins" },
+  { label: "Question sur antibiotique", group: "medicaments_soins" },
+  { label: "Oubli de prise", group: "medicaments_soins" },
+  { label: "Effet secondaire déclaré", group: "medicaments_soins" },
+  { label: "Demande de renouvellement", group: "medicaments_soins" },
+  { label: "Question pansement", group: "medicaments_soins" },
+  { label: "Question douche / soins", group: "medicaments_soins" },
+  { label: "Soins infirmiers non réalisés", group: "medicaments_soins" },
+  { label: "Infirmière qui pose une question", group: "medicaments_soins" },
+  // Organisation
+  { label: "Patient hors période de suivi", group: "organisation" },
+  { label: "Patient hors horaires", group: "organisation" },
+];
+
+const CAS_GROUP_LABELS: Record<CasGroup, { title: string; hint: string }> = {
+  communication: {
+    title: "Communication & comportement",
+    hint: "Demandes du patient, posture, multi-canaux.",
+  },
+  elements_rapportes: {
+    title: "Éléments rapportés par le patient",
+    hint: "Photos, douleur, saignement, fièvre… Ce que KOVELA collecte et transmet selon vos règles.",
+  },
+  medicaments_soins: {
+    title: "Médicaments, soins & ordonnances",
+    hint: "KOVELA ne modifie pas, n'interprète pas et ne commente pas une prescription. Les demandes sont transmises au cabinet selon vos règles.",
+  },
+  organisation: {
+    title: "Organisation",
+    hint: "Hors période, hors horaires.",
+  },
+};
+
+const INDISPONIBILITES_DEFS: string[] = [
+  "Chirurgien au bloc",
+  "Cabinet fermé",
+  "Assistante absente",
+  "Week-end",
+  "Jour férié",
+  "Vacances cabinet",
+  "Remplaçant / confrère",
+  "Clinique à contacter",
+  "Numéro d'urgence cabinet existant",
 ];
 
 // ---------------------------------------------------------------------------
 // Modèle de données
 // ---------------------------------------------------------------------------
 
-type CompletionMode = "solo" | "kovela_assisted";
+type CompletionMode = "essentiel" | "complet" | "avec_kovela";
 
 interface ContactAutorise {
   id: string;
@@ -167,6 +236,16 @@ interface DoctrineState {
   preferencesCR: string;
 }
 
+interface DocumentsRemisState {
+  fichePostOpRemise: boolean;
+  format: string; // papier / PDF / email / Doctolib / autre
+  consignesStandards: string;
+  consignesSpecifiques: string;
+  kovelaPeutRappeler: string;
+  kovelaNeJamaisReformuler: string;
+  documentSourceArecuperer: string;
+}
+
 interface Jalon {
   id: string;
   jour: string;
@@ -204,6 +283,19 @@ interface InterventionState {
   informationsRappeler: string;
   photosAttendues: boolean;
   typePhotos: string;
+  photoJours: string;
+  photoAngles: string;
+  photoConsignePatient: string;
+  photoFloueConduite: string;
+  photoSensibleConduite: string;
+  photoTransmissionSystematique: boolean;
+  // RDV de contrôle par intervention
+  rdvControleJour: string;
+  rdvControleQuiPlanifie: string;
+  rdvControleKovelaRappelle: boolean;
+  rdvControleSansRdv: string;
+  rdvControleAnnulation: string;
+  rdvControleTransmission: string;
   soinsRappeler: string;
   consignesGenerales: string;
   sujetsInterdits: string;
@@ -218,12 +310,23 @@ interface InterventionState {
 interface CasTransverseState {
   key: string;
   label: string;
+  group: CasGroup;
   conduiteAutorisee: string;
   conduiteInterdite: string;
   transmissionCabinet: boolean;
   delai: string;
   canal: string;
   remarques: string;
+}
+
+interface IndisponibiliteState {
+  key: string;
+  label: string;
+  conduiteAutorisee: string;
+  canalSecondaire: string;
+  delai: string;
+  messagePatient: string;
+  contactBackUp: string;
 }
 
 interface ComptesRendusState {
@@ -240,6 +343,18 @@ interface ComptesRendusState {
   syntheseMensuelle: boolean;
   libellesPreferes: string;
   ton: string;
+  // Questions complémentaires
+  crSiNominal: "tous" | "exceptions" | "";
+  recapHebdomadaire: boolean;
+  recapPatientACloture: boolean;
+  crIntermediaireSiAnxieux: boolean;
+}
+
+interface ReferentielStatusState {
+  status: "draft" | "kovela_review" | "surgeon_validated" | "active" | "archived";
+  prochaineRevue: string;
+  validatedBySurgeonAt: string;
+  reviewedByKovelaAt: string;
 }
 
 interface ValidationState {
@@ -252,10 +367,13 @@ interface Referentiel {
   modeCompletion: CompletionMode | "";
   cabinet: CabinetState;
   doctrine: DoctrineState;
+  documentsRemis: DocumentsRemisState;
   interventions: InterventionState[];
   casTransverses: CasTransverseState[];
+  indisponibilites: IndisponibiliteState[];
   comptesRendus: ComptesRendusState;
   validation: ValidationState;
+  statut: ReferentielStatusState;
 }
 
 // ---------------------------------------------------------------------------
@@ -312,6 +430,18 @@ const buildInterventionsCatalog = (): InterventionState[] => {
         informationsRappeler: "",
         photosAttendues: false,
         typePhotos: "",
+        photoJours: "",
+        photoAngles: "",
+        photoConsignePatient: "",
+        photoFloueConduite: "",
+        photoSensibleConduite: "",
+        photoTransmissionSystematique: false,
+        rdvControleJour: "",
+        rdvControleQuiPlanifie: "",
+        rdvControleKovelaRappelle: false,
+        rdvControleSansRdv: "",
+        rdvControleAnnulation: "",
+        rdvControleTransmission: "",
         soinsRappeler: "",
         consignesGenerales: "",
         sujetsInterdits: "",
@@ -362,16 +492,35 @@ const initialReferentiel = (defaults: Partial<CabinetState>): Referentiel => ({
     preferencesTransmission: "",
     preferencesCR: "",
   },
+  documentsRemis: {
+    fichePostOpRemise: false,
+    format: "",
+    consignesStandards: "",
+    consignesSpecifiques: "",
+    kovelaPeutRappeler: "",
+    kovelaNeJamaisReformuler: "",
+    documentSourceArecuperer: "",
+  },
   interventions: buildInterventionsCatalog(),
-  casTransverses: CAS_TRANSVERSES_DEFS.map((label) => ({
-    key: label,
-    label,
+  casTransverses: CAS_TRANSVERSES_DEFS.map((def) => ({
+    key: def.label,
+    label: def.label,
+    group: def.group,
     conduiteAutorisee: "",
     conduiteInterdite: "",
     transmissionCabinet: false,
     delai: "",
     canal: "",
     remarques: "",
+  })),
+  indisponibilites: INDISPONIBILITES_DEFS.map((label) => ({
+    key: label,
+    label,
+    conduiteAutorisee: "",
+    canalSecondaire: "",
+    delai: "",
+    messagePatient: "",
+    contactBackUp: "",
   })),
   comptesRendus: {
     format: "",
@@ -387,11 +536,21 @@ const initialReferentiel = (defaults: Partial<CabinetState>): Referentiel => ({
     syntheseMensuelle: false,
     libellesPreferes: "",
     ton: "",
+    crSiNominal: "",
+    recapHebdomadaire: false,
+    recapPatientACloture: false,
+    crIntermediaireSiAnxieux: false,
   },
   validation: {
     refleteMesPreferences: false,
     comprendNonSubstitution: false,
     comprendRelectureKovela: false,
+  },
+  statut: {
+    status: "draft",
+    prochaineRevue: "",
+    validatedBySurgeonAt: "",
+    reviewedByKovelaAt: "",
   },
 });
 
@@ -509,6 +668,22 @@ export default function ReferentielFonctionnementPage() {
 
   const setDoctrine = <K extends keyof DoctrineState>(key: K, val: DoctrineState[K]) =>
     setR((s) => ({ ...s, doctrine: { ...s.doctrine, [key]: val } }));
+
+  const setDocs = <K extends keyof DocumentsRemisState>(key: K, val: DocumentsRemisState[K]) =>
+    setR((s) => ({ ...s, documentsRemis: { ...s.documentsRemis, [key]: val } }));
+
+  const setIndispo = (key: string, patch: Partial<IndisponibiliteState>) =>
+    setR((s) => ({
+      ...s,
+      indisponibilites: s.indisponibilites.map((i) =>
+        i.key === key ? { ...i, ...patch } : i
+      ),
+    }));
+
+  const setStatut = <K extends keyof ReferentielStatusState>(
+    key: K,
+    val: ReferentielStatusState[K]
+  ) => setR((s) => ({ ...s, statut: { ...s.statut, [key]: val } }));
 
   const setIntervention = (key: string, patch: Partial<InterventionState>) =>
     setR((s) => ({
@@ -678,23 +853,42 @@ export default function ReferentielFonctionnementPage() {
 
   const exportJson = () => {
     const filteredInterventions = r.interventions.filter((i) => i.pratiquee);
+    const nowIso = new Date().toISOString();
     const payload = {
       meta: {
         version: "0.1",
-        date_saisie: new Date().toISOString(),
+        date_saisie: nowIso,
         type: "referentiel_fonctionnement_chirurgien",
         donnees: "configuration_cabinet_sans_donnees_patient",
         prototype: true,
+      },
+      referentiel_status: {
+        status: r.statut.status,
+        version: "0.1",
+        created_at: nowIso,
+        updated_at: nowIso,
+        validated_by_surgeon_at: r.statut.validatedBySurgeonAt || "",
+        reviewed_by_kovela_at: r.statut.reviewedByKovelaAt || "",
+        next_review_due: r.statut.prochaineRevue || "",
       },
       workflow_context: {
         stage: "post_onboarding",
         cabinet_status: "active_initial",
         payment_status: "mandate_ready",
-        assisted_completion: r.modeCompletion === "kovela_assisted",
+        assisted_completion: r.modeCompletion === "avec_kovela",
         completion_mode: r.modeCompletion || "non_renseigne",
       },
       cabinet: r.cabinet,
       doctrine_generale: r.doctrine,
+      documents_consignes: {
+        fiche_post_op_remise: r.documentsRemis.fichePostOpRemise,
+        format: r.documentsRemis.format,
+        consignes_standards: r.documentsRemis.consignesStandards,
+        consignes_specifiques: r.documentsRemis.consignesSpecifiques,
+        kovela_peut_rappeler: r.documentsRemis.kovelaPeutRappeler,
+        kovela_ne_jamais_reformuler: r.documentsRemis.kovelaNeJamaisReformuler,
+        document_source_a_recuperer: r.documentsRemis.documentSourceArecuperer,
+      },
       interventions: filteredInterventions.map((i) => ({
         family: i.family,
         label: i.label,
@@ -716,8 +910,26 @@ export default function ReferentielFonctionnementPage() {
           })),
           questions_au_patient: i.questionsAuPatient,
           informations_rappeler: i.informationsRappeler,
-          photos_attendues: i.photosAttendues,
-          type_photos: i.typePhotos,
+          photos: {
+            attendues: i.photosAttendues,
+            type: i.typePhotos,
+            jours: i.photoJours,
+            angles: i.photoAngles,
+            consigne_patient: i.photoConsignePatient,
+            floue_insuffisante_conduite: i.photoFloueConduite,
+            sensible_intime_conduite: i.photoSensibleConduite,
+            transmission_systematique_cabinet: i.photoTransmissionSystematique,
+            note_doctrine:
+              "KOVELA ne réalise pas d'interprétation médicale des photos. Les photos sont collectées et transmises selon les règles définies.",
+          },
+          rdv_controle: {
+            jour: i.rdvControleJour,
+            qui_planifie: i.rdvControleQuiPlanifie,
+            kovela_rappelle_au_patient: i.rdvControleKovelaRappelle,
+            si_pas_de_rdv: i.rdvControleSansRdv,
+            si_annulation_report: i.rdvControleAnnulation,
+            transmission_cabinet: i.rdvControleTransmission,
+          },
           soins_rappeler: i.soinsRappeler,
           consignes_generales: i.consignesGenerales,
           sujets_interdits: i.sujetsInterdits,
@@ -732,12 +944,21 @@ export default function ReferentielFonctionnementPage() {
       })),
       cas_transverses: r.casTransverses.map((c) => ({
         cas: c.label,
+        groupe: c.group,
         conduite_autorisee: c.conduiteAutorisee,
         conduite_interdite: c.conduiteInterdite,
         transmission_cabinet: c.transmissionCabinet,
         delai: c.delai,
         canal: c.canal,
         remarques: c.remarques,
+      })),
+      indisponibilites_cabinet: r.indisponibilites.map((ind) => ({
+        cas: ind.label,
+        conduite_autorisee: ind.conduiteAutorisee,
+        canal_secondaire: ind.canalSecondaire,
+        delai: ind.delai,
+        message_patient: ind.messagePatient,
+        contact_back_up: ind.contactBackUp,
       })),
       regle_situation_urgente:
         "Si le patient décrit une situation urgente ou inquiétante, KOVELA lui rappelle de contacter les services d'urgence 15 / 112 et transmet l'information au cabinet selon le canal défini.",
@@ -840,29 +1061,62 @@ export default function ReferentielFonctionnementPage() {
             complété progressivement. Ce référentiel est généralement complété avec l'équipe
             KOVELA, puis relu avant activation complète des premiers suivis.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setR((s) => ({ ...s, modeCompletion: "solo" }))}
-              className={`rounded-lg px-3.5 py-2 text-[12px] font-medium tracking-tight transition-colors ${
-                r.modeCompletion === "solo"
-                  ? "bg-navy-900 text-white shadow-soft"
-                  : "bg-white text-charcoal/70 ring-1 ring-navy-900/[0.06] hover:text-navy-900"
-              }`}
-            >
-              Je complète seul
-            </button>
-            <button
-              type="button"
-              onClick={() => setR((s) => ({ ...s, modeCompletion: "kovela_assisted" }))}
-              className={`rounded-lg px-3.5 py-2 text-[12px] font-medium tracking-tight transition-colors ${
-                r.modeCompletion === "kovela_assisted"
-                  ? "bg-navy-900 text-white shadow-soft"
-                  : "bg-white text-charcoal/70 ring-1 ring-navy-900/[0.06] hover:text-navy-900"
-              }`}
-            >
-              Je souhaite compléter avec l'équipe KOVELA
-            </button>
+          <div className="mt-5">
+            <p className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+              Choisir mon niveau de complétion
+            </p>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {(
+                [
+                  {
+                    v: "essentiel",
+                    title: "Essentiel",
+                    desc: "2 ou 3 interventions prioritaires. Démarrage rapide.",
+                    recommended: false,
+                  },
+                  {
+                    v: "complet",
+                    title: "Complet",
+                    desc: "Référentiel détaillé — toutes les interventions activées.",
+                    recommended: false,
+                  },
+                  {
+                    v: "avec_kovela",
+                    title: "Avec KOVELA",
+                    desc: "Recommandé — complété avec l'équipe KOVELA.",
+                    recommended: true,
+                  },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.v}
+                  type="button"
+                  onClick={() => setR((s) => ({ ...s, modeCompletion: opt.v }))}
+                  className={`relative rounded-xl border p-4 text-left transition-colors ${
+                    r.modeCompletion === opt.v
+                      ? "border-teal-500/60 bg-teal-50/40"
+                      : "border-navy-900/[0.08] bg-white hover:border-navy-900/[0.15]"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="font-display text-[14px] font-semibold tracking-tight text-navy-900">
+                      {opt.title}
+                    </p>
+                    {opt.recommended && (
+                      <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">
+                        Recommandé
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="mt-2 text-[11.5px] leading-relaxed text-charcoal/60">{opt.desc}</p>
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-[11.5px] leading-relaxed text-charcoal/55">
+              Le mode <span className="font-medium text-navy-900">Essentiel</span> permet de
+              démarrer avec les interventions les plus fréquentes. Le référentiel pourra être
+              enrichi ensuite avec l'équipe KOVELA.
+            </p>
           </div>
         </div>
 
@@ -1321,6 +1575,72 @@ export default function ReferentielFonctionnementPage() {
                   </Field>
                 </div>
               </SubSection>
+
+              <SubSection
+                title="Documents et consignes déjà remis au patient"
+                hint="Ces éléments permettent à KOVELA de s'aligner sur vos consignes existantes, sans les modifier."
+              >
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Fiche post-op remise au patient">
+                    <div className="flex flex-wrap gap-2">
+                      <Toggle
+                        checked={r.documentsRemis.fichePostOpRemise}
+                        onChange={(v) => setDocs("fichePostOpRemise", v)}
+                        label="Oui — fiche remise"
+                      />
+                    </div>
+                  </Field>
+                  <Field label="Format" hint="Papier, PDF, email, Doctolib, autre…">
+                    <input
+                      className={inputCls}
+                      value={r.documentsRemis.format}
+                      onChange={(e) => setDocs("format", e.target.value)}
+                      placeholder="ex : PDF transmis par email + papier en main propre"
+                    />
+                  </Field>
+                  <Field label="Consignes standards existantes" className="sm:col-span-2">
+                    <textarea
+                      className={textareaCls}
+                      rows={3}
+                      value={r.documentsRemis.consignesStandards}
+                      onChange={(e) => setDocs("consignesStandards", e.target.value)}
+                      placeholder="ex : repos 48 h, pas d'effort, pansement à laisser X jours…"
+                    />
+                  </Field>
+                  <Field label="Consignes spécifiques par intervention" className="sm:col-span-2">
+                    <textarea
+                      className={textareaCls}
+                      rows={3}
+                      value={r.documentsRemis.consignesSpecifiques}
+                      onChange={(e) => setDocs("consignesSpecifiques", e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Ce que KOVELA peut rappeler">
+                    <textarea
+                      className={textareaCls}
+                      rows={3}
+                      value={r.documentsRemis.kovelaPeutRappeler}
+                      onChange={(e) => setDocs("kovelaPeutRappeler", e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Ce que KOVELA ne doit jamais reformuler">
+                    <textarea
+                      className={textareaCls}
+                      rows={3}
+                      value={r.documentsRemis.kovelaNeJamaisReformuler}
+                      onChange={(e) => setDocs("kovelaNeJamaisReformuler", e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Document source à récupérer par KOVELA" className="sm:col-span-2">
+                    <input
+                      className={inputCls}
+                      value={r.documentsRemis.documentSourceArecuperer}
+                      onChange={(e) => setDocs("documentSourceArecuperer", e.target.value)}
+                      placeholder="ex : PDF fiche post-op v2025, à transmettre à l'équipe KOVELA"
+                    />
+                  </Field>
+                </div>
+              </SubSection>
             </div>
           )}
 
@@ -1574,7 +1894,7 @@ export default function ReferentielFonctionnementPage() {
                               />
                             </Field>
                             <Field
-                              label="Évolution habituelle selon chirurgien"
+                              label="Suites habituellement attendues selon votre pratique"
                               className="sm:col-span-2"
                             >
                               <textarea
@@ -1679,25 +1999,176 @@ export default function ReferentielFonctionnementPage() {
                         }
                       />
                     </Field>
-                    <Field label="Photos attendues" className="sm:col-span-2">
-                      <div className="flex flex-wrap gap-3">
-                        <Toggle
-                          checked={i.photosAttendues}
-                          onChange={(v) => setIntervention(i.key, { photosAttendues: v })}
-                          label="Oui, photos attendues"
+                  </div>
+
+                  {/* Photos — bloc enrichi */}
+                  <div className="mt-5 rounded-xl bg-bone/50 p-4 ring-1 ring-navy-900/[0.05]">
+                    <div className="mb-3 flex items-center justify-between gap-2">
+                      <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+                        Photos
+                      </p>
+                      <Toggle
+                        checked={i.photosAttendues}
+                        onChange={(v) => setIntervention(i.key, { photosAttendues: v })}
+                        label="Photos attendues pour cette intervention"
+                      />
+                    </div>
+                    {i.photosAttendues ? (
+                      <>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <Field label="Type de photos attendues">
+                            <input
+                              className={inputCls}
+                              placeholder="ex : zone opérée, cicatrice, profil…"
+                              value={i.typePhotos}
+                              onChange={(e) =>
+                                setIntervention(i.key, { typePhotos: e.target.value })
+                              }
+                            />
+                          </Field>
+                          <Field label="Photos demandées à quels jours" hint="ex : J+5, J+15, J+30">
+                            <input
+                              className={inputCls}
+                              value={i.photoJours}
+                              onChange={(e) =>
+                                setIntervention(i.key, { photoJours: e.target.value })
+                              }
+                            />
+                          </Field>
+                          <Field label="Angles souhaités">
+                            <input
+                              className={inputCls}
+                              placeholder="ex : face + 3/4 droite + 3/4 gauche"
+                              value={i.photoAngles}
+                              onChange={(e) =>
+                                setIntervention(i.key, { photoAngles: e.target.value })
+                              }
+                            />
+                          </Field>
+                          <Field label="Photos à transmettre systématiquement au cabinet">
+                            <Toggle
+                              checked={i.photoTransmissionSystematique}
+                              onChange={(v) =>
+                                setIntervention(i.key, { photoTransmissionSystematique: v })
+                              }
+                              label="Oui — transmission systématique"
+                            />
+                          </Field>
+                          <Field
+                            label="Consigne photo à envoyer au patient"
+                            className="sm:col-span-2"
+                          >
+                            <textarea
+                              className={textareaCls}
+                              rows={2}
+                              value={i.photoConsignePatient}
+                              onChange={(e) =>
+                                setIntervention(i.key, { photoConsignePatient: e.target.value })
+                              }
+                              placeholder="ex : photo de la zone à la lumière naturelle, sans pansement, à distance d'1 m…"
+                            />
+                          </Field>
+                          <Field label="Photo floue / insuffisante — conduite">
+                            <textarea
+                              className={textareaCls}
+                              rows={2}
+                              value={i.photoFloueConduite}
+                              onChange={(e) =>
+                                setIntervention(i.key, { photoFloueConduite: e.target.value })
+                              }
+                            />
+                          </Field>
+                          <Field label="Photo sensible / intime — conduite">
+                            <textarea
+                              className={textareaCls}
+                              rows={2}
+                              value={i.photoSensibleConduite}
+                              onChange={(e) =>
+                                setIntervention(i.key, { photoSensibleConduite: e.target.value })
+                              }
+                            />
+                          </Field>
+                        </div>
+                        <p className="mt-3 rounded-lg bg-white/70 px-3.5 py-2 text-[11px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.05]">
+                          KOVELA ne réalise pas d'interprétation médicale des photos. Les photos
+                          sont collectées et transmises selon vos règles.
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-[11.5px] leading-relaxed text-charcoal/55">
+                        Photos non attendues pour cette intervention.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* RDV de contrôle — bloc dédié */}
+                  <div className="mt-4 rounded-xl bg-bone/50 p-4 ring-1 ring-navy-900/[0.05]">
+                    <p className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+                      Rendez-vous de contrôle post-opératoire
+                    </p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <Field label="RDV de contrôle habituel" hint="ex : J+15, J+30">
+                        <input
+                          className={inputCls}
+                          value={i.rdvControleJour}
+                          onChange={(e) =>
+                            setIntervention(i.key, { rdvControleJour: e.target.value })
+                          }
                         />
-                        {i.photosAttendues && (
-                          <input
-                            className={`${inputCls} flex-1`}
-                            placeholder="Type de photos attendues (ex : zone opérée à J+7…)"
-                            value={i.typePhotos}
-                            onChange={(e) =>
-                              setIntervention(i.key, { typePhotos: e.target.value })
-                            }
-                          />
-                        )}
-                      </div>
-                    </Field>
+                      </Field>
+                      <Field label="Qui le planifie">
+                        <input
+                          className={inputCls}
+                          value={i.rdvControleQuiPlanifie}
+                          onChange={(e) =>
+                            setIntervention(i.key, { rdvControleQuiPlanifie: e.target.value })
+                          }
+                          placeholder="ex : secrétariat cabinet, patient lui-même via Doctolib…"
+                        />
+                      </Field>
+                      <Field label="KOVELA peut-il rappeler le RDV au patient ?">
+                        <Toggle
+                          checked={i.rdvControleKovelaRappelle}
+                          onChange={(v) =>
+                            setIntervention(i.key, { rdvControleKovelaRappelle: v })
+                          }
+                          label="Oui — rappel autorisé"
+                        />
+                      </Field>
+                      <Field label="Quand transmettre au cabinet">
+                        <input
+                          className={inputCls}
+                          value={i.rdvControleTransmission}
+                          onChange={(e) =>
+                            setIntervention(i.key, { rdvControleTransmission: e.target.value })
+                          }
+                          placeholder="ex : si pas de RDV à J+10"
+                        />
+                      </Field>
+                      <Field label="Si le patient n'a pas de RDV">
+                        <textarea
+                          className={textareaCls}
+                          rows={2}
+                          value={i.rdvControleSansRdv}
+                          onChange={(e) =>
+                            setIntervention(i.key, { rdvControleSansRdv: e.target.value })
+                          }
+                        />
+                      </Field>
+                      <Field label="Si le patient annule / reporte">
+                        <textarea
+                          className={textareaCls}
+                          rows={2}
+                          value={i.rdvControleAnnulation}
+                          onChange={(e) =>
+                            setIntervention(i.key, { rdvControleAnnulation: e.target.value })
+                          }
+                        />
+                      </Field>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
                     <Field label="Même fonctionnement qu'une autre intervention…" className="sm:col-span-2" hint="Permet de dupliquer la configuration d'une intervention déjà renseignée.">
                       <select
                         className={inputCls}
@@ -1714,6 +2185,18 @@ export default function ReferentielFonctionnementPage() {
                               informationsRappeler: src.informationsRappeler,
                               photosAttendues: src.photosAttendues,
                               typePhotos: src.typePhotos,
+                              photoJours: src.photoJours,
+                              photoAngles: src.photoAngles,
+                              photoConsignePatient: src.photoConsignePatient,
+                              photoFloueConduite: src.photoFloueConduite,
+                              photoSensibleConduite: src.photoSensibleConduite,
+                              photoTransmissionSystematique: src.photoTransmissionSystematique,
+                              rdvControleJour: src.rdvControleJour,
+                              rdvControleQuiPlanifie: src.rdvControleQuiPlanifie,
+                              rdvControleKovelaRappelle: src.rdvControleKovelaRappelle,
+                              rdvControleSansRdv: src.rdvControleSansRdv,
+                              rdvControleAnnulation: src.rdvControleAnnulation,
+                              rdvControleTransmission: src.rdvControleTransmission,
                               soinsRappeler: src.soinsRappeler,
                               consignesGenerales: src.consignesGenerales,
                               sujetsInterdits: src.sujetsInterdits,
@@ -1829,7 +2312,7 @@ export default function ReferentielFonctionnementPage() {
                               }
                             />
                           </Field>
-                          <Field label="Conduite KOVELA autorisée">
+                          <Field label="Ce que KOVELA peut faire">
                             <textarea
                               className={textareaCls}
                               rows={2}
@@ -1915,103 +2398,200 @@ export default function ReferentielFonctionnementPage() {
             </div>
           )}
 
-          {/* ÉTAPE 6 — Cas transverses */}
+          {/* ÉTAPE 6 — Cas transverses + Indisponibilité cabinet */}
           {step === 5 && (
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div>
                 <h2 className="font-display text-[1.5rem] font-medium tracking-tight text-navy-900">
                   Cas transverses
                 </h2>
                 <p className="mt-2 text-[13px] leading-relaxed text-charcoal/60">
                   Situations qui peuvent survenir quelle que soit l'intervention. Pour chaque cas,
-                  définissez ce que KOVELA peut faire, ce qu'elle ne doit jamais faire, et si une
+                  définissez ce que KOVELA peut faire, ce qu'elle ne doit pas faire, et si une
                   transmission cabinet est attendue.
                 </p>
               </div>
 
-              <div className="space-y-3">
-                {r.casTransverses.map((c) => (
-                  <details
-                    key={c.key}
-                    className="group rounded-xl bg-white p-4 ring-1 ring-navy-900/[0.06] transition-colors hover:ring-navy-900/[0.1]"
-                  >
-                    <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2 list-none">
-                      <span className="font-display text-[13.5px] font-semibold tracking-tight text-navy-900">
-                        {c.label}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {c.conduiteAutorisee && (
-                          <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">
-                            Conduite définie
-                          </Badge>
-                        )}
-                        {c.transmissionCabinet && (
-                          <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
-                            Transmission cabinet
-                          </Badge>
-                        )}
-                        <span className="text-[12px] text-charcoal/45 transition-transform group-open:rotate-90">
-                          ›
-                        </span>
+              {(["communication", "elements_rapportes", "medicaments_soins", "organisation"] as CasGroup[]).map(
+                (group) => {
+                  const cas = r.casTransverses.filter((c) => c.group === group);
+                  if (cas.length === 0) return null;
+                  const meta = CAS_GROUP_LABELS[group];
+                  return (
+                    <SubSection key={group} title={meta.title} hint={meta.hint}>
+                      <div className="space-y-2">
+                        {cas.map((c) => (
+                          <details
+                            key={c.key}
+                            className="group rounded-xl bg-white p-4 ring-1 ring-navy-900/[0.06] transition-colors hover:ring-navy-900/[0.1]"
+                          >
+                            <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2 list-none">
+                              <span className="font-display text-[13.5px] font-semibold tracking-tight text-navy-900">
+                                {c.label}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                {c.conduiteAutorisee && (
+                                  <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">
+                                    Conduite définie
+                                  </Badge>
+                                )}
+                                {c.transmissionCabinet && (
+                                  <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
+                                    Transmission cabinet
+                                  </Badge>
+                                )}
+                                <span className="text-[12px] text-charcoal/45 transition-transform group-open:rotate-90">
+                                  ›
+                                </span>
+                              </div>
+                            </summary>
+                            <div className="mt-4 grid gap-3 border-t border-navy-900/[0.05] pt-4 sm:grid-cols-2">
+                              <Field label="Ce que KOVELA peut faire">
+                                <textarea
+                                  className={textareaCls}
+                                  rows={2}
+                                  value={c.conduiteAutorisee}
+                                  onChange={(e) =>
+                                    setCas(c.key, { conduiteAutorisee: e.target.value })
+                                  }
+                                />
+                              </Field>
+                              <Field label="Ce que KOVELA ne doit pas faire">
+                                <textarea
+                                  className={textareaCls}
+                                  rows={2}
+                                  value={c.conduiteInterdite}
+                                  onChange={(e) =>
+                                    setCas(c.key, { conduiteInterdite: e.target.value })
+                                  }
+                                />
+                              </Field>
+                              <Field label="Transmission au cabinet">
+                                <Toggle
+                                  checked={c.transmissionCabinet}
+                                  onChange={(v) =>
+                                    setCas(c.key, { transmissionCabinet: v })
+                                  }
+                                  label="Oui — transmettre au cabinet"
+                                />
+                              </Field>
+                              <Field label="Délai souhaité">
+                                <input
+                                  className={inputCls}
+                                  value={c.delai}
+                                  onChange={(e) => setCas(c.key, { delai: e.target.value })}
+                                  placeholder="ex : sous 24 h"
+                                />
+                              </Field>
+                              <Field label="Canal">
+                                <input
+                                  className={inputCls}
+                                  value={c.canal}
+                                  onChange={(e) => setCas(c.key, { canal: e.target.value })}
+                                  placeholder="ex : email cabinet"
+                                />
+                              </Field>
+                              <Field label="Remarques">
+                                <input
+                                  className={inputCls}
+                                  value={c.remarques}
+                                  onChange={(e) =>
+                                    setCas(c.key, { remarques: e.target.value })
+                                  }
+                                />
+                              </Field>
+                            </div>
+                          </details>
+                        ))}
                       </div>
-                    </summary>
-                    <div className="mt-4 grid gap-3 border-t border-navy-900/[0.05] pt-4 sm:grid-cols-2">
-                      <Field label="Conduite KOVELA autorisée">
-                        <textarea
-                          className={textareaCls}
-                          rows={2}
-                          value={c.conduiteAutorisee}
-                          onChange={(e) =>
-                            setCas(c.key, { conduiteAutorisee: e.target.value })
-                          }
-                        />
-                      </Field>
-                      <Field label="Conduite interdite">
-                        <textarea
-                          className={textareaCls}
-                          rows={2}
-                          value={c.conduiteInterdite}
-                          onChange={(e) =>
-                            setCas(c.key, { conduiteInterdite: e.target.value })
-                          }
-                        />
-                      </Field>
-                      <Field label="Transmission au cabinet">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Toggle
-                            checked={c.transmissionCabinet}
-                            onChange={(v) => setCas(c.key, { transmissionCabinet: v })}
-                            label="Oui — transmettre au cabinet"
-                          />
+                    </SubSection>
+                  );
+                }
+              )}
+
+              <SubSection
+                title="Indisponibilité cabinet"
+                hint="Définissez la conduite KOVELA et le contact back-up selon les périodes d'indisponibilité."
+              >
+                <div className="space-y-2">
+                  {r.indisponibilites.map((ind) => (
+                    <details
+                      key={ind.key}
+                      className="group rounded-xl bg-white p-4 ring-1 ring-navy-900/[0.06] transition-colors hover:ring-navy-900/[0.1]"
+                    >
+                      <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2 list-none">
+                        <span className="font-display text-[13.5px] font-semibold tracking-tight text-navy-900">
+                          {ind.label}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {ind.conduiteAutorisee && (
+                            <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">
+                              Règle définie
+                            </Badge>
+                          )}
+                          {ind.contactBackUp && (
+                            <Badge className="bg-navy-900/[0.04] text-charcoal/70 ring-navy-900/[0.06]">
+                              Back-up défini
+                            </Badge>
+                          )}
+                          <span className="text-[12px] text-charcoal/45 transition-transform group-open:rotate-90">
+                            ›
+                          </span>
                         </div>
-                      </Field>
-                      <Field label="Délai souhaité">
-                        <input
-                          className={inputCls}
-                          value={c.delai}
-                          onChange={(e) => setCas(c.key, { delai: e.target.value })}
-                          placeholder="ex : sous 24 h"
-                        />
-                      </Field>
-                      <Field label="Canal">
-                        <input
-                          className={inputCls}
-                          value={c.canal}
-                          onChange={(e) => setCas(c.key, { canal: e.target.value })}
-                          placeholder="ex : email cabinet"
-                        />
-                      </Field>
-                      <Field label="Remarques">
-                        <input
-                          className={inputCls}
-                          value={c.remarques}
-                          onChange={(e) => setCas(c.key, { remarques: e.target.value })}
-                        />
-                      </Field>
-                    </div>
-                  </details>
-                ))}
-              </div>
+                      </summary>
+                      <div className="mt-4 grid gap-3 border-t border-navy-900/[0.05] pt-4 sm:grid-cols-2">
+                        <Field label="Ce que KOVELA peut faire">
+                          <textarea
+                            className={textareaCls}
+                            rows={2}
+                            value={ind.conduiteAutorisee}
+                            onChange={(e) =>
+                              setIndispo(ind.key, { conduiteAutorisee: e.target.value })
+                            }
+                          />
+                        </Field>
+                        <Field label="Canal secondaire">
+                          <input
+                            className={inputCls}
+                            value={ind.canalSecondaire}
+                            onChange={(e) =>
+                              setIndispo(ind.key, { canalSecondaire: e.target.value })
+                            }
+                          />
+                        </Field>
+                        <Field label="Délai">
+                          <input
+                            className={inputCls}
+                            value={ind.delai}
+                            onChange={(e) => setIndispo(ind.key, { delai: e.target.value })}
+                          />
+                        </Field>
+                        <Field label="Contact back-up">
+                          <input
+                            className={inputCls}
+                            value={ind.contactBackUp}
+                            onChange={(e) =>
+                              setIndispo(ind.key, { contactBackUp: e.target.value })
+                            }
+                            placeholder="ex : confrère de garde, numéro clinique…"
+                          />
+                        </Field>
+                        <Field label="Message patient autorisé" className="sm:col-span-2">
+                          <textarea
+                            className={textareaCls}
+                            rows={2}
+                            value={ind.messagePatient}
+                            onChange={(e) =>
+                              setIndispo(ind.key, { messagePatient: e.target.value })
+                            }
+                            placeholder="ex : « Votre cabinet est actuellement indisponible. Pour toute urgence, contactez le 15 / 112. »"
+                          />
+                        </Field>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </SubSection>
             </div>
           )}
 
@@ -2158,6 +2738,115 @@ export default function ReferentielFonctionnementPage() {
                   />
                 </div>
               </SubSection>
+
+              <SubSection
+                title="Structures indicatives"
+                hint="Aperçu des éléments couverts par chaque format. Indicatif — sera affiné avec l'équipe KOVELA."
+              >
+                <div className="grid gap-3 lg:grid-cols-3">
+                  {(
+                    [
+                      {
+                        title: "CR très court",
+                        items: [
+                          "Intervention",
+                          "Jour post-op",
+                          "Dernier contact",
+                          "Statut",
+                          "Action KOVELA",
+                        ],
+                      },
+                      {
+                        title: "CR standard",
+                        items: [
+                          "Intervention",
+                          "Jour post-op",
+                          "Dernier contact",
+                          "Éléments déclarés par patient",
+                          "Photos reçues (oui/non)",
+                          "Élément transmis au cabinet",
+                          "Action KOVELA",
+                          "Statut",
+                          "Prochaine étape",
+                        ],
+                      },
+                      {
+                        title: "CR prioritaire",
+                        items: [
+                          "Intervention",
+                          "Jour post-op",
+                          "Élément qui déclenche la transmission",
+                          "Éléments déclarés par patient",
+                          "Photos reçues + transmises",
+                          "Canal & destinataire",
+                          "Action KOVELA",
+                          "Délai d'attente cabinet",
+                        ],
+                      },
+                    ] as const
+                  ).map((s) => (
+                    <div
+                      key={s.title}
+                      className="rounded-xl bg-bone/50 p-4 ring-1 ring-navy-900/[0.05]"
+                    >
+                      <p className="font-display text-[13px] font-semibold tracking-tight text-navy-900">
+                        {s.title}
+                      </p>
+                      <ul className="mt-3 space-y-1.5">
+                        {s.items.map((it) => (
+                          <li
+                            key={it}
+                            className="flex gap-2 text-[11.5px] leading-relaxed text-charcoal/70"
+                          >
+                            <span className="mt-1.5 h-[3px] w-[3px] shrink-0 rounded-full bg-teal-600/60" />
+                            {it}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </SubSection>
+
+              <SubSection title="Questions complémentaires">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Field
+                    label="Quels patients couvrir par un CR ?"
+                    hint="Tous les patients, ou uniquement ceux pour lesquels une exception est survenue."
+                  >
+                    <select
+                      className={inputCls}
+                      value={r.comptesRendus.crSiNominal}
+                      onChange={(e) =>
+                        setCR("crSiNominal", e.target.value as ComptesRendusState["crSiNominal"])
+                      }
+                    >
+                      <option value="">—</option>
+                      <option value="tous">CR pour tous les patients (même si tout est nominal)</option>
+                      <option value="exceptions">CR uniquement pour les exceptions</option>
+                    </select>
+                  </Field>
+                  <Field label="Synthèses additionnelles">
+                    <div className="space-y-2">
+                      <Toggle
+                        checked={r.comptesRendus.recapHebdomadaire}
+                        onChange={(v) => setCR("recapHebdomadaire", v)}
+                        label="Récap hebdomadaire cabinet"
+                      />
+                      <Toggle
+                        checked={r.comptesRendus.recapPatientACloture}
+                        onChange={(v) => setCR("recapPatientACloture", v)}
+                        label="Récap par patient à clôture du suivi"
+                      />
+                      <Toggle
+                        checked={r.comptesRendus.crIntermediaireSiAnxieux}
+                        onChange={(v) => setCR("crIntermediaireSiAnxieux", v)}
+                        label="CR intermédiaire si patient anxieux"
+                      />
+                    </div>
+                  </Field>
+                </div>
+              </SubSection>
             </div>
           )}
 
@@ -2191,10 +2880,12 @@ export default function ReferentielFonctionnementPage() {
                     ["Interventions prioritaires V1", `${totalPriorite}`],
                     [
                       "Mode de complétion",
-                      r.modeCompletion === "solo"
-                        ? "Seul"
-                        : r.modeCompletion === "kovela_assisted"
-                        ? "Avec l'équipe KOVELA"
+                      r.modeCompletion === "essentiel"
+                        ? "Essentiel (2–3 interventions prioritaires)"
+                        : r.modeCompletion === "complet"
+                        ? "Complet (référentiel détaillé)"
+                        : r.modeCompletion === "avec_kovela"
+                        ? "Avec l'équipe KOVELA (recommandé)"
                         : "—",
                     ],
                     ["Format CR souhaité", r.comptesRendus.format || "—"],
@@ -2260,6 +2951,62 @@ export default function ReferentielFonctionnementPage() {
                     </label>
                   ))}
                 </div>
+              </SubSection>
+
+              <SubSection
+                title="Statut & versioning"
+                hint="État du référentiel et prochaine revue prévue avec l'équipe KOVELA."
+              >
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Statut du référentiel">
+                    <select
+                      className={inputCls}
+                      value={r.statut.status}
+                      onChange={(e) =>
+                        setStatut(
+                          "status",
+                          e.target.value as ReferentielStatusState["status"]
+                        )
+                      }
+                    >
+                      <option value="draft">Brouillon — en cours de saisie</option>
+                      <option value="kovela_review">À relire avec KOVELA</option>
+                      <option value="surgeon_validated">Validé par le chirurgien</option>
+                      <option value="active">Actif — usage opérationnel</option>
+                      <option value="archived">Archivé</option>
+                    </select>
+                  </Field>
+                  <Field label="Version">
+                    <input className={inputCls} value="v0.1 (prototype)" disabled />
+                  </Field>
+                  <Field label="Validé par le chirurgien (date)">
+                    <input
+                      type="date"
+                      className={inputCls}
+                      value={r.statut.validatedBySurgeonAt}
+                      onChange={(e) => setStatut("validatedBySurgeonAt", e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Relu par l'équipe KOVELA (date)">
+                    <input
+                      type="date"
+                      className={inputCls}
+                      value={r.statut.reviewedByKovelaAt}
+                      onChange={(e) => setStatut("reviewedByKovelaAt", e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Prochaine revue prévue" className="sm:col-span-2">
+                    <input
+                      type="date"
+                      className={inputCls}
+                      value={r.statut.prochaineRevue}
+                      onChange={(e) => setStatut("prochaineRevue", e.target.value)}
+                    />
+                  </Field>
+                </div>
+                <p className="mt-3 text-[11.5px] leading-relaxed text-charcoal/55">
+                  Référentiel à relire avec KOVELA avant usage opérationnel.
+                </p>
               </SubSection>
 
               <SubSection title="Export">
