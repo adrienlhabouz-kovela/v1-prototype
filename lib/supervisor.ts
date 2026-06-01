@@ -2,7 +2,7 @@
 // Ne modifie pas les types métier (PatientStatus reste intact).
 // Toute la logique est calculée à partir du store existant.
 
-import type { Patient, ClinicalReport, Escalation, CabinetConfig } from "./types";
+import type { Patient, ClinicalReport, Escalation, CabinetConfig, Surgeon } from "./types";
 
 // ---------------------------------------------------------------------------
 // Statuts opérationnels — 6 catégories ordonnées par priorité.
@@ -381,4 +381,233 @@ export function countByOperationalStatus(
     if (s) counts[s] += 1;
   });
   return counts;
+}
+
+// ---------------------------------------------------------------------------
+// Référentiel applicable — synthèse dérivée pour la fiche patient.
+// Données déclaratives plausibles pour la démo (pas de connexion store réelle
+// à un référentiel chirurgien). À remplacer par la vraie lecture en V1.
+// ---------------------------------------------------------------------------
+
+export interface ApplicableReferentiel {
+  chirurgien: string;
+  cabinet: string;
+  intervention: string;
+  version: string;
+  jalons_attendus: string[];
+  jours_contact: string[];
+  peut_rappeler: string;
+  ne_pas_traiter: string;
+  a_transmettre_cabinet: string;
+  transmission_prioritaire: string;
+  photos_attendues: string;
+  format_cr_attendu: string;
+  contact_prioritaire: string;
+  is_simulated: boolean;
+}
+
+export function getApplicableReferentiel(
+  patient: Patient,
+  surgeon: Surgeon | undefined
+): ApplicableReferentiel {
+  const config = surgeon?.config;
+  const durations = config?.interventionDurations ?? {};
+  const protocol =
+    durations[patient.intervention] ||
+    patient.protocol ||
+    config?.defaultProtocol ||
+    "J+8 / J+15";
+  const jalons = protocol.match(/J\+\d+/g) ?? ["J+1", "J+5", "J+15"];
+
+  return {
+    chirurgien: surgeon?.name ?? "—",
+    cabinet: config?.locations?.[0] ?? "—",
+    intervention: patient.intervention,
+    version: "v0.1 prototype",
+    jalons_attendus: jalons,
+    jours_contact: jalons,
+    peut_rappeler:
+      "Rappels logistiques (repos, hydratation), jalons à venir, consignes générales déjà transmises par le cabinet.",
+    ne_pas_traiter:
+      "Modification de prescription, interprétation d'évolution, avis médical, reformulation des consignes existantes.",
+    a_transmettre_cabinet:
+      "Photo reçue, élément déclaré par le patient hors cadre habituel, demande d'avis médical, question médicament / ordonnance.",
+    transmission_prioritaire:
+      "Si le patient décrit une situation urgente, KOVELA rappelle le 15 / 112 et transmet au cabinet selon le canal défini.",
+    photos_attendues:
+      jalons.length > 0
+        ? `Photos attendues aux jalons ${jalons.join(", ")} selon référentiel.`
+        : "Photos selon référentiel.",
+    format_cr_attendu: config?.crFrequency ?? "CR fin de suivi",
+    contact_prioritaire: config?.cabinetContact?.name ?? "—",
+    is_simulated: true,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Timeline structurée — événements typés pour la fiche patient.
+// ---------------------------------------------------------------------------
+
+export type TimelineEventKind =
+  | "message_patient"
+  | "reponse_kovela"
+  | "message_systeme"
+  | "note_interne"
+  | "compilation_preparee"
+  | "transmission_cabinet"
+  | "cr_brouillon"
+  | "cr_valide"
+  | "cr_disponible";
+
+export interface TimelineAttachment {
+  kind: "photo" | "audio";
+  label: string;
+}
+
+export interface TimelineEvent {
+  id: string;
+  kind: TimelineEventKind;
+  at: string; // ISO
+  actor: string; // "Patient" / "KOVELA" / "Système" / "Équipe"
+  label: string; // type d'événement lisible
+  content?: string; // texte court
+  attachments?: TimelineAttachment[];
+  meta?: string; // métadonnée optionnelle (ex : statut CR)
+}
+
+export type TimelineFilter = "all" | "messages" | "actions" | "transmissions" | "cr";
+
+export const timelineFilterLabels: Record<TimelineFilter, string> = {
+  all: "Tout",
+  messages: "Messages",
+  actions: "Actions KOVELA",
+  transmissions: "Transmissions",
+  cr: "CR",
+};
+
+const timelineKindByFilter: Record<TimelineFilter, TimelineEventKind[] | "all"> = {
+  all: "all",
+  messages: ["message_patient", "reponse_kovela", "message_systeme"],
+  actions: ["note_interne", "compilation_preparee"],
+  transmissions: ["transmission_cabinet"],
+  cr: ["cr_brouillon", "cr_valide", "cr_disponible"],
+};
+
+export function filterTimelineEvents(
+  events: TimelineEvent[],
+  filter: TimelineFilter
+): TimelineEvent[] {
+  const kinds = timelineKindByFilter[filter];
+  if (kinds === "all") return events;
+  return events.filter((e) => kinds.includes(e.kind));
+}
+
+export function getStructuredTimeline(
+  patient: Patient,
+  ctx: SupervisorCtx
+): TimelineEvent[] {
+  const events: TimelineEvent[] = [];
+
+  // Messages
+  patient.messages.forEach((m) => {
+    const kind: TimelineEventKind =
+      m.author === "patient"
+        ? "message_patient"
+        : m.author === "superviseur"
+        ? "reponse_kovela"
+        : "message_systeme";
+    const actor =
+      m.author === "patient"
+        ? "Patient"
+        : m.author === "superviseur"
+        ? "KOVELA"
+        : "Système";
+    const label =
+      kind === "message_patient"
+        ? "Message patient"
+        : kind === "reponse_kovela"
+        ? "Réponse KOVELA"
+        : "Message système";
+    events.push({
+      id: `msg-${m.id}`,
+      kind,
+      at: m.at,
+      actor,
+      label,
+      content: m.text,
+      attachments: m.attachments?.map((a) => ({
+        kind: a.kind === "photo" ? "photo" : "audio",
+        label: a.label,
+      })),
+      meta: m.author === "patient" && !m.treated ? "non traité" : undefined,
+    });
+  });
+
+  // Notes internes
+  patient.notes.forEach((n) => {
+    events.push({
+      id: `note-${n.id}`,
+      kind: "note_interne",
+      at: n.at,
+      actor: n.author || "KOVELA",
+      label: "Note interne",
+      content: n.text,
+    });
+  });
+
+  // Compilation factuelle préparée (brouillon)
+  const escalation = ctx.escalationFor(patient.id);
+  if (patient.compilationDraft && escalation?.status !== "transmise") {
+    // On ne connaît pas la date exacte — on prend lastMessageAt comme repère.
+    events.push({
+      id: `compil-${patient.id}`,
+      kind: "compilation_preparee",
+      at: patient.lastMessageAt ?? new Date().toISOString(),
+      actor: "KOVELA",
+      label: "Compilation factuelle préparée",
+      content: patient.compilationDraft.split("\n").slice(0, 3).join("\n"),
+      meta: "brouillon interne — non transmis",
+    });
+  }
+
+  // Transmission cabinet
+  if (escalation?.status === "transmise" && escalation.transmittedAt) {
+    events.push({
+      id: `trans-${patient.id}`,
+      kind: "transmission_cabinet",
+      at: escalation.transmittedAt,
+      actor: "KOVELA",
+      label: "Transmission cabinet envoyée",
+      content: escalation.compilation?.split("\n").slice(0, 3).join("\n"),
+    });
+  }
+
+  // CR
+  const report = ctx.reportFor(patient.id);
+  if (report) {
+    const crKind: TimelineEventKind =
+      report.status === "brouillon"
+        ? "cr_brouillon"
+        : report.status === "valide"
+        ? "cr_valide"
+        : "cr_disponible";
+    const crLabel =
+      report.status === "brouillon"
+        ? "CR brouillon préparé"
+        : report.status === "valide"
+        ? "CR validé en interne"
+        : "CR rendu disponible";
+    events.push({
+      id: `cr-${report.id}`,
+      kind: crKind,
+      at: report.updatedAt,
+      actor: "KOVELA",
+      label: crLabel,
+      content: report.content.split("\n").slice(0, 3).join("\n"),
+    });
+  }
+
+  // Tri chronologique inverse (plus récent en haut).
+  events.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+  return events;
 }
