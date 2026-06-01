@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
-import { Badge, Button, Card, DoctrineNote, Modal, PageHeader } from "@/components/ui";
+import { Badge, Button, Card, Modal, PageHeader } from "@/components/ui";
 import { useKovela, type SuggestionInput } from "@/lib/store";
 import { aiEstimatedMinutes, formatMinutes } from "@/lib/ai";
 import {
@@ -317,11 +317,12 @@ function InboxGroup({
   status: OperationalStatus;
   patients: Patient[];
 }) {
+  // Couleurs sobres — priorité opérationnelle, pas alerte clinique.
   const accentBar =
     status === "a_traiter"
-      ? "bg-rose-400/70"
+      ? "bg-amber-500/80"
       : status === "a_relancer"
-      ? "bg-amber-400/70"
+      ? "bg-amber-300/70"
       : status === "a_transmettre_cabinet"
       ? "bg-teal-500/80"
       : status === "en_attente_cabinet"
@@ -448,9 +449,9 @@ export default function SuperviseurInbox() {
           <span className="text-charcoal/60">patients actifs</span>
         </span>
         <span className="h-3 w-px bg-navy-900/[0.08]" />
-        <span className="text-[13px] tracking-tight text-rose-700">
+        <span className="text-[13px] tracking-tight text-amber-900">
           <span className="font-medium">{counts.a_traiter}</span>{" "}
-          <span className="text-rose-700/70">à traiter</span>
+          <span className="text-amber-800/75">à traiter</span>
         </span>
         <span className="h-3 w-px bg-navy-900/[0.08]" />
         <span className="text-[13px] tracking-tight text-teal-700">
@@ -465,9 +466,9 @@ export default function SuperviseurInbox() {
         {enRetard > 0 && (
           <>
             <span className="h-3 w-px bg-navy-900/[0.08]" />
-            <span className="text-[13px] tracking-tight text-rose-700">
+            <span className="text-[13px] tracking-tight text-amber-900">
               <span className="font-medium">{enRetard}</span>{" "}
-              <span className="text-rose-700/70">en retard</span>
+              <span className="text-amber-800/75">en retard</span>
             </span>
           </>
         )}
@@ -505,7 +506,23 @@ export default function SuperviseurInbox() {
         </div>
       </Card>
 
-      <DoctrineNote className="mb-6" />
+      {/* Doctrine courte — détail en accordéon pour ne pas alourdir l'inbox. */}
+      <details className="mb-6 rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
+        <summary className="flex cursor-pointer items-center justify-between gap-3 list-none px-5 py-3.5">
+          <p className="text-[12.5px] tracking-tight text-charcoal/75">
+            <span className="font-semibold text-navy-900">Doctrine KOVELA :</span> documenter,
+            transmettre, ne jamais décider médicalement.
+          </p>
+          <span className="text-[11px] tracking-tight text-charcoal/45">Voir détail</span>
+        </summary>
+        <div className="border-t border-navy-900/[0.05] px-5 py-3.5 text-[12px] leading-relaxed text-charcoal/70">
+          <p>
+            KOVELA structure, trace, priorise opérationnellement et transmet au cabinet selon les
+            règles définies. L'IA est assistive, interne, loggée et human-in-the-loop. Toute
+            décision médicale relève du chirurgien.
+          </p>
+        </div>
+      </details>
 
       {/* Inbox — 6 groupes verticaux par statut opérationnel */}
       <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">

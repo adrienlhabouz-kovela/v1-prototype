@@ -59,8 +59,10 @@ export const urgenceLabels: Record<OperationalUrgence, string> = {
   a_venir: "À venir",
 };
 
+// Couleurs choisies pour évoquer une priorité opérationnelle, pas une alerte
+// clinique. "En retard" reste plus marqué qu'"Aujourd'hui" mais sans rouge.
 export const urgenceStyles: Record<OperationalUrgence, string> = {
-  en_retard: "bg-rose-50/60 text-rose-700 ring-rose-200/60",
+  en_retard: "bg-amber-100/70 text-amber-900 ring-amber-400/40",
   aujourdhui: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
   a_venir: "bg-navy-900/[0.04] text-charcoal/70 ring-navy-900/[0.06]",
 };
@@ -134,6 +136,12 @@ export function getOperationalStatus(
 ): OperationalStatus | null {
   // Clôturé → pas dans l'inbox de travail.
   if (patient.status === "cloture") return null;
+
+  // Règle de cohérence : tout dossier en retard remonte dans "À traiter
+  // maintenant", quel que soit son sous-état (CR à publier, compilation à
+  // transmettre, etc.). Le bandeau "0 à traiter avec N en retard" ne peut
+  // plus exister.
+  if (getUrgence(patient, ctx) === "en_retard") return "a_traiter";
 
   const now = ctx.now ?? Date.now();
   const report = ctx.reportFor(patient.id);
@@ -396,10 +404,10 @@ export interface ApplicableReferentiel {
   version: string;
   jalons_attendus: string[];
   jours_contact: string[];
-  peut_rappeler: string;
-  ne_pas_traiter: string;
-  a_transmettre_cabinet: string;
-  transmission_prioritaire: string;
+  peut_rappeler: string[];
+  ne_pas_traiter: string[];
+  a_transmettre_cabinet: string[];
+  transmission_prioritaire: string[];
   photos_attendues: string;
   format_cr_attendu: string;
   contact_prioritaire: string;
@@ -426,18 +434,31 @@ export function getApplicableReferentiel(
     version: "v0.1 prototype",
     jalons_attendus: jalons,
     jours_contact: jalons,
-    peut_rappeler:
-      "Rappels logistiques (repos, hydratation), jalons à venir, consignes générales déjà transmises par le cabinet.",
-    ne_pas_traiter:
-      "Modification de prescription, interprétation d'évolution, avis médical, reformulation des consignes existantes.",
-    a_transmettre_cabinet:
-      "Photo reçue, élément déclaré par le patient hors cadre habituel, demande d'avis médical, question médicament / ordonnance.",
-    transmission_prioritaire:
-      "Si le patient décrit une situation urgente, KOVELA rappelle le 15 / 112 et transmet au cabinet selon le canal défini.",
+    peut_rappeler: [
+      "Rappels logistiques (repos, hydratation)",
+      "Jalons à venir",
+      "Consignes générales déjà transmises par le cabinet",
+    ],
+    ne_pas_traiter: [
+      "Modification de prescription",
+      "Interprétation d'évolution",
+      "Avis médical",
+      "Reformulation des consignes existantes",
+    ],
+    a_transmettre_cabinet: [
+      "Photo reçue",
+      "Élément déclaré hors cadre habituel",
+      "Demande d'avis médical",
+      "Question médicament / ordonnance",
+    ],
+    transmission_prioritaire: [
+      "Si le patient décrit une situation urgente : rappel du 15 / 112",
+      "Transmission au cabinet selon le canal défini",
+    ],
     photos_attendues:
       jalons.length > 0
-        ? `Photos attendues aux jalons ${jalons.join(", ")} selon référentiel.`
-        : "Photos selon référentiel.",
+        ? `Aux jalons ${jalons.join(", ")} selon référentiel`
+        : "Selon référentiel",
     format_cr_attendu: config?.crFrequency ?? "CR fin de suivi",
     contact_prioritaire: config?.cabinetContact?.name ?? "—",
     is_simulated: true,

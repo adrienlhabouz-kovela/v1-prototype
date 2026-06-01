@@ -190,6 +190,69 @@ export default function PatientFiche() {
   const canPublishCR = report?.status === "valide";
   const canTransmitCompilation =
     !!patient.compilationDraft && escalation?.status !== "transmise";
+  const hasUntreated =
+    patient.messages.filter((m) => m.author === "patient" && !m.treated).length > 0;
+
+  // Bouton primary = exactement l'action recommandée. Tous les autres tombent
+  // en variant subtle ou secondary. Cohérence "prochaine action ↔ premier bouton".
+  type PrimaryKey =
+    | "mark_treated"
+    | "validate_cr"
+    | "publish_cr"
+    | "transmit_compilation"
+    | "prepare_cr"
+    | "relance_patient"
+    | "documenter_habituel"
+    | "wait_cabinet";
+
+  let primaryKey: PrimaryKey = "documenter_habituel";
+  if (hasUntreated) primaryKey = "mark_treated";
+  else if (canValidateCR) primaryKey = "validate_cr";
+  else if (canPublishCR) primaryKey = "publish_cr";
+  else if (canTransmitCompilation) primaryKey = "transmit_compilation";
+  else if (patient.status === "cr_en_attente") primaryKey = "prepare_cr";
+  else if (escalation?.status === "transmise") primaryKey = "wait_cabinet";
+  else if (patient.status === "silencieux") primaryKey = "relance_patient";
+
+  const primaryConfig: Record<
+    PrimaryKey,
+    { label: string; handler: () => void; disabled?: boolean }
+  > = {
+    mark_treated: {
+      label: "Lire et documenter",
+      handler: () => k.markTreated(patient.id),
+    },
+    validate_cr: {
+      label: "Valider le CR en interne",
+      handler: () => k.validateReport(patient.id),
+    },
+    publish_cr: {
+      label: "Rendre disponible au chirurgien",
+      handler: () => k.publishReport(patient.id),
+    },
+    transmit_compilation: {
+      label: "Transmettre au cabinet",
+      handler: () => k.transmitCompilation(patient.id),
+    },
+    prepare_cr: {
+      label: "Préparer le CR factuel",
+      handler: () => runAi("preparation_cr"),
+    },
+    relance_patient: {
+      label: "Relancer le patient",
+      handler: () => k.relancePatient(patient.id),
+    },
+    wait_cabinet: {
+      label: "En attente retour cabinet",
+      handler: () => undefined,
+      disabled: true,
+    },
+    documenter_habituel: {
+      label: "Documenter — suivi habituel",
+      handler: () => k.markTreated(patient.id),
+    },
+  };
+  const primary = primaryConfig[primaryKey];
 
   return (
     <Shell>
@@ -245,39 +308,32 @@ export default function PatientFiche() {
             )}
           </p>
 
-          {/* Actions rapides */}
+          {/* Actions rapides — primary = exactement la prochaine action. */}
           <div className="mt-5 flex flex-wrap gap-2">
-            {canPrepareCR && (
-              <Button variant="primary" onClick={() => runAi("preparation_cr")}>
-                Préparer CR factuel
+            <Button variant="primary" onClick={primary.handler} disabled={primary.disabled}>
+              {primary.label}
+            </Button>
+            {/* Secondaires — uniquement les actions encore pertinentes mais non-primary. */}
+            {primaryKey !== "prepare_cr" && canPrepareCR && (
+              <Button variant="subtle" onClick={() => runAi("preparation_cr")}>
+                Préparer CR (IA)
               </Button>
             )}
-            {canValidateCR && (
-              <Button variant="primary" onClick={() => k.validateReport(patient.id)}>
-                Valider le CR en interne
-              </Button>
-            )}
-            {canPublishCR && (
-              <Button variant="primary" onClick={() => k.publishReport(patient.id)}>
-                Rendre disponible au chirurgien
-              </Button>
-            )}
-            {canTransmitCompilation && (
-              <Button
-                variant="primary"
-                onClick={() => k.transmitCompilation(patient.id)}
-              >
+            {primaryKey !== "transmit_compilation" && canTransmitCompilation && (
+              <Button variant="subtle" onClick={() => k.transmitCompilation(patient.id)}>
                 Transmettre au cabinet
               </Button>
             )}
-            {patient.status === "silencieux" && (
-              <Button variant="secondary" onClick={() => k.relancePatient(patient.id)}>
+            {primaryKey !== "relance_patient" && patient.status === "silencieux" && (
+              <Button variant="subtle" onClick={() => k.relancePatient(patient.id)}>
                 Relancer le patient
               </Button>
             )}
-            <Button variant="subtle" onClick={() => k.markTreated(patient.id)}>
-              Marquer suivi habituel
-            </Button>
+            {primaryKey !== "mark_treated" && primaryKey !== "documenter_habituel" && (
+              <Button variant="subtle" onClick={() => k.markTreated(patient.id)}>
+                Marquer suivi habituel
+              </Button>
+            )}
             <Button variant="ghost" onClick={() => k.clotureSuivi(patient.id)}>
               Clôturer le suivi
             </Button>
@@ -326,7 +382,7 @@ export default function PatientFiche() {
           <Card>
             <CardHeader
               title="Timeline du suivi"
-              subtitle="Événements structurés : messages, actions KOVELA, transmissions, CR."
+              subtitle="Plus récent en haut — messages, actions KOVELA, transmissions, CR."
             />
             {/* Filtres */}
             <div className="flex flex-wrap gap-1.5 border-b border-navy-900/[0.05] px-5 py-3">
@@ -492,34 +548,58 @@ export default function PatientFiche() {
                 </div>
               ))}
 
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-700/80">
-                  KOVELA peut rappeler
-                </p>
-                <p className="mt-1 tracking-tight text-charcoal/75">{refl.peut_rappeler}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-rose-700/80">
-                  Ne pas traiter
-                </p>
-                <p className="mt-1 tracking-tight text-charcoal/75">{refl.ne_pas_traiter}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-800/80">
-                  À transmettre au cabinet
-                </p>
-                <p className="mt-1 tracking-tight text-charcoal/75">
-                  {refl.a_transmettre_cabinet}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-navy-900/70">
-                  Transmission prioritaire
-                </p>
-                <p className="mt-1 tracking-tight text-charcoal/75">
-                  {refl.transmission_prioritaire}
-                </p>
-              </div>
+              {(
+                [
+                  {
+                    label: "KOVELA peut rappeler",
+                    items: refl.peut_rappeler,
+                    eyebrowCls: "text-teal-700/80",
+                    dotCls: "bg-teal-600/70",
+                  },
+                  {
+                    label: "Ne pas traiter",
+                    items: refl.ne_pas_traiter,
+                    eyebrowCls: "text-charcoal/55",
+                    dotCls: "bg-charcoal/40",
+                  },
+                  {
+                    label: "À transmettre au cabinet",
+                    items: refl.a_transmettre_cabinet,
+                    eyebrowCls: "text-amber-800/80",
+                    dotCls: "bg-amber-500/70",
+                  },
+                  {
+                    label: "Transmission prioritaire",
+                    items: refl.transmission_prioritaire,
+                    eyebrowCls: "text-navy-900/70",
+                    dotCls: "bg-navy-900/70",
+                  },
+                ] as const
+              ).map((bloc) => (
+                <div
+                  key={bloc.label}
+                  className="border-b border-navy-900/[0.04] pb-2 last:border-0"
+                >
+                  <p
+                    className={`text-[10px] font-semibold uppercase tracking-[0.14em] ${bloc.eyebrowCls}`}
+                  >
+                    {bloc.label}
+                  </p>
+                  <ul className="mt-1.5 space-y-1">
+                    {bloc.items.map((it) => (
+                      <li
+                        key={it}
+                        className="flex items-start gap-2 text-[11.5px] leading-relaxed tracking-tight text-charcoal/75"
+                      >
+                        <span
+                          className={`mt-1.5 h-[4px] w-[4px] shrink-0 rounded-full ${bloc.dotCls}`}
+                        />
+                        <span>{it}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </Card>
 
@@ -560,18 +640,55 @@ export default function PatientFiche() {
                     >
                       Copier CR
                     </Button>
+                    {report.status === "disponible" && (
+                      <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">
+                        Marqué comme transmis au chirurgien
+                      </Badge>
+                    )}
                   </div>
                 </>
               ) : (
                 <>
-                  <p className="text-[11.5px] tracking-tight text-charcoal/55">
-                    Structure attendue : intervention · J+ · dernier contact · éléments
-                    déclarés · photos reçues · action KOVELA · à transmettre · statut ·
-                    prochaine étape.
-                  </p>
-                  <Button variant="primary" onClick={() => runAi("preparation_cr")}>
-                    Préparer brouillon
-                  </Button>
+                  {/* Mini-structure pré-remplie — guide visuel pour la
+                      superviseuse, valeurs auto pour les champs connus. */}
+                  <dl className="space-y-1.5 rounded-lg bg-bone/60 p-3 text-[11.5px] leading-relaxed ring-1 ring-navy-900/[0.04]">
+                    {[
+                      ["Intervention", patient.intervention],
+                      ["Jour post-op", day],
+                      [
+                        "Dernier contact",
+                        last.ageLabel ? `${last.label} — ${last.ageLabel}` : "—",
+                      ],
+                      ["Éléments déclarés par le patient", "—"],
+                      [
+                        "Photos reçues",
+                        patient.messages.some((m) =>
+                          m.attachments?.some((a) => a.kind === "photo")
+                        )
+                          ? "Oui"
+                          : "Non",
+                      ],
+                      ["Action KOVELA", "—"],
+                      ["À transmettre au cabinet", "—"],
+                      ["Statut", opStatus ? operationalStatusLabels[opStatus] : "—"],
+                      ["Prochaine étape", recommended.label],
+                    ].map(([label, value]) => (
+                      <div
+                        key={label}
+                        className="flex items-baseline justify-between gap-3"
+                      >
+                        <dt className="shrink-0 text-charcoal/55">{label}</dt>
+                        <dd className="text-right tracking-tight text-navy-900">
+                          {value || "—"}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="primary" onClick={() => runAi("preparation_cr")}>
+                      Préparer brouillon
+                    </Button>
+                  </div>
                 </>
               )}
             </div>
