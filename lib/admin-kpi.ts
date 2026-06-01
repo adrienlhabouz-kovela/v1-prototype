@@ -194,7 +194,69 @@ export interface FinanceMetrics {
   coutSuperviseurMensuel: number;
   coutDirectPatientsMensuel: number;
   margeBruteEur: number;
-  margeBrutePercent: number;
+  margeBrutePercent: number; // marge prototype — non représentative à faible volume
+}
+
+// Lecture normalisée à volume cible — hypothèse prototype, non donnée réelle.
+// Objectif : éviter d'afficher une marge prototype trompeuse (-200% à faible
+// volume) en haut de page, tout en gardant l'honnêteté du calcul prototype.
+export interface NormalizedFinanceMetrics {
+  chirurgiensCible: number;
+  patientsParChirurgienCible: number;
+  patientsTotalCible: number;
+  patientsParSuperviseurCible: number;
+  superviseusesCible: number;
+  mrrNormalise: number;
+  arrNormalise: number;
+  revenuAbonnementNormalise: number;
+  revenuVariableNormalise: number;
+  coutSuperviseurNormalise: number;
+  coutDirectNormalise: number;
+  margeBruteNormaliseeEur: number;
+  margeBruteNormaliseePercent: number;
+}
+
+export function getNormalizedFinanceMetrics(state: AdminState): NormalizedFinanceMetrics {
+  const chirurgiensCible = ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET;
+  const patientsParChirurgienCible =
+    ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET;
+  const patientsTotalCible = chirurgiensCible * patientsParChirurgienCible;
+  const patientsParSuperviseurCible =
+    ADMIN_CONSTANTS.PATIENTS_PAR_SUPERVISEUR_CIBLE;
+  const superviseusesCible = Math.ceil(
+    patientsTotalCible / patientsParSuperviseurCible
+  );
+
+  const revenuAbonnementNormalise = chirurgiensCible * state.pricing.baseMonthly;
+  const revenuVariableNormalise =
+    patientsTotalCible * state.pricing.perActivatedPatient;
+  const mrrNormalise = revenuAbonnementNormalise + revenuVariableNormalise;
+  const arrNormalise = mrrNormalise * 12;
+
+  const coutSuperviseurNormalise =
+    superviseusesCible * ADMIN_CONSTANTS.COUT_SUPERVISEUR_MENSUEL_EUR;
+  const coutDirectNormalise =
+    patientsTotalCible * ADMIN_CONSTANTS.COUT_DIRECT_PATIENT_EUR;
+  const margeBruteNormaliseeEur =
+    mrrNormalise - coutSuperviseurNormalise - coutDirectNormalise;
+  const margeBruteNormaliseePercent =
+    mrrNormalise > 0 ? margeBruteNormaliseeEur / mrrNormalise : 0;
+
+  return {
+    chirurgiensCible,
+    patientsParChirurgienCible,
+    patientsTotalCible,
+    patientsParSuperviseurCible,
+    superviseusesCible,
+    mrrNormalise,
+    arrNormalise,
+    revenuAbonnementNormalise,
+    revenuVariableNormalise,
+    coutSuperviseurNormalise,
+    coutDirectNormalise,
+    margeBruteNormaliseeEur,
+    margeBruteNormaliseePercent,
+  };
 }
 
 export function getFinanceMetrics(state: AdminState): FinanceMetrics {
@@ -679,7 +741,11 @@ export interface ExecutiveKPIs {
   patientsActifsAujourdhui: number;
   mrrEstimated: number;
   arrEstimated: number;
-  margeBrutePercent: number;
+  // Marge prototype actuelle — non représentative à faible volume.
+  margeBrutePrototypePercent: number;
+  // Marge normalisée à volume cible — affichée dans les KPI executive
+  // pour éviter qu'un investisseur lise un -200% trompeur en haut de page.
+  margeBruteNormaliseePercent: number;
   capaciteUtiliseePercent: number;
   decisionsCount: number;
 }
@@ -687,6 +753,7 @@ export interface ExecutiveKPIs {
 export function getExecutiveKPIs(state: AdminState): ExecutiveKPIs {
   const cap = getCapacityActuelle(state);
   const fin = getFinanceMetrics(state);
+  const norm = getNormalizedFinanceMetrics(state);
   const care = getCareOpsMetrics(state);
   const decisions = getDecisions(state);
   const chirurgiensActifs = state.surgeons.filter((s) => s.config.configured).length;
@@ -697,7 +764,8 @@ export function getExecutiveKPIs(state: AdminState): ExecutiveKPIs {
     patientsActifsAujourdhui: cap.patientsActifs,
     mrrEstimated: fin.mrrEstimated,
     arrEstimated: fin.arrEstimated,
-    margeBrutePercent: fin.margeBrutePercent,
+    margeBrutePrototypePercent: fin.margeBrutePercent,
+    margeBruteNormaliseePercent: norm.margeBruteNormaliseePercent,
     capaciteUtiliseePercent: cap.capaciteUtiliseePercent,
     decisionsCount: decisions.filter(
       (d) => d.severity === "high" || d.severity === "medium"
@@ -739,14 +807,14 @@ export function getExecutiveSummary(state: AdminState): string {
   const kpi = getExecutiveKPIs(state);
   const proj14 = getCapacityProjection(state, 14);
   const capPct = Math.round(kpi.capaciteUtiliseePercent * 100);
-  const margePct = Math.round(kpi.margeBrutePercent * 100);
+  const margeNormPct = Math.round(kpi.margeBruteNormaliseePercent * 100);
   const projPct = Math.round(proj14.capaciteProjeteePercent * 100);
 
   return (
     `Mois en cours : ${kpi.chirurgiensActifs} chirurgiens actifs, ` +
     `${kpi.patientsSuivisMois} patients suivis, ` +
     `${kpi.mrrEstimated} € MRR estimé, ` +
-    `marge brute estimée ${margePct}%, ` +
+    `marge normalisée à volume cible ${margeNormPct}%, ` +
     `capacité superviseurs utilisée à ${capPct}%, ` +
     `capacité projetée à 14 jours ${projPct}%, ` +
     `${kpi.decisionsCount} décisions à prendre.`

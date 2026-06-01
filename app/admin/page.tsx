@@ -27,6 +27,7 @@ import {
   getGeneralState,
   getGrowthMetrics,
   getHeadOfCareStatus,
+  getNormalizedFinanceMetrics,
   getRiskMetrics,
   getSaturationEstimate,
   headOfCareLabels,
@@ -139,6 +140,7 @@ export default function AdminCockpit() {
   const proj30 = getCapacityProjection(state, 30);
   const saturation = getSaturationEstimate(state);
   const fin = getFinanceMetrics(state);
+  const norm = getNormalizedFinanceMetrics(state);
   const risk = getRiskMetrics(state);
   const growth = getGrowthMetrics(state);
   const care = getCareOpsMetrics(state);
@@ -217,9 +219,10 @@ export default function AdminCockpit() {
           category="estime"
         />
         <KpiCard
-          label="Marge brute estimée"
-          value={formatPct(exec.margeBrutePercent)}
-          category="estime"
+          label="Marge normalisée"
+          value={formatPct(exec.margeBruteNormaliseePercent)}
+          hint={`À ${norm.chirurgiensCible} chirurgiens × ${norm.patientsParChirurgienCible} patients/mois`}
+          category="hypothese"
         />
         <KpiCard
           label="Capacité superviseurs"
@@ -666,18 +669,94 @@ export default function AdminCockpit() {
                 </div>
               ))}
             </div>
+            {/* Marge brute prototype — affichée mais contextualisée. */}
             <div className="border-t border-navy-900/[0.05] px-5 py-4">
               <div className="flex flex-wrap items-baseline gap-3">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
-                  Marge brute estimée
+                  Marge brute prototype — faible volume
                 </p>
-                <p className="font-display text-[22px] font-medium tracking-tight text-teal-700">
+                <p
+                  className={`font-display text-[22px] font-medium tracking-tight ${
+                    fin.margeBruteEur >= 0 ? "text-teal-700" : "text-amber-900"
+                  }`}
+                >
                   {formatEur(fin.margeBruteEur)}
                 </p>
                 <p className="text-[13px] tracking-tight text-charcoal/65">
                   ({formatPct(fin.margeBrutePercent, 1)})
                 </p>
               </div>
+              <p className="mt-1.5 text-[11.5px] leading-relaxed text-charcoal/55">
+                Non représentative à ce stade : faible volume patients vs coûts
+                fixes de supervision.
+              </p>
+            </div>
+          </Card>
+
+          {/* Marge brute normalisée — lecture à volume cible. */}
+          <Card>
+            <CardHeader
+              title="Marge brute normalisée"
+              subtitle={`À volume cible : ${norm.chirurgiensCible} chirurgiens × ${norm.patientsParChirurgienCible} patients/mois = ${norm.patientsTotalCible} patients. Capacité cible : ${norm.patientsParSuperviseurCible} patients / superviseuse.`}
+              action={
+                <Badge className={DATA_CATEGORY_STYLES.hypothese}>
+                  {DATA_CATEGORY_LABELS.hypothese}
+                </Badge>
+              }
+            />
+            <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-4">
+              {[
+                ["Chirurgiens cible", norm.chirurgiensCible],
+                [
+                  "Patients/mois cible",
+                  norm.patientsTotalCible,
+                ],
+                ["Superviseuses requises", norm.superviseusesCible],
+                ["MRR normalisé", formatEur(norm.mrrNormalise)],
+                ["ARR normalisé", formatEur(norm.arrNormalise)],
+                [
+                  "Revenu abonnement",
+                  formatEur(norm.revenuAbonnementNormalise),
+                ],
+                ["Revenu variable", formatEur(norm.revenuVariableNormalise)],
+                [
+                  "Coût supervision",
+                  formatEur(norm.coutSuperviseurNormalise),
+                ],
+              ].map(([label, value]) => (
+                <div key={String(label)} className="bg-white px-4 py-3.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
+                    {label}
+                  </p>
+                  <p className="mt-1.5 font-display text-[16px] font-medium tracking-tight text-navy-900">
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-navy-900/[0.05] px-5 py-4">
+              <div className="flex flex-wrap items-baseline gap-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+                  Marge brute normalisée
+                </p>
+                <p
+                  className={`font-display text-[22px] font-medium tracking-tight ${
+                    norm.margeBruteNormaliseeEur >= 0
+                      ? "text-teal-700"
+                      : "text-amber-900"
+                  }`}
+                >
+                  {formatEur(norm.margeBruteNormaliseeEur)}
+                </p>
+                <p className="text-[13px] tracking-tight text-charcoal/65">
+                  ({formatPct(norm.margeBruteNormaliseePercent, 1)})
+                </p>
+              </div>
+              <p className="mt-1.5 text-[11.5px] leading-relaxed text-charcoal/55">
+                Hypothèse prototype — calcul honnête basé sur les paramètres
+                affichés. À ajuster avec données réelles V1 (capacité
+                superviseur, pricing, mix abonnement/variable).
+              </p>
             </div>
             <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11px] leading-relaxed text-charcoal/55">
               Burn / runway / CAC / payback : à créer en V1 (cash et historique
@@ -793,9 +872,18 @@ export default function AdminCockpit() {
                     </span>
                   </li>
                   <li>
-                    Marge brute estimée{" "}
+                    Marge prototype :{" "}
+                    <span className="font-medium text-amber-900">
+                      non représentative (faible volume)
+                    </span>
+                  </li>
+                  <li>
+                    Marge normalisée à volume cible :{" "}
                     <span className="font-medium text-navy-900">
-                      {formatPct(exec.margeBrutePercent)}
+                      {formatPct(exec.margeBruteNormaliseePercent)}
+                    </span>{" "}
+                    <span className="text-charcoal/55">
+                      ({norm.chirurgiensCible}×{norm.patientsParChirurgienCible}/mois)
                     </span>
                   </li>
                 </ul>
@@ -874,11 +962,11 @@ export default function AdminCockpit() {
               ],
               [
                 "estime",
-                "MRR, ARR, marge brute, capacité utilisée et projetée",
+                "MRR, ARR, marge brute prototype, capacité utilisée et projetée",
               ],
               [
                 "hypothese",
-                "capacité superviseur, coût superviseur, coût patient, croissance hebdo",
+                "capacité superviseur, coût superviseur, coût patient, croissance hebdo, volume cible (chirurgiens, patients/mois, capacité). Marge normalisée = hypothèse prototype, non donnée réelle.",
               ],
               [
                 "v1",

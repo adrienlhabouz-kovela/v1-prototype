@@ -18,6 +18,14 @@ export const ADMIN_CONSTANTS = {
   COUT_SUPERVISEUR_MENSUEL_EUR: 3500,
   COUT_DIRECT_PATIENT_EUR: 12,
 
+  // Hypothèses de volume cible — pour la marge brute normalisée.
+  // L'idée : la marge prototype est non représentative (faible volume
+  // vs coûts de supervision fixes). On affiche une lecture normalisée à
+  // volume cible pour montrer que le modèle peut devenir cohérent.
+  CHIRURGIENS_NORMALIZED_TARGET: 5,
+  PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET: 20,
+  PATIENTS_PAR_SUPERVISEUR_CIBLE: 30,
+
   // Croissance patients — hypothèse linéaire prototype.
   // En V1, à remplacer par une projection issue du CRM + activations réelles.
   NOUVEAUX_PATIENTS_HEBDO_HYPOTHESE: 8,
