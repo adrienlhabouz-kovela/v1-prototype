@@ -51,7 +51,7 @@ const heroBadges = [
 const pains = [
   { t: "Messages dispersés", d: "WhatsApp, appels, SMS, emails, secrétariat : les échanges patients arrivent partout, sans fil conducteur." },
   { t: "Charge cabinet", d: "Relances manuelles, photos à classer, doutes à apaiser. L'assistante absorbe le bruit." },
-  { t: "Sollicitations désordonnées", d: "Le chirurgien est sollicité trop tôt, trop tard, ou sans dossier structuré." },
+  { t: "Sollicitations non structurées", d: "Le chirurgien est sollicité trop tôt, trop tard, ou sans dossier structuré." },
   { t: "Historique éclaté", d: "La responsabilité reste au chirurgien, mais l'historique se reconstitue entre canaux." },
 ];
 
@@ -94,7 +94,7 @@ const aiDoesNever = [
   "Pas de réponse autonome au patient",
   "Pas d'avis médical, pas de diagnostic",
   "Pas d'interprétation des photos",
-  "Pas de décision d'escalade",
+  "Pas de transmission cabinet sans validation humaine",
   "Pas d'évaluation chiffrée du patient",
 ];
 
@@ -408,7 +408,7 @@ export default function Landing() {
             L&apos;IA prépare. L&apos;humain valide. Le chirurgien décide.
           </p>
           <p className="mt-5 max-w-2xl text-[11.5px] leading-relaxed text-navy-100/45">
-            KOVELA ne décide pas médicalement. KOVELA structure, trace, priorise opérationnellement
+            KOVELA ne décide pas médicalement. KOVELA organise les échanges, documente le suivi
             et transmet au cabinet selon les règles définies.
           </p>
         </div>
@@ -538,8 +538,8 @@ export default function Landing() {
           ))}
         </div>
         <p className="mt-8 text-[11.5px] leading-relaxed text-charcoal/45">
-          Tarification calibrée selon le volume et la configuration. Aucune fourchette définitive
-          publiée à ce stade — précisions lors de la démo.
+          Modèle cabinet + patients activés. Les conditions pilotes sont précisées lors de la
+          démo selon le volume patient et le niveau d&apos;accompagnement.
         </p>
       </section>
 
