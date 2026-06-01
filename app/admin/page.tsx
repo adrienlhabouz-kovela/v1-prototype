@@ -41,6 +41,7 @@ import {
   getProductivityMetrics,
   getRiskMetrics,
   getSaturationEstimate,
+  getScaleSimulation,
   getTimeScenarioMetrics,
   patientsParSupParMois,
   headOfCareLabels,
@@ -164,6 +165,7 @@ export default function AdminCockpit() {
   const productivity = getProductivityMetrics(state);
   const aiGains = getAIGainsMetrics(k.aiLogs);
   const timeScenarios = getTimeScenarioMetrics(state);
+  const scaleSim = getScaleSimulation(state);
 
   return (
     <Shell>
@@ -1250,6 +1252,132 @@ export default function AdminCockpit() {
               </span>
             </div>
           </Card>
+
+          {/* Simulation scale — vue séparée 45 × 25 = 1 125 patients/mois */}
+          <Card>
+            <CardHeader
+              title={`Simulation scale — ${scaleSim.chirurgiens} chirurgiens × ${scaleSim.patientsParChirurgien} patients/mois`}
+              subtitle={`Vue séparée pour visualiser le potentiel économique à volume mature (${scaleSim.patientsTotal} patients/mois). NE REPRÉSENTE PAS la situation actuelle.`}
+              action={
+                <Badge className="bg-amber-100/70 text-amber-900 ring-amber-400/40">
+                  Simulation scale — hypothèse prototype
+                </Badge>
+              }
+            />
+
+            {/* Volume + revenus simulés */}
+            <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-4">
+              {[
+                ["Chirurgiens simulés", scaleSim.chirurgiens],
+                [
+                  "Patients / chirurgien",
+                  `${scaleSim.patientsParChirurgien} / mois`,
+                ],
+                ["Patients mensuels", scaleSim.patientsTotal],
+                ["MRR simulé", formatEur(scaleSim.mrr)],
+                ["ARR simulé", formatEur(scaleSim.arr)],
+                ["Revenu abonnement", formatEur(scaleSim.revenuAbonnement)],
+                ["Revenu variable", formatEur(scaleSim.revenuVariable)],
+                [
+                  "Coût fixes patient",
+                  formatEur(scaleSim.coutPatientFixes),
+                ],
+              ].map(([label, value]) => (
+                <div key={String(label)} className="bg-white px-4 py-3.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
+                    {label}
+                  </p>
+                  <p className="mt-1.5 font-display text-[15px] font-medium tracking-tight text-navy-900">
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Marge care simulée selon scénarios temps humain */}
+            <div className="overflow-x-auto border-t border-navy-900/[0.05]">
+              <table className="w-full text-[12.5px]">
+                <thead>
+                  <tr className="border-b border-navy-900/[0.05] text-left text-[10px] uppercase tracking-[0.14em] text-charcoal/55">
+                    <th className="px-5 py-2.5 font-medium">Scénario</th>
+                    <th className="px-5 py-2.5 font-medium">Min / patient</th>
+                    <th className="px-5 py-2.5 font-medium">Sup requises</th>
+                    <th className="px-5 py-2.5 font-medium">Coût sup</th>
+                    <th className="px-5 py-2.5 font-medium">
+                      Marge care % (rapide / lent)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {scaleSim.scenarios.map((t) => (
+                    <tr
+                      key={t.scenario.key}
+                      className="border-b border-navy-900/[0.04]"
+                    >
+                      <td className="px-5 py-2.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium tracking-tight text-navy-900">
+                            {t.scenario.label}
+                          </p>
+                          <Badge
+                            className={
+                              productivitySourceStyles[t.scenario.sourceType]
+                            }
+                          >
+                            {productivitySourceLabels[t.scenario.sourceType]}
+                          </Badge>
+                        </div>
+                      </td>
+                      <td className="px-5 py-2.5 font-mono text-charcoal/70">
+                        {t.scenario.minMinutesPerPatient}–
+                        {t.scenario.maxMinutesPerPatient}
+                      </td>
+                      <td className="px-5 py-2.5 font-mono text-charcoal/70">
+                        {t.superviseursRequisMin}–{t.superviseursRequisMax}
+                      </td>
+                      <td className="px-5 py-2.5 text-charcoal/65">
+                        {formatEur(t.coutSuperviseursMin)} –{" "}
+                        {formatEur(t.coutSuperviseursMax)}
+                      </td>
+                      <td className="px-5 py-2.5 font-medium tracking-tight">
+                        <span
+                          className={
+                            t.margeCareMaxEur >= 0
+                              ? "text-teal-700"
+                              : "text-amber-900"
+                          }
+                        >
+                          {formatPct(t.margeCareMaxPercent, 0)}
+                        </span>
+                        {" / "}
+                        <span
+                          className={
+                            t.margeCareMinEur >= 0
+                              ? "text-teal-700"
+                              : "text-amber-900"
+                          }
+                        >
+                          {formatPct(t.margeCareMinPercent, 0)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11.5px] leading-relaxed text-charcoal/60">
+              <span className="font-medium text-navy-900">Lecture :</span>{" "}
+              cette simulation montre le potentiel économique à volume mature
+              avec les mêmes hypothèses de coûts et de temps humain. Périmètre
+              marge care identique au point d'équilibre actuel : exclut sales,
+              tech, CEO, juridique, compta, marketing.{" "}
+              <span className="font-medium text-amber-900">
+                Simulation prototype — ne représente pas {scaleSim.chirurgiens}{" "}
+                chirurgiens actuellement actifs. À valider en pilote.
+              </span>
+            </div>
+          </Card>
         </div>
       )}
 
@@ -1477,6 +1605,28 @@ export default function AdminCockpit() {
           {careStaff.countByCostType.renseigne} renseigné(s) ·{" "}
           {careStaff.countByCostType.hypothese} hypothèse(s) ·{" "}
           {careStaff.countByCostType.a_valider} à valider.
+        </div>
+        {/* Volume actuel vs Simulation scale */}
+        <div className="border-t border-navy-900/[0.05] px-6 py-3 text-[11.5px] leading-relaxed tracking-tight text-charcoal/65">
+          <span className="font-medium text-navy-900">Volumes affichés :</span>{" "}
+          KPI executive et lectures principales = volume actuel prototype
+          ({ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET} chirurgiens ×{" "}
+          {ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET} patients/mois ={" "}
+          {ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET *
+            ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET}{" "}
+          patients). Card « Simulation scale » Finance = vue séparée à volume
+          mature ({ADMIN_CONSTANTS.CHIRURGIENS_SCALE_TARGET} chirurgiens ×{" "}
+          {ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_SCALE} ={" "}
+          {ADMIN_CONSTANTS.CHIRURGIENS_SCALE_TARGET *
+            ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_SCALE}{" "}
+          patients) — simulation, pas situation actuelle.{" "}
+          <span className="text-charcoal/55">
+            Temps humain par patient = baseline terrain (
+            {ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_LOW}–
+            {ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_HIGH} min) +
+            hypothèses V1/V2 à mesurer en pilote. Coûts care = mix renseignés /
+            hypothèses / à renseigner.
+          </span>
         </div>
       </Card>
     </Shell>

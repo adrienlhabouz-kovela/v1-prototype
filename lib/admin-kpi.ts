@@ -1209,3 +1209,107 @@ export function getTimeScenarioMetrics(state: AdminState): TimeScenarioMetrics[]
     };
   });
 }
+
+// ---------------------------------------------------------------------------
+// Simulation scale — vue séparée à volume mature (45 chirurgiens × 25
+// patients/mois). Permet de visualiser le potentiel économique à grande
+// échelle SANS modifier les KPI executive ni faire croire que ce volume
+// est déjà atteint. Réutilise les scénarios de productivité (temps humain
+// par patient) comme lecture canonique.
+// ---------------------------------------------------------------------------
+
+export interface ScaleScenarioResult {
+  scenario: ProductivityScenario;
+  capaciteMin: number;
+  capaciteMax: number;
+  superviseursRequisMin: number;
+  superviseursRequisMax: number;
+  coutSuperviseursMin: number;
+  coutSuperviseursMax: number;
+  coutCareTotalMin: number;
+  coutCareTotalMax: number;
+  margeCareMinEur: number;
+  margeCareMaxEur: number;
+  margeCareMinPercent: number;
+  margeCareMaxPercent: number;
+}
+
+export interface ScaleSimulation {
+  chirurgiens: number;
+  patientsParChirurgien: number;
+  patientsTotal: number;
+  revenuAbonnement: number;
+  revenuVariable: number;
+  mrr: number;
+  arr: number;
+  coutPatientFixes: number;
+  scenarios: ScaleScenarioResult[];
+}
+
+export function getScaleSimulation(state: AdminState): ScaleSimulation {
+  const chirurgiens = ADMIN_CONSTANTS.CHIRURGIENS_SCALE_TARGET;
+  const patientsParChirurgien = ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_SCALE;
+  const patientsTotal = chirurgiens * patientsParChirurgien;
+
+  const revenuAbonnement = chirurgiens * state.pricing.baseMonthly;
+  const revenuVariable = patientsTotal * state.pricing.perActivatedPatient;
+  const mrr = revenuAbonnement + revenuVariable;
+  const arr = mrr * 12;
+
+  const coutPatientFixes =
+    patientsTotal *
+    (ADMIN_CONSTANTS.COUT_DIRECT_PATIENT_EUR +
+      ADMIN_CONSTANTS.COUT_OUTILS_CARE_PAR_PATIENT_EUR +
+      ADMIN_CONSTANTS.COUT_MESSAGERIE_PATIENT_EUR);
+
+  const scenarios: ScaleScenarioResult[] = PRODUCTIVITY_SCENARIOS.map((s) => {
+    const capaciteMin = patientsParSupParMois(s.maxMinutesPerPatient);
+    const capaciteMax = patientsParSupParMois(s.minMinutesPerPatient);
+
+    const superviseursRequisMax = Math.ceil(
+      patientsTotal / Math.max(1, capaciteMin)
+    );
+    const superviseursRequisMin = Math.ceil(
+      patientsTotal / Math.max(1, capaciteMax)
+    );
+
+    const coutSuperviseursMax =
+      superviseursRequisMax * ADMIN_CONSTANTS.COUT_SUPERVISEUR_MENSUEL_EUR;
+    const coutSuperviseursMin =
+      superviseursRequisMin * ADMIN_CONSTANTS.COUT_SUPERVISEUR_MENSUEL_EUR;
+
+    const coutCareTotalMax = coutSuperviseursMax + coutPatientFixes;
+    const coutCareTotalMin = coutSuperviseursMin + coutPatientFixes;
+
+    const margeCareMinEur = mrr - coutCareTotalMax;
+    const margeCareMaxEur = mrr - coutCareTotalMin;
+
+    return {
+      scenario: s,
+      capaciteMin,
+      capaciteMax,
+      superviseursRequisMin,
+      superviseursRequisMax,
+      coutSuperviseursMin,
+      coutSuperviseursMax,
+      coutCareTotalMin,
+      coutCareTotalMax,
+      margeCareMinEur,
+      margeCareMaxEur,
+      margeCareMinPercent: mrr > 0 ? margeCareMinEur / mrr : 0,
+      margeCareMaxPercent: mrr > 0 ? margeCareMaxEur / mrr : 0,
+    };
+  });
+
+  return {
+    chirurgiens,
+    patientsParChirurgien,
+    patientsTotal,
+    revenuAbonnement,
+    revenuVariable,
+    mrr,
+    arr,
+    coutPatientFixes,
+    scenarios,
+  };
+}

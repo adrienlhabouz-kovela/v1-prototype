@@ -28,6 +28,12 @@ export const ADMIN_CONSTANTS = {
   PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET: 20,
   PATIENTS_PAR_SUPERVISEUR_CIBLE: 30,
 
+  // Hypothèses simulation scale — vue séparée pour montrer le potentiel
+  // économique à un volume mature. NE REPRÉSENTE PAS la situation actuelle :
+  // toujours affichée comme simulation prototype, jamais comme état présent.
+  CHIRURGIENS_SCALE_TARGET: 45,
+  PATIENTS_MOIS_PAR_CHIRURGIEN_SCALE: 25,
+
   // Croissance patients — hypothèse linéaire prototype.
   // En V1, à remplacer par une projection issue du CRM + activations réelles.
   NOUVEAUX_PATIENTS_HEBDO_HYPOTHESE: 8,
