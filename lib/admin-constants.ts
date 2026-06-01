@@ -46,8 +46,23 @@ export const ADMIN_CONSTANTS = {
   // Score qualité minimum acceptable (pour l'état général).
   SEUIL_QUALITE_OPS_MIN: 0.7,
 
+  // -------------------------------------------------------------------------
+  // Baseline terrain V0 — donnée historique opérationnelle.
+  // Mode manuel WhatsApp/audio, sans interface KOVELA, sans IA, sans
+  // automatisation. 17 ans d'expérience bloc + patient (Mélanie, ex partenaire
+  // KOVELA). Sert de point d'ancrage honnête pour modéliser la productivité.
+  // -------------------------------------------------------------------------
+  MANUAL_BASELINE_MINUTES_PER_PATIENT_LOW: 60,
+  MANUAL_BASELINE_MINUTES_PER_PATIENT_HIGH: 90,
+  FOLLOW_UP_DURATION_DAYS_MIN: 3,
+  FOLLOW_UP_DURATION_DAYS_MAX: 15,
+
+  // Heures productives par superviseuse / mois — hypothèse plateau opérationnel
+  // raisonnable (≈ 30 h/sem nettes × 4 sem). À mesurer en pilote.
+  SUPERVISOR_PRODUCTIVE_HOURS_PER_MONTH: 120,
+
   // Date / version du cockpit — pour le footer data integrity.
-  COCKPIT_VERSION: "Passe A+ (0.1 prototype)",
+  COCKPIT_VERSION: "Passe A+ (0.2 prototype — baseline terrain V0)",
 };
 
 // Catégories de classification des données — affichées dans le footer.
@@ -235,5 +250,72 @@ export const BREAK_EVEN_SCENARIOS: BreakEvenScenario[] = [
     label: "Upside V2 à mesurer",
     hint: "Avec IA assistive et automation matures.",
     patientsPerSupervisor: 90,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Scénarios productivité care — temps humain par patient sur toute la durée
+// de suivi. Modélisation à partir de la baseline terrain V0 (mode manuel
+// WhatsApp/audio) puis hypothèses de gains avec interface, IA, automation.
+// ---------------------------------------------------------------------------
+
+export type ProductivitySourceType =
+  | "baseline_terrain" // donnée historique (Mélanie)
+  | "hypothese" // estimation prototype à mesurer
+  | "a_valider"; // upside non démontré
+
+export const productivitySourceLabels: Record<ProductivitySourceType, string> = {
+  baseline_terrain: "Baseline terrain",
+  hypothese: "Hypothèse pilote",
+  a_valider: "À valider",
+};
+
+export const productivitySourceStyles: Record<ProductivitySourceType, string> = {
+  baseline_terrain: "bg-teal-50/60 text-teal-700 ring-teal-100/70",
+  hypothese: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
+  a_valider: "bg-navy-900/[0.04] text-charcoal/65 ring-navy-900/[0.06]",
+};
+
+export interface ProductivityScenario {
+  key: string;
+  label: string;
+  hint: string;
+  minMinutesPerPatient: number;
+  maxMinutesPerPatient: number;
+  sourceType: ProductivitySourceType;
+}
+
+export const PRODUCTIVITY_SCENARIOS: ProductivityScenario[] = [
+  {
+    key: "manuel_historique",
+    label: "Manuel historique V0",
+    hint: "WhatsApp/audio, sans interface KOVELA, sans IA. Donnée terrain — 17 ans d'expérience opérationnelle (Mélanie).",
+    minMinutesPerPatient: 60,
+    maxMinutesPerPatient: 90,
+    sourceType: "baseline_terrain",
+  },
+  {
+    key: "v1_interface",
+    label: "V1 interface outillée",
+    hint: "Avec interface KOVELA, templates, messages programmés. Gain à mesurer en pilote.",
+    minMinutesPerPatient: 40,
+    maxMinutesPerPatient: 60,
+    sourceType: "hypothese",
+  },
+  {
+    key: "v1_ia_assistive",
+    label: "V1 IA assistive",
+    hint: "Interface + IA assistive sur résumés, CR, compilation. Gain à mesurer en pilote.",
+    minMinutesPerPatient: 30,
+    maxMinutesPerPatient: 45,
+    sourceType: "hypothese",
+  },
+  {
+    key: "v2_optimisee",
+    label: "V2 optimisée",
+    hint: "Automation matures et workflows optimisés. Upside à valider.",
+    minMinutesPerPatient: 20,
+    maxMinutesPerPatient: 30,
+    sourceType: "a_valider",
   },
 ];

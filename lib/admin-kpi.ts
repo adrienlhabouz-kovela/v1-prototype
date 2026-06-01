@@ -6,9 +6,11 @@ import {
   ADMIN_CONSTANTS,
   BREAK_EVEN_SCENARIOS,
   CARE_TEAM_COSTS,
+  PRODUCTIVITY_SCENARIOS,
   type BreakEvenScenario,
   type CareTeamMember,
   type CostType,
+  type ProductivityScenario,
 } from "./admin-constants";
 import type {
   Patient,
@@ -1122,4 +1124,88 @@ export function getAIGainsMetrics(aiLogs: AILogLike[]): AIGainsMetrics {
     messagesProgrammes: 0,
     templatesUtilises: 0,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Capacité dérivée du temps humain par patient
+// Baseline terrain : 60–90 min/patient (mode manuel WhatsApp/audio).
+// Capacité ≈ (heures productives × 60) / minutes par patient.
+// ---------------------------------------------------------------------------
+
+export function patientsParSupParMois(minutesPerPatient: number): number {
+  if (minutesPerPatient <= 0) return 0;
+  return Math.round(
+    (ADMIN_CONSTANTS.SUPERVISOR_PRODUCTIVE_HOURS_PER_MONTH * 60) /
+      minutesPerPatient
+  );
+}
+
+export interface TimeScenarioMetrics {
+  scenario: ProductivityScenario;
+  // Capacité dérivée — range haut/bas selon min/max minutes par patient.
+  // Note : MIN minutes → MAX patients, et vice versa.
+  capaciteMin: number; // au temps haut (le plus lent)
+  capaciteMax: number; // au temps bas (le plus rapide)
+  // Calcul break-even à volume cible normalisé.
+  patientsTotal: number;
+  superviseursRequisMin: number; // au temps bas (peu de sup)
+  superviseursRequisMax: number; // au temps haut (beaucoup de sup)
+  coutSuperviseursMin: number;
+  coutSuperviseursMax: number;
+  coutCareTotalMin: number;
+  coutCareTotalMax: number;
+  revenuTotal: number;
+  margeCareMinEur: number; // marge la plus basse (au plus lent)
+  margeCareMaxEur: number; // marge la plus haute (au plus rapide)
+  margeCareMinPercent: number;
+  margeCareMaxPercent: number;
+}
+
+export function getTimeScenarioMetrics(state: AdminState): TimeScenarioMetrics[] {
+  const norm = getNormalizedFinanceMetrics(state);
+  const patientsTotal = norm.patientsTotalCible;
+  const revenuTotal = norm.mrrNormalise;
+
+  return PRODUCTIVITY_SCENARIOS.map((s) => {
+    const capaciteMin = patientsParSupParMois(s.maxMinutesPerPatient);
+    const capaciteMax = patientsParSupParMois(s.minMinutesPerPatient);
+
+    const superviseursRequisMax = Math.ceil(patientsTotal / Math.max(1, capaciteMin));
+    const superviseursRequisMin = Math.ceil(patientsTotal / Math.max(1, capaciteMax));
+
+    const coutSuperviseursMax =
+      superviseursRequisMax * ADMIN_CONSTANTS.COUT_SUPERVISEUR_MENSUEL_EUR;
+    const coutSuperviseursMin =
+      superviseursRequisMin * ADMIN_CONSTANTS.COUT_SUPERVISEUR_MENSUEL_EUR;
+
+    const coutPatientFixes =
+      patientsTotal *
+      (ADMIN_CONSTANTS.COUT_DIRECT_PATIENT_EUR +
+        ADMIN_CONSTANTS.COUT_OUTILS_CARE_PAR_PATIENT_EUR +
+        ADMIN_CONSTANTS.COUT_MESSAGERIE_PATIENT_EUR);
+
+    const coutCareTotalMax = coutSuperviseursMax + coutPatientFixes;
+    const coutCareTotalMin = coutSuperviseursMin + coutPatientFixes;
+
+    const margeCareMinEur = revenuTotal - coutCareTotalMax;
+    const margeCareMaxEur = revenuTotal - coutCareTotalMin;
+
+    return {
+      scenario: s,
+      capaciteMin,
+      capaciteMax,
+      patientsTotal,
+      superviseursRequisMin,
+      superviseursRequisMax,
+      coutSuperviseursMin,
+      coutSuperviseursMax,
+      coutCareTotalMin,
+      coutCareTotalMax,
+      revenuTotal,
+      margeCareMinEur,
+      margeCareMaxEur,
+      margeCareMinPercent: revenuTotal > 0 ? margeCareMinEur / revenuTotal : 0,
+      margeCareMaxPercent: revenuTotal > 0 ? margeCareMaxEur / revenuTotal : 0,
+    };
+  });
 }

@@ -12,6 +12,8 @@ import {
   careRoleLabels,
   costTypeLabels,
   costTypeStyles,
+  productivitySourceLabels,
+  productivitySourceStyles,
   type CareRole,
   type DataCategory,
 } from "@/lib/admin-constants";
@@ -40,6 +42,8 @@ import {
   getProductivityMetrics,
   getRiskMetrics,
   getSaturationEstimate,
+  getTimeScenarioMetrics,
+  patientsParSupParMois,
   headOfCareLabels,
   headOfCareStyles,
   type AdminPeriod,
@@ -161,6 +165,7 @@ export default function AdminCockpit() {
   const breakEvens = getBreakEvenScenarios(state);
   const productivity = getProductivityMetrics(state);
   const aiGains = getAIGainsMetrics(k.aiLogs);
+  const timeScenarios = getTimeScenarioMetrics(state);
 
   return (
     <Shell>
@@ -711,6 +716,77 @@ export default function AdminCockpit() {
               économisées par patient.
             </div>
           </Card>
+
+          {/* Temps humain par patient — baseline terrain + scénarios */}
+          <Card>
+            <CardHeader
+              title="Temps humain par patient"
+              subtitle={`Baseline terrain V0 : ${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_LOW}–${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_HIGH} min/patient sur ${ADMIN_CONSTANTS.FOLLOW_UP_DURATION_DAYS_MIN}–${ADMIN_CONSTANTS.FOLLOW_UP_DURATION_DAYS_MAX} jours de suivi. Mode manuel WhatsApp/audio, sans interface ni IA.`}
+              action={
+                <Badge className={DATA_CATEGORY_STYLES.hypothese}>
+                  {DATA_CATEGORY_LABELS.hypothese}
+                </Badge>
+              }
+            />
+            <div className="overflow-x-auto">
+              <table className="w-full text-[12.5px]">
+                <thead>
+                  <tr className="border-b border-navy-900/[0.05] text-left text-[10px] uppercase tracking-[0.14em] text-charcoal/55">
+                    <th className="px-5 py-2.5 font-medium">Scénario</th>
+                    <th className="px-5 py-2.5 font-medium">Min / patient</th>
+                    <th className="px-5 py-2.5 font-medium">
+                      Capacité dérivée
+                    </th>
+                    <th className="px-5 py-2.5 font-medium">Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {timeScenarios.map((t) => (
+                    <tr
+                      key={t.scenario.key}
+                      className="border-b border-navy-900/[0.04]"
+                    >
+                      <td className="px-5 py-2.5">
+                        <p className="font-medium tracking-tight text-navy-900">
+                          {t.scenario.label}
+                        </p>
+                        <p className="mt-0.5 text-[10.5px] leading-relaxed text-charcoal/55">
+                          {t.scenario.hint}
+                        </p>
+                      </td>
+                      <td className="px-5 py-2.5 font-mono text-navy-900">
+                        {t.scenario.minMinutesPerPatient}–
+                        {t.scenario.maxMinutesPerPatient} min
+                      </td>
+                      <td className="px-5 py-2.5 font-mono text-charcoal/70">
+                        {t.capaciteMin}–{t.capaciteMax} pat. / sup / mois
+                      </td>
+                      <td className="px-5 py-2.5">
+                        <Badge
+                          className={
+                            productivitySourceStyles[t.scenario.sourceType]
+                          }
+                        >
+                          {productivitySourceLabels[t.scenario.sourceType]}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11.5px] leading-relaxed text-charcoal/60">
+              <span className="font-medium text-navy-900">
+                Capacité dérivée :
+              </span>{" "}
+              ({ADMIN_CONSTANTS.SUPERVISOR_PRODUCTIVE_HOURS_PER_MONTH} h
+              productives/mois × 60) / minutes par patient.{" "}
+              <span className="text-charcoal/55">
+                Baseline historique = donnée terrain (17 ans d'expérience).
+                Gains V1/V2 = hypothèses à mesurer en pilote, jamais promesses.
+              </span>
+            </div>
+          </Card>
         </div>
       )}
 
@@ -1081,6 +1157,95 @@ export default function AdminCockpit() {
               ratio patients simples/lourds, gain IA).
             </div>
           </Card>
+
+          {/* Point d'équilibre par temps humain — modélisation Mélanie */}
+          <Card>
+            <CardHeader
+              title="Point d'équilibre par temps humain"
+              subtitle={`Lecture dérivée du temps humain par patient. Volume cible : ${timeScenarios[0].patientsTotal} patients/mois. Baseline terrain ${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_LOW}–${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_HIGH} min/patient (donnée historique).`}
+              action={
+                <Badge className={DATA_CATEGORY_STYLES.hypothese}>
+                  {DATA_CATEGORY_LABELS.hypothese}
+                </Badge>
+              }
+            />
+            <div className="overflow-x-auto">
+              <table className="w-full text-[12.5px]">
+                <thead>
+                  <tr className="border-b border-navy-900/[0.05] text-left text-[10px] uppercase tracking-[0.14em] text-charcoal/55">
+                    <th className="px-5 py-2.5 font-medium">Scénario</th>
+                    <th className="px-5 py-2.5 font-medium">Min / patient</th>
+                    <th className="px-5 py-2.5 font-medium">Sup requises</th>
+                    <th className="px-5 py-2.5 font-medium">Coût sup</th>
+                    <th className="px-5 py-2.5 font-medium">Marge care</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {timeScenarios.map((t) => (
+                    <tr
+                      key={t.scenario.key}
+                      className="border-b border-navy-900/[0.04]"
+                    >
+                      <td className="px-5 py-2.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium tracking-tight text-navy-900">
+                            {t.scenario.label}
+                          </p>
+                          <Badge
+                            className={
+                              productivitySourceStyles[t.scenario.sourceType]
+                            }
+                          >
+                            {productivitySourceLabels[t.scenario.sourceType]}
+                          </Badge>
+                        </div>
+                      </td>
+                      <td className="px-5 py-2.5 font-mono text-charcoal/70">
+                        {t.scenario.minMinutesPerPatient}–
+                        {t.scenario.maxMinutesPerPatient}
+                      </td>
+                      <td className="px-5 py-2.5 font-mono text-charcoal/70">
+                        {t.superviseursRequisMin}–{t.superviseursRequisMax}
+                      </td>
+                      <td className="px-5 py-2.5 text-charcoal/65">
+                        {formatEur(t.coutSuperviseursMin)} –{" "}
+                        {formatEur(t.coutSuperviseursMax)}
+                      </td>
+                      <td className="px-5 py-2.5 font-medium tracking-tight">
+                        <span
+                          className={
+                            t.margeCareMaxEur >= 0
+                              ? "text-teal-700"
+                              : "text-amber-900"
+                          }
+                        >
+                          {formatPct(t.margeCareMaxPercent, 0)}
+                        </span>
+                        {" / "}
+                        <span
+                          className={
+                            t.margeCareMinEur >= 0
+                              ? "text-teal-700"
+                              : "text-amber-900"
+                          }
+                        >
+                          {formatPct(t.margeCareMinPercent, 0)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11.5px] leading-relaxed text-charcoal/60">
+              <span className="font-medium text-navy-900">Lecture :</span>{" "}
+              colonne marge care = (min / patient le plus rapide) /{" "}
+              (min / patient le plus lent). La marge care dépend directement du
+              temps humain : interface + IA + automation peuvent la faire
+              basculer du négatif au positif. Hypothèses à mesurer en pilote,
+              jamais promesses.
+            </div>
+          </Card>
         </div>
       )}
 
@@ -1284,11 +1449,11 @@ export default function AdminCockpit() {
               ],
               [
                 "hypothese",
-                "capacité superviseur, coûts care par poste, coût outils care, coût messagerie patient, volume cible. Marge normalisée et point d'équilibre = hypothèses prototype, non données réelles.",
+                `capacité superviseur, coûts care par poste, coût outils care, coût messagerie patient, volume cible, heures productives / mois. Baseline terrain V0 (${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_LOW}–${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_HIGH} min/patient) = donnée historique opérationnelle. Scénarios V1/V2 = hypothèses à mesurer.`,
               ],
               [
                 "v1",
-                "temps superviseur / patient · temps CR · temps transmission cabinet · gain IA réel · ratio patients simples/lourds · coûts care réels (WhatsApp, outils, QA, Head of Care). Churn, CAC, payback, runway.",
+                "temps humain total / patient · temps CR · temps transmission cabinet · temps relance · ratio patients simples/lourds · gain interface réel · gain IA réel · capacité réelle superviseuse · coûts care réels (WhatsApp, outils, QA, Head of Care). Churn, CAC, payback, runway.",
               ],
             ] as [DataCategory, string][]
           ).map(([cat, content]) => (
