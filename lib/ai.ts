@@ -104,9 +104,13 @@ export function aiPrepareReport(patient: Patient): string {
     "",
     "Actions KOVELA :",
     "— Réception et classement opérationnel des messages.",
-    "— Continuité post-opératoire assurée.",
+    "— Suivi opérationnel réalisé selon le référentiel cabinet.",
     "",
-    `Escalade : ${hasEscalade ? "compilation factuelle en cours de préparation." : "aucune escalade ouverte sur la période."}`,
+    `Transmission cabinet : ${
+      hasEscalade
+        ? "compilation factuelle en cours de préparation."
+        : "aucune transmission prioritaire ouverte sur la période."
+    }`,
     "Statut final : à relire, corriger si besoin, puis valider par la superviseuse KOVELA.",
     "",
     "⚠ Brouillon IA à relire et valider avant mise à disposition chirurgien — synthèse opérationnelle non médicale.",

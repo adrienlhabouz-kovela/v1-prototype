@@ -1269,7 +1269,7 @@ export default function PatientFiche() {
               <span className="flex h-5 w-5 items-center justify-center rounded bg-teal-600 text-[10px] font-bold text-white">
                 IA
               </span>
-              Suggestion IA — modification par un humain
+              Brouillon IA — modification par la superviseuse
             </div>
             <textarea
               value={aiOutput}
@@ -1286,6 +1286,19 @@ export default function PatientFiche() {
               </Button>
             </div>
           </div>
+        ) : aiKind === "preparation_cr" ? (
+          <CrPreparationView
+            output={aiOutput}
+            patientName={patient.name}
+            intervention={patient.intervention}
+            day={day}
+            surgeonName={k.surgeonName(patient.surgeonId)}
+            crStatusLabel={report ? crStatusLabels[report.status] : "Aucun CR préparé"}
+            estimatedMinutesLabel={formatMinutes(aiEstimatedMinutes("preparation_cr"))}
+            onAccept={acceptAi}
+            onModify={() => setEditing(true)}
+            onRefuse={refuseAi}
+          />
         ) : (
           <AiSuggestion
             output={aiOutput}
@@ -1299,5 +1312,194 @@ export default function PatientFiche() {
         )}
       </Modal>
     </Shell>
+  );
+}
+
+// Vue structurée de la préparation de brouillon de CR — rendue dans la modale
+// pour offrir une relecture en sections, une checklist et un rappel doctrine.
+// Le texte stocké reste celui d'aiPrepareReport (aiOutput) : la vue lit ce
+// texte, en extrait les sections connues, et le reste demeure la source de
+// vérité pour le stockage du brouillon.
+const BROUILLON_SECTIONS: { key: string; title: string }[] = [
+  { key: "Messages principaux", title: "Messages principaux" },
+  { key: "Relances", title: "Relances effectuées" },
+  { key: "Actions KOVELA", title: "Actions KOVELA" },
+  { key: "Transmission cabinet", title: "Transmission cabinet" },
+  { key: "Statut final", title: "Statut final" },
+];
+
+function parseBrouillonSections(output: string): { title: string; lines: string[] }[] {
+  const lines = output.split("\n");
+  const headerIndexes: { idx: number; title: string }[] = [];
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    const match = BROUILLON_SECTIONS.find((s) =>
+      trimmed.startsWith(`${s.key} :`) || trimmed === `${s.key} :`
+    );
+    if (match) headerIndexes.push({ idx, title: match.title });
+  });
+  return headerIndexes.map((h, i) => {
+    const start = h.idx;
+    const end = headerIndexes[i + 1]?.idx ?? lines.length;
+    const block = lines.slice(start, end);
+    const first = block[0]?.trim() ?? "";
+    const headerLabel = BROUILLON_SECTIONS.find((s) => s.title === h.title)!.key;
+    const inlineRest = first.startsWith(`${headerLabel} :`)
+      ? first.slice(headerLabel.length + 1).trim()
+      : "";
+    const rest = block
+      .slice(1)
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0 && !l.startsWith("⚠"));
+    const content = [inlineRest, ...rest].filter((l) => l.length > 0);
+    return { title: h.title, lines: content };
+  });
+}
+
+function CrPreparationView({
+  output,
+  patientName,
+  intervention,
+  day,
+  surgeonName,
+  crStatusLabel,
+  estimatedMinutesLabel,
+  onAccept,
+  onModify,
+  onRefuse,
+}: {
+  output: string;
+  patientName: string;
+  intervention: string;
+  day: string;
+  surgeonName: string;
+  crStatusLabel: string;
+  estimatedMinutesLabel: string;
+  onAccept: () => void;
+  onModify: () => void;
+  onRefuse: () => void;
+}) {
+  const sections = parseBrouillonSections(output);
+  const checklist = [
+    "Identité patient vérifiée",
+    "Période de suivi cohérente",
+    "Messages clés présents",
+    "Transmission cabinet cohérente",
+    "Aucune formulation médicale ajoutée",
+  ];
+  const resume: { label: string; value: string }[] = [
+    { label: "Patient", value: patientName },
+    { label: "Intervention", value: intervention },
+    { label: "Période", value: day },
+    { label: "Chirurgien", value: surgeonName },
+    { label: "Statut CR", value: crStatusLabel },
+  ];
+
+  return (
+    <div className="rounded-2xl border border-teal-100/80 bg-white p-5 shadow-card ring-1 ring-teal-100/40">
+      {/* En-tête IA — disclaimer + estimation, conservés. */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-teal-100/60 pb-3">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-[18px] w-[18px] items-center justify-center rounded-md bg-teal-600 text-[9.5px] font-bold tracking-tight text-white">
+            IA
+          </span>
+          <span className="text-[11.5px] font-semibold uppercase tracking-[0.12em] text-teal-700">
+            Suggestion IA — à valider par un humain
+          </span>
+        </div>
+        <span className="rounded-md bg-teal-50 px-2 py-0.5 text-[10.5px] text-teal-700 ring-1 ring-teal-100">
+          Estimation prototype — {estimatedMinutesLabel}
+        </span>
+      </div>
+
+      {/* A. Résumé patient */}
+      <section className="mb-5">
+        <h4 className="mb-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+          Résumé patient
+        </h4>
+        <dl className="grid grid-cols-1 gap-x-4 gap-y-1.5 rounded-xl bg-bone/60 p-3 text-[12px] leading-relaxed ring-1 ring-navy-900/[0.04] sm:grid-cols-2">
+          {resume.map((r) => (
+            <div key={r.label} className="flex items-baseline justify-between gap-3">
+              <dt className="shrink-0 text-charcoal/55">{r.label}</dt>
+              <dd className="text-right tracking-tight text-navy-900">{r.value || "—"}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {/* B. Brouillon CR factuel — sections */}
+      <section className="mb-5">
+        <h4 className="mb-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+          Brouillon CR factuel
+        </h4>
+        <div className="space-y-2.5">
+          {sections.length === 0 ? (
+            <pre className="whitespace-pre-wrap rounded-xl bg-bone/60 p-3 font-sans text-[12.5px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.04]">
+              {output}
+            </pre>
+          ) : (
+            sections.map((s) => (
+              <div
+                key={s.title}
+                className="rounded-xl bg-bone/60 p-3 ring-1 ring-navy-900/[0.04]"
+              >
+                <div className="mb-1 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-navy-700">
+                  {s.title}
+                </div>
+                <ul className="space-y-0.5 text-[12.5px] leading-relaxed text-navy-900">
+                  {s.lines.length === 0 ? (
+                    <li className="text-charcoal/55">—</li>
+                  ) : (
+                    s.lines.map((line, i) => (
+                      <li key={i} className="tracking-tight">
+                        {line.startsWith("—") ? line : `— ${line}`}
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* C. Checklist avant validation */}
+      <section className="mb-5">
+        <h4 className="mb-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+          Checklist avant validation
+        </h4>
+        <ul className="space-y-1 rounded-xl bg-teal-50/40 p-3 text-[12px] leading-relaxed ring-1 ring-teal-100/60">
+          {checklist.map((item) => (
+            <li key={item} className="flex items-start gap-2 text-navy-900">
+              <span
+                aria-hidden
+                className="mt-[3px] flex h-[13px] w-[13px] shrink-0 items-center justify-center rounded border border-teal-600/50 bg-white text-[9px] text-teal-700"
+              >
+                ✓
+              </span>
+              <span className="tracking-tight">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* D. Rappel doctrine */}
+      <p className="mb-5 rounded-xl bg-amber-50/60 px-3 py-2 text-[11.5px] leading-relaxed tracking-tight text-amber-900 ring-1 ring-amber-100">
+        Brouillon IA à relire et valider avant disponibilité chirurgien — synthèse opérationnelle non médicale.
+      </p>
+
+      {/* Boutons alignés sur le workflow CR : IA prépare, humain valide. */}
+      <div className="flex flex-wrap gap-2">
+        <Button variant="primary" onClick={onAccept}>
+          Relire et valider
+        </Button>
+        <Button variant="secondary" onClick={onModify}>
+          Modifier le brouillon
+        </Button>
+        <Button variant="ghost" onClick={onRefuse}>
+          Rejeter
+        </Button>
+      </div>
+    </div>
   );
 }
