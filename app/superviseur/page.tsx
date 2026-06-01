@@ -9,20 +9,30 @@ import { aiEstimatedMinutes, formatMinutes } from "@/lib/ai";
 import {
   formationLabels,
   formationStyles,
-  relativeDays,
-  statusLabels,
-  statusStyles,
   suggestionImpactLabels,
   suggestionTypeLabels,
 } from "@/lib/format";
-import type {
-  Patient,
-  SuggestionImpact,
-  SuggestionPriority,
-  SuggestionType,
-} from "@/lib/types";
+import type { Patient, SuggestionImpact, SuggestionPriority, SuggestionType } from "@/lib/types";
+import {
+  countByOperationalStatus,
+  getLastEvent,
+  getOperationalStatus,
+  getPostOpDay,
+  getRecommendedAction,
+  getUrgence,
+  operationalStatusHints,
+  operationalStatusLabels,
+  operationalStatusOrder,
+  type OperationalStatus,
+  urgenceLabels,
+  urgenceStyles,
+} from "@/lib/supervisor";
 
 const MY_SUPERVISOR_ID = "sup1";
+
+// ---------------------------------------------------------------------------
+// Améliorations terrain — composant existant conservé (déplacé en bas).
+// ---------------------------------------------------------------------------
 
 function SuggestionsBlock() {
   const k = useKovela();
@@ -51,13 +61,13 @@ function SuggestionsBlock() {
     "w-full rounded-xl border border-navy-100 px-3 py-2 text-sm outline-none focus:border-teal-400";
 
   return (
-    <Card className="mb-6 overflow-hidden">
+    <Card className="mt-6 overflow-hidden">
       <div className="flex items-start justify-between gap-3 border-b border-navy-900/[0.06] px-5 py-3.5">
         <div>
           <h3 className="text-sm font-semibold text-navy-900">Améliorations terrain</h3>
           <p className="text-[11px] text-charcoal/55">
-            Les superviseurs utilisent KOVELA au quotidien. Leurs retours permettent d'améliorer les
-            templates, l'IA assistive, la formation et l'organisation du service opéré.
+            Les superviseurs utilisent KOVELA au quotidien. Leurs retours permettent d'améliorer
+            les templates, l'IA assistive, la formation et l'organisation du service opéré.
           </p>
         </div>
         <Button variant="primary" onClick={() => setOpen(true)}>
@@ -157,20 +167,27 @@ function SuggestionsBlock() {
   );
 }
 
-function MyIndicators() {
+// ---------------------------------------------------------------------------
+// Bandeau "Mes indicateurs" — détails IA repliés.
+// ---------------------------------------------------------------------------
+
+function DetailsIA({ patients }: { patients: Patient[] }) {
   const k = useKovela();
-  const myId = "sup1";
-  const me = k.supervisors.find((s) => s.id === myId);
-  const mine = k.patients.filter((p) => p.supervisorId === myId);
-  const actifs = mine.filter((p) => p.status !== "cloture").length;
-  const treated = mine.reduce((acc, p) => acc + p.messages.filter((m) => m.treated).length, 0);
-  const untreated = mine.reduce(
-    (acc, p) => acc + p.messages.filter((m) => m.author === "patient" && !m.treated).length,
-    0
-  );
+  const [open, setOpen] = useState(false);
+  const me = k.supervisors.find((s) => s.id === MY_SUPERVISOR_ID);
+
+  const ids = new Set(patients.map((p) => p.id));
+  const myLogs = k.aiLogs.filter((l) => l.patientId && ids.has(l.patientId));
+  const usage = myLogs.filter((l) => l.decision === "propose").length;
+  const ac = myLogs.filter((l) => l.decision === "accepte").length;
+  const mo = myLogs.filter((l) => l.decision === "modifie").length;
+  const minutes = myLogs
+    .filter((l) => l.decision === "propose")
+    .reduce((acc, l) => acc + aiEstimatedMinutes(l.fn), 0);
+
   // Délai moyen patient → réponse (h)
   const delays: number[] = [];
-  mine.forEach((p) => {
+  patients.forEach((p) => {
     for (let i = 0; i < p.messages.length - 1; i++) {
       if (p.messages[i].author === "patient" && p.messages[i + 1].author !== "patient") {
         const dt =
@@ -180,122 +197,237 @@ function MyIndicators() {
     }
   });
   const delayH = delays.length ? delays.reduce((a, b) => a + b, 0) / delays.length : 0;
-  const reportsMine = k.reports.filter((r) => mine.some((p) => p.id === r.patientId));
-  const crFinalises = reportsMine.filter((r) => r.status === "valide" || r.status === "disponible").length;
-  const crEnAttente = mine.filter((p) => p.status === "cr_en_attente").length;
-  const assignedIds = new Set(mine.map((p) => p.id));
-  const myLogs = k.aiLogs.filter((l) => l.patientId && assignedIds.has(l.patientId));
-  const usage = myLogs.filter((l) => l.decision === "propose").length;
-  const ac = myLogs.filter((l) => l.decision === "accepte").length;
-  const mo = myLogs.filter((l) => l.decision === "modifie").length;
-  const minutes = myLogs
-    .filter((l) => l.decision === "propose")
-    .reduce((acc, l) => acc + aiEstimatedMinutes(l.fn), 0);
 
   return (
-    <Card className="mb-6 overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-navy-900/[0.06] px-5 py-3.5">
-        <div>
-          <h3 className="text-sm font-semibold text-navy-900">Mes indicateurs</h3>
-          <p className="text-[11px] text-charcoal/55">
-            Ces indicateurs aident KOVELA à maintenir une qualité de traitement homogène.
+    <div className="mt-3 rounded-xl bg-bone/40 ring-1 ring-navy-900/[0.04]">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left transition-colors hover:bg-bone/70"
+      >
+        <span className="flex items-center gap-2 text-[11.5px] font-medium tracking-tight text-charcoal/65">
+          Voir détails IA & qualité
+          {me && (
+            <Badge className={formationStyles[me.formationStatus]}>
+              {formationLabels[me.formationStatus]}
+            </Badge>
+          )}
+        </span>
+        <span
+          className={`text-[12px] text-charcoal/45 transition-transform ${open ? "rotate-90" : ""}`}
+        >
+          ›
+        </span>
+      </button>
+      {open && (
+        <div className="border-t border-navy-900/[0.05] px-4 py-3">
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg bg-navy-900/[0.04] sm:grid-cols-4">
+            {[
+              ["Délai moyen patient → réponse", delayH ? `${delayH.toFixed(1)} h` : "—"],
+              ["Usage IA", String(usage)],
+              ["IA acceptées / modifiées", `${ac} / ${mo}`],
+              ["Temps estimé gagné (IA)", formatMinutes(minutes)],
+            ].map(([label, value]) => (
+              <div key={label} className="bg-white px-3 py-2.5">
+                <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
+                  {label}
+                </p>
+                <p className="mt-1.5 font-display text-[15px] font-medium tracking-tight text-navy-900">
+                  {value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Carte patient enrichie — 4 lignes, action-first.
+// ---------------------------------------------------------------------------
+
+function PatientCard({ patient }: { patient: Patient }) {
+  const k = useKovela();
+  const ctx = { reportFor: k.reportFor, escalationFor: k.escalationFor };
+  const day = getPostOpDay(patient);
+  const last = getLastEvent(patient, ctx);
+  const action = getRecommendedAction(patient, ctx);
+  const urgence = getUrgence(patient, ctx);
+
+  return (
+    <Link
+      href={`/superviseur/patient/${patient.id}`}
+      className="group block border-t border-navy-900/[0.04] px-4 py-3 transition-colors first:border-t-0 hover:bg-bone/40"
+    >
+      {/* Ligne 1 : Patient · J+X · Intervention · Badge urgence */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+          <span className="truncate text-[13.5px] font-medium tracking-tight text-navy-900">
+            {patient.name}
+          </span>
+          <span className="text-[11.5px] font-mono font-medium text-teal-700">{day}</span>
+          <span className="truncate text-[11.5px] text-charcoal/55">{patient.intervention}</span>
+        </div>
+        <Badge className={`${urgenceStyles[urgence]} shrink-0`}>{urgenceLabels[urgence]}</Badge>
+      </div>
+
+      {/* Ligne 2 : Chirurgien */}
+      <p className="mt-1 text-[11.5px] text-charcoal/55">
+        {k.surgeonName(patient.surgeonId)}
+      </p>
+
+      {/* Ligne 3 : Dernier événement */}
+      <p className="mt-1.5 flex items-center gap-2 text-[12px] tracking-tight text-charcoal/65">
+        <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-navy-900/30" />
+        <span className="truncate">
+          {last.label}
+          {last.ageLabel && (
+            <span className="ml-1 text-charcoal/45">— {last.ageLabel}</span>
+          )}
+        </span>
+      </p>
+
+      {/* Ligne 4 : Prochaine action + délai */}
+      <div className="mt-1.5 flex items-center justify-between gap-2">
+        <p className="flex min-w-0 items-center gap-2 text-[12px] tracking-tight">
+          <span className="font-medium text-teal-700">→</span>
+          <span className="truncate font-medium text-navy-900">{action.label}</span>
+          {action.delay && (
+            <span className="shrink-0 text-charcoal/55">· {action.delay}</span>
+          )}
+        </p>
+        <span className="shrink-0 text-[11.5px] font-medium text-teal-700 opacity-0 transition-opacity group-hover:opacity-100">
+          Ouvrir →
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Groupe d'inbox — un statut opérationnel.
+// ---------------------------------------------------------------------------
+
+function InboxGroup({
+  status,
+  patients,
+}: {
+  status: OperationalStatus;
+  patients: Patient[];
+}) {
+  const accentBar =
+    status === "a_traiter"
+      ? "bg-rose-400/70"
+      : status === "a_relancer"
+      ? "bg-amber-400/70"
+      : status === "a_transmettre_cabinet"
+      ? "bg-teal-500/80"
+      : status === "en_attente_cabinet"
+      ? "bg-navy-900/30"
+      : status === "cloture_a_preparer"
+      ? "bg-navy-900/30"
+      : "bg-navy-900/[0.08]";
+
+  return (
+    <Card className="overflow-hidden">
+      <div className="flex items-start gap-4 border-b border-navy-900/[0.05] px-5 py-4">
+        <span className={`mt-1 h-7 w-[2px] shrink-0 rounded-full ${accentBar}`} />
+        <div className="flex-1">
+          <div className="flex items-baseline justify-between gap-3">
+            <h3 className="font-display text-[14.5px] font-semibold tracking-tight text-navy-900">
+              {operationalStatusLabels[status]}
+            </h3>
+            <span className="flex h-6 min-w-[24px] items-center justify-center rounded-md bg-navy-900 px-1.5 text-[11px] font-semibold text-white">
+              {patients.length}
+            </span>
+          </div>
+          <p className="mt-0.5 text-[11px] tracking-tight text-charcoal/55">
+            {operationalStatusHints[status]}
           </p>
         </div>
-        {me && (
-          <Badge className={formationStyles[me.formationStatus]}>{formationLabels[me.formationStatus]}</Badge>
-        )}
       </div>
-      <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-3 lg:grid-cols-6">
-        {[
-          ["Patients actifs", String(actifs)],
-          ["Messages traités", String(treated)],
-          ["Non traités", String(untreated)],
-          ["Délai moyen", delayH ? `${delayH.toFixed(1)} h` : "—"],
-          ["CR finalisés", String(crFinalises)],
-          ["CR en attente", String(crEnAttente)],
-          ["Usage IA", String(usage)],
-          ["IA acceptées / modifiées", `${ac} / ${mo}`],
-          ["Temps estimé gagné (IA)", formatMinutes(minutes)],
-        ].map(([label, value]) => (
-          <div key={label} className="bg-white px-4 py-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
-              {label}
-            </p>
-            <p className="mt-2 font-display text-[20px] font-medium tracking-tight text-navy-900">
-              {value}
-            </p>
-          </div>
-        ))}
+      <div>
+        {patients.length === 0 ? (
+          <p className="px-5 py-6 text-center text-[12px] tracking-tight text-charcoal/45">
+            Rien à traiter ici.
+          </p>
+        ) : (
+          patients.map((p) => <PatientCard key={p.id} patient={p} />)
+        )}
       </div>
     </Card>
   );
 }
 
-interface Section {
-  key: string;
-  title: string;
-  hint: string;
-  match: (p: Patient, ctx: { unTreated: (p: Patient) => number }) => boolean;
-}
-
-const sections: Section[] = [
-  {
-    key: "non_traites",
-    title: "Messages non traités",
-    hint: "Critère : message patient non lu / non traité",
-    match: (p, ctx) => ctx.unTreated(p) > 0,
-  },
-  {
-    key: "silencieux",
-    title: "Patients silencieux",
-    hint: "Critère : absence de réponse patient",
-    match: (p) => p.status === "silencieux",
-  },
-  {
-    key: "escalades",
-    title: "Escalades ouvertes",
-    hint: "Critère : escalade ouverte (signal déclaré)",
-    match: (p) => p.status === "escalade_ouverte",
-  },
-  {
-    key: "cr",
-    title: "CR à faire",
-    hint: "Critère : CR en attente",
-    match: (p) => p.status === "cr_en_attente",
-  },
-  {
-    key: "suivis",
-    title: "Suivis du jour",
-    hint: "Critère : suivi actif en cours",
-    match: (p) => p.status === "actif",
-  },
-  {
-    key: "clotures",
-    title: "Clôtures à faire",
-    hint: "Critère : onboarding incomplet à finaliser",
-    match: (p) => p.status === "onboarding_incomplet",
-  },
-];
+// ---------------------------------------------------------------------------
+// Page principale
+// ---------------------------------------------------------------------------
 
 export default function SuperviseurInbox() {
   const k = useKovela();
   const [onlyMine, setOnlyMine] = useState(true);
-  const myId = "sup1"; // Inès Carvalho (superviseur de démo)
 
-  const unTreated = (p: Patient) => p.messages.filter((m) => m.author === "patient" && !m.treated).length;
+  const ctx = useMemo(
+    () => ({ reportFor: k.reportFor, escalationFor: k.escalationFor }),
+    [k.reportFor, k.escalationFor]
+  );
 
   const scope = useMemo(() => {
-    return onlyMine ? k.patients.filter((p) => p.supervisorId === myId) : k.patients;
+    return onlyMine
+      ? k.patients.filter((p) => p.supervisorId === MY_SUPERVISOR_ID)
+      : k.patients;
   }, [k.patients, onlyMine]);
+
+  // Regroupement par statut opérationnel.
+  const grouped = useMemo(() => {
+    const map: Record<OperationalStatus, Patient[]> = {
+      a_traiter: [],
+      a_relancer: [],
+      a_transmettre_cabinet: [],
+      en_attente_cabinet: [],
+      cloture_a_preparer: [],
+      suivi_habituel: [],
+    };
+    scope.forEach((p) => {
+      const s = getOperationalStatus(p, ctx);
+      if (s) map[s].push(p);
+    });
+    return map;
+  }, [scope, ctx]);
+
+  // KPI compacts — 4 indicateurs métier.
+  const counts = useMemo(() => countByOperationalStatus(scope, ctx), [scope, ctx]);
+  const patientsActifs = scope.filter((p) => p.status !== "cloture").length;
+  const crAPreparer =
+    counts.a_transmettre_cabinet +
+    scope.filter((p) => {
+      const r = k.reportFor(p.id);
+      return r?.status === "brouillon" || r?.status === "valide";
+    }).length -
+    // éviter de compter en double les CR à publier
+    scope.filter((p) => {
+      const r = k.reportFor(p.id);
+      return r?.status === "brouillon" || r?.status === "valide";
+    }).length;
+  // Simplification : on prend le nombre direct de CR brouillon + valide non publié.
+  const crToWork = scope.filter((p) => {
+    const r = k.reportFor(p.id);
+    return r?.status === "brouillon" || r?.status === "valide";
+  }).length;
+
+  // Charge / retard
+  const enRetard = scope.filter((p) => getUrgence(p, ctx) === "en_retard").length;
 
   return (
     <Shell>
       <PageHeader
         eyebrow="Espace superviseur"
         title="Inbox opérationnelle"
-        subtitle="File organisée selon des critères opérationnels : messages non traités, délais, CR en attente et escalades ouvertes."
+        subtitle="Patients organisés par prochaine action. Action-first : ce qu'il faut faire maintenant, sans qualification médicale."
       >
-        <label className="flex cursor-pointer select-none items-center gap-2 rounded-xl bg-white/[0.06] px-3 py-2 text-xs text-navy-100/80 ring-1 ring-white/10">
+        <label className="flex cursor-pointer select-none items-center gap-2 rounded-lg bg-white/[0.06] px-3 py-2 text-[11.5px] tracking-tight text-navy-100/80 ring-1 ring-white/10">
           <input
             type="checkbox"
             checked={onlyMine}
@@ -306,70 +438,83 @@ export default function SuperviseurInbox() {
         </label>
       </PageHeader>
 
+      {/* Mini-bandeau de charge */}
+      <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl bg-white px-5 py-3.5 shadow-card ring-1 ring-navy-900/[0.045]">
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
+          Aujourd'hui
+        </span>
+        <span className="text-[13px] tracking-tight text-navy-900">
+          <span className="font-medium">{patientsActifs}</span>{" "}
+          <span className="text-charcoal/60">patients actifs</span>
+        </span>
+        <span className="h-3 w-px bg-navy-900/[0.08]" />
+        <span className="text-[13px] tracking-tight text-rose-700">
+          <span className="font-medium">{counts.a_traiter}</span>{" "}
+          <span className="text-rose-700/70">à traiter</span>
+        </span>
+        <span className="h-3 w-px bg-navy-900/[0.08]" />
+        <span className="text-[13px] tracking-tight text-teal-700">
+          <span className="font-medium">{counts.a_transmettre_cabinet}</span>{" "}
+          <span className="text-teal-700/70">à transmettre cabinet</span>
+        </span>
+        <span className="h-3 w-px bg-navy-900/[0.08]" />
+        <span className="text-[13px] tracking-tight text-navy-900">
+          <span className="font-medium">{counts.en_attente_cabinet}</span>{" "}
+          <span className="text-charcoal/60">en attente cabinet</span>
+        </span>
+        {enRetard > 0 && (
+          <>
+            <span className="h-3 w-px bg-navy-900/[0.08]" />
+            <span className="text-[13px] tracking-tight text-rose-700">
+              <span className="font-medium">{enRetard}</span>{" "}
+              <span className="text-rose-700/70">en retard</span>
+            </span>
+          </>
+        )}
+      </div>
+
+      {/* 4 KPI compacts + détails IA repliés */}
+      <Card className="mb-6 overflow-hidden">
+        <div className="flex items-center justify-between border-b border-navy-900/[0.05] px-5 py-3.5">
+          <div>
+            <h3 className="text-sm font-semibold tracking-tight text-navy-900">Mes indicateurs</h3>
+            <p className="text-[11px] tracking-tight text-charcoal/55">
+              Pilotage opérationnel — pas de qualification médicale.
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-4">
+          {[
+            ["Patients actifs", String(patientsActifs)],
+            ["À traiter maintenant", String(counts.a_traiter)],
+            ["En attente cabinet", String(counts.en_attente_cabinet)],
+            ["CR à préparer / finaliser", String(crToWork)],
+          ].map(([label, value]) => (
+            <div key={label} className="bg-white px-4 py-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
+                {label}
+              </p>
+              <p className="mt-2 font-display text-[22px] font-medium tracking-tight text-navy-900">
+                {value}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="px-5 pb-4">
+          <DetailsIA patients={scope} />
+        </div>
+      </Card>
+
       <DoctrineNote className="mb-6" />
 
-      <MyIndicators />
+      {/* Inbox — 6 groupes verticaux par statut opérationnel */}
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        {operationalStatusOrder.map((status) => (
+          <InboxGroup key={status} status={status} patients={grouped[status]} />
+        ))}
+      </div>
 
       <SuggestionsBlock />
-
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {sections.map((section) => {
-          const list = scope.filter((p) => section.match(p, { unTreated }));
-          return (
-            <Card key={section.key} className="flex flex-col">
-              <div className="flex items-center justify-between border-b border-navy-900/[0.06] px-4 py-3">
-                <div>
-                  <h2 className="text-sm font-semibold text-navy-900">{section.title}</h2>
-                  <p className="text-[11px] text-charcoal/45">{section.hint}</p>
-                </div>
-                <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-navy-900 px-1.5 text-xs font-semibold text-white">
-                  {list.length}
-                </span>
-              </div>
-              <div className="flex-1 divide-y divide-navy-900/[0.05]">
-                {list.length === 0 && (
-                  <p className="px-4 py-6 text-center text-xs text-charcoal/45">Rien à traiter ici.</p>
-                )}
-                {list.map((p) => {
-                  const n = unTreated(p);
-                  const lastMsg = p.messages[p.messages.length - 1];
-                  return (
-                    <Link
-                      key={p.id}
-                      href={`/superviseur/patient/${p.id}`}
-                      className="group block px-4 py-3 hover:bg-teal-50/30"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="truncate text-sm font-medium text-navy-900">{p.name}</p>
-                        <span className="shrink-0 text-[11px] text-charcoal/40">
-                          {relativeDays(p.lastMessageAt)}
-                        </span>
-                      </div>
-                      <p className="mt-0.5 truncate text-xs text-charcoal/50">
-                        {k.surgeonName(p.surgeonId)}
-                        {lastMsg ? ` · ${lastMsg.text}` : ""}
-                      </p>
-                      <div className="mt-2 flex items-center justify-between gap-2">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {n > 0 && (
-                            <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
-                              {n} non traité
-                            </Badge>
-                          )}
-                          <Badge className={statusStyles[p.status]}>{statusLabels[p.status]}</Badge>
-                        </div>
-                        <span className="shrink-0 text-xs font-medium text-teal-600 opacity-0 transition-opacity group-hover:opacity-100">
-                          Ouvrir →
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </Card>
-          );
-        })}
-      </div>
     </Shell>
   );
 }
