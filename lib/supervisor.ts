@@ -21,7 +21,7 @@ export type OperationalStatus =
 export const operationalStatusLabels: Record<OperationalStatus, string> = {
   a_traiter: "À traiter maintenant",
   a_relancer: "À relancer",
-  a_transmettre_cabinet: "À transmettre au cabinet",
+  a_transmettre_cabinet: "CR & transmissions cabinet",
   en_attente_cabinet: "En attente cabinet",
   cloture_a_preparer: "Clôture à préparer",
   suivi_habituel: "Suivi habituel",
@@ -31,7 +31,7 @@ export const operationalStatusHints: Record<OperationalStatus, string> = {
   a_traiter: "Messages non lus, retards ou actions immédiates.",
   a_relancer: "Patient silencieux ou éléments manquants.",
   a_transmettre_cabinet:
-    "CR à valider / rendre disponible, compilation à transmettre.",
+    "CR à préparer, valider ou rendre disponible. Transmission cabinet à envoyer.",
   en_attente_cabinet: "Transmission cabinet en cours — retour attendu.",
   cloture_a_preparer: "Fin de suivi atteinte — finaliser le dossier.",
   suivi_habituel: "Suivi actif, pas d'action immédiate.",
@@ -188,6 +188,49 @@ export function getOperationalStatus(
 // ---------------------------------------------------------------------------
 // Urgence opérationnelle — orthogonale au statut.
 // ---------------------------------------------------------------------------
+
+// Format "Retard Xh" / "Retard Xj" — durée la plus parlante selon l'ordre
+// de grandeur. Retourne null si pas de durée mesurable.
+function formatRetardDuration(hours: number): string | null {
+  if (hours <= 0) return null;
+  if (hours < 24) return `Retard ${Math.round(hours)}h`;
+  return `Retard ${Math.round(hours / 24)}j`;
+}
+
+// Label enrichi : "Retard Xj" si en retard avec durée mesurable, sinon
+// fallback sur le label standard "En retard / Aujourd'hui / À venir".
+export function getUrgenceLabelDetailed(
+  patient: Patient,
+  ctx: SupervisorCtx
+): string {
+  const u = getUrgence(patient, ctx);
+  if (u !== "en_retard") return urgenceLabels[u];
+
+  const now = ctx.now ?? Date.now();
+  const report = ctx.reportFor(patient.id);
+  const escalation = ctx.escalationFor(patient.id);
+
+  // On choisit la durée la plus pertinente selon ce qui déclenche le retard.
+  const untreatedAge = oldestUntreatedAgeHours(patient, now);
+  if (untreatedAge !== null && untreatedAge > 24) {
+    return formatRetardDuration(untreatedAge) ?? "En retard";
+  }
+  if (report?.status === "valide") {
+    const age = (now - new Date(report.updatedAt).getTime()) / 3_600_000;
+    if (age > 48) return formatRetardDuration(age) ?? "En retard";
+  }
+  if (escalation?.status === "transmise" && escalation.transmittedAt) {
+    const age = (now - new Date(escalation.transmittedAt).getTime()) / 3_600_000;
+    if (age > 48) return formatRetardDuration(age) ?? "En retard";
+  }
+  if (patient.status === "silencieux") {
+    const lastAge = lastPatientMessageAgeHours(patient, now);
+    if (lastAge !== null && lastAge > 24 * 5) {
+      return formatRetardDuration(lastAge) ?? "En retard";
+    }
+  }
+  return "En retard";
+}
 
 export function getUrgence(patient: Patient, ctx: SupervisorCtx): OperationalUrgence {
   const now = ctx.now ?? Date.now();

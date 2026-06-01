@@ -20,11 +20,11 @@ import {
   getPostOpDay,
   getRecommendedAction,
   getUrgence,
+  getUrgenceLabelDetailed,
   operationalStatusHints,
   operationalStatusLabels,
   operationalStatusOrder,
   type OperationalStatus,
-  urgenceLabels,
   urgenceStyles,
 } from "@/lib/supervisor";
 
@@ -255,13 +255,14 @@ function PatientCard({ patient }: { patient: Patient }) {
   const last = getLastEvent(patient, ctx);
   const action = getRecommendedAction(patient, ctx);
   const urgence = getUrgence(patient, ctx);
+  const urgenceLabel = getUrgenceLabelDetailed(patient, ctx);
 
   return (
     <Link
       href={`/superviseur/patient/${patient.id}`}
       className="group block border-t border-navy-900/[0.04] px-4 py-3 transition-colors first:border-t-0 hover:bg-bone/40"
     >
-      {/* Ligne 1 : Patient · J+X · Intervention · Badge urgence */}
+      {/* Ligne 1 : Patient · J+X · Intervention · Badge priorité */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
           <span className="truncate text-[13.5px] font-medium tracking-tight text-navy-900">
@@ -270,7 +271,7 @@ function PatientCard({ patient }: { patient: Patient }) {
           <span className="text-[11.5px] font-mono font-medium text-teal-700">{day}</span>
           <span className="truncate text-[11.5px] text-charcoal/55">{patient.intervention}</span>
         </div>
-        <Badge className={`${urgenceStyles[urgence]} shrink-0`}>{urgenceLabels[urgence]}</Badge>
+        <Badge className={`${urgenceStyles[urgence]} shrink-0`}>{urgenceLabel}</Badge>
       </div>
 
       {/* Ligne 2 : Chirurgien */}
@@ -478,9 +479,9 @@ export default function SuperviseurInbox() {
       <Card className="mb-6 overflow-hidden">
         <div className="flex items-center justify-between border-b border-navy-900/[0.05] px-5 py-3.5">
           <div>
-            <h3 className="text-sm font-semibold tracking-tight text-navy-900">Mes indicateurs</h3>
+            <h3 className="text-sm font-semibold tracking-tight text-navy-900">Vue du jour</h3>
             <p className="text-[11px] tracking-tight text-charcoal/55">
-              Pilotage opérationnel — pas de qualification médicale.
+              Pilotage opérationnel — sans qualification médicale.
             </p>
           </div>
         </div>

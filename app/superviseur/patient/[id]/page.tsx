@@ -26,9 +26,9 @@ import {
   getRecommendedAction,
   getStructuredTimeline,
   getUrgence,
+  getUrgenceLabelDetailed,
   operationalStatusLabels,
   timelineFilterLabels,
-  urgenceLabels,
   urgenceStyles,
   type ApplicableReferentiel,
   type TimelineEvent,
@@ -143,6 +143,7 @@ export default function PatientFiche() {
 
   const opStatus = getOperationalStatus(patient, ctx);
   const urgence = getUrgence(patient, ctx);
+  const urgenceLabel = getUrgenceLabelDetailed(patient, ctx);
   const recommended = getRecommendedAction(patient, ctx);
   const day = getPostOpDay(patient);
   const last = getLastEvent(patient, ctx);
@@ -291,7 +292,7 @@ export default function PatientFiche() {
                 {operationalStatusLabels[opStatus]}
               </Badge>
             )}
-            <Badge className={urgenceStyles[urgence]}>{urgenceLabels[urgence]}</Badge>
+            <Badge className={urgenceStyles[urgence]}>{urgenceLabel}</Badge>
             <Badge className="bg-bone/80 text-charcoal/75 ring-navy-900/[0.06]">
               Référentiel : {refl.version}
             </Badge>
@@ -515,7 +516,7 @@ export default function PatientFiche() {
                 </p>
               )}
               {urgence === "en_retard" && (
-                <Badge className={urgenceStyles.en_retard}>En retard</Badge>
+                <Badge className={urgenceStyles.en_retard}>{urgenceLabel}</Badge>
               )}
             </div>
           </Card>
