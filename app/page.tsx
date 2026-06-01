@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BrandMark, Wordmark } from "@/components/Brand";
 
 const DEMO = "mailto:contact@kovela.care?subject=Demande%20de%20démo%20KOVELA";
+const PILOT = "mailto:contact@kovela.care?subject=Discuter%20du%20pilote%20KOVELA";
 
 // Graphisme « infrastructure » : flux Patient → Coordination → Chirurgien.
 function HeroGraphic() {
@@ -136,7 +137,7 @@ export default function Landing() {
             <a href="#solution" className="transition-colors hover:text-navy-900">La solution</a>
             <a href="#etapes" className="transition-colors hover:text-navy-900">Comment ça marche</a>
             <a href="#ia" className="transition-colors hover:text-navy-900">IA assistive</a>
-            <a href="#modele" className="transition-colors hover:text-navy-900">Modèle</a>
+            <a href="#modele" className="transition-colors hover:text-navy-900">Tarification</a>
           </nav>
           <div className="flex items-center gap-2">
             <Link
@@ -500,47 +501,149 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section I — Modèle économique */}
+      {/* Section I — Tarification · Moins qu'un mi-temps. Plus qu'un outil. */}
       <section id="modele" className="mx-auto max-w-6xl px-6 py-24">
-        <Eyebrow>Modèle économique</Eyebrow>
+        <Eyebrow>Tarification</Eyebrow>
         <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
-          Un modèle simple, aligné sur l&apos;usage.
+          Moins qu&apos;un mi-temps. Plus qu&apos;un outil.
         </h2>
         <p className="mt-5 max-w-3xl text-[14.5px] leading-relaxed text-charcoal/70">
-          Abonnement cabinet + patients activés. La tarification est calibrée selon le volume de
-          suivi et le niveau d&apos;accompagnement. Détail présenté lors de la démo.
+          KOVELA donne accès à une organisation post-opératoire structurée, sans créer un poste
+          supplémentaire dans le cabinet.
         </p>
-        <div className="mt-10 grid gap-3 md:grid-cols-3">
-          {[
-            {
-              t: "Abonnement cabinet",
-              d: "Mise en place du service, supervision continue, référentiel maintenu avec votre cabinet.",
-            },
-            {
-              t: "Variable patient",
-              d: "Un volume aligné sur les patients réellement activés et suivis sur la période.",
-            },
-            {
-              t: "Démarrage progressif",
-              d: "Pilote sur 2 ou 3 interventions prioritaires. Extension co-construite ensuite.",
-            },
-          ].map((b) => (
-            <div
-              key={b.t}
-              className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]"
-            >
-              <div className="mb-4 h-px w-7 bg-teal-500/70" />
-              <h3 className="font-display text-[14px] font-semibold tracking-tight text-navy-900">
-                {b.t}
-              </h3>
-              <p className="mt-2.5 text-[13px] leading-relaxed text-charcoal/60">{b.d}</p>
+
+        {/* Card pricing — fixe + variable, hiérarchie forte, prix lisible */}
+        <div className="mt-12 overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-navy-900/[0.06]">
+          <div className="flex flex-wrap items-center gap-2 border-b border-navy-900/[0.05] bg-bone/60 px-7 py-4">
+            <span className="rounded-md bg-navy-900 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white">
+              Offre pilote
+            </span>
+            {["Accès service", "Usage réel", "Facturation mensuelle", "Service opéré"].map((b) => (
+              <span
+                key={b}
+                className="rounded-md bg-white px-2.5 py-1 text-[10.5px] font-medium tracking-tight text-navy-700 ring-1 ring-navy-100"
+              >
+                {b}
+              </span>
+            ))}
+          </div>
+
+          <div className="grid items-stretch md:grid-cols-[1fr_auto_1fr]">
+            {/* Bloc fixe */}
+            <div className="px-7 py-10 md:py-12">
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+                Accès mensuel au service
+              </p>
+              <p className="mt-4 font-display text-[2.6rem] font-medium leading-none tracking-tight text-navy-900 md:text-[3rem]">
+                690 €{" "}
+                <span className="text-[14px] font-normal text-charcoal/55">HT / mois</span>
+              </p>
+              <ul className="mt-5 space-y-1.5 text-[13px] leading-relaxed text-charcoal/70">
+                <li>Accès mensuel au service KOVELA</li>
+                <li>Facturé le 1er du mois</li>
+              </ul>
             </div>
-          ))}
+
+            {/* Séparateur + */}
+            <div className="flex items-center justify-center border-t border-navy-900/[0.05] md:border-l md:border-t-0 md:border-navy-900/[0.05] md:px-2">
+              <span className="font-display text-[28px] font-light leading-none text-charcoal/35 md:text-[40px]">
+                +
+              </span>
+            </div>
+
+            {/* Bloc variable */}
+            <div className="border-t border-navy-900/[0.05] px-7 py-10 md:border-l md:border-t-0 md:py-12">
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+                Part variable d&apos;usage
+              </p>
+              <p className="mt-4 font-display text-[2.6rem] font-medium leading-none tracking-tight text-navy-900 md:text-[3rem]">
+                80 €{" "}
+                <span className="text-[14px] font-normal text-charcoal/55">
+                  HT / patient activé
+                </span>
+              </p>
+              <ul className="mt-5 space-y-1.5 text-[13px] leading-relaxed text-charcoal/70">
+                <li>Facturé en fin de mois selon les patients réellement suivis</li>
+                <li>Patient activé : onboarding validé + suivi lancé</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-navy-900/[0.05] bg-ivory px-7 py-5">
+            <p className="font-display text-[15.5px] italic leading-relaxed tracking-tight text-navy-900 md:text-[17px]">
+              Le fixe donne accès au service. Le variable suit l&apos;usage réel.
+            </p>
+          </div>
         </div>
-        <p className="mt-8 text-[11.5px] leading-relaxed text-charcoal/45">
-          Modèle cabinet + patients activés. Les conditions pilotes sont précisées lors de la
-          démo selon le volume patient et le niveau d&apos;accompagnement.
+
+        {/* 2 colonnes bénéfices : Ce que le cabinet évite · Ce que KOVELA apporte */}
+        <div className="mt-12 grid gap-3 md:grid-cols-2">
+          <div className="rounded-2xl bg-ivory p-7 ring-1 ring-navy-900/[0.05]">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+              Ce que le cabinet évite
+            </p>
+            <ul className="mt-5 space-y-2 text-[13px] leading-relaxed text-charcoal/70">
+              {[
+                "Recherche de profil",
+                "Recrutement",
+                "Formation et montée en compétence",
+                "Congés et indisponibilités",
+                "Remplacement",
+                "Management quotidien",
+                "Coût fixe déconnecté du volume patient",
+              ].map((it) => (
+                <li key={it} className="flex gap-3">
+                  <span className="mt-[7px] h-1 w-3 shrink-0 bg-navy-900/30" />
+                  {it}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-2xl bg-white p-7 shadow-card ring-1 ring-navy-900/[0.045]">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+              Ce que KOVELA apporte
+            </p>
+            <ul className="mt-5 space-y-2 text-[13px] leading-relaxed text-navy-900">
+              {[
+                "Référentiel cabinet",
+                "Supervision humaine",
+                "Messages programmés",
+                "Transmissions cabinet",
+                "Comptes-rendus factuels",
+                "Interface chirurgien",
+                "Service structuré toute l'année",
+                "Expérience patient mieux structurée",
+                "Chirurgien sollicité au bon moment, avec un dossier clair",
+              ].map((it) => (
+                <li key={it} className="flex gap-3">
+                  <span className="mt-[7px] h-1 w-3 shrink-0 bg-teal-500/70" />
+                  {it}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p className="mt-8 max-w-3xl text-[11.5px] leading-relaxed text-charcoal/55">
+          Le cabinet n&apos;a pas toujours la bande passante pour structurer seul ce flux. Les
+          conditions peuvent être ajustées selon le volume patient, le niveau d&apos;accompagnement
+          et la configuration du cabinet.
         </p>
+
+        <div className="mt-8 flex flex-wrap gap-2.5">
+          <a
+            href={DEMO}
+            className="rounded-lg bg-navy-900 px-6 py-3 text-[13.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
+          >
+            Demander une démo
+          </a>
+          <a
+            href={PILOT}
+            className="rounded-lg bg-white px-6 py-3 text-[13.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/15 transition-colors hover:bg-bone"
+          >
+            Discuter du pilote
+          </a>
+        </div>
       </section>
 
       {/* Section J — CTA final */}
