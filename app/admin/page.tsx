@@ -240,9 +240,9 @@ export default function AdminCockpit() {
           category="estime"
         />
         <KpiCard
-          label="Marge normalisée"
-          value={formatPct(exec.margeBruteNormaliseePercent)}
-          hint={`Proof case : ${norm.chirurgiensCible} chirurgiens × ${norm.patientsParChirurgienCible} patients/mois`}
+          label="Unit economics care"
+          value="À valider"
+          hint="Temps humain / patient — voir Finance"
           category="hypothese"
         />
         <KpiCard
@@ -1493,13 +1493,13 @@ export default function AdminCockpit() {
                     </span>
                   </li>
                   <li>
-                    Marge proof case ({norm.chirurgiensCible}×
+                    Proof case ({norm.chirurgiensCible}×
                     {norm.patientsParChirurgienCible}) :{" "}
                     <span className="font-medium text-navy-900">
-                      {formatPct(exec.margeBruteNormaliseePercent)}
+                      palier opérationnel
                     </span>{" "}
                     <span className="text-charcoal/55">
-                      — démonstration cohérence modèle
+                      — marge non représentative à ce stade
                     </span>
                   </li>
                   <li>
@@ -1510,6 +1510,15 @@ export default function AdminCockpit() {
                     </span>{" "}
                     <span className="text-charcoal/55">
                       — potentiel volume mature, pas situation actuelle
+                    </span>
+                  </li>
+                  <li>
+                    Unit economics care :{" "}
+                    <span className="font-medium text-navy-900">
+                      dépend du temps humain / patient
+                    </span>
+                    <span className="text-charcoal/55">
+                      , à valider en pilote
                     </span>
                   </li>
                 </ul>

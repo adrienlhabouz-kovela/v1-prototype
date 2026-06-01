@@ -816,17 +816,16 @@ export function getExecutiveSummary(state: AdminState): string {
   const kpi = getExecutiveKPIs(state);
   const proj14 = getCapacityProjection(state, 14);
   const capPct = Math.round(kpi.capaciteUtiliseePercent * 100);
-  const margeNormPct = Math.round(kpi.margeBruteNormaliseePercent * 100);
   const projPct = Math.round(proj14.capaciteProjeteePercent * 100);
 
   return (
     `Mois en cours : ${kpi.chirurgiensActifs} chirurgiens actifs, ` +
     `${kpi.patientsSuivisMois} patients suivis, ` +
     `${kpi.mrrEstimated} € MRR estimé, ` +
-    `marge normalisée à volume cible ${margeNormPct}%, ` +
     `capacité superviseurs utilisée à ${capPct}%, ` +
     `capacité projetée à 14 jours ${projPct}%, ` +
-    `${kpi.decisionsCount} décisions à prendre.`
+    `${kpi.decisionsCount} décisions à prendre. ` +
+    `Unit economics care à valider en pilote.`
   );
 }
 
