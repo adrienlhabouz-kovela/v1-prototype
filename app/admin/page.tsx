@@ -242,7 +242,7 @@ export default function AdminCockpit() {
         <KpiCard
           label="Marge normalisée"
           value={formatPct(exec.margeBruteNormaliseePercent)}
-          hint={`À ${norm.chirurgiensCible} chirurgiens × ${norm.patientsParChirurgienCible} patients/mois`}
+          hint={`Proof case : ${norm.chirurgiensCible} chirurgiens × ${norm.patientsParChirurgienCible} patients/mois`}
           category="hypothese"
         />
         <KpiCard
@@ -876,11 +876,11 @@ export default function AdminCockpit() {
             </div>
           </Card>
 
-          {/* Marge brute normalisée — lecture à volume cible. */}
+          {/* Marge brute normalisée — proof case 5×20 (démonstration). */}
           <Card>
             <CardHeader
-              title="Marge brute normalisée"
-              subtitle={`À volume cible : ${norm.chirurgiensCible} chirurgiens × ${norm.patientsParChirurgienCible} patients/mois = ${norm.patientsTotalCible} patients. Capacité cible : ${norm.patientsParSuperviseurCible} patients / superviseuse.`}
+              title="Marge brute normalisée — proof case"
+              subtitle={`Proof case : ${norm.chirurgiensCible} chirurgiens × ${norm.patientsParChirurgienCible} patients/mois = ${norm.patientsTotalCible} patients. Capacité cible : ${norm.patientsParSuperviseurCible} patients / superviseuse. Voir "Simulation scale" en bas pour la lecture à volume mature.`}
               action={
                 <Badge className={DATA_CATEGORY_STYLES.hypothese}>
                   {DATA_CATEGORY_LABELS.hypothese}
@@ -1099,7 +1099,7 @@ export default function AdminCockpit() {
           <Card>
             <CardHeader
               title="Point d'équilibre care — par temps humain"
-              subtitle={`Lecture canonique : capacité dérivée de ${ADMIN_CONSTANTS.SUPERVISOR_PRODUCTIVE_HOURS_PER_MONTH} h productives/mois et du temps humain par patient. Volume cible : ${timeScenarios[0].patientsTotal} patients/mois (${ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET} chirurgiens × ${ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET} patients/mois).`}
+              subtitle={`Lecture canonique : capacité dérivée de ${ADMIN_CONSTANTS.SUPERVISOR_PRODUCTIVE_HOURS_PER_MONTH} h productives/mois et du temps humain par patient. Proof case : ${ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET} chirurgiens × ${ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET} patients/mois = ${timeScenarios[0].patientsTotal} patients. Voir « Simulation scale » en bas pour la lecture à volume mature.`}
               action={
                 <Badge className={DATA_CATEGORY_STYLES.hypothese}>
                   Simulation prototype
@@ -1493,12 +1493,23 @@ export default function AdminCockpit() {
                     </span>
                   </li>
                   <li>
-                    Marge normalisée à volume cible :{" "}
+                    Marge proof case ({norm.chirurgiensCible}×
+                    {norm.patientsParChirurgienCible}) :{" "}
                     <span className="font-medium text-navy-900">
                       {formatPct(exec.margeBruteNormaliseePercent)}
                     </span>{" "}
                     <span className="text-charcoal/55">
-                      ({norm.chirurgiensCible}×{norm.patientsParChirurgienCible}/mois)
+                      — démonstration cohérence modèle
+                    </span>
+                  </li>
+                  <li>
+                    Simulation scale ({scaleSim.chirurgiens}×
+                    {scaleSim.patientsParChirurgien}) :{" "}
+                    <span className="font-medium text-navy-900">
+                      {formatEur(scaleSim.mrr)} MRR simulé
+                    </span>{" "}
+                    <span className="text-charcoal/55">
+                      — potentiel volume mature, pas situation actuelle
                     </span>
                   </li>
                 </ul>
@@ -1562,70 +1573,122 @@ export default function AdminCockpit() {
         )}
       </Card>
 
-      {/* G. Data integrity footer */}
+      {/* G. Data integrity footer — 2 zones : Volumes + Qualité */}
       <Card className="mt-6">
         <CardHeader
           title="Data integrity"
           subtitle={`Cockpit ${ADMIN_CONSTANTS.COCKPIT_VERSION} — dernière mise à jour : live (état volatile).`}
         />
-        <div className="grid gap-4 px-6 py-5 sm:grid-cols-4">
-          {(
-            [
-              [
-                "mesure",
-                "patients, statuts, CR, transmissions, superviseurs, prospects, propositions IA, taux validation humaine",
-              ],
-              [
-                "estime",
-                "MRR, ARR, marge brute prototype, marge care simulée, capacité utilisée et projetée",
-              ],
-              [
-                "hypothese",
-                `capacité superviseur, coûts care par poste, coût outils care, coût messagerie patient, volume cible, heures productives / mois. Baseline terrain V0 (${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_LOW}–${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_HIGH} min/patient) = donnée historique opérationnelle. Scénarios V1/V2 = hypothèses à mesurer.`,
-              ],
-              [
-                "v1",
-                "temps humain total / patient · temps CR · temps transmission cabinet · temps relance · ratio patients simples/lourds · gain interface réel · gain IA réel · capacité réelle superviseuse · coûts care réels (WhatsApp, outils, QA, Head of Care). Churn, CAC, payback, runway.",
-              ],
-            ] as [DataCategory, string][]
-          ).map(([cat, content]) => (
-            <div key={cat}>
-              <Badge className={DATA_CATEGORY_STYLES[cat]}>
-                {DATA_CATEGORY_LABELS[cat]}
+
+        {/* Zone 1 — Volumes affichés : 3 niveaux distincts */}
+        <div className="border-b border-navy-900/[0.05] px-6 py-5">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
+            Volumes affichés dans le cockpit
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">
+                Volume actuel prototype
               </Badge>
-              <p className="mt-2 text-[11.5px] leading-relaxed text-charcoal/65">
-                {content}
+              <p className="mt-2 text-[11.5px] leading-relaxed text-charcoal/70">
+                Données mesurées dans le store seed :{" "}
+                {k.surgeons.length} chirurgien(s) configuré(s),{" "}
+                {k.patients.length} patient(s) en seed,{" "}
+                {k.supervisors.length} superviseuse(s).
+              </p>
+              <p className="mt-1.5 text-[10.5px] leading-relaxed text-charcoal/50">
+                Sert à valider les flux opérationnels, pas la marge réelle.
               </p>
             </div>
-          ))}
+            <div>
+              <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
+                Proof case {ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET}×
+                {ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET}
+              </Badge>
+              <p className="mt-2 text-[11.5px] leading-relaxed text-charcoal/70">
+                Hypothèse pilotage opérationnel :{" "}
+                {ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET} chirurgiens ×{" "}
+                {ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET}{" "}
+                patients/mois ={" "}
+                {ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET *
+                  ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET}{" "}
+                patients/mois.
+              </p>
+              <p className="mt-1.5 text-[10.5px] leading-relaxed text-charcoal/50">
+                Démonstration de cohérence du modèle. Marge normalisée +
+                point d'équilibre care + KPI executive sont calés sur ce
+                volume.
+              </p>
+            </div>
+            <div>
+              <Badge className="bg-amber-100/70 text-amber-900 ring-amber-400/40">
+                Simulation scale {ADMIN_CONSTANTS.CHIRURGIENS_SCALE_TARGET}×
+                {ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_SCALE}
+              </Badge>
+              <p className="mt-2 text-[11.5px] leading-relaxed text-charcoal/70">
+                Vue séparée — potentiel volume mature :{" "}
+                {ADMIN_CONSTANTS.CHIRURGIENS_SCALE_TARGET} chirurgiens ×{" "}
+                {ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_SCALE} ={" "}
+                {ADMIN_CONSTANTS.CHIRURGIENS_SCALE_TARGET *
+                  ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_SCALE}{" "}
+                patients/mois.
+              </p>
+              <p className="mt-1.5 text-[10.5px] leading-relaxed text-charcoal/50">
+                Card dédiée Finance — ne représente PAS la situation
+                actuelle. Simulation prototype, à valider en pilote.
+              </p>
+            </div>
+          </div>
         </div>
+
+        {/* Zone 2 — Qualité de donnée : 4 catégories */}
+        <div className="px-6 py-5">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
+            Qualité de donnée
+          </p>
+          <div className="grid gap-4 sm:grid-cols-4">
+            {(
+              [
+                [
+                  "mesure",
+                  "patients, statuts, CR, transmissions, superviseurs, prospects, propositions IA, taux validation humaine",
+                ],
+                [
+                  "estime",
+                  "MRR, ARR, marge brute prototype, marge care simulée, capacité utilisée et projetée",
+                ],
+                [
+                  "hypothese",
+                  `capacité superviseur, coûts care par poste, coût outils care, coût messagerie patient, volume proof case (${ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET}×${ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET}), volume scale (${ADMIN_CONSTANTS.CHIRURGIENS_SCALE_TARGET}×${ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_SCALE}), heures productives / mois. Baseline terrain V0 (${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_LOW}–${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_HIGH} min/patient) = donnée historique opérationnelle. Scénarios V1/V2 = hypothèses.`,
+                ],
+                [
+                  "v1",
+                  "temps humain total / patient · temps CR · temps transmission cabinet · temps relance · ratio patients simples/lourds · gain interface réel · gain IA réel · capacité réelle superviseuse · coûts care réels (WhatsApp, outils, QA, Head of Care, back-up). Churn chirurgien, CAC, payback, runway, cohortes.",
+                ],
+              ] as [DataCategory, string][]
+            ).map(([cat, content]) => (
+              <div key={cat}>
+                <Badge className={DATA_CATEGORY_STYLES[cat]}>
+                  {DATA_CATEGORY_LABELS[cat]}
+                </Badge>
+                <p className="mt-2 text-[11.5px] leading-relaxed text-charcoal/65">
+                  {content}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Bilan coûts care */}
         <div className="border-t border-navy-900/[0.05] px-6 py-3 text-[11.5px] tracking-tight text-charcoal/65">
-          <span className="font-medium text-navy-900">Coûts care :</span>{" "}
+          <span className="font-medium text-navy-900">Bilan coûts care :</span>{" "}
           {careStaff.countByCostType.renseigne} renseigné(s) ·{" "}
           {careStaff.countByCostType.hypothese} hypothèse(s) ·{" "}
-          {careStaff.countByCostType.a_valider} à valider.
-        </div>
-        {/* Volume actuel vs Simulation scale */}
-        <div className="border-t border-navy-900/[0.05] px-6 py-3 text-[11.5px] leading-relaxed tracking-tight text-charcoal/65">
-          <span className="font-medium text-navy-900">Volumes affichés :</span>{" "}
-          KPI executive et lectures principales = volume actuel prototype
-          ({ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET} chirurgiens ×{" "}
-          {ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET} patients/mois ={" "}
-          {ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET *
-            ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET}{" "}
-          patients). Card « Simulation scale » Finance = vue séparée à volume
-          mature ({ADMIN_CONSTANTS.CHIRURGIENS_SCALE_TARGET} chirurgiens ×{" "}
-          {ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_SCALE} ={" "}
-          {ADMIN_CONSTANTS.CHIRURGIENS_SCALE_TARGET *
-            ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_SCALE}{" "}
-          patients) — simulation, pas situation actuelle.{" "}
+          {careStaff.countByCostType.a_valider} à valider.{" "}
           <span className="text-charcoal/55">
-            Temps humain par patient = baseline terrain (
-            {ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_LOW}–
-            {ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_HIGH} min) +
-            hypothèses V1/V2 à mesurer en pilote. Coûts care = mix renseignés /
-            hypothèses / à renseigner.
+            Périmètre marge care : superviseuses actives + coût direct
+            patient + outils + messagerie. Exclut sales, tech, CEO, juridique,
+            compta, marketing.
           </span>
         </div>
       </Card>
