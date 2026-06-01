@@ -155,9 +155,9 @@ export const followTypeLabels: Record<FollowType, string> = {
 };
 
 export const crStatusLabels: Record<CRStatus, string> = {
-  brouillon: "Brouillon de CR à valider",
-  valide: "CR validé en interne",
-  disponible: "CR disponible pour le chirurgien",
+  brouillon: "Brouillon IA — à relire et valider",
+  valide: "CR validé KOVELA",
+  disponible: "CR disponible chirurgien",
 };
 
 export const crStatusStyles: Record<CRStatus, string> = {

@@ -171,8 +171,8 @@ export default function SupervisionPage() {
         <StatCard label="Messages traités" value={global.treated} />
         <StatCard label="Messages non traités" value={global.untreated} />
         <StatCard label="Délai moyen de traitement" value={`${global.delayH.toFixed(1)} h`} />
-        <StatCard label="CR finalisés" value={global.crFinalises} />
-        <StatCard label="CR en retard" value={global.crEnRetard} />
+        <StatCard label="CR disponibles chirurgien" value={global.crFinalises} />
+        <StatCard label="CR en retard de validation" value={global.crEnRetard} />
         <StatCard label="Escalades transmises" value={global.escalades} />
         <StatCard label="IA — acceptées" value={global.accepted} />
         <StatCard label="IA — modifiées" value={global.modified} />
@@ -201,8 +201,8 @@ export default function SupervisionPage() {
                   <th className="px-5 py-3.5 font-medium">Msg. traités</th>
                   <th className="px-5 py-3.5 font-medium">Non traités</th>
                   <th className="px-5 py-3.5 font-medium">Délai moyen</th>
-                  <th className="px-5 py-3.5 font-medium">CR finalisés</th>
-                  <th className="px-5 py-3.5 font-medium">CR en retard</th>
+                  <th className="px-5 py-3.5 font-medium">CR dispo. chir.</th>
+                  <th className="px-5 py-3.5 font-medium">CR en retard valid.</th>
                   <th className="px-5 py-3.5 font-medium">Escalades</th>
                   <th className="px-5 py-3.5 font-medium">Usage IA</th>
                   <th className="px-5 py-3.5 font-medium">IA A/M/R</th>

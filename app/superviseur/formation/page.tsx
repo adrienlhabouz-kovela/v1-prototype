@@ -63,7 +63,7 @@ const QUIZ: { q: string; options: string[]; correct: number }[] = [
     correct: 0,
   },
   {
-    q: "Où vérifier les CR à finaliser ?",
+    q: "Où vérifier les CR en file de validation ?",
     options: [
       "Sur la fiche patient superviseur, dans la carte Compte-rendu",
       "Sur la landing publique",
@@ -153,7 +153,7 @@ export default function FormationPage() {
             "Connaître les limites du service",
             "Utiliser les templates",
             "Utiliser l'IA assistive (human-in-the-loop)",
-            "Préparer un CR factuel",
+            "Relire et valider un brouillon IA de CR",
             "Préparer une compilation factuelle",
             "Tracer ses actions",
             "Savoir quand transmettre au chirurgien selon procédure interne",

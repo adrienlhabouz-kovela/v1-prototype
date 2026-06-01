@@ -268,11 +268,11 @@ export default function PatientFiche() {
       handler: () => k.markTreated(patient.id),
     },
     validate_cr: {
-      label: "Valider le CR en interne",
+      label: "Relire et valider le CR",
       handler: () => k.validateReport(patient.id),
     },
     publish_cr: {
-      label: "Rendre disponible au chirurgien",
+      label: "Rendre disponible chirurgien",
       handler: () => k.publishReport(patient.id),
     },
     transmit_compilation: {
@@ -280,7 +280,7 @@ export default function PatientFiche() {
       handler: () => k.transmitCompilation(patient.id),
     },
     prepare_cr: {
-      label: "Préparer le CR factuel",
+      label: "Préparer brouillon IA",
       handler: () => runAi("preparation_cr"),
     },
     relance_patient: {
@@ -380,7 +380,7 @@ export default function PatientFiche() {
               available: boolean;
             }[] = [
               {
-                label: "Préparer CR (IA)",
+                label: "Préparer brouillon IA",
                 handler: () => runAi("preparation_cr"),
                 available: primaryKey !== "prepare_cr" && canPrepareCR,
               },
@@ -803,7 +803,12 @@ export default function PatientFiche() {
                   </Badge>
                   {report.status === "valide" && (
                     <p className="text-[11px] tracking-tight text-charcoal/55">
-                      Validé en interne — pas encore visible côté chirurgien.
+                      Validé KOVELA — à rendre disponible chirurgien.
+                    </p>
+                  )}
+                  {report.status === "brouillon" && (
+                    <p className="text-[11px] tracking-tight text-charcoal/55">
+                      Brouillon préparé par l&apos;IA — à relire, corriger si besoin, puis valider.
                     </p>
                   )}
                   <pre className="max-h-40 overflow-y-auto whitespace-pre-wrap rounded-lg bg-bone/60 p-3 font-sans text-[11.5px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.04]">
@@ -812,12 +817,12 @@ export default function PatientFiche() {
                   <div className="flex flex-wrap gap-2">
                     {report.status === "brouillon" && (
                       <Button variant="primary" onClick={() => k.validateReport(patient.id)}>
-                        Valider en interne
+                        Relire et valider
                       </Button>
                     )}
                     {report.status !== "disponible" && (
                       <Button variant="secondary" onClick={() => k.publishReport(patient.id)}>
-                        Rendre disponible
+                        Rendre disponible chirurgien
                       </Button>
                     )}
                     <Button
@@ -828,7 +833,7 @@ export default function PatientFiche() {
                     </Button>
                     {report.status === "disponible" && (
                       <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">
-                        Marqué comme transmis au chirurgien
+                        CR disponible chirurgien
                       </Badge>
                     )}
                   </div>
@@ -872,7 +877,7 @@ export default function PatientFiche() {
                   </dl>
                   <div className="flex flex-wrap gap-2">
                     <Button variant="primary" onClick={() => runAi("preparation_cr")}>
-                      Préparer brouillon
+                      Préparer brouillon IA
                     </Button>
                   </div>
                 </>
@@ -1052,7 +1057,7 @@ export default function PatientFiche() {
                 className="w-full"
                 onClick={() => runAi("preparation_cr")}
               >
-                Préparer le CR
+                Préparer brouillon IA
               </Button>
               <Button
                 variant="subtle"

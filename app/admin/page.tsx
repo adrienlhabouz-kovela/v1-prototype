@@ -438,7 +438,7 @@ export default function AdminCockpit() {
                 ["Patients suivis (mois)", care.patientsSuivisMois],
                 ["Dossiers à traiter", care.dossiersATraiter],
                 ["Retards opérationnels", care.retardsOperationnels],
-                ["CR à préparer / finaliser", care.crAPreparer],
+                ["CR en file de validation", care.crAPreparer],
                 ["Transmissions cabinet", care.transmissionsCabinet],
                 ["En attente cabinet", care.enAttenteCabinet],
                 ["Clôtures à préparer", care.cloturesAPreparer],
@@ -682,7 +682,7 @@ export default function AdminCockpit() {
           <Card>
             <CardHeader
               title="Gains IA & automation"
-              subtitle="IA assistive — validation humaine systématique. Aucune décision médicale automatisée."
+              subtitle="L'IA prépare les brouillons de CR. Validation humaine KOVELA obligatoire avant disponibilité chirurgien. Le chirurgien consulte un compte-rendu factuel, il ne valide pas dans KOVELA."
             />
             <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-4">
               {[
@@ -713,7 +713,9 @@ export default function AdminCockpit() {
             <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11.5px] leading-relaxed text-charcoal/60">
               <span className="font-medium text-navy-900">À mesurer en pilote :</span>{" "}
               temps CR sans / avec IA · minutes économisées par CR · minutes
-              économisées par patient.
+              économisées par patient · délai brouillon IA → validation
+              superviseuse · délai validation → disponibilité chirurgien · taux
+              CR validés sans correction.
             </div>
           </Card>
 
@@ -1398,7 +1400,7 @@ export default function AdminCockpit() {
                 ["Patients sans référentiel", risk.patientsSansReferentiel],
                 ["Interventions non mappées", risk.interventionsNonMappees],
                 ["Référentiels à relire", risk.referentielsArRelire],
-                ["CR en retard", risk.crEnRetard],
+                ["CR en retard de validation", risk.crEnRetard],
                 ["Transmissions en attente", risk.transmissionsEnAttente],
                 ["Patients sans superviseuse", risk.patientsSansSuperviseur],
                 ["Risques opérationnels", risk.risquesOuverts],
@@ -1555,7 +1557,7 @@ export default function AdminCockpit() {
                 <ul className="space-y-1.5 text-[12.5px] leading-relaxed text-charcoal/75">
                   <li>{risk.referentielsArRelire} référentiels à relire</li>
                   <li>{risk.patientsSansReferentiel} patients sans référentiel</li>
-                  <li>{risk.crEnRetard} CR en retard</li>
+                  <li>{risk.crEnRetard} CR en retard de validation</li>
                   <li>
                     {headOfCareLabels[hoc.recommendation]} (management care)
                   </li>
@@ -1672,7 +1674,7 @@ export default function AdminCockpit() {
                 ],
                 [
                   "v1",
-                  "temps humain total / patient · temps CR · temps transmission cabinet · temps relance · ratio patients simples/lourds · gain interface réel · gain IA réel · capacité réelle superviseuse · coûts care réels (WhatsApp, outils, QA, Head of Care, back-up). Churn chirurgien, CAC, payback, runway, cohortes.",
+                  "temps humain total / patient · temps CR · temps transmission cabinet · temps relance · délai brouillon IA → validation superviseuse · délai validation → disponibilité chirurgien · taux CR validés sans correction · taux de corrections · taux CR disponibles dans le délai attendu · temps gagné / CR · ratio patients simples/lourds · gain interface réel · gain IA réel · capacité réelle superviseuse · coûts care réels (WhatsApp, outils, QA, Head of Care, back-up). Churn chirurgien, CAC, payback, runway, cohortes.",
                 ],
               ] as [DataCategory, string][]
             ).map(([cat, content]) => (

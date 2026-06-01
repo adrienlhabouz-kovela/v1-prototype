@@ -511,7 +511,7 @@ export default function SuperviseurInbox() {
             ["Patients actifs", String(patientsActifs)],
             ["À traiter maintenant", String(counts.a_traiter)],
             ["En attente cabinet", String(counts.en_attente_cabinet)],
-            ["CR à préparer / finaliser", String(crToWork)],
+            ["CR en file de validation", String(crToWork)],
           ].map(([label, value]) => (
             <div key={label} className="bg-white px-4 py-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">

@@ -477,7 +477,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
           },
         ];
       });
-      if (status === "brouillon") pushLog("cr_prepare", "Brouillon de CR préparé.", patientId);
+      if (status === "brouillon") pushLog("cr_prepare", "Brouillon IA préparé — à relire et valider.", patientId);
     },
 
     validateReport(patientId) {
@@ -487,7 +487,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
         )
       );
       updatePatient(patientId, (p) => ({ ...p, status: p.status === "cr_en_attente" ? "actif" : p.status }));
-      pushLog("cr_valide", "CR validé en interne (non encore visible côté chirurgien).", patientId);
+      pushLog("cr_valide", "CR validé KOVELA — à rendre disponible chirurgien.", patientId);
     },
 
     publishReport(patientId) {
@@ -510,7 +510,7 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
             : r
         )
       );
-      pushLog("cr_disponible", "CR rendu disponible pour le chirurgien.", patientId);
+      pushLog("cr_disponible", "CR disponible chirurgien.", patientId);
     },
 
     // Préparer = brouillon factuel interne. N'ouvre PAS d'escalade.

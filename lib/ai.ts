@@ -88,7 +88,7 @@ export function aiPrepareReport(patient: Patient): string {
   ).length;
   const hasEscalade = patient.status === "escalade_ouverte";
   return [
-    "Brouillon de CR à valider",
+    "Brouillon IA — à relire, corriger si besoin, puis valider (KOVELA)",
     "",
     `Patient : ${patient.name}`,
     `Période : suivi structuré — protocole ${patient.protocol}`,
@@ -107,9 +107,9 @@ export function aiPrepareReport(patient: Patient): string {
     "— Continuité post-opératoire assurée.",
     "",
     `Escalade : ${hasEscalade ? "compilation factuelle en cours de préparation." : "aucune escalade ouverte sur la période."}`,
-    "Statut final : à compléter et valider par le superviseur.",
+    "Statut final : à relire, corriger si besoin, puis valider par la superviseuse KOVELA.",
     "",
-    "⚠ Brouillon de CR à valider — synthèse opérationnelle non médicale.",
+    "⚠ Brouillon IA à relire et valider avant mise à disposition chirurgien — synthèse opérationnelle non médicale.",
   ].join("\n");
 }
 

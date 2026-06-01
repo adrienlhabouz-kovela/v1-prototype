@@ -599,13 +599,14 @@ export function getDecisions(state: AdminState): Decision[] {
     });
   }
 
-  // 4. CR à préparer / finaliser
+  // 4. CR en file de validation — IA prépare, superviseuses relisent et valident.
   if (care.crAPreparer >= 3) {
     decisions.push({
       key: "cr_to_prepare",
-      label: `${care.crAPreparer} CR à préparer ou finaliser`,
-      consequence: "Risque de retard côté chirurgien.",
-      action: "Réorienter superviseuses sur les CR en cours.",
+      label: `${care.crAPreparer} CR en file de validation`,
+      consequence:
+        "Brouillons IA à relire, corriger si besoin et rendre disponibles chirurgien.",
+      action: "Prioriser relecture superviseuse sur les CR en cours.",
       severity: "medium",
       link: "/admin/supervision",
       linkLabel: "Voir supervision",
@@ -721,7 +722,7 @@ export function getHeadOfCareStatus(state: AdminState): HeadOfCareAssessment {
   }
   if (risk.crEnRetard >= 3) {
     score += 1;
-    reasons.push(`${risk.crEnRetard} CR en retard`);
+    reasons.push(`${risk.crEnRetard} CR en retard de validation`);
   }
   if (risk.scoreQualiteOpsPercent < ADMIN_CONSTANTS.SEUIL_QUALITE_OPS_MIN) {
     score += 1;

@@ -31,7 +31,7 @@ export const operationalStatusHints: Record<OperationalStatus, string> = {
   a_traiter: "Messages non lus, retards ou actions immédiates.",
   a_relancer: "Patient silencieux ou éléments manquants.",
   a_transmettre_cabinet:
-    "CR à préparer, valider ou rendre disponible. Transmission cabinet à envoyer.",
+    "Brouillon IA à relire, CR à valider ou à rendre disponible chirurgien. Transmission cabinet à envoyer.",
   en_attente_cabinet: "Transmission cabinet en cours — retour attendu.",
   cloture_a_preparer: "Fin de suivi atteinte — finaliser le dossier.",
   suivi_habituel: "Suivi actif, pas d'action immédiate.",
