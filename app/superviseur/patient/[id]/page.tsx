@@ -98,6 +98,7 @@ export default function PatientFiche() {
   const [aiOutput, setAiOutput] = useState("");
   const [editing, setEditing] = useState(false);
   const [showAI, setShowAI] = useState(false);
+  const [showTransmission, setShowTransmission] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
@@ -309,36 +310,82 @@ export default function PatientFiche() {
             )}
           </p>
 
-          {/* Actions rapides — primary = exactement la prochaine action. */}
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Button variant="primary" onClick={primary.handler} disabled={primary.disabled}>
-              {primary.label}
-            </Button>
-            {/* Secondaires — uniquement les actions encore pertinentes mais non-primary. */}
-            {primaryKey !== "prepare_cr" && canPrepareCR && (
-              <Button variant="subtle" onClick={() => runAi("preparation_cr")}>
-                Préparer CR (IA)
-              </Button>
-            )}
-            {primaryKey !== "transmit_compilation" && canTransmitCompilation && (
-              <Button variant="subtle" onClick={() => k.transmitCompilation(patient.id)}>
-                Transmettre au cabinet
-              </Button>
-            )}
-            {primaryKey !== "relance_patient" && patient.status === "silencieux" && (
-              <Button variant="subtle" onClick={() => k.relancePatient(patient.id)}>
-                Relancer le patient
-              </Button>
-            )}
-            {primaryKey !== "mark_treated" && primaryKey !== "documenter_habituel" && (
-              <Button variant="subtle" onClick={() => k.markTreated(patient.id)}>
-                Marquer suivi habituel
-              </Button>
-            )}
-            <Button variant="ghost" onClick={() => k.clotureSuivi(patient.id)}>
-              Clôturer le suivi
-            </Button>
-          </div>
+          {/* Actions rapides — 1 primary + 2 secondary visibles + overflow. */}
+          {(() => {
+            const secondaryCandidates: {
+              label: string;
+              handler: () => void;
+              available: boolean;
+            }[] = [
+              {
+                label: "Préparer CR (IA)",
+                handler: () => runAi("preparation_cr"),
+                available: primaryKey !== "prepare_cr" && canPrepareCR,
+              },
+              {
+                label: "Transmettre au cabinet",
+                handler: () => k.transmitCompilation(patient.id),
+                available:
+                  primaryKey !== "transmit_compilation" && canTransmitCompilation,
+              },
+              {
+                label: "Relancer le patient",
+                handler: () => k.relancePatient(patient.id),
+                available:
+                  primaryKey !== "relance_patient" && patient.status === "silencieux",
+              },
+              {
+                label: "Marquer suivi habituel",
+                handler: () => k.markTreated(patient.id),
+                available:
+                  primaryKey !== "mark_treated" && primaryKey !== "documenter_habituel",
+              },
+              {
+                label: "Clôturer le suivi",
+                handler: () => k.clotureSuivi(patient.id),
+                available: true,
+              },
+            ];
+            const available = secondaryCandidates.filter((a) => a.available);
+            const visible = available.slice(0, 2);
+            const overflow = available.slice(2);
+
+            return (
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <Button
+                  variant="primary"
+                  onClick={primary.handler}
+                  disabled={primary.disabled}
+                >
+                  {primary.label}
+                </Button>
+                {visible.map((a) => (
+                  <Button key={a.label} variant="subtle" onClick={a.handler}>
+                    {a.label}
+                  </Button>
+                ))}
+                {overflow.length > 0 && (
+                  <details className="relative">
+                    <summary className="cursor-pointer list-none rounded-lg px-3 py-2 text-[12px] font-medium tracking-tight text-charcoal/65 transition-colors hover:bg-navy-900/[0.04] hover:text-navy-900">
+                      Autres actions ▾
+                    </summary>
+                    <div className="absolute right-0 z-10 mt-1.5 min-w-[200px] overflow-hidden rounded-xl bg-white shadow-lift ring-1 ring-navy-900/[0.08]">
+                      {overflow.map((a) => (
+                        <button
+                          key={a.label}
+                          type="button"
+                          onClick={a.handler}
+                          className="block w-full px-4 py-2.5 text-left text-[12.5px] tracking-tight text-charcoal/80 transition-colors hover:bg-bone/60 hover:text-navy-900"
+                        >
+                          {a.label}
+                        </button>
+                      ))}
+                    </div>
+                  </details>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -532,23 +579,7 @@ export default function PatientFiche() {
                 Données de démonstration — synthèse issue du référentiel chirurgien.
               </p>
 
-              {[
-                ["Jalons attendus", refl.jalons_attendus.join(" · ")],
-                ["Jours de contact", refl.jours_contact.join(" · ")],
-                ["Photos attendues", refl.photos_attendues],
-                ["Format CR attendu", refl.format_cr_attendu],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="border-b border-navy-900/[0.04] pb-2 last:border-0"
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/50">
-                    {label}
-                  </p>
-                  <p className="mt-1 tracking-tight text-charcoal/75">{value}</p>
-                </div>
-              ))}
-
+              {/* 4 catégories opérables — aide à l'action (en premier). */}
               {(
                 [
                   {
@@ -601,6 +632,31 @@ export default function PatientFiche() {
                   </ul>
                 </div>
               ))}
+
+              {/* Infos descriptives — en second, plus discrètes. */}
+              <div className="pt-2">
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/45">
+                  Infos descriptives
+                </p>
+                <dl className="grid gap-y-1.5 text-[11.5px]">
+                  {[
+                    ["Jalons attendus", refl.jalons_attendus.join(" · ")],
+                    ["Jours de contact", refl.jours_contact.join(" · ")],
+                    ["Photos attendues", refl.photos_attendues],
+                    ["Format CR attendu", refl.format_cr_attendu],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="flex items-baseline justify-between gap-3"
+                    >
+                      <dt className="shrink-0 text-charcoal/55">{label}</dt>
+                      <dd className="text-right tracking-tight text-charcoal/75">
+                        {value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
             </div>
           </Card>
 
@@ -695,19 +751,36 @@ export default function PatientFiche() {
             </div>
           </Card>
 
-          {/* 4. Compilation factuelle → transmission cabinet */}
-          <Card>
-            <CardHeader
-              title="Transmission cabinet"
-              subtitle={
-                escalation?.status === "transmise"
-                  ? "Transmission cabinet envoyée"
-                  : patient.compilationDraft
-                  ? "Brouillon préparé — non transmis"
-                  : "Aucune compilation"
-              }
-            />
-            <div className="space-y-3 px-5 py-4">
+          {/* 4. Transmission cabinet — accordéon, ouvert si action en cours */}
+          <details
+            open={
+              showTransmission ||
+              escalation?.status === "transmise" ||
+              !!patient.compilationDraft
+            }
+            onToggle={(e) =>
+              setShowTransmission((e.target as HTMLDetailsElement).open)
+            }
+            className="rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]"
+          >
+            <summary className="flex cursor-pointer items-center justify-between gap-2 list-none px-5 py-4">
+              <div>
+                <p className="font-display text-[14px] font-semibold tracking-tight text-navy-900">
+                  Transmission cabinet
+                </p>
+                <p className="mt-0.5 text-[11px] tracking-tight text-charcoal/55">
+                  {escalation?.status === "transmise"
+                    ? "Transmission cabinet en cours"
+                    : patient.compilationDraft
+                    ? "Brouillon préparé — non transmis"
+                    : "Aucune compilation préparée"}
+                </p>
+              </div>
+              <span className="text-[12px] text-charcoal/45 transition-transform [details[open]>summary>&]:rotate-90">
+                ›
+              </span>
+            </summary>
+            <div className="space-y-3 border-t border-navy-900/[0.05] px-5 py-4">
               {escalation?.status === "transmise" ? (
                 <>
                   <Badge className="bg-navy-900 text-teal-100 ring-navy-900">
@@ -742,7 +815,7 @@ export default function PatientFiche() {
                 </p>
               )}
             </div>
-          </Card>
+          </details>
 
           {/* 5. IA assistive — repliée par défaut */}
           <details
