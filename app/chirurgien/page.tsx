@@ -89,14 +89,14 @@ export default function ChirurgienDashboard() {
                   cabinet.
                 </p>
                 <p className="mt-2.5 text-[12px] leading-relaxed text-charcoal/55">
-                  Vous pouvez aussi construire un{" "}
+                  Vous pouvez aussi préparer un{" "}
                   <Link
                     href="/chirurgien/referentiel"
                     className="font-medium text-teal-700 underline-offset-2 hover:text-teal-800 hover:underline"
                   >
-                    référentiel de fonctionnement complet
+                    référentiel essentiel
                   </Link>{" "}
-                  — version étendue (20–30 min, généralement complétée avec l'équipe KOVELA).
+                  — 2 ou 3 interventions prioritaires, généralement finalisé avec l'équipe KOVELA.
                 </p>
               </div>
             </div>
@@ -108,7 +108,7 @@ export default function ChirurgienDashboard() {
               </Link>
               <Link href="/chirurgien/referentiel">
                 <Button variant="subtle" className="w-full">
-                  Préparer le référentiel complet →
+                  Commencer avec mes interventions prioritaires →
                 </Button>
               </Link>
             </div>
