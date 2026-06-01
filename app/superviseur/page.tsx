@@ -19,6 +19,7 @@ import {
   getOperationalStatus,
   getPostOpDay,
   getRecommendedAction,
+  getFollowUpWindow,
   getUrgence,
   getUrgenceLabelDetailed,
   operationalStatusHints,
@@ -256,19 +257,29 @@ function PatientCard({ patient }: { patient: Patient }) {
   const action = getRecommendedAction(patient, ctx);
   const urgence = getUrgence(patient, ctx);
   const urgenceLabel = getUrgenceLabelDetailed(patient, ctx);
+  const window = getFollowUpWindow(patient);
+  const windowAccent =
+    window.status === "termine"
+      ? "text-amber-900"
+      : window.status === "proche_cloture"
+      ? "text-amber-800"
+      : "text-charcoal/55";
 
   return (
     <Link
       href={`/superviseur/patient/${patient.id}`}
       className="group block border-t border-navy-900/[0.04] px-4 py-3 transition-colors first:border-t-0 hover:bg-bone/40"
     >
-      {/* Ligne 1 : Patient · J+X · Intervention · Badge priorité */}
+      {/* Ligne 1 : Patient · J+X · fenêtre · Intervention · Badge priorité */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
           <span className="truncate text-[13.5px] font-medium tracking-tight text-navy-900">
             {patient.name}
           </span>
           <span className="text-[11.5px] font-mono font-medium text-teal-700">{day}</span>
+          <span className={`text-[11px] tracking-tight ${windowAccent}`}>
+            · {window.label}
+          </span>
           <span className="truncate text-[11.5px] text-charcoal/55">{patient.intervention}</span>
         </div>
         <Badge className={`${urgenceStyles[urgence]} shrink-0`}>{urgenceLabel}</Badge>

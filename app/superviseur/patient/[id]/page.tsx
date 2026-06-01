@@ -25,6 +25,8 @@ import {
   getPostOpDay,
   getRecommendedAction,
   getStructuredTimeline,
+  followUpStatusStyles,
+  getFollowUpWindow,
   getUrgence,
   getUrgenceLabelDetailed,
   operationalStatusLabels,
@@ -145,6 +147,7 @@ export default function PatientFiche() {
   const opStatus = getOperationalStatus(patient, ctx);
   const urgence = getUrgence(patient, ctx);
   const urgenceLabel = getUrgenceLabelDetailed(patient, ctx);
+  const followUp = getFollowUpWindow(patient);
   const recommended = getRecommendedAction(patient, ctx);
   const day = getPostOpDay(patient);
   const last = getLastEvent(patient, ctx);
@@ -204,9 +207,12 @@ export default function PatientFiche() {
     | "transmit_compilation"
     | "prepare_cr"
     | "relance_patient"
+    | "prepare_cloture"
+    | "cloturer_suivi"
     | "documenter_habituel"
     | "wait_cabinet";
 
+  // Ordre : message > CR/transmission > silencieux > suivi terminé > habituel.
   let primaryKey: PrimaryKey = "documenter_habituel";
   if (hasUntreated) primaryKey = "mark_treated";
   else if (canValidateCR) primaryKey = "validate_cr";
@@ -215,6 +221,9 @@ export default function PatientFiche() {
   else if (patient.status === "cr_en_attente") primaryKey = "prepare_cr";
   else if (escalation?.status === "transmise") primaryKey = "wait_cabinet";
   else if (patient.status === "silencieux") primaryKey = "relance_patient";
+  else if (followUp.status === "termine" && !report) primaryKey = "prepare_cloture";
+  else if (followUp.status === "termine" && report?.status === "disponible")
+    primaryKey = "cloturer_suivi";
 
   const primaryConfig: Record<
     PrimaryKey,
@@ -244,6 +253,14 @@ export default function PatientFiche() {
       label: "Relancer le patient",
       handler: () => k.relancePatient(patient.id),
     },
+    prepare_cloture: {
+      label: "Préparer la clôture du suivi",
+      handler: () => runAi("preparation_cr"),
+    },
+    cloturer_suivi: {
+      label: "Clôturer le suivi",
+      handler: () => k.clotureSuivi(patient.id),
+    },
     wait_cabinet: {
       label: "En attente retour cabinet",
       handler: () => undefined,
@@ -268,13 +285,24 @@ export default function PatientFiche() {
       {/* BANNER ACTION — résumé action très visible */}
       <div className="mb-6 overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
         <div className="border-l-[3px] border-teal-500/80 px-6 py-5">
-          {/* Ligne 1 : patient · J+X · intervention · chirurgien */}
+          {/* Ligne 1 : patient · J+X · fenêtre · intervention · chirurgien */}
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h1 className="font-display text-[1.7rem] font-medium leading-tight tracking-tight text-navy-900">
               {patient.name}
             </h1>
             <span className="font-mono text-[15px] font-medium tracking-tight text-teal-700">
               {day}
+            </span>
+            <span
+              className={`text-[12.5px] tracking-tight ${
+                followUp.status === "termine"
+                  ? "text-amber-900"
+                  : followUp.status === "proche_cloture"
+                  ? "text-amber-800"
+                  : "text-charcoal/60"
+              }`}
+            >
+              · {followUp.label}
             </span>
             <span className="text-[13.5px] text-charcoal/65">·</span>
             <span className="text-[13.5px] tracking-tight text-charcoal/80">
@@ -422,6 +450,65 @@ export default function PatientFiche() {
                 </div>
               ))}
             </dl>
+          </Card>
+
+          {/* Fenêtre de suivi — début / fin / restants / progression. */}
+          <Card>
+            <CardHeader
+              title="Fenêtre de suivi"
+              subtitle="Début, fin prévue, progression."
+              action={
+                <Badge className={followUpStatusStyles[followUp.status]}>
+                  {followUp.status === "en_cours"
+                    ? "Suivi en cours"
+                    : followUp.status === "proche_cloture"
+                    ? "Proche clôture"
+                    : followUp.status === "termine"
+                    ? "Terminé"
+                    : "Hors fenêtre"}
+                </Badge>
+              }
+            />
+            <div className="px-5 py-4">
+              <dl className="space-y-2.5 text-[12.5px]">
+                {[
+                  ["Début suivi", formatDate(followUp.startDate)],
+                  ["Fin prévue", formatDate(followUp.endDate)],
+                  [
+                    "Jours restants",
+                    followUp.daysRemaining === 0
+                      ? "Fin aujourd'hui"
+                      : followUp.daysRemaining > 0
+                      ? `${followUp.daysRemaining}j`
+                      : `Terminé depuis ${Math.abs(followUp.daysRemaining)}j`,
+                  ],
+                  ["Progression", `${followUp.progressPercent} %`],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="flex justify-between gap-3 border-b border-navy-900/[0.04] pb-2 last:border-0"
+                  >
+                    <dt className="shrink-0 text-charcoal/55">{label}</dt>
+                    <dd className="text-right font-medium tracking-tight text-navy-900">
+                      {value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              {/* Barre de progression discrète. */}
+              <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-navy-900/[0.06]">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    followUp.status === "termine"
+                      ? "bg-amber-500/80"
+                      : followUp.status === "proche_cloture"
+                      ? "bg-amber-400/80"
+                      : "bg-teal-500"
+                  }`}
+                  style={{ width: `${followUp.progressPercent}%` }}
+                />
+              </div>
+            </div>
           </Card>
         </aside>
 

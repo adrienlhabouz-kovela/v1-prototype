@@ -127,6 +127,88 @@ function endOfFollowUpDays(patient: Patient): number | null {
 }
 
 // ---------------------------------------------------------------------------
+// Fenêtre de suivi — début / fin prévue / jours restants / progression.
+// Calculé à partir de la date d'intervention et du protocole.
+// ---------------------------------------------------------------------------
+
+export type FollowUpStatus =
+  | "hors_fenetre"
+  | "en_cours"
+  | "proche_cloture"
+  | "termine";
+
+export interface FollowUpWindow {
+  startDate: string; // ISO — date d'intervention
+  endDate: string; // ISO — date prévue de fin de suivi
+  currentDay: number; // J+X (peut être négatif avant intervention)
+  plannedEndDay: number; // ex : 15 pour J+15
+  daysRemaining: number; // peut être négatif si terminé
+  progressPercent: number; // 0–100, plafonné
+  status: FollowUpStatus;
+  label: string; // ex : "Reste 2j", "Fin aujourd'hui", "Terminé depuis 4j"
+}
+
+// Fallback raisonnable si le protocole n'est pas parsable.
+const DEFAULT_FOLLOWUP_END_DAY = 15;
+
+export function getFollowUpWindow(
+  patient: Patient,
+  nowMs?: number
+): FollowUpWindow {
+  const now = nowMs ?? Date.now();
+  const startMs = new Date(patient.interventionDate).getTime();
+  const plannedEndDay = endOfFollowUpDays(patient) ?? DEFAULT_FOLLOWUP_END_DAY;
+  const endMs = startMs + plannedEndDay * 86_400_000;
+  const currentDay = Math.floor((now - startMs) / 86_400_000);
+  // Jours restants — arrondi vers le haut pour qu'à J+14 sur un J+15 on lise
+  // "reste 1j" et pas "reste 0j".
+  const daysRemaining = Math.ceil((endMs - now) / 86_400_000);
+  const progressPercent = Math.max(
+    0,
+    Math.min(100, Math.round((currentDay / Math.max(1, plannedEndDay)) * 100))
+  );
+
+  let status: FollowUpStatus;
+  let label: string;
+
+  if (currentDay < 0) {
+    status = "hors_fenetre";
+    label = `Suivi non commencé · J${currentDay}`;
+  } else if (daysRemaining > 3) {
+    status = "en_cours";
+    label = `Reste ${daysRemaining}j`;
+  } else if (daysRemaining > 0) {
+    status = "proche_cloture";
+    label = `Reste ${daysRemaining}j`;
+  } else if (daysRemaining === 0) {
+    status = "proche_cloture";
+    label = "Fin aujourd'hui";
+  } else {
+    status = "termine";
+    label = `Terminé depuis ${Math.abs(daysRemaining)}j`;
+  }
+
+  return {
+    startDate: new Date(startMs).toISOString(),
+    endDate: new Date(endMs).toISOString(),
+    currentDay,
+    plannedEndDay,
+    daysRemaining,
+    progressPercent,
+    status,
+    label,
+  };
+}
+
+// Style du badge fenêtre de suivi — cohérent avec l'urgence (sobre).
+export const followUpStatusStyles: Record<FollowUpStatus, string> = {
+  hors_fenetre: "bg-navy-900/[0.04] text-charcoal/65 ring-navy-900/[0.06]",
+  en_cours: "bg-teal-50/60 text-teal-700 ring-teal-100/70",
+  proche_cloture: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
+  termine: "bg-amber-100/70 text-amber-900 ring-amber-400/40",
+};
+
+// ---------------------------------------------------------------------------
 // Statut opérationnel — calcul à partir des données du store.
 // ---------------------------------------------------------------------------
 
@@ -331,15 +413,28 @@ export function getRecommendedAction(
     return { label: "Relancer le patient", delay: "aujourd'hui" };
   }
 
-  const endDay = endOfFollowUpDays(patient);
-  const interv = new Date(patient.interventionDate).getTime();
-  const dayNb = Math.floor((now - interv) / 86_400_000);
-  if (endDay !== null && dayNb >= endDay) {
+  // Suivi terminé sans CR final / clôture → préparer la clôture.
+  const window = getFollowUpWindow(patient, now);
+  if (window.status === "termine" && !report) {
+    return {
+      label: "Préparer la clôture du suivi",
+      delay: `terminé depuis ${Math.abs(window.daysRemaining)}j`,
+    };
+  }
+  if (window.status === "termine" && report?.status === "disponible") {
     return { label: "Clôturer le suivi", delay: "à venir" };
   }
 
   if (patient.status === "onboarding_incomplet") {
     return { label: "Finaliser l'onboarding patient", delay: "à venir" };
+  }
+
+  // Proche clôture — anticiper le CR final.
+  if (window.status === "proche_cloture" && !report) {
+    return {
+      label: "Préparer le CR final",
+      delay: window.label.toLowerCase(),
+    };
   }
 
   return { label: "Documenter — suivi habituel", delay: "à venir" };
