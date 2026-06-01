@@ -739,8 +739,8 @@ export default function ReferentielFonctionnementPage() {
         canal: c.canal,
         remarques: c.remarques,
       })),
-      regle_urgence_vitale:
-        "En cas de signe d'urgence vitale ou de situation manifestement urgente, KOVELA rappelle au patient de contacter le 15 / 112 et transmet l'information au cabinet selon le canal défini.",
+      regle_situation_urgente:
+        "Si le patient décrit une situation urgente ou inquiétante, KOVELA lui rappelle de contacter les services d'urgence 15 / 112 et transmet l'information au cabinet selon le canal défini.",
       comptes_rendus: r.comptesRendus,
       validation: r.validation,
     };
@@ -812,6 +812,16 @@ export default function ReferentielFonctionnementPage() {
       </PageHeader>
 
       <div className="mx-auto max-w-4xl space-y-6">
+        {/* Cadrage de la version */}
+        <div className="rounded-2xl border border-teal-200/40 bg-teal-50/40 px-5 py-4 text-[12.5px] leading-relaxed text-navy-900">
+          <p className="font-medium">
+            Cette version sert à valider la structure du référentiel avec des chirurgiens.
+          </p>
+          <p className="mt-1 text-charcoal/75">
+            Le remplissage complet sera généralement accompagné par l'équipe KOVELA.
+          </p>
+        </div>
+
         {/* Bandeau de contexte */}
         <div className="rounded-2xl bg-white p-5 shadow-card ring-1 ring-navy-900/[0.045]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -826,8 +836,8 @@ export default function ReferentielFonctionnementPage() {
             </Badge>
           </div>
           <p className="mt-3 text-[13px] leading-relaxed text-charcoal/70">
-            Vous pouvez commencer par vos interventions les plus fréquentes. Le référentiel pourra
-            être enrichi progressivement. Ce référentiel est généralement complété avec l'équipe
+            Vous pouvez commencer par 2 ou 3 interventions prioritaires. Le reste pourra être
+            complété progressivement. Ce référentiel est généralement complété avec l'équipe
             KOVELA, puis relu avant activation complète des premiers suivis.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -1115,7 +1125,7 @@ export default function ReferentielFonctionnementPage() {
                   </Field>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-3">
-                  <Field label="Délai attendu — Niveau 1">
+                  <Field label="Délai attendu — Suivi habituel">
                     <input
                       className={inputCls}
                       value={r.cabinet.delaiNiveau1}
@@ -1123,7 +1133,7 @@ export default function ReferentielFonctionnementPage() {
                       placeholder="ex : 48 h"
                     />
                   </Field>
-                  <Field label="Délai attendu — Niveau 2">
+                  <Field label="Délai attendu — À transmettre au cabinet">
                     <input
                       className={inputCls}
                       value={r.cabinet.delaiNiveau2}
@@ -1131,7 +1141,7 @@ export default function ReferentielFonctionnementPage() {
                       placeholder="ex : 24 h"
                     />
                   </Field>
-                  <Field label="Délai attendu — Niveau 3 (prioritaire)">
+                  <Field label="Délai attendu — Transmission prioritaire">
                     <input
                       className={inputCls}
                       value={r.cabinet.delaiNiveau3}
@@ -1339,9 +1349,14 @@ export default function ReferentielFonctionnementPage() {
                   hint={fam.hint}
                 >
                   {fam.optional && (
-                    <Badge className="bg-bone text-charcoal/65 ring-navy-900/[0.06]">
-                      Optionnel / later
-                    </Badge>
+                    <div className="-mt-2 mb-1 flex flex-wrap items-center gap-2 rounded-xl bg-bone/70 px-3.5 py-2.5 ring-1 ring-navy-900/[0.05]">
+                      <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
+                        Optionnel / later — non prioritaire V1
+                      </Badge>
+                      <span className="text-[11.5px] leading-relaxed text-charcoal/65">
+                        Le wedge V1 KOVELA reste la chirurgie esthétique post-opératoire.
+                      </span>
+                    </div>
                   )}
                   <div className="space-y-2">
                     {r.interventions
@@ -1733,15 +1748,18 @@ export default function ReferentielFonctionnementPage() {
                   Règles de transmission au cabinet
                 </h2>
                 <p className="mt-2 text-[13px] leading-relaxed text-charcoal/60">
-                  Pour chaque intervention activée en priorité V1, définissez les trois niveaux de
-                  transmission. KOVELA ne qualifie pas médicalement — KOVELA applique les règles
-                  que vous définissez ici.
+                  Pour chaque intervention activée en priorité V1, définissez les trois catégories
+                  de transmission : <span className="font-medium text-navy-900">suivi habituel</span>,
+                  <span className="font-medium text-navy-900"> à transmettre au cabinet</span>,
+                  <span className="font-medium text-navy-900"> transmission prioritaire</span>.
+                  KOVELA ne qualifie pas médicalement — KOVELA applique les règles que vous
+                  définissez ici.
                 </p>
                 <div className="mt-3 rounded-xl bg-navy-depth p-4 text-[12px] leading-relaxed text-navy-100/85 ring-1 ring-white/[0.06]">
-                  <p className="font-medium text-white">Règle non éditable — urgence vitale</p>
+                  <p className="font-medium text-white">Règle non éditable — situation urgente</p>
                   <p className="mt-1.5">
-                    En cas de signe d'urgence vitale ou de situation manifestement urgente, KOVELA
-                    rappelle au patient de contacter le 15 / 112 et transmet l'information au
+                    Si le patient décrit une situation urgente ou inquiétante, KOVELA lui rappelle
+                    de contacter les services d'urgence 15 / 112 et transmet l'information au
                     cabinet selon le canal défini.
                   </p>
                 </div>
@@ -1773,19 +1791,19 @@ export default function ReferentielFonctionnementPage() {
                     [
                       {
                         key: "niveau1",
-                        title: "Niveau 1 — Suivi habituel",
+                        title: "Suivi habituel",
                         badge: "bg-teal-50/60 text-teal-700 ring-teal-100/70",
                         prioritaire: false,
                       },
                       {
                         key: "niveau2",
-                        title: "Niveau 2 — À revoir / à transmettre",
+                        title: "À transmettre au cabinet",
                         badge: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
                         prioritaire: false,
                       },
                       {
                         key: "niveau3",
-                        title: "Niveau 3 — Transmission prioritaire",
+                        title: "Transmission prioritaire",
                         badge: "bg-rose-50/60 text-rose-700 ring-rose-200/60",
                         prioritaire: true,
                       },
@@ -2153,6 +2171,11 @@ export default function ReferentielFonctionnementPage() {
                 <p className="mt-2 text-[13px] leading-relaxed text-charcoal/60">
                   Aperçu du référentiel saisi. Validez et exportez pour transmettre à l'équipe
                   KOVELA.
+                </p>
+                <p className="mt-3 rounded-xl border border-teal-200/40 bg-teal-50/40 px-4 py-3 text-[12.5px] leading-relaxed text-navy-900">
+                  <span className="font-medium">
+                    Référentiel de fonctionnement à relire avec KOVELA avant usage opérationnel.
+                  </span>
                 </p>
               </div>
 
