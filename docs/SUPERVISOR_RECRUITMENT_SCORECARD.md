@@ -36,6 +36,47 @@ Elle **ne** :
 
 ---
 
+## 1bis. Version entretien — 1 page (raccourci opérationnel)
+
+À utiliser directement en entretien sans parcourir le reste du document.
+
+### Score total
+
+Noter sur **/ 100** selon la scorecard § 4 (9 catégories pondérées).
+
+### 5 questions clés à poser systématiquement
+1. Comment décririez-vous le rôle d'une superviseuse KOVELA — et **où s'arrête-t-il** ?
+2. Que faites-vous si un patient vous demande **« est-ce normal ? »** sur sa douleur ?
+3. Comment **documentez-vous** une interaction patient ?
+4. Comment **suivriez-vous 30 à 50 patients actifs en parallèle** ? Comment **priorisez-vous** ?
+5. Que vérifiez-vous **avant de valider un brouillon IA** ?
+
+### 3 cas pratiques obligatoires
+- **Cas 1** — Patient : *« J'ai très mal depuis ce matin, est-ce normal ? »* (cf. § 6.1)
+- **Cas 2** — Photo : *« Vous trouvez que c'est normal ? »* (cf. § 6.2)
+- **Cas 8** — Brouillon IA risqué : *« L'évolution semble normale et la douleur ne paraît pas inquiétante. »* — à corriger. (cf. § 6.8)
+
+### Test CR obligatoire
+- **Cas Mme X · rhinoplastie · J+4** (§ 7). 8 à 10 lignes. Grille de correction § 7.
+
+### Red flags éliminatoires (rappel)
+No go définitif si la candidate :
+- veut **reconnaître si une situation est normale ou non** ;
+- propose de **rassurer médicalement** ;
+- veut **interpréter les photos** ;
+- veut gérer **« à l'instinct »** ou **par WhatsApp uniquement** ;
+- se positionne en **soignante décisionnaire** ou substitut au chirurgien.
+
+Liste complète : § 8.
+
+### Décision à prendre en fin d'entretien
+- [ ] **Go** — score ≥ 80, aucun red flag, posture saine
+- [ ] **Go avec réserve** — score 70–79, onboarding KOVELA renforcé requis
+- [ ] **À revoir** — second entretien / référence à appeler avant décision
+- [ ] **No go** — score < 60 OU red flag éliminatoire OU seuil minimum non atteint (§ 4bis)
+
+---
+
 ## 2. Process de recrutement — 3 étapes
 
 | Étape | Durée | Objectif |
@@ -88,9 +129,28 @@ Elle **ne** :
 
 ### Mode d'évaluation par item
 - 0 = absent / dangereux
-- 1/3 du barème = faible mais récupérable avec formation
+- 1/3 du barème = faible mais récupérable avec onboarding
 - 2/3 du barème = correct
 - Barème plein = excellent
+
+---
+
+## 4bis. Seuils minimums par catégorie
+
+Même si le score total est correct, les seuils suivants déclenchent automatiquement la
+décision indiquée :
+
+| Catégorie | Seuil critique | Conséquence |
+|---|---|---|
+| B. Discipline non médicale | **< 10 / 15** | **No go** |
+| C. Rigueur opérationnelle | **< 10 / 15** | **No go** sauf profil junior très accompagné (décision explicite Adrien / HoC) |
+| D. Rédaction factuelle / CR | **< 9 / 15** | **Test complémentaire obligatoire** avant décision |
+| I. Confidentialité / posture | **< 4 / 5** | **No go** |
+| H. Usage IA assistive | **< 3 / 5** | **Onboarding KOVELA renforcé obligatoire** si maintenu |
+| **Red flag éliminatoire (§ 8)** | — | **No go** même si score global correct |
+
+> Règle : un seul seuil critique non atteint = la décision recommandée prime sur le score
+> global. Documenter la justification dans la synthèse § 11.
 
 ---
 
@@ -215,6 +275,33 @@ Demander à la candidate de **corriger**.
 - Garder un wording neutre.
 - Transmettre selon le référentiel si besoin.
 
+### Cas 9 — Test priorisation (10 minutes)
+
+Donner les **8 situations fictives** suivantes et demander à la candidate de les **classer
+par ordre de traitement** dans la journée. Chronométrer 10 minutes maximum.
+
+1. Message patient non traité depuis 6 h.
+2. Photo reçue avec demande *« c'est normal ? »*.
+3. Patient silencieux depuis 48 h.
+4. Brouillon IA de CR prêt.
+5. CR validé KOVELA mais non disponible chirurgien.
+6. Transmission cabinet préparée sans retour.
+7. Suivi habituel sans événement.
+8. Pré-clôture de suivi prévue aujourd'hui.
+
+**Attendu** :
+- Prioriser sans dramatiser (pas de hiérarchie médicale, hiérarchie opérationnelle).
+- Ne pas interpréter médicalement la situation 2 — la traiter comme un message à
+  documenter + transmission selon référentiel.
+- Traiter les retards / CR / transmissions selon process (typiquement 1 → 2 → 5 → 4 →
+  3 → 8 → 6 → 7, mais l'ordre exact est moins important que la **logique justifiée**).
+- Distinguer **urgence opérationnelle** (réponse > SLA, CR en retard de validation,
+  transmission préparée mais non transmise) et **avis médical** (jamais).
+- Documenter les décisions de priorisation prises.
+
+> Évaluation : pertinence du raisonnement > exactitude de l'ordre. Un classement
+> différent peut être tout à fait valide s'il est justifié sans interprétation médicale.
+
 ---
 
 ## 7. Test écrit complet — CR Mme X
@@ -251,6 +338,26 @@ Messages :
 Un CR qui passe la grille mais reste **plat / non utile** au chirurgien = pénaliser la
 catégorie D (rédaction factuelle).
 
+### Exemple de CR attendu (formulation acceptable)
+
+```
+Mme X — Rhinoplastie — J+4.
+
+À 09h12, la patiente indique une douleur et un gonflement.
+À 09h16, une photo est reçue.
+À 09h24, la patiente demande si l'évolution est normale.
+À 09h35, KOVELA accuse réception, rappelle que l'équipe ne réalise pas d'interprétation
+médicale et indique que les éléments sont traités selon le référentiel cabinet.
+À 09h50, une transmission cabinet est préparée.
+
+Statut : transmission cabinet préparée, en attente du retour cabinet.
+```
+
+> **Note** : ce modèle est un exemple de formulation factuelle. Il ne doit contenir
+> **aucun avis médical, aucune interprétation photo, aucune qualification normal /
+> anormal**. Le candidat n'est pas obligé de reprendre cette structure mot pour mot —
+> seule l'absence d'interprétation et la clarté chronologique sont notées.
+
 ---
 
 ## 8. Red flags éliminatoires
@@ -281,7 +388,7 @@ est correct.**
 |---|---|---|
 | **90–100** | Senior excellent · Head of Care potentiel | Go franc · envisager rôle élargi (Lead, HoC) |
 | **80–89** | Très bon profil superviseuse senior | Go · onboarding standard |
-| **70–79** | Profil recrutable avec formation KOVELA | Go avec réserve · onboarding renforcé, mentorat |
+| **70–79** | Profil recrutable avec onboarding KOVELA renforcé | Go avec réserve · onboarding renforcé, mentorat |
 | **60–69** | Profil à risque, uniquement si très accompagné | À revoir · décision en 2ᵉ entretien + ref ; refus par défaut |
 | **< 60** | Non recommandé | No go |
 | **Red flag éliminatoire** | Non recommandé même si score correct | No go définitif · pas de vivier |
@@ -316,6 +423,17 @@ Date entretien              :
 Profil                      :
 Expérience pertinente       :
 
+Disponibilité / contractuel :
+  Disponibilité hebdomadaire :
+  Plages horaires possibles  :
+  Soirs / week-end           : (oui / non / partiel)
+  Statut                     : (freelance / salarié / portage / autre)
+  Capacité à facturer        : (oui / non)
+  Équipement de travail      : (ordi, casque, connexion stable, écran 2nd ?)
+  Environnement confidentiel : (pièce dédiée / open space / mobile ?)
+  Langues parlées            :
+  Contraintes connues        :
+
 Score total / 100           :
   A. Compréhension rôle      / 15
   B. Discipline non médicale / 15
@@ -331,7 +449,11 @@ Points forts                :
 Points faibles              :
 Red flags                   : (oui / non — détailler)
 Qualité rédactionnelle      :
-Capacité volume             : (30 / 50 / 80 / 120 patients/jour estimés)
+Capacité volume estimée     :
+  [ ] 20–30 patients actifs suivis en parallèle
+  [ ] 30–50 patients actifs suivis en parallèle
+  [ ] 50–80 patients actifs suivis en parallèle
+  [ ] À valider en pilote réel
 Compréhension doctrine      :
 Risque principal            :
 
@@ -359,6 +481,11 @@ Prochaines étapes (cocher)  :
 
 Signature évaluateur·trice  :
 ```
+
+> **Note capacité volume** : la capacité réelle doit toujours être confirmée en pilote :
+> temps humain / patient, qualité des CR, retards de validation, charge émotionnelle,
+> capacité à tenir les process. L'estimation cochée ci-dessus reste indicative tant que
+> le pilote n'a pas tourné sur 4 à 8 semaines avec des patients réels.
 
 ---
 
