@@ -88,11 +88,30 @@ export default function ChirurgienDashboard() {
                   l'équipe KOVELA de préparer les parcours patients selon les habitudes de votre
                   cabinet.
                 </p>
+                <p className="mt-2.5 text-[12px] leading-relaxed text-charcoal/55">
+                  Vous pouvez aussi construire un{" "}
+                  <Link
+                    href="/chirurgien/referentiel"
+                    className="font-medium text-teal-700 underline-offset-2 hover:text-teal-800 hover:underline"
+                  >
+                    référentiel de fonctionnement complet
+                  </Link>{" "}
+                  — version étendue (20–30 min, généralement complétée avec l'équipe KOVELA).
+                </p>
               </div>
             </div>
-            <Link href="/chirurgien/referentiel-suivi" className="shrink-0">
-              <Button variant="primary">Compléter le référentiel</Button>
-            </Link>
+            <div className="flex shrink-0 flex-col gap-2">
+              <Link href="/chirurgien/referentiel-suivi">
+                <Button variant="primary" className="w-full">
+                  Compléter le référentiel
+                </Button>
+              </Link>
+              <Link href="/chirurgien/referentiel">
+                <Button variant="subtle" className="w-full">
+                  Préparer le référentiel complet →
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       )}
