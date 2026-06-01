@@ -24,7 +24,6 @@ import {
   generalStateLabels,
   generalStateStyles,
   getAIGainsMetrics,
-  getBreakEvenScenarios,
   getCapacityActuelle,
   getCapacityProjection,
   getCareCostsActuels,
@@ -162,7 +161,6 @@ export default function AdminCockpit() {
   const careStaff = getCareStaffCosts();
   const careCosts = getCareCostsActuels(state);
   const careMargin = getCareMarginActuelle(state);
-  const breakEvens = getBreakEvenScenarios(state);
   const productivity = getProductivityMetrics(state);
   const aiGains = getAIGainsMetrics(k.aiLogs);
   const timeScenarios = getTimeScenarioMetrics(state);
@@ -1083,89 +1081,26 @@ export default function AdminCockpit() {
                 fixes. Voir Point d'équilibre ci-dessous pour la sensibilité.
               </p>
             </div>
-          </Card>
-
-          {/* Point d'équilibre care */}
-          <Card>
-            <CardHeader
-              title="Point d'équilibre care"
-              subtitle={`Sensibilité productivité superviseur à volume cible (${breakEvens[0].patientsTotal} patients / mois).`}
-              action={
-                <Badge className={DATA_CATEGORY_STYLES.hypothese}>
-                  {DATA_CATEGORY_LABELS.hypothese}
-                </Badge>
-              }
-            />
-            <div className="overflow-x-auto">
-              <table className="w-full text-[12.5px]">
-                <thead>
-                  <tr className="border-b border-navy-900/[0.05] text-left text-[10px] uppercase tracking-[0.14em] text-charcoal/55">
-                    <th className="px-5 py-2.5 font-medium">Scénario</th>
-                    <th className="px-5 py-2.5 font-medium">Pat. / sup</th>
-                    <th className="px-5 py-2.5 font-medium">Sup requises</th>
-                    <th className="px-5 py-2.5 font-medium">Coût sup</th>
-                    <th className="px-5 py-2.5 font-medium">Coût care total</th>
-                    <th className="px-5 py-2.5 font-medium">Marge care</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {breakEvens.map((b) => (
-                    <tr
-                      key={b.scenario.key}
-                      className="border-b border-navy-900/[0.04]"
-                    >
-                      <td className="px-5 py-2.5">
-                        <p className="font-medium tracking-tight text-navy-900">
-                          {b.scenario.label}
-                        </p>
-                        <p className="mt-0.5 text-[10.5px] text-charcoal/55">
-                          {b.scenario.hint}
-                        </p>
-                      </td>
-                      <td className="px-5 py-2.5 font-mono text-navy-900">
-                        {b.scenario.patientsPerSupervisor}
-                      </td>
-                      <td className="px-5 py-2.5 text-charcoal/65">
-                        {b.superviseursRequis}
-                      </td>
-                      <td className="px-5 py-2.5 text-charcoal/65">
-                        {formatEur(b.coutSuperviseurs)}
-                      </td>
-                      <td className="px-5 py-2.5 text-charcoal/65">
-                        {formatEur(b.coutCareTotal)}
-                      </td>
-                      <td
-                        className={`px-5 py-2.5 font-medium tracking-tight ${
-                          b.margeCareEur >= 0
-                            ? "text-teal-700"
-                            : "text-amber-900"
-                        }`}
-                      >
-                        {formatEur(b.margeCareEur)} ({formatPct(b.margeCarePercent, 0)})
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11.5px] leading-relaxed text-charcoal/60">
-              <span className="font-medium text-navy-900">
-                Lecture pilote :
-              </span>{" "}
-              le point d'équilibre dépend de la productivité réelle par
-              superviseuse, à valider en pilote avec données mesurées (temps,
-              ratio patients simples/lourds, gain IA).
+            <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11px] leading-relaxed text-charcoal/60">
+              <span className="font-medium text-navy-900">Périmètre marge care :</span>{" "}
+              inclut superviseuses actives + coût direct patient + outils care +
+              messagerie patient.{" "}
+              <span className="text-charcoal/55">
+                Exclut sales, tech, CEO, juridique, compta, marketing. Coûts
+                additionnels à mesurer en V1 : Head of Care, Lead, QA care,
+                WhatsApp réel, back-up.
+              </span>
             </div>
           </Card>
 
-          {/* Point d'équilibre par temps humain — modélisation Mélanie */}
+          {/* Point d'équilibre care — dérivé du temps humain (baseline V0) */}
           <Card>
             <CardHeader
-              title="Point d'équilibre par temps humain"
-              subtitle={`Lecture dérivée du temps humain par patient. Volume cible : ${timeScenarios[0].patientsTotal} patients/mois. Baseline terrain ${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_LOW}–${ADMIN_CONSTANTS.MANUAL_BASELINE_MINUTES_PER_PATIENT_HIGH} min/patient (donnée historique).`}
+              title="Point d'équilibre care — par temps humain"
+              subtitle={`Lecture canonique : capacité dérivée de ${ADMIN_CONSTANTS.SUPERVISOR_PRODUCTIVE_HOURS_PER_MONTH} h productives/mois et du temps humain par patient. Volume cible : ${timeScenarios[0].patientsTotal} patients/mois (${ADMIN_CONSTANTS.CHIRURGIENS_NORMALIZED_TARGET} chirurgiens × ${ADMIN_CONSTANTS.PATIENTS_MOIS_PAR_CHIRURGIEN_TARGET} patients/mois).`}
               action={
                 <Badge className={DATA_CATEGORY_STYLES.hypothese}>
-                  {DATA_CATEGORY_LABELS.hypothese}
+                  Simulation prototype
                 </Badge>
               }
             />
@@ -1177,7 +1112,9 @@ export default function AdminCockpit() {
                     <th className="px-5 py-2.5 font-medium">Min / patient</th>
                     <th className="px-5 py-2.5 font-medium">Sup requises</th>
                     <th className="px-5 py-2.5 font-medium">Coût sup</th>
-                    <th className="px-5 py-2.5 font-medium">Marge care</th>
+                    <th className="px-5 py-2.5 font-medium">
+                      Marge care % (rapide / lent)
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1237,13 +1174,80 @@ export default function AdminCockpit() {
                 </tbody>
               </table>
             </div>
+
+            {/* Périmètre marge care — ce qui est inclus, exclu, à mesurer */}
+            <div className="grid gap-px border-t border-navy-900/[0.05] bg-navy-900/[0.04] sm:grid-cols-3">
+              <div className="bg-white px-5 py-3.5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+                  Inclus dans la marge care
+                </p>
+                <ul className="mt-2 space-y-1 text-[11.5px] leading-relaxed text-charcoal/70">
+                  <li>
+                    • Superviseuses actives (
+                    {formatEur(ADMIN_CONSTANTS.COUT_SUPERVISEUR_MENSUEL_EUR)} /
+                    mois — hypothèse)
+                  </li>
+                  <li>
+                    • Coût direct patient (
+                    {formatEur(ADMIN_CONSTANTS.COUT_DIRECT_PATIENT_EUR)} / patient)
+                  </li>
+                  <li>
+                    • Coût outils care (
+                    {formatEur(
+                      ADMIN_CONSTANTS.COUT_OUTILS_CARE_PAR_PATIENT_EUR
+                    )}{" "}
+                    / patient)
+                  </li>
+                  <li>
+                    • Coût messagerie patient (
+                    {formatEur(ADMIN_CONSTANTS.COUT_MESSAGERIE_PATIENT_EUR)} /
+                    patient)
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-white px-5 py-3.5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+                  Exclus de la marge care
+                </p>
+                <ul className="mt-2 space-y-1 text-[11.5px] leading-relaxed text-charcoal/65">
+                  <li>• Sales / acquisition chirurgiens</li>
+                  <li>• Tech / produit / infra</li>
+                  <li>• CEO / direction / G&amp;A</li>
+                  <li>• Juridique · compta · marketing</li>
+                </ul>
+                <p className="mt-2 text-[10.5px] leading-relaxed text-charcoal/50">
+                  Cette marge isole le moteur care, pas la rentabilité totale.
+                </p>
+              </div>
+              <div className="bg-white px-5 py-3.5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-800">
+                  Coûts care additionnels à mesurer
+                </p>
+                <ul className="mt-2 space-y-1 text-[11.5px] leading-relaxed text-charcoal/65">
+                  <li>• Head of Care (non activé)</li>
+                  <li>• Lead superviseuse (non activée)</li>
+                  <li>• QA care (non activée)</li>
+                  <li>• Coût WhatsApp / canal externe réel</li>
+                  <li>• Outils care additionnels</li>
+                  <li>• Back-up superviseuse / remplacement</li>
+                </ul>
+                <p className="mt-2 text-[10.5px] leading-relaxed text-charcoal/50">
+                  Comptabilisés en V1 selon activation et données pilote.
+                </p>
+              </div>
+            </div>
+
             <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11.5px] leading-relaxed text-charcoal/60">
-              <span className="font-medium text-navy-900">Lecture :</span>{" "}
-              colonne marge care = (min / patient le plus rapide) /{" "}
-              (min / patient le plus lent). La marge care dépend directement du
-              temps humain : interface + IA + automation peuvent la faire
-              basculer du négatif au positif. Hypothèses à mesurer en pilote,
-              jamais promesses.
+              <span className="font-medium text-navy-900">
+                Lecture marge care % :
+              </span>{" "}
+              colonne « rapide / lent » = marge calculée au temps le plus bas
+              (capacité haute) puis au temps le plus haut (capacité basse). La
+              marge care dépend directement du temps humain : interface, IA et
+              automation peuvent la faire basculer du négatif au positif.{" "}
+              <span className="font-medium text-amber-900">
+                Simulation prototype — à valider en pilote.
+              </span>
             </div>
           </Card>
         </div>
