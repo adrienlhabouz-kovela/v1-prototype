@@ -17,6 +17,8 @@ export const ADMIN_CONSTANTS = {
   // Hypothèses de coûts — pour le calcul de marge brute estimée.
   COUT_SUPERVISEUR_MENSUEL_EUR: 3500,
   COUT_DIRECT_PATIENT_EUR: 12,
+  COUT_OUTILS_CARE_PAR_PATIENT_EUR: 3, // hypothèse — outils internes + messagerie pro
+  COUT_MESSAGERIE_PATIENT_EUR: 1, // hypothèse — WhatsApp / SMS / canal externe
 
   // Hypothèses de volume cible — pour la marge brute normalisée.
   // L'idée : la marge prototype est non représentative (faible volume
@@ -64,3 +66,174 @@ export const DATA_CATEGORY_STYLES: Record<DataCategory, string> = {
   hypothese: "bg-navy-900/[0.04] text-charcoal/65 ring-navy-900/[0.06]",
   v1: "bg-bone/60 text-charcoal/55 ring-navy-900/[0.04]",
 };
+
+// ---------------------------------------------------------------------------
+// Équipe care — coûts par poste / personne, structure configurable.
+// Chaque ligne peut être renseignée (coût réel), hypothèse (estimation V1)
+// ou à valider (à figer avec la personne / le rôle plus tard).
+// ---------------------------------------------------------------------------
+
+export type CareRole =
+  | "supervisor"
+  | "lead_supervisor"
+  | "head_of_care"
+  | "qa_care"
+  | "care_coordinator"
+  | "ops_manager"
+  | "custom";
+
+export type CostType = "renseigne" | "hypothese" | "a_valider";
+
+export const careRoleLabels: Record<CareRole, string> = {
+  supervisor: "Superviseuse",
+  lead_supervisor: "Lead superviseuse",
+  head_of_care: "Head of Care",
+  qa_care: "QA care",
+  care_coordinator: "Care coordinator",
+  ops_manager: "Ops manager",
+  custom: "Poste custom",
+};
+
+export const costTypeLabels: Record<CostType, string> = {
+  renseigne: "Renseigné",
+  hypothese: "Hypothèse",
+  a_valider: "À valider",
+};
+
+export const costTypeStyles: Record<CostType, string> = {
+  renseigne: "bg-teal-50/60 text-teal-700 ring-teal-100/70",
+  hypothese: "bg-amber-50/50 text-amber-800 ring-amber-200/50",
+  a_valider: "bg-navy-900/[0.04] text-charcoal/65 ring-navy-900/[0.06]",
+};
+
+export interface CareTeamMember {
+  id: string;
+  label: string;
+  role: CareRole;
+  customRoleLabel?: string;
+  monthlyCompanyCost: number;
+  costType: CostType;
+  active: boolean;
+  capacityContribution: boolean; // compte dans la capacité care opérationnelle
+  managementContribution: boolean; // compte dans le management care
+  qualityContribution: boolean; // compte dans la QA care
+  note?: string;
+}
+
+// Seed prototype — à enrichir / remplacer lors du pilote.
+// Mélange volontaire de "renseigné" (faux mais déclaré) et "hypothèse" /
+// "à valider" pour montrer la discipline data dès le prototype.
+export const CARE_TEAM_COSTS: CareTeamMember[] = [
+  {
+    id: "supervisor_1",
+    label: "Superviseuse 1",
+    role: "supervisor",
+    monthlyCompanyCost: 3400,
+    costType: "renseigne",
+    active: true,
+    capacityContribution: true,
+    managementContribution: false,
+    qualityContribution: false,
+    note: "Coût société mensuel renseigné",
+  },
+  {
+    id: "supervisor_2",
+    label: "Superviseuse 2",
+    role: "supervisor",
+    monthlyCompanyCost: 3200,
+    costType: "renseigne",
+    active: true,
+    capacityContribution: true,
+    managementContribution: false,
+    qualityContribution: false,
+  },
+  {
+    id: "supervisor_3",
+    label: "Superviseuse 3",
+    role: "supervisor",
+    monthlyCompanyCost: 3500,
+    costType: "hypothese",
+    active: true,
+    capacityContribution: true,
+    managementContribution: false,
+    qualityContribution: false,
+  },
+  {
+    id: "supervisor_4",
+    label: "Superviseuse 4",
+    role: "supervisor",
+    monthlyCompanyCost: 3500,
+    costType: "hypothese",
+    active: false,
+    capacityContribution: true,
+    managementContribution: false,
+    qualityContribution: false,
+    note: "Recrutement à anticiper si capacité > 85%",
+  },
+  {
+    id: "head_of_care",
+    label: "Head of Care",
+    role: "head_of_care",
+    monthlyCompanyCost: 5540,
+    costType: "a_valider",
+    active: false,
+    capacityContribution: false,
+    managementContribution: true,
+    qualityContribution: true,
+    note: "À activer selon seuils (capacité, # superviseuses, qualité)",
+  },
+  {
+    id: "lead_supervisor",
+    label: "Lead superviseuse",
+    role: "lead_supervisor",
+    monthlyCompanyCost: 4200,
+    costType: "a_valider",
+    active: false,
+    capacityContribution: true,
+    managementContribution: true,
+    qualityContribution: true,
+  },
+  {
+    id: "qa_care",
+    label: "QA care",
+    role: "qa_care",
+    monthlyCompanyCost: 3000,
+    costType: "a_valider",
+    active: false,
+    capacityContribution: false,
+    managementContribution: false,
+    qualityContribution: true,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Scénarios point d'équilibre care — sensibilité productivité superviseur.
+// ---------------------------------------------------------------------------
+
+export interface BreakEvenScenario {
+  key: string;
+  label: string;
+  hint: string;
+  patientsPerSupervisor: number;
+}
+
+export const BREAK_EVEN_SCENARIOS: BreakEvenScenario[] = [
+  {
+    key: "prudent",
+    label: "Prudent manuel",
+    hint: "Charge soutenable sans outillage avancé.",
+    patientsPerSupervisor: 30,
+  },
+  {
+    key: "cible_v1",
+    label: "Cible V1 à valider",
+    hint: "Productivité avec outils, templates, messages programmés.",
+    patientsPerSupervisor: 60,
+  },
+  {
+    key: "upside_v2",
+    label: "Upside V2 à mesurer",
+    hint: "Avec IA assistive et automation matures.",
+    patientsPerSupervisor: 90,
+  },
+];

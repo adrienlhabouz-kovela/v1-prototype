@@ -2,7 +2,14 @@
 // Centralise toutes les formules pour ne pas dissiper la logique dans l'UI.
 // Aucune modification du store — tout est dérivé en vue pure.
 
-import { ADMIN_CONSTANTS } from "./admin-constants";
+import {
+  ADMIN_CONSTANTS,
+  BREAK_EVEN_SCENARIOS,
+  CARE_TEAM_COSTS,
+  type BreakEvenScenario,
+  type CareTeamMember,
+  type CostType,
+} from "./admin-constants";
 import type {
   Patient,
   Surgeon,
@@ -819,4 +826,300 @@ export function getExecutiveSummary(state: AdminState): string {
     `capacité projetée à 14 jours ${projPct}%, ` +
     `${kpi.decisionsCount} décisions à prendre.`
   );
+}
+
+// ---------------------------------------------------------------------------
+// Équipe care — coûts par poste
+// ---------------------------------------------------------------------------
+
+export interface CareStaffCosts {
+  members: CareTeamMember[];
+  membersActive: CareTeamMember[];
+  totalActiveMonthlyCost: number;
+  countByCostType: Record<CostType, number>;
+  byRoleActive: {
+    supervisor: number;
+    lead_supervisor: number;
+    head_of_care: number;
+    qa_care: number;
+    care_coordinator: number;
+    ops_manager: number;
+    custom: number;
+  };
+  averageSupervisorCost: number;
+}
+
+export function getCareStaffCosts(): CareStaffCosts {
+  const members = CARE_TEAM_COSTS;
+  const membersActive = members.filter((m) => m.active);
+
+  const totalActiveMonthlyCost = membersActive.reduce(
+    (acc, m) => acc + m.monthlyCompanyCost,
+    0
+  );
+
+  const countByCostType: Record<CostType, number> = {
+    renseigne: 0,
+    hypothese: 0,
+    a_valider: 0,
+  };
+  members.forEach((m) => {
+    countByCostType[m.costType] += 1;
+  });
+
+  const supervisorsActive = membersActive.filter(
+    (m) => m.role === "supervisor"
+  );
+  const averageSupervisorCost =
+    supervisorsActive.length > 0
+      ? supervisorsActive.reduce((acc, m) => acc + m.monthlyCompanyCost, 0) /
+        supervisorsActive.length
+      : 0;
+
+  const byRoleActive = {
+    supervisor: membersActive.filter((m) => m.role === "supervisor").length,
+    lead_supervisor: membersActive.filter((m) => m.role === "lead_supervisor")
+      .length,
+    head_of_care: membersActive.filter((m) => m.role === "head_of_care")
+      .length,
+    qa_care: membersActive.filter((m) => m.role === "qa_care").length,
+    care_coordinator: membersActive.filter(
+      (m) => m.role === "care_coordinator"
+    ).length,
+    ops_manager: membersActive.filter((m) => m.role === "ops_manager").length,
+    custom: membersActive.filter((m) => m.role === "custom").length,
+  };
+
+  return {
+    members,
+    membersActive,
+    totalActiveMonthlyCost,
+    countByCostType,
+    byRoleActive,
+    averageSupervisorCost,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Coûts care totaux & marge care simulée
+// ---------------------------------------------------------------------------
+
+export interface CareCosts {
+  staffCost: number;
+  directPatientCost: number;
+  toolsCost: number;
+  messagingCost: number;
+  totalCost: number;
+  // Détail
+  patientCount: number;
+}
+
+export function getCareCostsActuels(state: AdminState): CareCosts {
+  const staff = getCareStaffCosts();
+  const activePatients = state.patients.filter((p) => p.status !== "cloture")
+    .length;
+  return {
+    staffCost: staff.totalActiveMonthlyCost,
+    directPatientCost: activePatients * ADMIN_CONSTANTS.COUT_DIRECT_PATIENT_EUR,
+    toolsCost: activePatients * ADMIN_CONSTANTS.COUT_OUTILS_CARE_PAR_PATIENT_EUR,
+    messagingCost:
+      activePatients * ADMIN_CONSTANTS.COUT_MESSAGERIE_PATIENT_EUR,
+    totalCost:
+      staff.totalActiveMonthlyCost +
+      activePatients *
+        (ADMIN_CONSTANTS.COUT_DIRECT_PATIENT_EUR +
+          ADMIN_CONSTANTS.COUT_OUTILS_CARE_PAR_PATIENT_EUR +
+          ADMIN_CONSTANTS.COUT_MESSAGERIE_PATIENT_EUR),
+    patientCount: activePatients,
+  };
+}
+
+export interface CareMargin {
+  revenuCare: number;
+  coutCareTotal: number;
+  margeCareEur: number;
+  margeCarePercent: number;
+  margePatientEur: number; // marge care par patient
+}
+
+export function getCareMarginActuelle(state: AdminState): CareMargin {
+  const fin = getFinanceMetrics(state);
+  const costs = getCareCostsActuels(state);
+  const revenuCare = fin.mrrEstimated;
+  const margeCareEur = revenuCare - costs.totalCost;
+  return {
+    revenuCare,
+    coutCareTotal: costs.totalCost,
+    margeCareEur,
+    margeCarePercent: revenuCare > 0 ? margeCareEur / revenuCare : 0,
+    margePatientEur:
+      costs.patientCount > 0 ? margeCareEur / costs.patientCount : 0,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Point d'équilibre care — sensibilité productivité superviseur
+// ---------------------------------------------------------------------------
+
+export interface BreakEvenResult {
+  scenario: BreakEvenScenario;
+  patientsTotal: number;
+  superviseursRequis: number;
+  coutSuperviseurs: number;
+  coutDirectPatients: number;
+  coutOutils: number;
+  coutMessagerie: number;
+  coutCareTotal: number;
+  revenuTotal: number;
+  margeCareEur: number;
+  margeCarePercent: number;
+}
+
+export function getBreakEvenScenarios(state: AdminState): BreakEvenResult[] {
+  const norm = getNormalizedFinanceMetrics(state);
+  const patientsTotal = norm.patientsTotalCible;
+  const revenuTotal = norm.mrrNormalise;
+
+  return BREAK_EVEN_SCENARIOS.map((s) => {
+    const supRequis = Math.ceil(patientsTotal / s.patientsPerSupervisor);
+    const coutSup = supRequis * ADMIN_CONSTANTS.COUT_SUPERVISEUR_MENSUEL_EUR;
+    const coutDirect =
+      patientsTotal * ADMIN_CONSTANTS.COUT_DIRECT_PATIENT_EUR;
+    const coutOutils =
+      patientsTotal * ADMIN_CONSTANTS.COUT_OUTILS_CARE_PAR_PATIENT_EUR;
+    const coutMessagerie =
+      patientsTotal * ADMIN_CONSTANTS.COUT_MESSAGERIE_PATIENT_EUR;
+    const coutCareTotal = coutSup + coutDirect + coutOutils + coutMessagerie;
+    const margeCareEur = revenuTotal - coutCareTotal;
+    return {
+      scenario: s,
+      patientsTotal,
+      superviseursRequis: supRequis,
+      coutSuperviseurs: coutSup,
+      coutDirectPatients: coutDirect,
+      coutOutils,
+      coutMessagerie,
+      coutCareTotal,
+      revenuTotal,
+      margeCareEur,
+      margeCarePercent: revenuTotal > 0 ? margeCareEur / revenuTotal : 0,
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Productivité superviseur — dérivée des données existantes
+// ---------------------------------------------------------------------------
+
+export interface ProductivityMetrics {
+  // Par superviseuse
+  patientsParSuperviseuseMoyenne: number;
+  patientsSuivisParSupMoisMoyenne: number;
+  messagesTraitesParSupMoyenne: number;
+  crPreparesParSupMoyenne: number;
+  transmissionsParSupMoyenne: number;
+  // Capacités
+  capaciteActuellePatients: number; // patients actifs / sup
+  capaciteCiblePatients: number; // hypothèse cible V1
+  // Métriques temps — à mesurer en pilote
+  tempsMoyenParPatient: null;
+  tempsMoyenParCR: null;
+  tempsMoyenParTransmission: null;
+  patientsSimples: null;
+  patientsLourds: null;
+}
+
+export function getProductivityMetrics(state: AdminState): ProductivityMetrics {
+  const supCount = state.supervisors.length;
+  const activePatients = state.patients.filter(
+    (p) => p.status !== "cloture"
+  );
+  const patientsParSup =
+    supCount > 0 ? activePatients.length / supCount : 0;
+
+  const patientsSuivisMois = state.patients.filter(
+    (p) => p.activatedThisMonth
+  ).length;
+  const patientsSuivisParSupMois =
+    supCount > 0 ? patientsSuivisMois / supCount : 0;
+
+  const messagesTraitesTotal = activePatients.reduce(
+    (acc, p) => acc + p.messages.filter((m) => m.treated).length,
+    0
+  );
+  const messagesTraitesParSup =
+    supCount > 0 ? messagesTraitesTotal / supCount : 0;
+
+  const crPrepares = state.reports.length;
+  const crPreparesParSup = supCount > 0 ? crPrepares / supCount : 0;
+
+  const transmissions = state.escalations.filter(
+    (e) => e.status === "transmise"
+  ).length;
+  const transmissionsParSup = supCount > 0 ? transmissions / supCount : 0;
+
+  return {
+    patientsParSuperviseuseMoyenne: Math.round(patientsParSup * 10) / 10,
+    patientsSuivisParSupMoisMoyenne: Math.round(patientsSuivisParSupMois * 10) / 10,
+    messagesTraitesParSupMoyenne: Math.round(messagesTraitesParSup * 10) / 10,
+    crPreparesParSupMoyenne: Math.round(crPreparesParSup * 10) / 10,
+    transmissionsParSupMoyenne: Math.round(transmissionsParSup * 10) / 10,
+    capaciteActuellePatients: ADMIN_CONSTANTS.CAPACITE_SUPERVISEUR_PATIENTS_OPTIMAL,
+    capaciteCiblePatients: ADMIN_CONSTANTS.PATIENTS_PAR_SUPERVISEUR_CIBLE,
+    tempsMoyenParPatient: null,
+    tempsMoyenParCR: null,
+    tempsMoyenParTransmission: null,
+    patientsSimples: null,
+    patientsLourds: null,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Gains IA & automation — dérivés des aiLogs si disponibles
+// ---------------------------------------------------------------------------
+
+export interface AIGainsMetrics {
+  // Mesuré sur aiLogs prototype
+  propositionsTotal: number;
+  acceptees: number;
+  modifiees: number;
+  refusees: number;
+  tauxValidationHumaine: number; // (accepted + modified) / total
+  // À mesurer en pilote
+  tempsMoyenCRsansIA: null;
+  tempsMoyenCRavecIA: null;
+  minutesEconomiseesParCR: null;
+  minutesEconomiseesParPatient: null;
+  // Compteurs prototype
+  messagesProgrammes: number; // hypothèse — pas de store dédié
+  templatesUtilises: number; // hypothèse
+}
+
+export interface AILogLike {
+  decision: "propose" | "accepte" | "modifie" | "refuse";
+  patientId?: string;
+}
+
+export function getAIGainsMetrics(aiLogs: AILogLike[]): AIGainsMetrics {
+  const propositionsTotal = aiLogs.filter((l) => l.decision === "propose").length;
+  const acceptees = aiLogs.filter((l) => l.decision === "accepte").length;
+  const modifiees = aiLogs.filter((l) => l.decision === "modifie").length;
+  const refusees = aiLogs.filter((l) => l.decision === "refuse").length;
+  const totalDecisions = acceptees + modifiees + refusees;
+  const tauxValidationHumaine =
+    totalDecisions > 0 ? (acceptees + modifiees) / totalDecisions : 0;
+
+  return {
+    propositionsTotal,
+    acceptees,
+    modifiees,
+    refusees,
+    tauxValidationHumaine,
+    tempsMoyenCRsansIA: null,
+    tempsMoyenCRavecIA: null,
+    minutesEconomiseesParCR: null,
+    minutesEconomiseesParPatient: null,
+    messagesProgrammes: 0,
+    templatesUtilises: 0,
+  };
 }

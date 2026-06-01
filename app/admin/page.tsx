@@ -9,6 +9,10 @@ import {
   ADMIN_CONSTANTS,
   DATA_CATEGORY_LABELS,
   DATA_CATEGORY_STYLES,
+  careRoleLabels,
+  costTypeLabels,
+  costTypeStyles,
+  type CareRole,
   type DataCategory,
 } from "@/lib/admin-constants";
 import {
@@ -17,9 +21,14 @@ import {
   decisionSeverityStyles,
   generalStateLabels,
   generalStateStyles,
+  getAIGainsMetrics,
+  getBreakEvenScenarios,
   getCapacityActuelle,
   getCapacityProjection,
+  getCareCostsActuels,
+  getCareMarginActuelle,
   getCareOpsMetrics,
+  getCareStaffCosts,
   getDecisions,
   getExecutiveKPIs,
   getExecutiveSummary,
@@ -28,6 +37,7 @@ import {
   getGrowthMetrics,
   getHeadOfCareStatus,
   getNormalizedFinanceMetrics,
+  getProductivityMetrics,
   getRiskMetrics,
   getSaturationEstimate,
   headOfCareLabels,
@@ -145,6 +155,12 @@ export default function AdminCockpit() {
   const growth = getGrowthMetrics(state);
   const care = getCareOpsMetrics(state);
   const hoc = getHeadOfCareStatus(state);
+  const careStaff = getCareStaffCosts();
+  const careCosts = getCareCostsActuels(state);
+  const careMargin = getCareMarginActuelle(state);
+  const breakEvens = getBreakEvenScenarios(state);
+  const productivity = getProductivityMetrics(state);
+  const aiGains = getAIGainsMetrics(k.aiLogs);
 
   return (
     <Shell>
@@ -604,6 +620,97 @@ export default function AdminCockpit() {
               </div>
             )}
           </Card>
+
+          {/* Productivité superviseur */}
+          <Card>
+            <CardHeader
+              title="Productivité superviseur"
+              subtitle="Dérivé prototype — les temps réels seront mesurés en pilote."
+            />
+            <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-4">
+              {[
+                [
+                  "Patients actifs / sup",
+                  productivity.patientsParSuperviseuseMoyenne,
+                ],
+                [
+                  "Patients suivis / sup / mois",
+                  productivity.patientsSuivisParSupMoisMoyenne,
+                ],
+                [
+                  "Messages traités / sup",
+                  productivity.messagesTraitesParSupMoyenne,
+                ],
+                ["CR préparés / sup", productivity.crPreparesParSupMoyenne],
+                [
+                  "Transmissions cabinet / sup",
+                  productivity.transmissionsParSupMoyenne,
+                ],
+                [
+                  "Capacité actuelle",
+                  `${productivity.capaciteActuellePatients} pat. / sup`,
+                ],
+                [
+                  "Capacité cible V1",
+                  `${productivity.capaciteCiblePatients} pat. / sup`,
+                ],
+                ["Patients lourds", "À classifier V1"],
+              ].map(([label, value]) => (
+                <div key={String(label)} className="bg-white px-4 py-3.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
+                    {label}
+                  </p>
+                  <p className="mt-1.5 font-display text-[16px] font-medium tracking-tight text-navy-900">
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11.5px] leading-relaxed text-charcoal/60">
+              <span className="font-medium text-navy-900">À mesurer en pilote :</span>{" "}
+              temps moyen / patient · temps moyen / CR · temps moyen /
+              transmission cabinet · taux patients simples vs lourds.
+            </div>
+          </Card>
+
+          {/* Gains IA & automation */}
+          <Card>
+            <CardHeader
+              title="Gains IA & automation"
+              subtitle="IA assistive — validation humaine systématique. Aucune décision médicale automatisée."
+            />
+            <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-4">
+              {[
+                ["Propositions IA", aiGains.propositionsTotal],
+                ["Acceptées", aiGains.acceptees],
+                ["Modifiées par humain", aiGains.modifiees],
+                ["Refusées", aiGains.refusees],
+                [
+                  "Taux validation humaine",
+                  aiGains.tauxValidationHumaine > 0
+                    ? `${Math.round(aiGains.tauxValidationHumaine * 100)} %`
+                    : "—",
+                ],
+                ["Messages programmés", "Prototype — voir fiche patient"],
+                ["Templates utilisés", "Prototype — voir fiche patient"],
+                ["Gain temps estimé", "À mesurer en pilote"],
+              ].map(([label, value]) => (
+                <div key={String(label)} className="bg-white px-4 py-3.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
+                    {label}
+                  </p>
+                  <p className="mt-1.5 font-display text-[14.5px] font-medium tracking-tight text-navy-900">
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11.5px] leading-relaxed text-charcoal/60">
+              <span className="font-medium text-navy-900">À mesurer en pilote :</span>{" "}
+              temps CR sans / avec IA · minutes économisées par CR · minutes
+              économisées par patient.
+            </div>
+          </Card>
         </div>
       )}
 
@@ -761,6 +868,217 @@ export default function AdminCockpit() {
             <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11px] leading-relaxed text-charcoal/55">
               Burn / runway / CAC / payback : à créer en V1 (cash et historique
               nécessaires).
+            </div>
+          </Card>
+
+          {/* Coûts care par rôle */}
+          <Card>
+            <CardHeader
+              title="Coûts care par rôle"
+              subtitle={`${careStaff.countByCostType.renseigne} renseigné(s) · ${careStaff.countByCostType.hypothese} hypothèse(s) · ${careStaff.countByCostType.a_valider} à valider`}
+            />
+            <div className="overflow-x-auto">
+              <table className="w-full text-[12.5px]">
+                <thead>
+                  <tr className="border-b border-navy-900/[0.05] text-left text-[10px] uppercase tracking-[0.14em] text-charcoal/55">
+                    <th className="px-5 py-2.5 font-medium">Poste</th>
+                    <th className="px-5 py-2.5 font-medium">Rôle</th>
+                    <th className="px-5 py-2.5 font-medium">Coût mensuel</th>
+                    <th className="px-5 py-2.5 font-medium">Type</th>
+                    <th className="px-5 py-2.5 font-medium">Statut</th>
+                    <th className="px-5 py-2.5 font-medium">Contribution</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {careStaff.members.map((m) => (
+                    <tr
+                      key={m.id}
+                      className={`border-b border-navy-900/[0.04] ${
+                        m.active ? "" : "opacity-60"
+                      }`}
+                    >
+                      <td className="px-5 py-2.5">
+                        <p className="font-medium tracking-tight text-navy-900">
+                          {m.label}
+                        </p>
+                        {m.note && (
+                          <p className="mt-0.5 text-[10.5px] text-charcoal/55">
+                            {m.note}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-5 py-2.5 text-charcoal/65">
+                        {m.customRoleLabel ?? careRoleLabels[m.role]}
+                      </td>
+                      <td className="px-5 py-2.5 font-medium text-navy-900">
+                        {formatEur(m.monthlyCompanyCost)}
+                      </td>
+                      <td className="px-5 py-2.5">
+                        <Badge className={costTypeStyles[m.costType]}>
+                          {costTypeLabels[m.costType]}
+                        </Badge>
+                      </td>
+                      <td className="px-5 py-2.5 text-charcoal/65">
+                        {m.active ? "Actif" : "Non activé"}
+                      </td>
+                      <td className="px-5 py-2.5 text-[10.5px] text-charcoal/55">
+                        {[
+                          m.capacityContribution && "capacité",
+                          m.managementContribution && "management",
+                          m.qualityContribution && "qualité",
+                        ]
+                          .filter(Boolean)
+                          .join(" · ") || "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[12px] tracking-tight text-charcoal/70">
+              <span className="font-medium text-navy-900">
+                Coût care staff actif :
+              </span>{" "}
+              {formatEur(careStaff.totalActiveMonthlyCost)} / mois ·{" "}
+              <span className="text-charcoal/55">
+                {careStaff.byRoleActive.supervisor} superviseuse(s) ·{" "}
+                {careStaff.byRoleActive.lead_supervisor} lead ·{" "}
+                {careStaff.byRoleActive.head_of_care} HoC ·{" "}
+                {careStaff.byRoleActive.qa_care} QA
+              </span>
+            </div>
+          </Card>
+
+          {/* Unit economics care */}
+          <Card>
+            <CardHeader
+              title="Unit economics care — simulation"
+              subtitle={`Calcul honnête à partir des coûts renseignés + hypothèses prototype (outils ${ADMIN_CONSTANTS.COUT_OUTILS_CARE_PAR_PATIENT_EUR} € / patient · messagerie ${ADMIN_CONSTANTS.COUT_MESSAGERIE_PATIENT_EUR} € / patient).`}
+              action={
+                <Badge className={DATA_CATEGORY_STYLES.estime}>Simulation</Badge>
+              }
+            />
+            <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-4">
+              {[
+                ["Revenu / patient activé", formatEur(fin.revenuMoyenParPatient)],
+                ["Revenu / chirurgien", formatEur(fin.revenuMoyenParChirurgien)],
+                ["Coût care staff", formatEur(careCosts.staffCost)],
+                ["Coût direct patient", formatEur(careCosts.directPatientCost)],
+                ["Coût outils care", formatEur(careCosts.toolsCost)],
+                ["Coût messagerie", formatEur(careCosts.messagingCost)],
+                ["Coût care total", formatEur(careCosts.totalCost)],
+                [
+                  "Marge care / patient",
+                  careCosts.patientCount > 0
+                    ? formatEur(Math.round(careMargin.margePatientEur))
+                    : "—",
+                ],
+              ].map(([label, value]) => (
+                <div key={String(label)} className="bg-white px-4 py-3.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
+                    {label}
+                  </p>
+                  <p className="mt-1.5 font-display text-[15px] font-medium tracking-tight text-navy-900">
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-navy-900/[0.05] px-5 py-4">
+              <div className="flex flex-wrap items-baseline gap-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+                  Marge care actuelle — faible volume
+                </p>
+                <p
+                  className={`font-display text-[20px] font-medium tracking-tight ${
+                    careMargin.margeCareEur >= 0
+                      ? "text-teal-700"
+                      : "text-amber-900"
+                  }`}
+                >
+                  {formatEur(Math.round(careMargin.margeCareEur))}
+                </p>
+                <p className="text-[12px] tracking-tight text-charcoal/65">
+                  ({formatPct(careMargin.margeCarePercent, 1)})
+                </p>
+              </div>
+              <p className="mt-1.5 text-[11.5px] leading-relaxed text-charcoal/55">
+                Non représentative à ce stade : faible volume vs coûts care
+                fixes. Voir Point d'équilibre ci-dessous pour la sensibilité.
+              </p>
+            </div>
+          </Card>
+
+          {/* Point d'équilibre care */}
+          <Card>
+            <CardHeader
+              title="Point d'équilibre care"
+              subtitle={`Sensibilité productivité superviseur à volume cible (${breakEvens[0].patientsTotal} patients / mois).`}
+              action={
+                <Badge className={DATA_CATEGORY_STYLES.hypothese}>
+                  {DATA_CATEGORY_LABELS.hypothese}
+                </Badge>
+              }
+            />
+            <div className="overflow-x-auto">
+              <table className="w-full text-[12.5px]">
+                <thead>
+                  <tr className="border-b border-navy-900/[0.05] text-left text-[10px] uppercase tracking-[0.14em] text-charcoal/55">
+                    <th className="px-5 py-2.5 font-medium">Scénario</th>
+                    <th className="px-5 py-2.5 font-medium">Pat. / sup</th>
+                    <th className="px-5 py-2.5 font-medium">Sup requises</th>
+                    <th className="px-5 py-2.5 font-medium">Coût sup</th>
+                    <th className="px-5 py-2.5 font-medium">Coût care total</th>
+                    <th className="px-5 py-2.5 font-medium">Marge care</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {breakEvens.map((b) => (
+                    <tr
+                      key={b.scenario.key}
+                      className="border-b border-navy-900/[0.04]"
+                    >
+                      <td className="px-5 py-2.5">
+                        <p className="font-medium tracking-tight text-navy-900">
+                          {b.scenario.label}
+                        </p>
+                        <p className="mt-0.5 text-[10.5px] text-charcoal/55">
+                          {b.scenario.hint}
+                        </p>
+                      </td>
+                      <td className="px-5 py-2.5 font-mono text-navy-900">
+                        {b.scenario.patientsPerSupervisor}
+                      </td>
+                      <td className="px-5 py-2.5 text-charcoal/65">
+                        {b.superviseursRequis}
+                      </td>
+                      <td className="px-5 py-2.5 text-charcoal/65">
+                        {formatEur(b.coutSuperviseurs)}
+                      </td>
+                      <td className="px-5 py-2.5 text-charcoal/65">
+                        {formatEur(b.coutCareTotal)}
+                      </td>
+                      <td
+                        className={`px-5 py-2.5 font-medium tracking-tight ${
+                          b.margeCareEur >= 0
+                            ? "text-teal-700"
+                            : "text-amber-900"
+                        }`}
+                      >
+                        {formatEur(b.margeCareEur)} ({formatPct(b.margeCarePercent, 0)})
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="border-t border-navy-900/[0.05] px-5 py-3 text-[11.5px] leading-relaxed text-charcoal/60">
+              <span className="font-medium text-navy-900">
+                Lecture pilote :
+              </span>{" "}
+              le point d'équilibre dépend de la productivité réelle par
+              superviseuse, à valider en pilote avec données mesurées (temps,
+              ratio patients simples/lourds, gain IA).
             </div>
           </Card>
         </div>
@@ -958,19 +1276,19 @@ export default function AdminCockpit() {
             [
               [
                 "mesure",
-                "patients, statuts, CR, transmissions, superviseurs, prospects",
+                "patients, statuts, CR, transmissions, superviseurs, prospects, propositions IA, taux validation humaine",
               ],
               [
                 "estime",
-                "MRR, ARR, marge brute prototype, capacité utilisée et projetée",
+                "MRR, ARR, marge brute prototype, marge care simulée, capacité utilisée et projetée",
               ],
               [
                 "hypothese",
-                "capacité superviseur, coût superviseur, coût patient, croissance hebdo, volume cible (chirurgiens, patients/mois, capacité). Marge normalisée = hypothèse prototype, non donnée réelle.",
+                "capacité superviseur, coûts care par poste, coût outils care, coût messagerie patient, volume cible. Marge normalisée et point d'équilibre = hypothèses prototype, non données réelles.",
               ],
               [
                 "v1",
-                "churn, CAC, payback, runway, cohortes, historique M/M réel",
+                "temps superviseur / patient · temps CR · temps transmission cabinet · gain IA réel · ratio patients simples/lourds · coûts care réels (WhatsApp, outils, QA, Head of Care). Churn, CAC, payback, runway.",
               ],
             ] as [DataCategory, string][]
           ).map(([cat, content]) => (
@@ -983,6 +1301,13 @@ export default function AdminCockpit() {
               </p>
             </div>
           ))}
+        </div>
+        {/* Bilan coûts care */}
+        <div className="border-t border-navy-900/[0.05] px-6 py-3 text-[11.5px] tracking-tight text-charcoal/65">
+          <span className="font-medium text-navy-900">Coûts care :</span>{" "}
+          {careStaff.countByCostType.renseigne} renseigné(s) ·{" "}
+          {careStaff.countByCostType.hypothese} hypothèse(s) ·{" "}
+          {careStaff.countByCostType.a_valider} à valider.
         </div>
       </Card>
     </Shell>
