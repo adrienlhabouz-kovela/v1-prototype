@@ -25,7 +25,7 @@
 - KOVELA organise le flux
 
 ### Phrases canoniques (à ne pas modifier sans décision explicite)
-- **H1** : « Le suivi post-opératoire, opéré pour votre cabinet. »
+- **H1** : « Votre suivi post-opératoire, structuré et opéré. »
 - **Sous-titre** : « Supervision humaine, référentiel cabinet, comptes-rendus factuels et IA assistive. Le chirurgien garde la main, KOVELA organise le flux. »
 - **Tagline IA** : « L'IA prépare. L'humain valide. Le chirurgien décide. »
 - **Baseline terrain** : « 60 à 90 minutes de travail humain par patient, sur 3 à 15 jours selon l'intervention. »

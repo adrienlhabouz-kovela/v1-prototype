@@ -158,7 +158,7 @@ export default function Landing() {
           </span>
 
           <h1 className="mt-8 max-w-3xl font-display text-[2.6rem] font-normal leading-[1.08] tracking-[-0.03em] md:text-[3.6rem]">
-            Le suivi post-opératoire, opéré pour votre cabinet.
+            Votre suivi post-opératoire, structuré et opéré.
           </h1>
 
           <p className="mt-7 max-w-2xl text-[17px] leading-relaxed text-navy-100/80">

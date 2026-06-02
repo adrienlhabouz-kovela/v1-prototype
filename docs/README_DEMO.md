@@ -90,7 +90,7 @@ et les pills en haut.
 > Pour des **scripts détaillés par audience** (Émilien lead dev, chirurgien, investisseur,
 > cabinet Aumans — versions courtes et complètes), voir [`DEMO_SCRIPTS.md`](./DEMO_SCRIPTS.md).
 
-1. **Landing V1 validée** (`/`) — *« Le suivi post-opératoire, opéré pour votre cabinet. »* Hero,
+1. **Landing V1 validée** (`/`) — *« Votre suivi post-opératoire, structuré et opéré. »* Hero,
    constat cabinet, solution (5 piliers), ce qui change pour votre cabinet, baseline terrain
    (60 à 90 min / patient sur 3 à 15 jours), comment ça marche (5 étapes), IA assistive
    encadrée, supervision compacte, cadre clair, **tarification** (690 € HT/mois + 80 € HT/patient
