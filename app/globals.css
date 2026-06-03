@@ -11,6 +11,21 @@ body {
   font-feature-settings: "ss01", "cv11";
 }
 
+/* Police display (Fraunces) — neutralisation des alternates stylistiques et
+   ligatures discrétionnaires héritées du réglage global ci-dessus.
+   Conservation des ligatures standard (fi, fl) et du crénage pour la
+   lisibilité ; désactivation explicite des sets stylistiques SS01–SS07 et
+   du Character Variant cv11 qui rendent f / s / j / g / ct / st trop
+   décoratifs aux grandes tailles. */
+.font-display {
+  font-feature-settings:
+    "liga" 1, "kern" 1,
+    "calt" 0, "dlig" 0, "salt" 0,
+    "ss01" 0, "ss02" 0, "ss03" 0, "ss04" 0, "ss05" 0, "ss06" 0, "ss07" 0,
+    "cv11" 0;
+  font-variant-ligatures: common-ligatures no-discretionary-ligatures no-contextual;
+}
+
 @layer base {
   h1,
   h2,
