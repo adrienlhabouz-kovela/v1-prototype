@@ -453,6 +453,34 @@ Renforcer `/admin/supervision` comme cockpit Head of Care.
 
 ---
 
+## 13bis. Renforcement landing — Cadre opérationnel + Construit avec exigence
+
+**Statut** : intégré landing le 2026-06-03 (suite à l'audit Hippocratic AI + réassurance).
+
+**Décisions** :
+- Section H « Un cadre clair » → renommée **« Cadre opérationnel KOVELA »**.
+- Sous-titre : « Une architecture de confiance pensée pour structurer le suivi sans jamais
+  se substituer au chirurgien. »
+- **3 piliers visuels** : Humain · IA encadrée · Traçabilité (4 items chacun).
+- Phrase doctrine : « KOVELA ne remplace pas le chirurgien. KOVELA structure, documente et
+  transmet. »
+- Cards Site public / Application métier cible conservées.
+
+**Nouvelle section « Construit avec exigence »** (avant CTA final) — 4 piliers réassurance :
+- **Fondateur** : Adrien Lhabouz, entrepreneur et cofondateur de Trecento Asset Management.
+- **Chirurgiens** : conçu à partir de retours terrain de chirurgiens esthétiques privés.
+- **Doctrine** : IA assistive, validation humaine, chirurgien décisionnaire.
+- **Produit** : prototype complet, déjà démontrable.
+- Bande **« Preuve d'exécution »** sobre en pied : activation cabinet · parcours chirurgien
+  · espace superviseur · suivi patient · workflow CR · cockpit admin.
+
+**Wording verrouillé** : pas de « Safety Layer » en H1 (préfère « Cadre opérationnel KOVELA »).
+Pas d'« advisory board », pas de chiffre non vérifié, pas de « leader healthtech », pas de
+« expert IA / médical », pas de claim « IA sûre » / « surveillance médicale » /
+« certifié HDS ».
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1

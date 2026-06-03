@@ -99,17 +99,6 @@ const aiDoesNever = [
   "Pas d'évaluation chiffrée du patient",
 ];
 
-const doctrinePoints = [
-  "KOVELA ne diagnostique pas",
-  "KOVELA ne prescrit pas",
-  "KOVELA ne décide pas médicalement",
-  "KOVELA ne remplace pas le chirurgien",
-  "KOVELA structure, trace, documente et transmet",
-  "Architecture cible HDS / RGPD",
-  "Accès par rôle · traçabilité · minimisation",
-  "Aucune certification revendiquée à ce stade",
-];
-
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-teal-600">{children}</p>;
 }
@@ -439,15 +428,15 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section H — Sécurité / doctrine (cadre clair) */}
+      {/* Section H — Cadre opérationnel KOVELA · architecture de confiance */}
       <section className="border-y border-navy-900/[0.06] bg-white">
         <div className="mx-auto max-w-6xl px-6 py-24">
           <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
             <BrandMark size={44} className="shrink-0 text-navy-900" />
             <div>
-              <Eyebrow>Un cadre clair</Eyebrow>
-              <h2 className="max-w-2xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
-                Conçu pour un cadre santé exigeant.
+              <Eyebrow>Cadre opérationnel KOVELA</Eyebrow>
+              <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
+                Une architecture de confiance pensée pour structurer le suivi sans jamais se substituer au chirurgien.
               </h2>
               <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-charcoal/70">
                 KOVELA est conçu pour s&apos;inscrire dans un cadre HDS, RGPD et CNIL, avec une
@@ -455,18 +444,58 @@ export default function Landing() {
                 minimisation des données, des accès par rôle et une traçabilité des actions.
               </p>
 
-              <div className="mt-8 grid gap-2.5 sm:grid-cols-2">
-                {doctrinePoints.map((p) => (
-                  <div
-                    key={p}
-                    className="flex items-start gap-3 text-[13px] tracking-tight text-charcoal/75"
-                  >
-                    <span className="mt-1.5 h-1 w-3 shrink-0 bg-teal-500/70" />
-                    {p}
-                  </div>
-                ))}
+              {/* 3 piliers : Humain · IA encadrée · Traçabilité */}
+              <div className="mt-10 grid gap-3 md:grid-cols-3">
+                <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+                  <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+                    Humain
+                  </p>
+                  <h3 className="mt-2.5 font-display text-[14.5px] font-semibold tracking-tight text-navy-900">
+                    Supervision spécialisée
+                  </h3>
+                  <ul className="mt-3 space-y-1.5 text-[12.5px] leading-relaxed text-charcoal/70">
+                    <li>— Équipe de superviseurs formée</li>
+                    <li>— Validation humaine de chaque CR</li>
+                    <li>— Head of Care · revue qualité continue</li>
+                    <li>— Aucune décision médicale prise par KOVELA</li>
+                  </ul>
+                </div>
+                <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+                  <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+                    IA encadrée
+                  </p>
+                  <h3 className="mt-2.5 font-display text-[14.5px] font-semibold tracking-tight text-navy-900">
+                    Assistive · jamais autonome
+                  </h3>
+                  <ul className="mt-3 space-y-1.5 text-[12.5px] leading-relaxed text-charcoal/70">
+                    <li>— Brouillons IA uniquement</li>
+                    <li>— Aucune réponse IA autonome au patient</li>
+                    <li>— Garde-fous de formulation (MedicalGuard)</li>
+                    <li>— Désactivable et loggée</li>
+                  </ul>
+                </div>
+                <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+                  <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+                    Traçabilité
+                  </p>
+                  <h3 className="mt-2.5 font-display text-[14.5px] font-semibold tracking-tight text-navy-900">
+                    Référentiel · CR · transmissions
+                  </h3>
+                  <ul className="mt-3 space-y-1.5 text-[12.5px] leading-relaxed text-charcoal/70">
+                    <li>— Référentiel cabinet relu KOVELA</li>
+                    <li>— Comptes-rendus factuels validés</li>
+                    <li>— Transmissions cabinet validées avant envoi</li>
+                    <li>— Logs et historique d&apos;actions</li>
+                  </ul>
+                </div>
               </div>
 
+              {/* Phrase doctrine */}
+              <p className="mt-10 max-w-3xl font-display text-[20px] italic leading-relaxed tracking-tight text-navy-900">
+                KOVELA ne remplace pas le chirurgien. KOVELA structure, documente et transmet.
+              </p>
+
+              {/* 2 cards site public / app métier — concept architectural distinct (HDS) */}
               <div className="mt-10 grid gap-3 md:grid-cols-2">
                 <div className="rounded-2xl bg-ivory p-6 ring-1 ring-navy-900/[0.05]">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
@@ -647,6 +676,80 @@ export default function Landing() {
             Discuter du pilote
           </a>
         </div>
+      </section>
+
+      {/* Section Ibis — Construit avec exigence · réassurance 4 piliers */}
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <Eyebrow>Construit avec exigence</Eyebrow>
+        <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
+          Pourquoi KOVELA peut être confié à votre cabinet.
+        </h2>
+
+        <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Fondateur */}
+          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+              Fondateur
+            </p>
+            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
+              Une culture de structuration et de risque
+            </h3>
+            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
+              KOVELA est porté par Adrien Lhabouz, entrepreneur et cofondateur de Trecento Asset
+              Management, avec une culture de structuration, d&apos;investissement et
+              d&apos;analyse du risque.
+            </p>
+          </div>
+
+          {/* Chirurgiens */}
+          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+              Chirurgiens
+            </p>
+            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
+              Conçu à partir de retours terrain
+            </h3>
+            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
+              Le service est construit à partir de retours terrain de chirurgiens esthétiques
+              privés et d&apos;une compréhension concrète de la charge post-opératoire.
+            </p>
+          </div>
+
+          {/* Doctrine */}
+          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+              Doctrine
+            </p>
+            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
+              IA assistive · validation humaine
+            </h3>
+            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
+              IA assistive, validation humaine, chirurgien décisionnaire. KOVELA ne diagnostique
+              pas, ne prescrit pas et ne décide pas médicalement.
+            </p>
+          </div>
+
+          {/* Produit */}
+          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+              Produit
+            </p>
+            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
+              Prototype déjà démontrable
+            </h3>
+            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
+              Prototype complet : activation cabinet, parcours chirurgien, espace superviseur,
+              suivi patient, workflow CR et cockpit admin déjà démontrables.
+            </p>
+          </div>
+        </div>
+
+        {/* Preuve d'exécution sobre */}
+        <p className="mt-10 max-w-3xl rounded-md bg-bone/70 px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
+          <span className="font-medium text-navy-900">Preuve d&apos;exécution :</span> prototype
+          produit fonctionnel · activation cabinet · parcours chirurgien · espace superviseur ·
+          suivi patient · workflow CR · cockpit admin.
+        </p>
       </section>
 
       {/* Section J — CTA final */}
