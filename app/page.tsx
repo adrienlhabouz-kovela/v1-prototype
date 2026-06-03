@@ -206,7 +206,8 @@ export default function Landing() {
         </h2>
         <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-charcoal/65">
           Le post-opératoire est un moment clé de l&apos;expérience patient. Il vit pourtant entre
-          canaux dispersés, relances manuelles et historiques éclatés.
+          canaux dispersés, relances manuelles et historiques éclatés. Une photo arrive par
+          message, une question suit deux heures plus tard, puis il faut reconstituer le contexte.
         </p>
         <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {pains.map((p) => (
@@ -256,7 +257,7 @@ export default function Landing() {
             </p>
           </blockquote>
           <p className="mt-8 font-display text-[24px] italic leading-tight tracking-[-0.01em] text-navy-900">
-            Le patient se sent accompagné. Le cabinet respire. Le chirurgien garde la main.
+            Le patient se sent accompagné. Le cabinet respire.
           </p>
         </div>
       </section>
@@ -436,7 +437,7 @@ export default function Landing() {
             <div>
               <Eyebrow>Cadre opérationnel KOVELA</Eyebrow>
               <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
-                Une architecture de confiance pensée pour structurer le suivi sans jamais se substituer au chirurgien.
+                Un cadre clair pour suivre, documenter et transmettre — sans remplacer le chirurgien.
               </h2>
               <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-charcoal/70">
                 KOVELA est conçu pour s&apos;inscrire dans un cadre HDS, RGPD et CNIL, avec une
@@ -678,11 +679,11 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section Ibis — Construit avec exigence · réassurance 4 piliers */}
+      {/* Section Ibis — Un projet construit sur le terrain · réassurance 4 piliers */}
       <section className="mx-auto max-w-6xl px-6 py-20">
-        <Eyebrow>Construit avec exigence</Eyebrow>
+        <Eyebrow>Un projet construit sur le terrain</Eyebrow>
         <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
-          Pourquoi KOVELA peut être confié à votre cabinet.
+          Qui porte KOVELA, et comment.
         </h2>
 
         <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -696,8 +697,7 @@ export default function Landing() {
             </h3>
             <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
               KOVELA est porté par Adrien Lhabouz, entrepreneur et cofondateur de Trecento Asset
-              Management, avec une culture de structuration, d&apos;investissement et
-              d&apos;analyse du risque.
+              Management, avec une culture d&apos;investissement et d&apos;analyse du risque.
             </p>
           </div>
 
@@ -711,7 +711,7 @@ export default function Landing() {
             </h3>
             <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
               Le service est construit à partir de retours terrain de chirurgiens esthétiques
-              privés et d&apos;une compréhension concrète de la charge post-opératoire.
+              privés et d&apos;années d&apos;expérience cabinet.
             </p>
           </div>
 
