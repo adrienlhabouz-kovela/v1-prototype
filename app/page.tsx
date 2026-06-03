@@ -531,6 +531,13 @@ export default function Landing() {
                   structurent le suivi, documentent les échanges et transmettent au cabinet
                   selon le cadre validé avec le chirurgien.
                 </p>
+                <p className="mt-4 max-w-3xl rounded-md bg-white/60 px-3 py-2 text-[12px] leading-relaxed text-charcoal/70 ring-1 ring-navy-900/[0.04]">
+                  <span className="font-medium text-navy-900">Horaires du service.</span>{" "}
+                  KOVELA opère le suivi sur une plage quotidienne élargie, définie avec le
+                  cabinet — par exemple 8h–20h. Hors horaires, les messages sont conservés et
+                  repris à l&apos;ouverture du service ; les situations urgentes restent
+                  orientées vers les contacts d&apos;urgence définis par le chirurgien.
+                </p>
               </div>
 
               {/* Phrase doctrine */}

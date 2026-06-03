@@ -151,6 +151,11 @@ export default function PatientMessages() {
               <p className="mt-1.5 text-charcoal/55">
                 L&apos;équipe KOVELA revient vers vous selon les délais définis avec votre cabinet.
               </p>
+              <p className="mt-1.5 text-charcoal/55">
+                Hors horaires KOVELA, votre message sera repris à l&apos;ouverture du service. En
+                cas d&apos;urgence, contactez le <span className="font-semibold">15 / 112</span>
+                {" "}ou les contacts d&apos;urgence transmis par votre cabinet.
+              </p>
             </div>
           </div>
         </Card>

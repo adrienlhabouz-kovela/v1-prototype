@@ -574,6 +574,53 @@ fin de surveillance médicale.
 
 ---
 
+## 13quater. Horaires du service V1 (2026-06-03)
+
+### Décision opérationnelle
+- **V1 KOVELA ne promet pas de H24.** Le service opéré est prévu sur une **plage
+  quotidienne élargie**, typiquement **8h–19h ou 8h–20h**, à valider avec le cabinet.
+- **Hors horaires** : les messages patient sont **conservés** et **repris à
+  l'ouverture du service**. Les situations urgentes restent orientées vers les
+  **contacts d'urgence définis par le chirurgien** + **15 / 112**.
+- **V2** : option patient **payante** de suivi étendu / plus long / éventuellement H24
+  sur certaines périodes — **à ne pas survendre en V1**.
+
+### Wording validé
+- « plage quotidienne élargie »
+- « service opéré en journée élargie »
+- « messages conservés hors horaires »
+- « reprise à l'ouverture du service »
+- « consignes urgence du chirurgien »
+- « 15 / 112 / urgences selon le cadre défini »
+- « option de suivi étendu en V2 »
+
+### Wording interdit (audit grep landing + lib + components : 0 occurrence)
+- « H24 » en promesse V1
+- « 24/7 »
+- « supervision nocturne », « supervision continue », « supervision permanente »
+- « urgence validée » par KOVELA
+- « tri médical » / « pré-analyse médicale » / « pré-qualification médicale »
+- « urgence prise en charge par KOVELA »
+
+### Intégrations produit
+- **Landing** (`app/page.tsx`) · bloc « Qui supervise ? » de la section Cadre opérationnel
+  KOVELA : ajout d'une note encadrée discrète « Horaires du service · KOVELA opère le
+  suivi sur une plage quotidienne élargie, définie avec le cabinet — par exemple 8h–20h.
+  Hors horaires, les messages sont conservés et repris à l'ouverture du service ; les
+  situations urgentes restent orientées vers les contacts d'urgence définis par le
+  chirurgien. »
+- **Messagerie patient** (`app/patient/messages/page.tsx`) · sous le bloc « Quand
+  utiliser ce canal vs le 15 / 112 ? » : ajout d'une ligne « Hors horaires KOVELA, votre
+  message sera repris à l'ouverture du service. En cas d'urgence, contactez le 15 / 112
+  ou les contacts d'urgence transmis par votre cabinet. »
+
+### À ne pas complexifier maintenant
+- Pas de logique technique de fermeture / ouverture du service en prototype.
+- Pas de variantes V2 (« option étendue », « H24 ponctuel ») dans la landing tant que
+  l'offre commerciale V1 n'est pas calée avec les premiers cabinets pilotes.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1
