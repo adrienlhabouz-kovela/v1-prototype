@@ -502,9 +502,14 @@ Pas d'« advisory board », pas de chiffre non vérifié, pas de « leader healt
     certification et documentation juridique finalisés avant tout usage réel. Ce site est
     un démonstrateur : aucune donnée patient n'y est collectée. »
 - **Vocabulaire interdit conservé** : ne pas écrire « certifié HDS », « conforme HDS »,
-  « 100 % conforme RGPD », « superviseur médical », « soignant », « infirmier »,
-  « coordinateur médical », « rassure médicalement », « tri médical », « opérateurs »
-  (trop industriel pour le rôle équipe coordination).
+  « HDS certifié », « 100 % conforme RGPD », « validé CNIL », « superviseur médical »,
+  « soignant », « infirmier », « coordinateur médical », « rassure médicalement »,
+  « tri médical », « opérateurs » (trop industriel pour le rôle équipe coordination).
+- **Audit chirurgiens Gemini V2 (2026-06-03)** : les deux objections « qui sont les humains
+  côté KOVELA ? » et « comment le patient accède au suivi ? » sont confirmées couvertes par
+  les ajouts déjà en place (bloc « Qui supervise ? » l. 514–528 + phrase accès patient
+  l. 374). Aucune modification produit complémentaire requise. Cible chirurgie esthétique
+  privée conservée (pas d'ouverture orthopédie / ORL / ophtalmo).
 
 ---
 
