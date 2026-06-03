@@ -185,6 +185,30 @@ export default function Landing() {
           <p className="mt-7 text-[12.5px] text-navy-100/50">
             Démarrage progressif sur 2 ou 3 interventions prioritaires, avec accompagnement KOVELA.
           </p>
+
+          {/* Trust badges HDS / RGPD — visibilité forte, posture « dès la conception » */}
+          <div className="mt-10 flex flex-wrap items-center gap-5">
+            <div className="flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-white/[0.07] text-center ring-1 ring-teal-400/35 backdrop-blur-sm">
+              <span className="font-display text-[17px] font-semibold tracking-tight text-white">
+                HDS
+              </span>
+              <span className="mt-1 text-[7.5px] uppercase tracking-[0.14em] text-teal-200/85">
+                dès la conception
+              </span>
+            </div>
+            <div className="flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-white/[0.07] text-center ring-1 ring-teal-400/35 backdrop-blur-sm">
+              <span className="font-display text-[15.5px] font-semibold tracking-tight text-white">
+                RGPD
+              </span>
+              <span className="mt-1 text-[7.5px] uppercase tracking-[0.14em] text-teal-200/85">
+                dès la conception
+              </span>
+            </div>
+            <p className="max-w-xs text-[11.5px] leading-relaxed text-navy-100/65">
+              Environnement santé prévu dès la V1 : hébergement HDS, consentement patient,
+              traçabilité et rôles séparés.
+            </p>
+          </div>
         </div>
       </section>
 
