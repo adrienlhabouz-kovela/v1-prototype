@@ -201,7 +201,7 @@ export default function Landing() {
       {/* Section B — Problème cabinet */}
       <section id="probleme" className="mx-auto max-w-6xl px-6 py-24">
         <Eyebrow>Le constat</Eyebrow>
-        <h2 className="max-w-2xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
+        <h2 className="max-w-2xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Après l&apos;intervention, tout repose encore trop souvent sur la disponibilité du cabinet.
         </h2>
         <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-charcoal/65">
@@ -229,7 +229,7 @@ export default function Landing() {
       <section id="solution" className="border-y border-navy-900/[0.06] bg-white">
         <div className="mx-auto max-w-6xl px-6 py-24">
           <Eyebrow>La solution KOVELA</Eyebrow>
-          <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
+          <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
             Le flux opérationnel est pris en charge — humain et IA, encadrés par votre référentiel.
           </h2>
           <div className="mt-12 grid gap-3 md:grid-cols-2 lg:grid-cols-5">
@@ -267,7 +267,7 @@ export default function Landing() {
         <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
           <div>
             <Eyebrow>Ce qui change pour votre cabinet</Eyebrow>
-            <h2 className="font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
+            <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
               Le suivi devient structuré, lisible et exploitable.
             </h2>
             <p className="mt-5 text-[14.5px] leading-relaxed text-charcoal/65">
@@ -299,7 +299,7 @@ export default function Landing() {
       <section className="border-y border-navy-900/[0.06] bg-white">
         <div className="mx-auto max-w-5xl px-6 py-20">
           <Eyebrow>Une douleur opérationnelle mesurable</Eyebrow>
-          <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
+          <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
             60 à 90 minutes de travail humain par patient, sur 3 à 15 jours.
           </h2>
           <p className="mt-5 max-w-3xl text-[14.5px] leading-relaxed text-charcoal/70">
@@ -331,7 +331,7 @@ export default function Landing() {
       {/* Section F — Comment ça marche */}
       <section id="etapes" className="mx-auto max-w-6xl px-6 py-24">
         <Eyebrow>Comment ça marche</Eyebrow>
-        <h2 className="font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
+        <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           De la mise en place au CR disponible chirurgien, en cinq étapes.
         </h2>
         <ol className="mt-12 grid gap-3 md:grid-cols-5">
@@ -362,7 +362,7 @@ export default function Landing() {
           <Eyebrow>
             <span className="text-teal-300/90">IA assistive · jamais autonome</span>
           </Eyebrow>
-          <h2 className="max-w-2xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-white md:text-[2.4rem]">
+          <h2 className="max-w-2xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-white md:text-[2.4rem]">
             L&apos;IA aide l&apos;équipe. Elle ne décide jamais.
           </h2>
 
@@ -436,7 +436,7 @@ export default function Landing() {
             <BrandMark size={44} className="shrink-0 text-navy-900" />
             <div>
               <Eyebrow>Cadre opérationnel KOVELA</Eyebrow>
-              <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
+              <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
                 Un cadre clair pour suivre, documenter et transmettre — sans remplacer le chirurgien.
               </h2>
               <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-charcoal/70">
@@ -537,7 +537,7 @@ export default function Landing() {
       {/* Section I — Tarification · Moins qu'un mi-temps. Plus qu'un outil. */}
       <section id="modele" className="mx-auto max-w-6xl px-6 py-24">
         <Eyebrow>Tarification</Eyebrow>
-        <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
+        <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Moins qu&apos;un mi-temps. Plus qu&apos;un outil.
         </h2>
         <p className="mt-5 max-w-3xl text-[14.5px] leading-relaxed text-charcoal/70">
@@ -682,7 +682,7 @@ export default function Landing() {
       {/* Section Ibis — Un projet construit sur le terrain · réassurance 4 piliers */}
       <section className="mx-auto max-w-6xl px-6 py-20">
         <Eyebrow>Un projet construit sur le terrain</Eyebrow>
-        <h2 className="max-w-3xl font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] text-navy-900 md:text-[2.4rem]">
+        <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Qui porte KOVELA, et comment.
         </h2>
 
@@ -755,7 +755,7 @@ export default function Landing() {
       {/* Section J — CTA final */}
       <section className="bg-navy-depth text-white">
         <div className="mx-auto max-w-4xl px-6 py-24 text-center">
-          <h2 className="font-display text-[2rem] font-medium leading-tight tracking-[-0.02em] md:text-[2.4rem]">
+          <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] md:text-[2.4rem]">
             Structurer le suivi post-opératoire de votre cabinet.
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-[14.5px] leading-relaxed text-navy-100/75">
