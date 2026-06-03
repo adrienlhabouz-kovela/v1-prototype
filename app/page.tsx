@@ -355,8 +355,7 @@ export default function Landing() {
           tout usage opérationnel.
         </p>
         <p className="mt-3 max-w-3xl text-[12.5px] leading-relaxed text-charcoal/55">
-          Le patient accède au suivi via un lien sécurisé transmis selon le cadre validé avec
-          le cabinet — aucune application à télécharger.
+          Le patient accède au suivi via un lien sécurisé, sans application à télécharger.
         </p>
       </section>
 
@@ -444,9 +443,10 @@ export default function Landing() {
                 Un cadre clair pour suivre, documenter et transmettre — sans remplacer le chirurgien.
               </h2>
               <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-charcoal/70">
-                KOVELA est conçu pour s&apos;inscrire dans un cadre HDS, RGPD et CNIL, avec une
-                séparation claire entre site public et application métier, une logique de
-                minimisation des données, des accès par rôle et une traçabilité des actions.
+                <span className="font-semibold text-navy-900">HDS / RGPD dès la conception.</span>{" "}
+                KOVELA est construit dès le départ pour être opéré dans un environnement HDS, avec
+                consentement patient, traçabilité des actions, séparation stricte des rôles et
+                documentation RGPD.
               </p>
 
               {/* 3 piliers : Humain · IA encadrée · Traçabilité */}
@@ -501,10 +501,13 @@ export default function Landing() {
                   Qui supervise ?
                 </p>
                 <p className="mt-3 max-w-3xl text-[13.5px] leading-relaxed text-navy-900">
-                  Des superviseurs opérationnels formés au cadre KOVELA suivent les échanges,
-                  documentent les informations utiles et transmettent au cabinet selon les règles
-                  définies avec le chirurgien. Leur rôle n&apos;est pas d&apos;interpréter une
-                  situation, mais d&apos;appliquer un cadre, de tracer et de transmettre.
+                  Une équipe de coordination post-opératoire formée au cadre KOVELA suit les
+                  échanges, documente les informations utiles et transmet au cabinet selon les
+                  règles définies avec le chirurgien.
+                </p>
+                <p className="mt-2 max-w-3xl text-[13.5px] leading-relaxed text-navy-900">
+                  Elle n&apos;interprète pas. Elle applique un cadre, trace les échanges et
+                  prépare une information exploitable pour le cabinet.
                 </p>
               </div>
 
@@ -542,9 +545,9 @@ export default function Landing() {
               </div>
 
               <p className="mt-8 text-[11.5px] leading-relaxed text-charcoal/45">
-                Architecture cible — éléments à valider juridiquement avant un déploiement en
-                production. Ce site est un démonstrateur : aucune donnée patient n&apos;y est
-                collectée. Aucune certification revendiquée à ce stade.
+                Prototype de démonstration — certification, hébergement production et
+                documentation juridique finalisés avant tout usage réel. Ce site est un
+                démonstrateur : aucune donnée patient n&apos;y est collectée.
               </p>
             </div>
           </div>

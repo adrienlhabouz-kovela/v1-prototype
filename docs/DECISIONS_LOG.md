@@ -479,17 +479,25 @@ Pas d'« advisory board », pas de chiffre non vérifié, pas de « leader healt
 « expert IA / médical », pas de claim « IA sûre » / « surveillance médicale » /
 « certifié HDS ».
 
-**Ajout 2026-06-03 (audit chirurgiens Gemini)** :
-- Bloc « Qui supervise ? » dans la section Cadre opérationnel KOVELA : précise que les
-  superviseurs sont **opérationnels** (non médicaux), formés au cadre KOVELA, et que leur
-  rôle est d'appliquer un cadre / tracer / transmettre — pas d'interpréter.
-- Phrase accès patient dans la section Fonctionnement : « Le patient accède au suivi via
-  un lien sécurisé transmis selon le cadre validé avec le cabinet — aucune application à
-  télécharger. »
-- **Vocabulaire interdit conservé** : ne pas écrire « superviseur médical », « soignant »,
-  « infirmier », « coordinateur médical », « rassure médicalement », « tri médical ».
-- **HDS** : conserver « architecture cible HDS / RGPD » et « aucune certification revendiquée
-  à ce stade ». Ne pas écrire « certifié HDS » ni « conforme HDS ».
+**Ajout 2026-06-03 (audit chirurgiens Gemini + ajustement ton)** :
+- Bloc « Qui supervise ? » dans la section Cadre opérationnel KOVELA, formulation
+  valorisée : **« Une équipe de coordination post-opératoire formée au cadre KOVELA »**
+  (préféré à « superviseurs opérationnels » seul, qui peut sonner industriel). Suivi
+  de : « Elle n'interprète pas. Elle applique un cadre, trace les échanges et prépare
+  une information exploitable pour le cabinet. »
+- Phrase accès patient dans la section Fonctionnement, version courte et confiante :
+  **« Le patient accède au suivi via un lien sécurisé, sans application à télécharger. »**
+- **Ton HDS / RGPD repositionné comme construction, pas comme excuse** :
+  - Bloc valeur : « **HDS / RGPD dès la conception.** KOVELA est construit dès le départ
+    pour être opéré dans un environnement HDS, avec consentement patient, traçabilité des
+    actions, séparation stricte des rôles et documentation RGPD. »
+  - Note discrète en pied : « Prototype de démonstration — certification, hébergement
+    production et documentation juridique finalisés avant tout usage réel. Ce site est
+    un démonstrateur : aucune donnée patient n'y est collectée. »
+- **Vocabulaire interdit conservé** : ne pas écrire « certifié HDS », « conforme HDS »,
+  « 100 % conforme RGPD », « superviseur médical », « soignant », « infirmier »,
+  « coordinateur médical », « rassure médicalement », « tri médical », « opérateurs »
+  (trop industriel pour le rôle équipe coordination).
 
 ---
 
