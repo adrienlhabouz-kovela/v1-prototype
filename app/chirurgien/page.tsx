@@ -138,11 +138,11 @@ export default function ChirurgienDashboard() {
       )}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-5">
+        <StatCard label="Transmissions cabinet" value={stats.escalades} accent />
+        <StatCard label="CR factuels disponibles" value={stats.crDispo} />
+        <StatCard label="Patients en suivi" value={stats.actifs} />
         <StatCard label="Interventions à venir" value={stats.aVenir} />
         <StatCard label="Onboardings à compléter" value={stats.onboardingsACompleter} />
-        <StatCard label="Patients actifs" value={stats.actifs} />
-        <StatCard label="CR disponibles" value={stats.crDispo} accent />
-        <StatCard label="Escalades transmises" value={stats.escalades} />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
@@ -169,10 +169,10 @@ export default function ChirurgienDashboard() {
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     {escTransmise && (
-                      <Badge className="bg-navy-900 text-teal-100 ring-navy-900">Escalade reçue</Badge>
+                      <Badge className="bg-navy-900 text-teal-100 ring-navy-900">Transmission cabinet</Badge>
                     )}
                     {report && report.status === "disponible" && (
-                      <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">CR disponible</Badge>
+                      <Badge className="bg-teal-50/60 text-teal-700 ring-teal-100/70">CR factuel disponible</Badge>
                     )}
                     <Badge className={statusStyles[p.status]}>{statusLabels[p.status]}</Badge>
                     <Link href={`/chirurgien/patient/${p.id}`}>

@@ -49,6 +49,21 @@ au plan technique :
   qualification. Spec canonique : [`CABINET_ACTIVATION_FLOW.md`](./CABINET_ACTIVATION_FLOW.md).
   En V1 pilote : JWT signé HS256 + TTL 7j + redemption unique + email transactionnel DPA +
   auth Clerk/Auth.js + audit trail BDD append-only.
+- **Parcours chirurgien · tuyauterie opérationnelle** (`app/chirurgien/patient/[id]/page.tsx`,
+  passe 2026-06-03) : référentiel actif visible, journal d'action horodaté (transmissions +
+  CR), banner clôture, bouton export CR désactivé. À rendre réel en V1 :
+  - **Notifications cabinet réelles** : email transactionnel (Mailgun/SendGrid · DPA UE)
+    + SMS optionnel (Twilio · DPA validé).
+  - **Audit trail append-only en BDD** avec **accusé de lecture cabinet réel** (webhook
+    email + tracking pixel + bouton confirmation côté cabinet).
+  - **Export PDF du CR factuel** : template versionné, signature électronique optionnelle,
+    archivage CRM cabinet.
+  - **Clôture du suivi** : workflow superviseur explicite → bascule patient `cloture` →
+    archivage CRM cabinet → notification chirurgien.
+  - **Accès rapide praticien iPad / mobile** : passkeys WebAuthn / FaceID / TouchID si
+    possible, OTP sécurisé en fallback, session persistante avec re-auth périodique selon
+    arbitrage DPO. Cible UX : ouvrir un dossier patient en < 5 secondes depuis un téléphone
+    pro entre 2 consultations.
 
 ---
 

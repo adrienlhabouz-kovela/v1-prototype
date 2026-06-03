@@ -520,6 +520,60 @@ Pas d'« advisory board », pas de chiffre non vérifié, pas de « leader healt
 
 ---
 
+## 13ter. Renforcement parcours chirurgien (2026-06-03)
+
+Suite à l'audit chirurgiens Gemini : passage d'un beau prototype de suivi à un prototype
+qui montre la **tuyauterie opérationnelle d'un service post-opératoire réel**.
+
+### Fiche patient chirurgien (`/chirurgien/patient/[id]`)
+- **Référentiel actif** affiché en haut de fiche : intervention + nom chirurgien + badge
+  « version validée KOVELA ». Montre que KOVELA applique le cadre du chirurgien.
+- **Banner clôture** : si statut patient = `cloture`, banner sobre « Suivi KOVELA clôturé ·
+  dossier archivé · Patient renvoyé vers son suivi habituel cabinet ».
+- **Bouton export CR** désactivé avec label « Exporter le CR factuel (PDF prévu en V1) ».
+- **Journal d'action** : nouvelle Card avec timeline horodatée des étapes opérationnelles :
+  - Transmission cabinet préparée par KOVELA (réel · escalation.openedAt)
+  - Transmission cabinet envoyée (réel · escalation.transmittedAt)
+  - Transmission ouverte par le cabinet ou « En attente de lecture cabinet » (**mock simulé
+    prototype** · marqué explicitement « Statut simulé · affichage opérationnel en V1 »)
+  - CR factuel rendu disponible chirurgien (réel · report.updatedAt)
+  - Suivi KOVELA clôturé · dossier archivé (réel si patient.status = cloture)
+- Renommages : « Compilation factuelle d'escalade » → « **Transmission cabinet** » ;
+  « CR disponible pour le chirurgien » → « **CR disponible chirurgien** ».
+
+### Dashboard chirurgien (`/chirurgien`)
+- **KPIs réordonnés** dans l'ordre utile chirurgien : Transmissions cabinet (accent) · CR
+  factuels disponibles · Patients en suivi · Interventions à venir · Onboardings à compléter.
+- **Liste patients** : badge « Escalade reçue » renommé en « **Transmission cabinet** » ;
+  « CR disponible » → « **CR factuel disponible** ».
+
+### Limites prototype assumées
+- Statut « lecture cabinet » : **mock** dérivé d'un délai depuis transmittedAt (si > 1h →
+  « ouvert » simulé +13 min, sinon « en attente »). Aucune vraie notification envoyée.
+- Marqué explicitement « Statut simulé · affichage opérationnel en V1 » dans la timeline.
+- Bouton export CR : désactivé avec mention « PDF prévu en V1 ».
+
+### Wording ajouté
+synthèse factuelle · CR factuel · transmission cabinet · information à revoir par le
+cabinet · notification cabinet · référentiel actif · journal d'action · horodatage · suivi
+clôturé · dossier archivé · retour au suivi habituel cabinet.
+
+### Wording évité (0 occurrence)
+synthèse clinique · patient à risque · tri médical · surveillance médicale · constantes ·
+urgence validée · alerte critique · rapport médical · compte-rendu médical · bouclier
+médico-légal · preuve juridique garantie · responsabilité couverte · décharge médicale ·
+fin de surveillance médicale.
+
+### À rendre réel en V1 (cf. TECHNICAL_NOTES.md § 0)
+- Vraies notifications cabinet (email transactionnel + SMS si DPA validé).
+- Audit trail BDD append-only avec accusé de lecture réel.
+- Export PDF du CR factuel (template versionné).
+- Logique de clôture du suivi avec archivage CRM.
+- Accès rapide praticien sur iPad / mobile : passkeys (WebAuthn) / FaceID / TouchID si
+  possible, OTP sécurisé en fallback, session persistante avec re-auth périodique.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1
