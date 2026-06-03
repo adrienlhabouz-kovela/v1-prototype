@@ -113,9 +113,9 @@ export default function Landing() {
           <nav className="hidden items-center gap-9 text-[13px] tracking-tight text-charcoal/70 md:flex">
             <a href="#probleme" className="transition-colors hover:text-navy-900">Le constat</a>
             <a href="#solution" className="transition-colors hover:text-navy-900">La solution</a>
-            <a href="#etapes" className="transition-colors hover:text-navy-900">Comment ça marche</a>
-            <a href="#ia" className="transition-colors hover:text-navy-900">IA assistive</a>
-            <a href="#modele" className="transition-colors hover:text-navy-900">Tarification</a>
+            <a href="#etapes" className="transition-colors hover:text-navy-900">Fonctionnement</a>
+            <a href="#cadre" className="transition-colors hover:text-navy-900">Cadre KOVELA</a>
+            <a href="#modele" className="transition-colors hover:text-navy-900">Tarifs</a>
           </nav>
           <div className="flex items-center gap-2">
             <Link
@@ -429,7 +429,7 @@ export default function Landing() {
       </section>
 
       {/* Section H — Cadre opérationnel KOVELA · architecture de confiance */}
-      <section className="border-y border-navy-900/[0.06] bg-white">
+      <section id="cadre" className="border-y border-navy-900/[0.06] bg-white">
         <div className="mx-auto max-w-6xl px-6 py-24">
           <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
             <BrandMark size={44} className="shrink-0 text-navy-900" />
