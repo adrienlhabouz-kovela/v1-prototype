@@ -354,6 +354,10 @@ export default function Landing() {
           Démarrage accompagné par l&apos;équipe KOVELA. Le référentiel est relu avec vous avant
           tout usage opérationnel.
         </p>
+        <p className="mt-3 max-w-3xl text-[12.5px] leading-relaxed text-charcoal/55">
+          Le patient accède au suivi via un lien sécurisé transmis selon le cadre validé avec
+          le cabinet — aucune application à télécharger.
+        </p>
       </section>
 
       {/* Section G — IA assistive */}
@@ -489,6 +493,19 @@ export default function Landing() {
                     <li>— Logs et historique d&apos;actions</li>
                   </ul>
                 </div>
+              </div>
+
+              {/* Qui supervise — précision sur le rôle opérationnel non médical de l'équipe. */}
+              <div className="mt-10 rounded-2xl bg-bone/60 px-5 py-5 ring-1 ring-navy-900/[0.05]">
+                <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+                  Qui supervise ?
+                </p>
+                <p className="mt-3 max-w-3xl text-[13.5px] leading-relaxed text-navy-900">
+                  Des superviseurs opérationnels formés au cadre KOVELA suivent les échanges,
+                  documentent les informations utiles et transmettent au cabinet selon les règles
+                  définies avec le chirurgien. Leur rôle n&apos;est pas d&apos;interpréter une
+                  situation, mais d&apos;appliquer un cadre, de tracer et de transmettre.
+                </p>
               </div>
 
               {/* Phrase doctrine */}
