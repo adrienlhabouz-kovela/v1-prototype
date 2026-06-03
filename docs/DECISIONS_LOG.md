@@ -488,10 +488,13 @@ Pas d'« advisory board », pas de chiffre non vérifié, pas de « leader healt
 - Phrase accès patient dans la section Fonctionnement, version courte et confiante :
   **« Le patient accède au suivi via un lien sécurisé, sans application à télécharger. »**
 - **Ton HDS / RGPD repositionné comme construction, pas comme excuse** :
-  - **Badges hero (5)** : « Service opéré · pas un logiciel » · « IA assistive · jamais
-    autonome » · « Construit avec des chirurgiens » · **« HDS dès la conception »** ·
-    **« RGPD dès la conception »**. Le badge consolidé « Architecture cible HDS / RGPD » est
-    remplacé par deux badges séparés visibles dès le haut de page.
+  - **Badges hero (3 chips)** : « Service opéré · pas un logiciel » · « IA assistive ·
+    jamais autonome » · « Construit avec des chirurgiens ». Les chips HDS / RGPD ont été
+    retirés de la rangée (jugés noyés) et remplacés par un **bloc trust HDS + RGPD
+    horizontal premium** situé sous les CTAs hero (fond white/[0.04] + border teal-400/25,
+    « HDS + RGPD » en font-display 22 px, sous-ligne « Conçus dans l'architecture dès le
+    premier jour. », explicatif court « Environnement santé, consentement patient,
+    traçabilité des actions et rôles séparés. »). Pas de logo officiel, pas de tampon.
   - Bloc valeur (section Cadre opérationnel) : « **HDS / RGPD dès la conception.** KOVELA
     est construit dès le départ pour être opéré dans un environnement HDS, avec consentement
     patient, traçabilité des actions, séparation stricte des rôles et documentation RGPD. »

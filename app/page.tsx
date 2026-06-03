@@ -46,8 +46,6 @@ const heroBadges = [
   "Service opéré · pas un logiciel",
   "IA assistive · jamais autonome",
   "Construit avec des chirurgiens",
-  "HDS dès la conception",
-  "RGPD dès la conception",
 ];
 
 const pains = [
@@ -186,27 +184,20 @@ export default function Landing() {
             Démarrage progressif sur 2 ou 3 interventions prioritaires, avec accompagnement KOVELA.
           </p>
 
-          {/* Trust badges HDS / RGPD — visibilité forte, posture « dès la conception » */}
-          <div className="mt-10 flex flex-wrap items-center gap-5">
-            <div className="flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-white/[0.07] text-center ring-1 ring-teal-400/35 backdrop-blur-sm">
-              <span className="font-display text-[17px] font-semibold tracking-tight text-white">
-                HDS
-              </span>
-              <span className="mt-1 text-[7.5px] uppercase tracking-[0.14em] text-teal-200/85">
-                dès la conception
-              </span>
+          {/* Bloc trust HDS + RGPD — affirmé, premium, sous les CTAs. */}
+          <div className="mt-10 max-w-2xl rounded-2xl border border-teal-400/25 bg-white/[0.04] px-6 py-5 backdrop-blur-sm sm:flex sm:items-center sm:gap-6">
+            <div className="shrink-0">
+              <p className="font-display text-[22px] font-semibold leading-none tracking-tight text-white">
+                HDS + RGPD
+              </p>
+              <p className="mt-1.5 text-[12px] tracking-tight text-teal-200/90">
+                Conçus dans l&apos;architecture dès le premier jour.
+              </p>
             </div>
-            <div className="flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-white/[0.07] text-center ring-1 ring-teal-400/35 backdrop-blur-sm">
-              <span className="font-display text-[15.5px] font-semibold tracking-tight text-white">
-                RGPD
-              </span>
-              <span className="mt-1 text-[7.5px] uppercase tracking-[0.14em] text-teal-200/85">
-                dès la conception
-              </span>
-            </div>
-            <p className="max-w-xs text-[11.5px] leading-relaxed text-navy-100/65">
-              Environnement santé prévu dès la V1 : hébergement HDS, consentement patient,
-              traçabilité et rôles séparés.
+            <div className="mt-4 h-px w-full bg-white/10 sm:my-0 sm:ml-1 sm:mt-0 sm:h-10 sm:w-px" />
+            <p className="text-[12.5px] leading-relaxed text-navy-100/75">
+              Environnement santé, consentement patient, traçabilité des actions et rôles
+              séparés.
             </p>
           </div>
         </div>
