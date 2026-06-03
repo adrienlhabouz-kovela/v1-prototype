@@ -507,9 +507,16 @@ Pas d'« advisory board », pas de chiffre non vérifié, pas de « leader healt
   « tri médical », « opérateurs » (trop industriel pour le rôle équipe coordination).
 - **Audit chirurgiens Gemini V2 (2026-06-03)** : les deux objections « qui sont les humains
   côté KOVELA ? » et « comment le patient accède au suivi ? » sont confirmées couvertes par
-  les ajouts déjà en place (bloc « Qui supervise ? » l. 514–528 + phrase accès patient
-  l. 374). Aucune modification produit complémentaire requise. Cible chirurgie esthétique
-  privée conservée (pas d'ouverture orthopédie / ORL / ophtalmo).
+  les ajouts en place (bloc « Qui supervise ? » + phrase accès patient l. 374). Cible
+  chirurgie esthétique privée conservée (pas d'ouverture orthopédie / ORL / ophtalmo).
+- **Audit chirurgiens (2026-06-03 · suite)** : bloc « Qui supervise ? » enrichi avec un
+  titre **« Une supervision issue du terrain. »** et une description des profils :
+  « profils senior issus du bloc, du cabinet ou du suivi patient — aides opératoires
+  expérimentées, infirmières ou coordinatrices de parcours — formés au référentiel KOVELA
+  et aux limites non médicales du service. » Mention prudente : les profils listés sont
+  des **exemples** de profils possibles, pas un standard obligatoire. Le rôle reste
+  strictement non médical (« Ils ne diagnostiquent pas, ne prescrivent pas et
+  n'interprètent pas »).
 
 ---
 

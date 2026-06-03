@@ -511,19 +511,25 @@ export default function Landing() {
                 </div>
               </div>
 
-              {/* Qui supervise — précision sur le rôle opérationnel non médical de l'équipe. */}
+              {/* Qui supervise — profils terrain senior, non médicaux. Répond à
+                  l'objection chirurgien : qui lit mes patients et quel est leur niveau. */}
               <div className="mt-10 rounded-2xl bg-bone/60 px-5 py-5 ring-1 ring-navy-900/[0.05]">
                 <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
                   Qui supervise ?
                 </p>
+                <p className="mt-2 font-sans text-[16px] font-semibold tracking-tight text-navy-900">
+                  Une supervision issue du terrain.
+                </p>
                 <p className="mt-3 max-w-3xl text-[13.5px] leading-relaxed text-navy-900">
-                  Une équipe de coordination post-opératoire formée au cadre KOVELA suit les
-                  échanges, documente les informations utiles et transmet au cabinet selon les
-                  règles définies avec le chirurgien.
+                  Les superviseurs KOVELA sont des profils senior issus du bloc, du cabinet ou
+                  du suivi patient — aides opératoires expérimentées, infirmières ou
+                  coordinatrices de parcours — formés au référentiel KOVELA et aux limites non
+                  médicales du service.
                 </p>
                 <p className="mt-2 max-w-3xl text-[13.5px] leading-relaxed text-navy-900">
-                  Elle n&apos;interprète pas. Elle applique un cadre, trace les échanges et
-                  prépare une information exploitable pour le cabinet.
+                  Ils ne diagnostiquent pas, ne prescrivent pas et n&apos;interprètent pas. Ils
+                  structurent le suivi, documentent les échanges et transmettent au cabinet
+                  selon le cadre validé avec le chirurgien.
                 </p>
               </div>
 
