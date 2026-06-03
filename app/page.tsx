@@ -46,7 +46,8 @@ const heroBadges = [
   "Service opéré · pas un logiciel",
   "IA assistive · jamais autonome",
   "Construit avec des chirurgiens",
-  "Architecture cible HDS / RGPD",
+  "HDS dès la conception",
+  "RGPD dès la conception",
 ];
 
 const pains = [
@@ -545,7 +546,7 @@ export default function Landing() {
               </div>
 
               <p className="mt-8 text-[11.5px] leading-relaxed text-charcoal/45">
-                Prototype de démonstration — certification, hébergement production et
+                Prototype de démonstration — hébergement production, certification et
                 documentation juridique finalisés avant tout usage réel. Ce site est un
                 démonstrateur : aucune donnée patient n&apos;y est collectée.
               </p>

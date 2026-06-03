@@ -488,11 +488,15 @@ Pas d'« advisory board », pas de chiffre non vérifié, pas de « leader healt
 - Phrase accès patient dans la section Fonctionnement, version courte et confiante :
   **« Le patient accède au suivi via un lien sécurisé, sans application à télécharger. »**
 - **Ton HDS / RGPD repositionné comme construction, pas comme excuse** :
-  - Bloc valeur : « **HDS / RGPD dès la conception.** KOVELA est construit dès le départ
-    pour être opéré dans un environnement HDS, avec consentement patient, traçabilité des
-    actions, séparation stricte des rôles et documentation RGPD. »
-  - Note discrète en pied : « Prototype de démonstration — certification, hébergement
-    production et documentation juridique finalisés avant tout usage réel. Ce site est
+  - **Badges hero (5)** : « Service opéré · pas un logiciel » · « IA assistive · jamais
+    autonome » · « Construit avec des chirurgiens » · **« HDS dès la conception »** ·
+    **« RGPD dès la conception »**. Le badge consolidé « Architecture cible HDS / RGPD » est
+    remplacé par deux badges séparés visibles dès le haut de page.
+  - Bloc valeur (section Cadre opérationnel) : « **HDS / RGPD dès la conception.** KOVELA
+    est construit dès le départ pour être opéré dans un environnement HDS, avec consentement
+    patient, traçabilité des actions, séparation stricte des rôles et documentation RGPD. »
+  - Note discrète en pied : « Prototype de démonstration — hébergement production,
+    certification et documentation juridique finalisés avant tout usage réel. Ce site est
     un démonstrateur : aucune donnée patient n'y est collectée. »
 - **Vocabulaire interdit conservé** : ne pas écrire « certifié HDS », « conforme HDS »,
   « 100 % conforme RGPD », « superviseur médical », « soignant », « infirmier »,
