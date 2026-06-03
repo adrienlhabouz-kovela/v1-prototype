@@ -165,7 +165,24 @@ export default function Landing() {
             ))}
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-2.5">
+          {/* Bloc trust HDS + RGPD — affirmé, premium, entre badges et CTAs. */}
+          <div className="mt-6 max-w-2xl rounded-2xl border border-teal-400/25 bg-white/[0.04] px-6 py-5 backdrop-blur-sm sm:flex sm:items-center sm:gap-6">
+            <div className="shrink-0">
+              <p className="font-display text-[22px] font-semibold leading-none tracking-tight text-white">
+                HDS + RGPD
+              </p>
+              <p className="mt-1.5 text-[12px] tracking-tight text-teal-200/90">
+                Conçus dans l&apos;architecture dès le premier jour.
+              </p>
+            </div>
+            <div className="mt-4 h-px w-full bg-white/10 sm:my-0 sm:ml-1 sm:mt-0 sm:h-10 sm:w-px" />
+            <p className="text-[12.5px] leading-relaxed text-navy-100/75">
+              Environnement santé, consentement patient, traçabilité des actions et rôles
+              séparés.
+            </p>
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-2.5">
             <a
               href={DEMO}
               className="rounded-lg bg-white px-6 py-3 text-[13.5px] font-medium tracking-tight text-navy-900 shadow-soft transition-colors hover:bg-ivory"
@@ -183,23 +200,6 @@ export default function Landing() {
           <p className="mt-7 text-[12.5px] text-navy-100/50">
             Démarrage progressif sur 2 ou 3 interventions prioritaires, avec accompagnement KOVELA.
           </p>
-
-          {/* Bloc trust HDS + RGPD — affirmé, premium, sous les CTAs. */}
-          <div className="mt-10 max-w-2xl rounded-2xl border border-teal-400/25 bg-white/[0.04] px-6 py-5 backdrop-blur-sm sm:flex sm:items-center sm:gap-6">
-            <div className="shrink-0">
-              <p className="font-display text-[22px] font-semibold leading-none tracking-tight text-white">
-                HDS + RGPD
-              </p>
-              <p className="mt-1.5 text-[12px] tracking-tight text-teal-200/90">
-                Conçus dans l&apos;architecture dès le premier jour.
-              </p>
-            </div>
-            <div className="mt-4 h-px w-full bg-white/10 sm:my-0 sm:ml-1 sm:mt-0 sm:h-10 sm:w-px" />
-            <p className="text-[12.5px] leading-relaxed text-navy-100/75">
-              Environnement santé, consentement patient, traçabilité des actions et rôles
-              séparés.
-            </p>
-          </div>
         </div>
       </section>
 
