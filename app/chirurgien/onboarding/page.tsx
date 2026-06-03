@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Shell } from "@/components/Shell";
 import { Badge, Button, Card, Modal, PageHeader } from "@/components/ui";
 import { useKovela } from "@/lib/store";
@@ -102,9 +102,24 @@ const ACCEPTANCE_ITEMS: string[] = [
   "J'ai compris que les modalités opérationnelles du service sont définies avec le cabinet.",
 ];
 
-export default function ChirurgienOnboarding() {
+// useSearchParams() exige un Suspense boundary côté Next 14 App Router.
+export default function ChirurgienOnboardingPage() {
+  return (
+    <Suspense fallback={null}>
+      <ChirurgienOnboarding />
+    </Suspense>
+  );
+}
+
+function ChirurgienOnboarding() {
   const k = useKovela();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromActivation = searchParams?.get("from") === "activation";
+  const activationProspectId = searchParams?.get("prospect") ?? null;
+  const activationProspect = activationProspectId
+    ? k.prospects.find((p) => p.id === activationProspectId)
+    : undefined;
   const me = k.surgeon(MY_SURGEON_ID);
 
   const [step, setStep] = useState(0);
@@ -156,11 +171,32 @@ export default function ChirurgienOnboarding() {
     <Shell>
       <PageHeader
         eyebrow="Mise en place cabinet"
-        title="Mettre en place le service KOVELA pour votre cabinet"
-        subtitle="Ce lien vous a été transmis après un échange avec l'équipe KOVELA. Il permet de préparer l'activation du service : informations cabinet, contacts autorisés, documents de service et prélèvement."
+        title={
+          fromActivation && activationProspect
+            ? `Bienvenue Dr ${activationProspect.firstName} ${activationProspect.lastName}`
+            : "Mettre en place le service KOVELA pour votre cabinet"
+        }
+        subtitle={
+          fromActivation
+            ? "Activation cabinet en cours — informations cabinet, contacts autorisés, documents de service et prélèvement. Le référentiel essentiel sera ensuite construit avec l'équipe KOVELA."
+            : "Ce lien vous a été transmis après un échange avec l'équipe KOVELA. Il permet de préparer l'activation du service : informations cabinet, contacts autorisés, documents de service et prélèvement."
+        }
       />
 
       <div className="mx-auto max-w-3xl">
+        {/* Mode démo (accès direct via /login, hors parcours activation) : honnêteté narrative. */}
+        {!fromActivation && (
+          <div className="mb-4 flex items-start gap-3 rounded-xl border border-amber-200/50 bg-amber-50/40 px-4 py-3 text-[11.5px] leading-relaxed text-amber-900">
+            <span className="mt-0.5 rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-800 ring-1 ring-amber-200">
+              Mode démo
+            </span>
+            <span>
+              Vous explorez le flux de mise en place sans lien d&apos;activation cabinet. En
+              production, ce parcours est ouvert via un lien personnalisé transmis après un
+              échange avec l&apos;équipe KOVELA — pas d&apos;inscription libre.
+            </span>
+          </div>
+        )}
         <div className="mb-6 flex flex-wrap items-start gap-x-4 gap-y-3 rounded-xl bg-white px-5 py-4 text-[12.5px] leading-relaxed text-charcoal/70 shadow-soft ring-1 ring-navy-900/[0.05]">
           <div className="flex flex-col gap-1.5">
             <span className="flex w-fit items-center gap-2 rounded-md bg-teal-50/60 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-teal-700 ring-1 ring-teal-100/70">

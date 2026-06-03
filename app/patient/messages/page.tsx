@@ -133,6 +133,25 @@ export default function PatientMessages() {
               Vos messages sont traités par une équipe humaine de coordination. Aucune réponse
               automatique par IA.
             </p>
+            <div className="mt-2 rounded-xl bg-bone/70 px-3 py-2 text-[10.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
+              <p className="font-medium text-navy-900">
+                Quand utiliser ce canal vs le 15 / 112 ?
+              </p>
+              <ul className="mt-1 space-y-0.5">
+                <li>
+                  <span className="font-medium text-navy-900">Suivi non urgent</span> · question
+                  d&apos;organisation, photo demandée, point d&apos;étape → message ici.
+                </li>
+                <li>
+                  <span className="font-medium text-amber-900">Urgence ou inquiétude forte</span>
+                  {" "}· contactez le <span className="font-semibold">15 / 112</span> ou suivez
+                  les consignes de votre chirurgien.
+                </li>
+              </ul>
+              <p className="mt-1.5 text-charcoal/55">
+                L&apos;équipe KOVELA revient vers vous selon les délais définis avec votre cabinet.
+              </p>
+            </div>
           </div>
         </Card>
       </div>

@@ -684,6 +684,7 @@ function ProspectModal({ target, onClose }: { target: Prospect | null; onClose: 
   const [relanceDate, setRelanceDate] = useState("");
   const [relanceAction, setRelanceAction] = useState("");
   const [seed, setSeed] = useState("");
+  const [activationOpen, setActivationOpen] = useState(false);
 
   if (target && seed !== target.id) {
     setSeed(target.id);
@@ -806,10 +807,13 @@ function ProspectModal({ target, onClose }: { target: Prospect | null; onClose: 
             </Button>
             <Button
               variant="secondary"
-              onClick={() => k.launchProspectOnboarding(p.id)}
-              disabled={p.onboardingLaunched || p.isActive}
+              onClick={() => {
+                if (!p.activation) k.generateActivationToken(p.id);
+                setActivationOpen(true);
+              }}
+              disabled={p.isActive}
             >
-              Envoyer le lien de mise en place
+              {p.activation ? "Voir le lien d'activation" : "Générer le lien d'activation cabinet"}
             </Button>
             <Button
               variant="primary"
@@ -893,6 +897,148 @@ function ProspectModal({ target, onClose }: { target: Prospect | null; onClose: 
         <Button variant="ghost" onClick={onClose}>
           Fermer
         </Button>
+      </div>
+
+      <ActivationLinkModal
+        open={activationOpen}
+        onClose={() => setActivationOpen(false)}
+        prospect={p}
+      />
+    </Modal>
+  );
+}
+
+// Modale activation cabinet — affiche le token + URL copiable + chronologie statut.
+// Prototype : pas d'email réel ; en V1 le lien est envoyé via Mailgun/SendGrid (DPA OK).
+function ActivationLinkModal({
+  open,
+  onClose,
+  prospect,
+}: {
+  open: boolean;
+  onClose: () => void;
+  prospect: Prospect;
+}) {
+  const k = useKovela();
+  const [copied, setCopied] = useState(false);
+
+  if (!open || !prospect.activation) return null;
+
+  const a = prospect.activation;
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://kovela.care";
+  const url = `${origin}/chirurgien/activation/${a.token}`;
+
+  async function copyUrl() {
+    try {
+      await navigator.clipboard?.writeText(url);
+    } catch {
+      // noop — clipboard peut être indisponible en démo SSR
+    }
+    k.markActivationLinkCopied(a.token);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+
+  const steps: { label: string; at?: string; help: string }[] = [
+    { label: "Lien généré", at: a.generatedAt, help: "L'admin KOVELA a créé un lien d'activation personnalisé." },
+    { label: "Lien copié / envoyé", at: a.linkCopiedAt, help: "À transmettre au chirurgien (email transactionnel en V1)." },
+    { label: "Lien ouvert", at: a.linkOpenedAt, help: "Le chirurgien a ouvert le lien dans son navigateur." },
+    { label: "Onboarding lancé", at: a.onboardingStartedAt, help: "Le chirurgien a cliqué « Activer mon espace »." },
+    { label: "Cabinet actif", at: a.cabinetActivatedAt, help: "Onboarding complété + référentiel relu KOVELA + mandat actif." },
+  ];
+
+  return (
+    <Modal open={open} onClose={onClose} title="Lien d'activation cabinet généré" wide>
+      <div className="space-y-5">
+        <div>
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+            Chirurgien
+          </p>
+          <p className="mt-1.5 font-display text-[15.5px] font-semibold tracking-tight text-navy-900">
+            Dr {prospect.firstName} {prospect.lastName} · {prospect.cabinet} · {prospect.city}
+          </p>
+          <p className="mt-1 text-[12px] text-charcoal/60">
+            Statut CRM actuel : <span className="font-medium text-navy-900">{prospectStatusLabels[prospect.status]}</span>
+          </p>
+        </div>
+
+        <div className="rounded-2xl bg-bone/60 px-4 py-3 ring-1 ring-navy-900/[0.05]">
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+            URL d&apos;activation
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <code className="flex-1 min-w-[260px] break-all rounded-md bg-white px-3 py-2 font-mono text-[11.5px] text-navy-900 ring-1 ring-navy-900/[0.08]">
+              {url}
+            </code>
+            <Button variant="primary" onClick={copyUrl}>
+              {copied ? "Copié ✓" : "Copier le lien"}
+            </Button>
+            <a
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-lg bg-white px-4 py-2 text-[12.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/15 transition-colors hover:bg-bone"
+            >
+              Ouvrir ↗
+            </a>
+          </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-charcoal/55">
+            Prototype : aucun email n&apos;est envoyé. Copiez l&apos;URL et transmettez-la par
+            le canal de votre choix. En V1, le lien est envoyé par email transactionnel
+            (Mailgun / SendGrid · DPA validé), signé JWT et expirable.
+          </p>
+        </div>
+
+        <div>
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+            Chronologie activation
+          </p>
+          <ol className="mt-3 space-y-2">
+            {steps.map((s, i) => {
+              const done = !!s.at;
+              return (
+                <li key={s.label} className="flex gap-3 text-[12.5px]">
+                  <span
+                    className={`mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-bold ${
+                      done
+                        ? "bg-teal-600 text-white"
+                        : "bg-navy-50 text-charcoal/45 ring-1 ring-navy-100"
+                    }`}
+                  >
+                    {done ? "✓" : i + 1}
+                  </span>
+                  <div className="flex-1">
+                    <p className={`tracking-tight ${done ? "text-navy-900" : "text-charcoal/55"}`}>
+                      <span className="font-medium">{s.label}</span>
+                      {done && (
+                        <span className="ml-2 text-[11px] text-charcoal/55">
+                          · {new Date(s.at!).toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-[11px] leading-relaxed text-charcoal/55">{s.help}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+
+        <div className="rounded-2xl border border-amber-200/50 bg-amber-50/40 px-4 py-3 text-[11.5px] leading-relaxed text-amber-900">
+          <p className="font-semibold">Limites prototype</p>
+          <p className="mt-1">
+            Token mock sans signature, pas d&apos;expiration technique, pas de révocation, pas
+            d&apos;email envoyé. En V1 pilote : JWT signé HS256, TTL 7j, redemption unique,
+            révocation manuelle possible, audit trail immuable. Cf.{" "}
+            <code className="text-amber-900">docs/CABINET_ACTIVATION_FLOW.md</code>.
+          </p>
+        </div>
+
+        <div className="flex justify-end">
+          <Button variant="ghost" onClick={onClose}>
+            Fermer
+          </Button>
+        </div>
       </div>
     </Modal>
   );

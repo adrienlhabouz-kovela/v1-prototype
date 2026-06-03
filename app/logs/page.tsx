@@ -47,6 +47,10 @@ const logKindLabel: Record<LogKind, string> = {
   signalement_cabinet: "Patient — signalement cabinet",
   documents_acceptes: "Cabinet — documents de service acceptés (simulation)",
   referentiel_suivi: "Cabinet — référentiel de suivi complété",
+  activation_link_generated: "Activation — lien cabinet généré",
+  activation_link_copied: "Activation — lien copié",
+  activation_link_opened: "Activation — lien ouvert par le chirurgien",
+  activation_onboarding_lance: "Activation — onboarding cabinet lancé",
 };
 
 const logKindStyle: Partial<Record<LogKind, string>> = {

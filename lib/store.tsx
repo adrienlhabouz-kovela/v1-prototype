@@ -168,6 +168,12 @@ interface KovelaState {
   activateProspectAsSurgeon: (id: string) => void;
   assignProspectSalesOwner: (id: string, salesOwnerId: string) => void;
 
+  // Activation cabinet (prototype mock — token + statuts dérivés des timestamps).
+  generateActivationToken: (prospectId: string) => string;
+  markActivationLinkCopied: (token: string) => void;
+  markActivationLinkOpened: (token: string) => void;
+  prospectByToken: (token: string) => Prospect | undefined;
+
   logAi: (fn: AiFunction, decision: AiDecision, patientId?: string) => void;
 
   // helpers
@@ -786,6 +792,12 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
         onboardingLaunched: true,
         status: p.isActive ? p.status : "onboarding_cabinet",
         mandateStatus: p.mandateStatus === "a_creer" ? "lien_envoye" : p.mandateStatus,
+        activation: p.activation
+          ? {
+              ...p.activation,
+              onboardingStartedAt: p.activation.onboardingStartedAt ?? new Date().toISOString(),
+            }
+          : p.activation,
       }));
       const t = prospects.find((p) => p.id === id);
       pushLog(
@@ -804,6 +816,60 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
       );
     },
 
+    // ── Activation cabinet (prototype mock) ─────────────────────────────────
+    // Token = chaîne opaque sans signature ; en V1 il faudra un JWT signé HS256
+    // avec TTL 7j + invalidation à la 1ʳᵉ redemption. Cf. docs/CABINET_ACTIVATION_FLOW.md.
+    generateActivationToken(prospectId) {
+      const tok = `act_${Math.random().toString(36).slice(2, 10)}_${prospectId.slice(-3)}`;
+      const nowIso = new Date().toISOString();
+      updateProspect(prospectId, (p) => ({
+        ...p,
+        activation: {
+          token: tok,
+          generatedAt: nowIso,
+          generatedBy: currentUser,
+        },
+      }));
+      const t = prospects.find((p) => p.id === prospectId);
+      pushLog(
+        "activation_link_generated",
+        `Lien d'activation cabinet généré pour ${t?.firstName ?? ""} ${t?.lastName ?? prospectId}.`
+      );
+      return tok;
+    },
+
+    markActivationLinkCopied(token) {
+      const target = prospects.find((p) => p.activation?.token === token);
+      if (!target) return;
+      updateProspect(target.id, (p) =>
+        p.activation
+          ? { ...p, activation: { ...p.activation, linkCopiedAt: new Date().toISOString() } }
+          : p
+      );
+      pushLog(
+        "activation_link_copied",
+        `Lien d'activation copié pour ${target.firstName} ${target.lastName}.`
+      );
+    },
+
+    markActivationLinkOpened(token) {
+      const target = prospects.find((p) => p.activation?.token === token);
+      if (!target || target.activation?.linkOpenedAt) return;
+      updateProspect(target.id, (p) =>
+        p.activation
+          ? { ...p, activation: { ...p.activation, linkOpenedAt: new Date().toISOString() } }
+          : p
+      );
+      pushLog(
+        "activation_link_opened",
+        `Lien d'activation ouvert par ${target.firstName} ${target.lastName}.`
+      );
+    },
+
+    prospectByToken(token) {
+      return prospects.find((p) => p.activation?.token === token);
+    },
+
     activateProspectAsSurgeon(id) {
       updateProspect(id, (p) => ({
         ...p,
@@ -812,6 +878,9 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
         cabinetConfigured: true,
         onboardingLaunched: true,
         mandateStatus: p.mandateStatus === "mandat_actif" ? p.mandateStatus : "mandat_actif",
+        activation: p.activation
+          ? { ...p.activation, cabinetActivatedAt: new Date().toISOString() }
+          : p.activation,
       }));
       const t = prospects.find((p) => p.id === id);
       pushLog(

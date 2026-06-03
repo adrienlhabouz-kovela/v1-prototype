@@ -399,6 +399,34 @@ Demander leur approche en 5 points avant call. Pas d'audit gratuit complet exig�
 
 ---
 
+## 12bis. Activation cabinet — décision P0
+
+**Statut** : intégrée prototype le 2026-06-03. Spec canonique :
+[`CABINET_ACTIVATION_FLOW.md`](./CABINET_ACTIVATION_FLOW.md).
+
+**Décision** : **pas d'inscription libre**. Tout chirurgien KOVELA doit passer par le
+parcours canonique CRM → call → accord verbal → **lien d'activation cabinet
+personnalisé** → onboarding accompagné → référentiel relu KOVELA → cabinet actif.
+
+**Implémentation prototype** :
+- Nouvelle route `/chirurgien/activation/[token]`.
+- 4 LogKinds : `activation_link_generated`, `activation_link_copied`,
+  `activation_link_opened`, `activation_onboarding_lance`.
+- Sous-objet `Prospect.activation: ProspectActivation` portant la chronologie.
+- Modale CRM « Lien d'activation cabinet généré » avec URL copiable + timeline statut.
+- Banner « Mode démo » sur `/chirurgien/onboarding` si arrivée hors parcours activation.
+
+**Wording validé** : Activer votre espace KOVELA · Finaliser votre accès cabinet ·
+Démarrer la mise en place accompagnée · Compléter votre activation cabinet.
+**Wording interdit** : s'inscrire · créer un compte gratuitement · essai gratuit ·
+commencer seul · self-service.
+
+**À rendre réel en V1 pilote** (cf. CABINET_ACTIVATION_FLOW.md § 5–6) : JWT signé,
+TTL 7j, redemption unique, email transactionnel DPA, auth chirurgien Clerk/Auth.js,
+audit trail BDD append-only, révocation manuelle, KPI conversion CRM.
+
+---
+
 ## 13. Prochaines priorités produit
 
 ### Priorité immédiate · Inbox superviseur scalable
@@ -440,6 +468,7 @@ Renforcer `/admin/supervision` comme cockpit Head of Care.
 - Workflow CR : IA → humain → chirurgien
 - Référentiel avec relecture KOVELA obligatoire
 - Unit economics care = à valider en pilote
+- Parcours activation cabinet (pas d'inscription libre · lien personnalisé après qualification) — cf. § 12bis et `CABINET_ACTIVATION_FLOW.md`
 
 ---
 

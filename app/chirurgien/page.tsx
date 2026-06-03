@@ -71,6 +71,27 @@ export default function ChirurgienDashboard() {
         </Link>
       </PageHeader>
 
+      {/* Moment clé · 1er CR disponible — affiché si au moins 1 CR disponible. */}
+      {stats.crDispo > 0 && (
+        <div className="mb-6 overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-teal-100/60">
+          <div className="border-l-[3px] border-teal-500/80 px-6 py-5">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-teal-700">
+              {stats.crDispo === 1 ? "Premier compte-rendu disponible" : "Comptes-rendus disponibles"}
+            </p>
+            <p className="mt-1.5 font-display text-[17px] font-semibold tracking-tight text-navy-900">
+              {stats.crDispo === 1
+                ? "Votre premier CR factuel est prêt."
+                : `${stats.crDispo} CR factuels prêts à consulter.`}
+            </p>
+            <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-charcoal/65">
+              Synthèse opérationnelle préparée par l&apos;IA, relue et validée par l&apos;équipe
+              KOVELA. Vous consultez le CR factuel ; aucune décision médicale n&apos;est prise par
+              KOVELA.
+            </p>
+          </div>
+        </div>
+      )}
+
       {config && !config.referentielComplete && (
         <div className="mb-6 overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">

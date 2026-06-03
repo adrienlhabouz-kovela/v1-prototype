@@ -588,7 +588,7 @@ export function buildInitialLogs(patients: Patient[]): LogEntry[] {
     at: daysAgoISO(5, 14),
     user: "Thomas Berger",
     patientId: patients[12].id,
-    detail: `Brouillon de CR préparé pour ${patients[12].name}.`,
+    detail: `Brouillon IA préparé pour ${patients[12].name}.`,
   });
   push({
     kind: "escalade_transmise",
@@ -723,6 +723,14 @@ export const seedProspects: Prospect[] = [
     notes: [{ id: "n-pr11-1", text: "Accord verbal — confirmation par email à venir.", author: "Admin KOVELA", at: daysAgoISO(2, 16) }],
     onboardingLaunched: false, cabinetConfigured: false, assistantAdded: false,
     mandateStatus: "a_creer", isActive: false,
+    // Seed démo : lien d'activation cabinet déjà généré, copié, mais pas encore ouvert.
+    // Permet de tester /chirurgien/activation/[token] sans avoir à passer par le CRM.
+    activation: {
+      token: "act_demo_seed_r11",
+      generatedAt: daysAgoISO(1, 12),
+      generatedBy: "Admin KOVELA",
+      linkCopiedAt: daysAgoISO(1, 12),
+    },
   },
   {
     id: "pr12", salesOwnerId: "so2", firstName: "Romain", lastName: "Lopez", specialty: "Chirurgie esthétique / plastique",

@@ -32,6 +32,50 @@ import {
 
 const MY_SUPERVISOR_ID = "sup1";
 
+// Tri d'une liste de patients selon le critère sélectionné dans la barre filtres.
+// Ne modifie pas l'ordre des groupes opérationnels — opère intra-groupe.
+type SortKey = "action" | "retard" | "jplus" | "chirurgien";
+function daysSinceIntervention(p: Patient, now: number): number {
+  const t = new Date(p.interventionDate).getTime();
+  return Math.floor((now - t) / 86_400_000);
+}
+function sortPatients(
+  list: Patient[],
+  by: SortKey,
+  ctx: { reportFor: (id: string) => unknown; escalationFor: (id: string) => unknown },
+  k: { surgeonName: (id: string) => string }
+): Patient[] {
+  const arr = [...list];
+  const now = Date.now();
+  if (by === "chirurgien") {
+    arr.sort((a, b) => k.surgeonName(a.surgeonId).localeCompare(k.surgeonName(b.surgeonId), "fr"));
+    return arr;
+  }
+  if (by === "jplus") {
+    arr.sort((a, b) => daysSinceIntervention(a, now) - daysSinceIntervention(b, now));
+    return arr;
+  }
+  if (by === "retard") {
+    const score = (p: Patient) => {
+      const u = getUrgence(p, ctx as never);
+      return u === "en_retard" ? 0 : u === "aujourdhui" ? 1 : 2;
+    };
+    arr.sort((a, b) => score(a) - score(b));
+    return arr;
+  }
+  // "action" : urgence opérationnelle (retard > aujourd'hui > à venir), puis J+ croissant.
+  arr.sort((a, b) => {
+    const ua = getUrgence(a, ctx as never);
+    const ub = getUrgence(b, ctx as never);
+    const order = { en_retard: 0, aujourdhui: 1, a_venir: 2 } as const;
+    const da = order[ua as keyof typeof order] ?? 3;
+    const db = order[ub as keyof typeof order] ?? 3;
+    if (da !== db) return da - db;
+    return daysSinceIntervention(a, now) - daysSinceIntervention(b, now);
+  });
+  return arr;
+}
+
 // ---------------------------------------------------------------------------
 // Améliorations terrain — composant existant conservé (déplacé en bas).
 // ---------------------------------------------------------------------------
@@ -335,9 +379,15 @@ function PatientCard({ patient }: { patient: Patient }) {
 function InboxGroup({
   status,
   patients,
+  limit,
+  onExpand,
+  expanded,
 }: {
   status: OperationalStatus;
   patients: Patient[];
+  limit: number;
+  onExpand: () => void;
+  expanded: boolean;
 }) {
   // Couleurs sobres — priorité opérationnelle, pas alerte clinique.
   const accentBar =
@@ -377,7 +427,29 @@ function InboxGroup({
             Rien à traiter ici.
           </p>
         ) : (
-          patients.map((p) => <PatientCard key={p.id} patient={p} />)
+          <>
+            {patients.slice(0, limit).map((p) => (
+              <PatientCard key={p.id} patient={p} />
+            ))}
+            {patients.length > limit && (
+              <button
+                type="button"
+                onClick={onExpand}
+                className="w-full border-t border-navy-900/[0.05] px-5 py-3 text-center text-[11.5px] font-medium tracking-tight text-teal-700 hover:bg-bone/40"
+              >
+                Voir tout ({patients.length}) ↓
+              </button>
+            )}
+            {expanded && patients.length > 12 && (
+              <button
+                type="button"
+                onClick={onExpand}
+                className="w-full border-t border-navy-900/[0.05] px-5 py-3 text-center text-[11px] tracking-tight text-charcoal/55 hover:bg-bone/40"
+              >
+                Replier
+              </button>
+            )}
+          </>
         )}
       </div>
     </Card>
@@ -392,16 +464,52 @@ export default function SuperviseurInbox() {
   const k = useKovela();
   const [onlyMine, setOnlyMine] = useState(true);
 
+  // Recherche + filtres + tri — V0 scalabilité (50-80 patients suivis).
+  const [search, setSearch] = useState("");
+  const [filterStatut, setFilterStatut] = useState<"" | OperationalStatus>("");
+  const [filterUrgence, setFilterUrgence] = useState<"" | "en_retard" | "aujourdhui" | "a_venir">("");
+  const [filterSurgeon, setFilterSurgeon] = useState<string>("");
+  const [filterCR, setFilterCR] = useState<"" | "brouillon" | "valide">("");
+  const [filterSilencieux, setFilterSilencieux] = useState(false);
+  const [sortBy, setSortBy] = useState<"action" | "retard" | "jplus" | "chirurgien">("action");
+  // Pagination simple par groupe : afficher les N premiers, bouton « Voir tout ».
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const LIMIT_PER_GROUP = 12;
+
   const ctx = useMemo(
     () => ({ reportFor: k.reportFor, escalationFor: k.escalationFor }),
     [k.reportFor, k.escalationFor]
   );
 
-  const scope = useMemo(() => {
+  const baseScope = useMemo(() => {
     return onlyMine
       ? k.patients.filter((p) => p.supervisorId === MY_SUPERVISOR_ID)
       : k.patients;
   }, [k.patients, onlyMine]);
+
+  // Application recherche + filtres avant le regroupement par statut.
+  const scope = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return baseScope.filter((p) => {
+      if (q) {
+        const surgeon = k.surgeonName(p.surgeonId).toLowerCase();
+        const hit =
+          p.name.toLowerCase().includes(q) ||
+          surgeon.includes(q) ||
+          p.intervention.toLowerCase().includes(q);
+        if (!hit) return false;
+      }
+      if (filterStatut && getOperationalStatus(p, ctx) !== filterStatut) return false;
+      if (filterUrgence && getUrgence(p, ctx) !== filterUrgence) return false;
+      if (filterSurgeon && p.surgeonId !== filterSurgeon) return false;
+      if (filterCR) {
+        const r = k.reportFor(p.id);
+        if (!r || r.status !== filterCR) return false;
+      }
+      if (filterSilencieux && p.status !== "silencieux") return false;
+      return true;
+    });
+  }, [baseScope, search, filterStatut, filterUrgence, filterSurgeon, filterCR, filterSilencieux, ctx, k]);
 
   // Regroupement par statut opérationnel.
   const grouped = useMemo(() => {
@@ -420,28 +528,42 @@ export default function SuperviseurInbox() {
     return map;
   }, [scope, ctx]);
 
-  // KPI compacts — 4 indicateurs métier.
+  // KPI compacts — 4 indicateurs métier (CR splitté en 2 KPIs).
   const counts = useMemo(() => countByOperationalStatus(scope, ctx), [scope, ctx]);
   const patientsActifs = scope.filter((p) => p.status !== "cloture").length;
-  const crAPreparer =
-    counts.a_transmettre_cabinet +
-    scope.filter((p) => {
-      const r = k.reportFor(p.id);
-      return r?.status === "brouillon" || r?.status === "valide";
-    }).length -
-    // éviter de compter en double les CR à publier
-    scope.filter((p) => {
-      const r = k.reportFor(p.id);
-      return r?.status === "brouillon" || r?.status === "valide";
-    }).length;
-  // Simplification : on prend le nombre direct de CR brouillon + valide non publié.
-  const crToWork = scope.filter((p) => {
+  // CR brouillon IA à relire (par la superviseuse).
+  const crBrouillonARelire = scope.filter((p) => {
     const r = k.reportFor(p.id);
-    return r?.status === "brouillon" || r?.status === "valide";
+    return r?.status === "brouillon";
+  }).length;
+  // CR validés KOVELA à rendre disponibles chirurgien.
+  const crValidesAPublier = scope.filter((p) => {
+    const r = k.reportFor(p.id);
+    return r?.status === "valide";
   }).length;
 
   // Charge / retard
   const enRetard = scope.filter((p) => getUrgence(p, ctx) === "en_retard").length;
+
+  // Liste des chirurgiens présents dans le scope filtré (pour le dropdown filtre).
+  const surgeonsInScope = useMemo(() => {
+    const ids = Array.from(new Set(baseScope.map((p) => p.surgeonId)));
+    return ids
+      .map((id) => ({ id, name: k.surgeonName(id) }))
+      .sort((a, b) => a.name.localeCompare(b.name, "fr"));
+  }, [baseScope, k]);
+
+  function clearFilters() {
+    setSearch("");
+    setFilterStatut("");
+    setFilterUrgence("");
+    setFilterSurgeon("");
+    setFilterCR("");
+    setFilterSilencieux(false);
+  }
+
+  const hasActiveFilter =
+    !!search || !!filterStatut || !!filterUrgence || !!filterSurgeon || !!filterCR || filterSilencieux;
 
   return (
     <Shell>
@@ -506,12 +628,13 @@ export default function SuperviseurInbox() {
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-px bg-navy-900/[0.04] sm:grid-cols-5">
           {[
             ["Patients actifs", String(patientsActifs)],
             ["À traiter maintenant", String(counts.a_traiter)],
             ["En attente cabinet", String(counts.en_attente_cabinet)],
-            ["CR en file de validation", String(crToWork)],
+            ["CR brouillon à relire", String(crBrouillonARelire)],
+            ["CR validé à publier", String(crValidesAPublier)],
           ].map(([label, value]) => (
             <div key={label} className="bg-white px-4 py-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
@@ -546,10 +669,114 @@ export default function SuperviseurInbox() {
         </div>
       </details>
 
+      {/* Barre filtres + tri — scalabilité V0 (50–80 patients). */}
+      <Card className="mb-6 overflow-hidden">
+        <div className="flex flex-wrap items-center gap-2 border-b border-navy-900/[0.05] px-4 py-3">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Rechercher patient · chirurgien · intervention…"
+            className="flex-1 min-w-[220px] rounded-md bg-bone/60 px-3 py-1.5 text-[12.5px] tracking-tight text-navy-900 placeholder:text-charcoal/45 ring-1 ring-navy-900/[0.06] focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+          />
+          <select
+            value={filterStatut}
+            onChange={(e) => setFilterStatut(e.target.value as typeof filterStatut)}
+            className="rounded-md bg-bone/60 px-2.5 py-1.5 text-[12px] tracking-tight text-navy-900 ring-1 ring-navy-900/[0.06] focus:bg-white focus:outline-none"
+          >
+            <option value="">Statut · tous</option>
+            {operationalStatusOrder.map((s) => (
+              <option key={s} value={s}>
+                {operationalStatusLabels[s]}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterUrgence}
+            onChange={(e) => setFilterUrgence(e.target.value as typeof filterUrgence)}
+            className="rounded-md bg-bone/60 px-2.5 py-1.5 text-[12px] tracking-tight text-navy-900 ring-1 ring-navy-900/[0.06] focus:bg-white focus:outline-none"
+          >
+            <option value="">Retard · tous</option>
+            <option value="en_retard">En retard</option>
+            <option value="aujourdhui">Aujourd&apos;hui</option>
+            <option value="a_venir">À venir</option>
+          </select>
+          <select
+            value={filterSurgeon}
+            onChange={(e) => setFilterSurgeon(e.target.value)}
+            className="rounded-md bg-bone/60 px-2.5 py-1.5 text-[12px] tracking-tight text-navy-900 ring-1 ring-navy-900/[0.06] focus:bg-white focus:outline-none"
+          >
+            <option value="">Chirurgien · tous</option>
+            {surgeonsInScope.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterCR}
+            onChange={(e) => setFilterCR(e.target.value as typeof filterCR)}
+            className="rounded-md bg-bone/60 px-2.5 py-1.5 text-[12px] tracking-tight text-navy-900 ring-1 ring-navy-900/[0.06] focus:bg-white focus:outline-none"
+          >
+            <option value="">CR · tous</option>
+            <option value="brouillon">Brouillon IA à relire</option>
+            <option value="valide">Validé KOVELA à publier</option>
+          </select>
+          <label className="flex cursor-pointer select-none items-center gap-1.5 rounded-md bg-bone/60 px-2.5 py-1.5 text-[12px] tracking-tight text-navy-900 ring-1 ring-navy-900/[0.06]">
+            <input
+              type="checkbox"
+              checked={filterSilencieux}
+              onChange={(e) => setFilterSilencieux(e.target.checked)}
+              className="h-3.5 w-3.5"
+            />
+            Silencieux
+          </label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            className="rounded-md bg-white px-2.5 py-1.5 text-[12px] tracking-tight text-navy-900 ring-1 ring-navy-900/[0.06] focus:outline-none"
+          >
+            <option value="action">Tri · prochaine action</option>
+            <option value="retard">Tri · retard</option>
+            <option value="jplus">Tri · J+ croissant</option>
+            <option value="chirurgien">Tri · chirurgien</option>
+          </select>
+          {hasActiveFilter && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="rounded-md bg-white px-2.5 py-1.5 text-[11.5px] font-medium tracking-tight text-charcoal/70 ring-1 ring-navy-900/[0.08] hover:bg-bone"
+            >
+              ✕ Réinitialiser
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-[11px] text-charcoal/60">
+          <span>
+            {scope.length} patient{scope.length > 1 ? "s" : ""} dans le scope filtré
+            {hasActiveFilter && baseScope.length !== scope.length && (
+              <span className="text-charcoal/45"> · sur {baseScope.length}</span>
+            )}
+          </span>
+          <span className="text-[10.5px] text-charcoal/45">
+            Scalabilité V0 · au-delà de 80 patients suivis, prévoir virtualisation V1
+          </span>
+        </div>
+      </Card>
+
       {/* Inbox — 6 groupes verticaux par statut opérationnel */}
       <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
         {operationalStatusOrder.map((status) => (
-          <InboxGroup key={status} status={status} patients={grouped[status]} />
+          <InboxGroup
+            key={status}
+            status={status}
+            patients={sortPatients(grouped[status], sortBy, ctx, k)}
+            limit={expandedGroups[status] ? Infinity : LIMIT_PER_GROUP}
+            onExpand={() =>
+              setExpandedGroups((prev) => ({ ...prev, [status]: !prev[status] }))
+            }
+            expanded={!!expandedGroups[status]}
+          />
         ))}
       </div>
 

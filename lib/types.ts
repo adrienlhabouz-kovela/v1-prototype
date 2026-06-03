@@ -36,6 +36,20 @@ export type ProspectStatus =
   | "actif"
   | "perdu";
 
+// Activation cabinet — sous-statuts dérivés des timestamps. Prototype : mock token,
+// pas de signature, pas de TTL technique (UI peut montrer un délai informatif).
+export interface ProspectActivation {
+  token: string;
+  generatedAt: string;
+  generatedBy?: string;
+  linkCopiedAt?: string;
+  linkOpenedAt?: string;
+  onboardingStartedAt?: string;
+  onboardingCompletedAt?: string;
+  referentielReviewedAt?: string;
+  cabinetActivatedAt?: string;
+}
+
 export type InterestLevel = "froid" | "tiede" | "chaud";
 export type Priority = "basse" | "moyenne" | "haute";
 export type CabinetType = "solo" | "groupe" | "clinique";
@@ -76,6 +90,8 @@ export interface Prospect {
   assistantAdded: boolean;
   mandateStatus: MandateStatus;
   isActive: boolean;
+  // Parcours activation cabinet (lien personnalisé · prototype mock).
+  activation?: ProspectActivation;
 }
 
 // Améliorations terrain — retours superviseurs (lean, démonstratif).
@@ -318,7 +334,11 @@ export type LogKind =
   | "consentement_patient"
   | "signalement_cabinet"
   | "documents_acceptes"
-  | "referentiel_suivi";
+  | "referentiel_suivi"
+  | "activation_link_generated"
+  | "activation_link_copied"
+  | "activation_link_opened"
+  | "activation_onboarding_lance";
 
 export interface LogEntry {
   id: string;

@@ -34,8 +34,14 @@ en 4 grandes zones :
   priorité), suivi commercial (statut, dernier contact, prochaine action, relance), activation
   (onboarding lancé, cabinet configuré, assistante ajoutée, mandat GoCardless).
 - Actions : ajouter prospect, modifier statut, ajouter note, marquer démo faite, programmer
-  relance, lancer onboarding cabinet, transformer en chirurgien actif.
-- 14 prospects fictifs seedés. Logs CRM dédiés (7 types).
+  relance, **générer / partager le lien d'activation cabinet** (modale dédiée avec URL
+  copiable, timeline statut, 4 LogKinds activation), transformer en chirurgien actif.
+- 14 prospects fictifs seedés. Logs CRM dédiés (11 types depuis 2026-06-03 : ajout
+  `activation_link_generated`, `activation_link_copied`, `activation_link_opened`,
+  `activation_onboarding_lance`).
+- **Activation cabinet** : pas d'inscription libre. Parcours canonique CRM → call → accord
+  verbal → lien d'activation personnalisé (`/chirurgien/activation/[token]`) → onboarding
+  accompagné. Spec : [`CABINET_ACTIVATION_FLOW.md`](./CABINET_ACTIVATION_FLOW.md).
 - **Aucune donnée patient**.
 
 ### V1

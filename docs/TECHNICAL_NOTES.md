@@ -42,7 +42,13 @@ au plan technique :
 - **Prochaine priorité produit V1** : **inbox superviseur scalable** (recherche, filtres
   statut / retard / J+, tri par urgence opérationnelle, séparation CR brouillon IA / à
   relire / à rendre disponible, capacité 60 / 80 / 120 patients par superviseuse). Cf.
-  `DECISIONS_LOG.md` § 13.
+  `DECISIONS_LOG.md` § 13. **V0 intégrée prototype le 2026-06-03** : recherche, 5 filtres,
+  4 tris, KPI CR splitté, pagination 12/groupe avec « Voir tout ».
+- **Activation cabinet** (`app/chirurgien/activation/[token]/page.tsx` + CRM modale +
+  `ProspectActivation` types) : **pas d'inscription libre**, lien personnalisé après
+  qualification. Spec canonique : [`CABINET_ACTIVATION_FLOW.md`](./CABINET_ACTIVATION_FLOW.md).
+  En V1 pilote : JWT signé HS256 + TTL 7j + redemption unique + email transactionnel DPA +
+  auth Clerk/Auth.js + audit trail BDD append-only.
 
 ---
 
