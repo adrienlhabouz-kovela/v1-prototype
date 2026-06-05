@@ -621,6 +621,57 @@ fin de surveillance médicale.
 
 ---
 
+## 13quinquies. Renforcement UX superviseur — poste de travail opérationnel (2026-06-03)
+
+Suite à l'audit terrain : la fiche superviseur était structurée en 3 colonnes mais
+manquait 4 éléments d'orientation action.
+
+### Fiche patient superviseur (`app/superviseur/patient/[id]/page.tsx`)
+- **Référentiel actif** déplacé / dupliqué en zone gauche (haut), en encadré teal-50/40,
+  avant le « Contexte patient » : « Référentiel actif · {intervention} · {chirurgien} ·
+  {version} ». Le bloc « Référentiel applicable » à droite est conservé pour le détail.
+- **Bouton « Contacter le cabinet »** ajouté dans la Card « Action recommandée » (zone
+  droite), variant secondary, sous une fine bordure. Ouvre une nouvelle modale
+  **« Transmission cabinet »**.
+- **Modale « Transmission cabinet »** : destinataire (chirurgien + cabinet + contact
+  prioritaire) + message factuel pré-rempli (patient en initiales, intervention, J+,
+  3 derniers messages patient comme « Éléments déclarés », demande d'action neutre,
+  signature « KOVELA — transmission factuelle, sans interprétation médicale »).
+  Boutons : Copier le message + Ouvrir WhatsApp ↗ (lien `wa.me` prototype). Encart
+  amber « Prototype · canal réel à valider en V1 selon cadre RGPD / HDS ».
+- **Bloc doctrine « 15 / 112 / urgences clinique »** ajouté entre Action recommandée
+  et Référentiel applicable, sobre amber. Rappelle que KOVELA ne prend pas en charge
+  les urgences et que le patient doit contacter 15 / 112 / urgences clinique / cabinet.
+- **Journal d'action (Logs)** : ouvert par défaut (`showLogs = true`) au lieu de replié.
+
+### Inbox superviseur (`lib/supervisor.ts`)
+Labels et hints des 6 groupes opérationnels alignés avec le brief :
+- « À relancer » → « **Patients sans réponse** »
+- « CR & transmissions cabinet » → « **CR & transmissions à traiter** »
+- « Suivi habituel » → « **Suivis du jour** »
+- « Clôture à préparer » → « **Clôtures à finaliser** »
+- Hints reformulés en mode plus actionable.
+
+### Wording verrouillé (0 occurrence dans app/superviseur + lib/supervisor.ts)
+escalade médicale · tri médical · surveillance médicale · patient à risque · urgence
+gérée par KOVELA · décision médicale · interprétation médicale · validation médicale ·
+synthèse clinique. (« diagnostic » et « prescription » apparaissent uniquement dans
+un commentaire interdisant l'usage et dans une liste de motifs de transmission
+cabinet — situations patient, pas actes KOVELA.)
+
+### WhatsApp / canal cabinet
+Le bouton « Ouvrir WhatsApp ↗ » est marqué **(prototype)** et l'encart amber précise :
+« canal réel à valider en V1 selon cadre RGPD / HDS et contrat de service ». WhatsApp
+n'est jamais présenté comme le canal conforme définitif.
+
+### À rendre réel en V1 (cf. TECHNICAL_NOTES.md § 0)
+- Notifications cabinet réelles (email DPA UE, SMS Twilio).
+- Audit trail BDD append-only (journal d'action signé).
+- Intégration canal cabinet validée juridiquement (WhatsApp Business + DPA, ou autre).
+- Confirmation de lecture cabinet (accusé réel, pas mock).
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1

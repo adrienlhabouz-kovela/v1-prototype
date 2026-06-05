@@ -20,21 +20,21 @@ export type OperationalStatus =
 
 export const operationalStatusLabels: Record<OperationalStatus, string> = {
   a_traiter: "À traiter maintenant",
-  a_relancer: "À relancer",
-  a_transmettre_cabinet: "CR & transmissions cabinet",
+  a_relancer: "Patients sans réponse",
+  a_transmettre_cabinet: "CR & transmissions à traiter",
   en_attente_cabinet: "En attente cabinet",
-  cloture_a_preparer: "Clôture à préparer",
-  suivi_habituel: "Suivi habituel",
+  cloture_a_preparer: "Clôtures à finaliser",
+  suivi_habituel: "Suivis du jour",
 };
 
 export const operationalStatusHints: Record<OperationalStatus, string> = {
   a_traiter: "Messages non lus, retards ou actions immédiates.",
-  a_relancer: "Patient silencieux ou éléments manquants.",
+  a_relancer: "Patient sans réponse selon référentiel — relance à prévoir.",
   a_transmettre_cabinet:
-    "Brouillon IA à relire, CR à valider ou à rendre disponible chirurgien. Transmission cabinet à envoyer.",
-  en_attente_cabinet: "Transmission cabinet en cours — retour attendu.",
-  cloture_a_preparer: "Fin de suivi atteinte — finaliser le dossier.",
-  suivi_habituel: "Suivi actif, pas d'action immédiate.",
+    "Brouillon IA à relire, CR à valider ou à rendre disponible chirurgien. Transmission cabinet à préparer.",
+  en_attente_cabinet: "Transmission cabinet envoyée — retour cabinet attendu.",
+  cloture_a_preparer: "Fin de suivi atteinte — finaliser le dossier et clôturer.",
+  suivi_habituel: "Suivi actif, pas d'action immédiate aujourd'hui.",
 };
 
 // Ordre d'affichage dans l'inbox (priorité visuelle).
