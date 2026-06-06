@@ -385,6 +385,28 @@ export default function PatientFiche() {
                     Réf. {refl.version}
                   </Badge>
                 </div>
+                {/* Fenêtre prévue + temps humain cible — repère opérationnel
+                    pour piloter la marge (~1h cible / patient sur l'ensemble
+                    du suivi 3-12j selon intervention). */}
+                <p className="mt-1.5 text-[10.5px] tracking-tight text-charcoal/55">
+                  Fenêtre prévue J0 → J+{Math.max(
+                    1,
+                    Math.round(
+                      (new Date(followUp.endDate).getTime() -
+                        new Date(followUp.startDate).getTime()) /
+                        86_400_000
+                    )
+                  )}
+                  <span className="text-charcoal/35"> · </span>
+                  cible temps humain ~1h
+                  <span className="text-charcoal/35"> · </span>
+                  consommé ~
+                  {Math.min(
+                    60,
+                    Math.round(patientLogs.length * 2 + patient.messages.length * 1.5)
+                  )}{" "}
+                  min (estimation prototype)
+                </p>
               </div>
             </div>
 
@@ -616,7 +638,10 @@ export default function PatientFiche() {
               </div>
             </div>
 
-            {/* Timeline — défile, occupe l'espace disponible. */}
+            {/* Timeline — défile, occupe l'espace disponible. Le fond et la
+                bordure de chaque carte distinguent visuellement les types :
+                message patient (ambre), réponse KOVELA (teal), note interne
+                (navy), transmission cabinet (navy fort), CR (teal fort). */}
             <div className="max-h-[calc(100vh-22rem)] min-h-[420px] overflow-y-auto bg-bone/20 px-5 py-4">
               {filteredTimeline.length === 0 ? (
                 <p className="py-12 text-center text-[12px] tracking-tight text-charcoal/45">
@@ -625,48 +650,132 @@ export default function PatientFiche() {
               ) : (
                 <ol className="relative space-y-3">
                   <span className="absolute left-[6.5px] top-2 bottom-2 w-px bg-navy-900/[0.06]" />
-                  {filteredTimeline.map((e) => (
-                    <li key={e.id} className="relative flex gap-3.5">
-                      <span
-                        className={`mt-1.5 h-[13px] w-[13px] shrink-0 rounded-full ring-2 ring-white ${timelineDot(
-                          e.kind
-                        )}`}
-                      />
-                      <div className="min-w-0 flex-1 rounded-xl bg-white px-4 py-3 ring-1 ring-navy-900/[0.05]">
-                        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                          <span className="font-display text-[12.5px] font-semibold tracking-tight text-navy-900">
-                            {e.label}
-                          </span>
-                          <span className="text-[10.5px] text-charcoal/55">
-                            {e.actor} · {relativeAge(e.at)}
-                          </span>
-                          {e.meta && (
-                            <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
-                              {e.meta}
-                            </Badge>
+                  {filteredTimeline.map((e) => {
+                    const cardStyles = (() => {
+                      switch (e.kind) {
+                        case "message_patient":
+                          return "bg-amber-50/40 ring-amber-200/40";
+                        case "reponse_kovela":
+                          return "bg-teal-50/30 ring-teal-100/60";
+                        case "note_interne":
+                          return "bg-navy-50/40 ring-navy-100";
+                        case "transmission_cabinet":
+                          return "bg-navy-900/[0.05] ring-navy-900/[0.12]";
+                        case "compilation_preparee":
+                          return "bg-amber-50/40 ring-amber-200/40";
+                        case "cr_brouillon":
+                        case "cr_valide":
+                        case "cr_disponible":
+                          return "bg-teal-50/40 ring-teal-100/70";
+                        default:
+                          return "bg-white ring-navy-900/[0.05]";
+                      }
+                    })();
+                    const eyebrow = (() => {
+                      switch (e.kind) {
+                        case "message_patient":
+                          return { label: "Message patient", cls: "text-amber-800" };
+                        case "reponse_kovela":
+                          return { label: "Réponse KOVELA", cls: "text-teal-700" };
+                        case "note_interne":
+                          return { label: "Note interne", cls: "text-navy-700" };
+                        case "transmission_cabinet":
+                          return { label: "→ Cabinet", cls: "text-navy-900" };
+                        case "compilation_preparee":
+                          return {
+                            label: "Compilation préparée",
+                            cls: "text-amber-800",
+                          };
+                        case "cr_brouillon":
+                          return { label: "CR brouillon", cls: "text-teal-700" };
+                        case "cr_valide":
+                          return { label: "CR validé", cls: "text-teal-700" };
+                        case "cr_disponible":
+                          return { label: "CR publié", cls: "text-teal-700" };
+                        default:
+                          return { label: "", cls: "" };
+                      }
+                    })();
+                    return (
+                      <li key={e.id} className="relative flex gap-3.5">
+                        <span
+                          className={`mt-1.5 h-[13px] w-[13px] shrink-0 rounded-full ring-2 ring-white ${timelineDot(
+                            e.kind
+                          )}`}
+                        />
+                        <div
+                          className={`min-w-0 flex-1 rounded-xl px-4 py-3 ring-1 ${cardStyles}`}
+                        >
+                          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                            {eyebrow.label && (
+                              <span
+                                className={`text-[9.5px] font-semibold uppercase tracking-[0.12em] ${eyebrow.cls}`}
+                              >
+                                {eyebrow.label}
+                              </span>
+                            )}
+                            <span className="font-display text-[12.5px] font-semibold tracking-tight text-navy-900">
+                              {e.label}
+                            </span>
+                            <span className="text-[10.5px] text-charcoal/55">
+                              {e.actor} · {relativeAge(e.at)}
+                            </span>
+                            {e.meta && (
+                              <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
+                                {e.meta}
+                              </Badge>
+                            )}
+                          </div>
+                          {e.content && (
+                            <p className="mt-1.5 whitespace-pre-wrap text-[12.5px] leading-relaxed text-charcoal/80">
+                              {e.content}
+                            </p>
+                          )}
+                          {e.attachments && e.attachments.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              {e.attachments.map((a, idx) => (
+                                <span
+                                  key={idx}
+                                  className="inline-flex items-center gap-1.5 rounded-md bg-bone/70 px-2 py-1 text-[10.5px] tracking-tight text-charcoal/70 ring-1 ring-navy-900/[0.04]"
+                                >
+                                  <span className="h-[5px] w-[5px] rounded-full bg-teal-600/70" />
+                                  {a.kind === "photo" ? "Photo" : "Audio"} · {a.label}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {/* Quick-action : transformer un message patient en
+                              transmission cabinet — accélère le flux selon
+                              la doctrine (transmission factuelle, non médicale). */}
+                          {e.kind === "message_patient" && (
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              <button
+                                type="button"
+                                onClick={(ev) => {
+                                  ev.preventDefault();
+                                  setContactCabinetOpen(true);
+                                  setContactCabinetCopied(false);
+                                }}
+                                className="rounded-md bg-white px-2 py-1 text-[10.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/10 transition-colors hover:bg-navy-900 hover:text-white"
+                              >
+                                → Transmission cabinet
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(ev) => {
+                                  ev.preventDefault();
+                                  k.markTreated(patient.id);
+                                }}
+                                className="rounded-md bg-white px-2 py-1 text-[10.5px] font-medium tracking-tight text-charcoal/70 ring-1 ring-navy-900/10 transition-colors hover:bg-bone hover:text-navy-900"
+                              >
+                                Marquer documenté
+                              </button>
+                            </div>
                           )}
                         </div>
-                        {e.content && (
-                          <p className="mt-1.5 whitespace-pre-wrap text-[12.5px] leading-relaxed text-charcoal/75">
-                            {e.content}
-                          </p>
-                        )}
-                        {e.attachments && e.attachments.length > 0 && (
-                          <div className="mt-2 flex flex-wrap gap-1.5">
-                            {e.attachments.map((a, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-flex items-center gap-1.5 rounded-md bg-bone/70 px-2 py-1 text-[10.5px] tracking-tight text-charcoal/70 ring-1 ring-navy-900/[0.04]"
-                              >
-                                <span className="h-[5px] w-[5px] rounded-full bg-teal-600/70" />
-                                {a.kind === "photo" ? "Photo" : "Audio"} · {a.label}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
                 </ol>
               )}
             </div>
@@ -1062,6 +1171,14 @@ export default function PatientFiche() {
                         >
                           Copier
                         </Button>
+                        <button
+                          type="button"
+                          disabled
+                          title="Export PDF prévu en V1"
+                          className="cursor-not-allowed rounded-lg bg-white px-3 py-1.5 text-[11.5px] font-medium tracking-tight text-charcoal/45 ring-1 ring-navy-900/10"
+                        >
+                          Export PDF prévu en V1
+                        </button>
                       </div>
                     </>
                   ) : (
@@ -1170,6 +1287,9 @@ export default function PatientFiche() {
                       {patientLogs.length} entrée{patientLogs.length > 1 ? "s" : ""}
                     </span>
                   </div>
+                  <p className="rounded-md bg-bone/60 px-2.5 py-1.5 text-[10.5px] leading-relaxed tracking-tight text-charcoal/60 ring-1 ring-navy-900/[0.04]">
+                    Journal d&apos;action prototype — audit trail réel prévu en V1.
+                  </p>
                   {patientLogs.length === 0 ? (
                     <p className="rounded-lg bg-bone/50 p-3 text-[11.5px] tracking-tight text-charcoal/55">
                       Aucun log.

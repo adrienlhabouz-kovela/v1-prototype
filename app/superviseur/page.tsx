@@ -91,6 +91,16 @@ function HeroPatientRow({ patient }: { patient: Patient }) {
   const action = getRecommendedAction(patient, ctx);
   const urgence = getUrgence(patient, ctx);
 
+  // Dernier message patient — utile pour scanner sans ouvrir la fiche.
+  const lastPatientMsg = [...patient.messages]
+    .reverse()
+    .find((m) => m.author === "patient");
+  const preview = lastPatientMsg
+    ? lastPatientMsg.text.length > 90
+      ? lastPatientMsg.text.slice(0, 90) + "…"
+      : lastPatientMsg.text
+    : null;
+
   const reason = (() => {
     const r = k.reportFor(patient.id);
     if (r?.status === "brouillon") return "CR brouillon IA à relire";
@@ -136,6 +146,12 @@ function HeroPatientRow({ patient }: { patient: Patient }) {
               <span className="text-charcoal/45">· dernier événement {last.ageLabel}</span>
             )}
           </p>
+          {preview && (
+            <p className="mt-0.5 truncate text-[11px] italic tracking-tight text-charcoal/55">
+              <span className="not-italic text-amber-700">«</span> {preview}{" "}
+              <span className="not-italic text-amber-700">»</span>
+            </p>
+          )}
         </div>
 
         {/* Action */}

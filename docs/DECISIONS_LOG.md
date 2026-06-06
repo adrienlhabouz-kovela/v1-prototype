@@ -672,6 +672,51 @@ n'est jamais présenté comme le canal conforme définitif.
 
 ---
 
+## 13sexies. Refonte UX/UI superviseur — poste de travail opérationnel (2026-06-06)
+
+**Contexte.** Le commit `435a70d` puis la refonte `6fbaf0a` (architecture cockpit + grille 3/6/3) ont posé la structure. Cette passe rend la page réellement opérationnelle : densité décisionnelle, scan en 5 secondes, données opérationnelles métier (durée suivi 3-12j, cible humaine ~1h/patient).
+
+**Données opérationnelles intégrées (visibles UI) :**
+
+- Suivi KOVELA = 3 à 12 jours selon intervention → bandeau patient affiche `Fenêtre prévue J0 → J+N`.
+- Cible humaine ~1h par patient sur l'ensemble du suivi → bandeau patient affiche `cible temps humain ~1h · consommé ~XX min (estimation prototype)`.
+- Chaque minute perdue dans l'interface détruit la marge → priorisation 1 action / patient, action recommandée visible en 5s.
+
+**Améliorations dashboard `/superviseur` :**
+
+- `HeroPatientRow` : preview du dernier message patient sous forme de citation (`« ... »`) — la superviseuse sait quoi répondre sans ouvrir la fiche.
+- `À traiter maintenant` reste la zone dominante, mais chaque ligne contient désormais : initiales · nom · J+ · intervention · chirurgien · raison de priorité · dernier événement (temps) · dernier message patient (citation) · action attendue · bouton Ouvrir.
+
+**Améliorations fiche `/superviseur/patient/[id]` :**
+
+- Bandeau patient : ajoute `Fenêtre prévue J0 → J+N · cible temps humain ~1h · consommé ~XX min (estimation prototype)`.
+- Timeline conversation : chaque carte est désormais visuellement distinguée par type :
+  - Message patient → fond ambre + eyebrow « Message patient ».
+  - Réponse KOVELA → fond teal + eyebrow « Réponse KOVELA ».
+  - Note interne → fond navy léger + eyebrow « Note interne ».
+  - Transmission cabinet → fond navy fort + eyebrow « → Cabinet ».
+  - Compilation préparée → fond ambre + eyebrow « Compilation préparée ».
+  - CR brouillon / validé / publié → fond teal + eyebrow CR.
+- Quick-actions sur les messages patient dans la timeline :
+  - `→ Transmission cabinet` : ouvre la modale Transmission cabinet préchargée selon référentiel.
+  - `Marquer documenté` : passe le message en traité sans réponse.
+- Onglet CR : ajout d'un bouton désactivé `Export PDF prévu en V1` (signale la roadmap sans promettre).
+- Onglet Journal : ajout d'un bandeau `Journal d'action prototype — audit trail réel prévu en V1` (cadre l'attente).
+- Rappel `15 / 112 / urgences clinique` reste sous le composer, sobre, non invasif.
+
+**Wording :**
+
+- Aucune réintroduction du mot « escalade » en surface UI.
+- Aucune formulation médicale risquée (tri médical / surveillance médicale / patient à risque / urgence gérée par KOVELA / synthèse clinique / rapport médical / preuve juridique / bouclier médico-légal — tous absents).
+- Wording autorisé utilisé partout (transmission cabinet, éléments déclarés par le patient, CR factuel, journal d'action, à revoir selon référentiel, patient sans réponse selon référentiel).
+- WhatsApp reste explicitement marqué `prototype` + bandeau `Aucun envoi réel — canal réel à valider en V1 selon cadre RGPD / HDS`.
+
+**Pricing.** Intact (690 € HT / mois + 80 € HT / patient activé).
+
+**Périmètre non touché.** Landing, deck, BP, CRM commercial, activation cabinet, espace chirurgien, interface patient.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1
