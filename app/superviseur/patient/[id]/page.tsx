@@ -131,6 +131,11 @@ export default function PatientFiche() {
   const [contactCabinetCopied, setContactCabinetCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<RightTab>("actions");
   const [showAllScheduled, setShowAllScheduled] = useState(false);
+  const [closeConfirmOpen, setCloseConfirmOpen] = useState(false);
+  // Pipeline transmission cabinet — copié reste localement (le store ne le
+  // persiste pas), envoyé est lu depuis escalation.status.
+  const [hasCopiedTransmission, setHasCopiedTransmission] = useState(false);
+  const [transmissionMarkedSent, setTransmissionMarkedSent] = useState(false);
 
   const ctx = useMemo(
     () => ({ reportFor: k.reportFor, escalationFor: k.escalationFor }),
@@ -301,7 +306,7 @@ export default function PatientFiche() {
     },
     cloturer_suivi: {
       label: "Clôturer le suivi",
-      handler: () => k.clotureSuivi(patient.id),
+      handler: () => setCloseConfirmOpen(true),
     },
     wait_cabinet: {
       label: "En attente retour cabinet",
@@ -480,7 +485,7 @@ export default function PatientFiche() {
                       },
                       {
                         label: "Clôturer le suivi",
-                        handler: () => k.clotureSuivi(patient.id),
+                        handler: () => setCloseConfirmOpen(true),
                         show: true,
                       },
                     ]
@@ -744,11 +749,22 @@ export default function PatientFiche() {
                               ))}
                             </div>
                           )}
-                          {/* Quick-action : transformer un message patient en
-                              transmission cabinet — accélère le flux selon
-                              la doctrine (transmission factuelle, non médicale). */}
-                          {e.kind === "message_patient" && (
+                          {/* Quick-actions sur message patient — flux complet
+                              sans quitter la conversation : marquer documenté,
+                              préparer transmission cabinet, capturer en note
+                              interne, ajouter comme élément du CR factuel. */}
+                          {e.kind === "message_patient" && e.content && (
                             <div className="mt-2 flex flex-wrap gap-1.5">
+                              <button
+                                type="button"
+                                onClick={(ev) => {
+                                  ev.preventDefault();
+                                  k.markTreated(patient.id);
+                                }}
+                                className="rounded-md bg-white px-2 py-1 text-[10.5px] font-medium tracking-tight text-charcoal/70 ring-1 ring-navy-900/10 transition-colors hover:bg-bone hover:text-navy-900"
+                              >
+                                Marquer documenté
+                              </button>
                               <button
                                 type="button"
                                 onClick={(ev) => {
@@ -764,11 +780,32 @@ export default function PatientFiche() {
                                 type="button"
                                 onClick={(ev) => {
                                   ev.preventDefault();
-                                  k.markTreated(patient.id);
+                                  k.addNote(
+                                    patient.id,
+                                    `Capturé depuis message patient : « ${e.content} »`
+                                  );
+                                  setActiveTab("notes");
                                 }}
-                                className="rounded-md bg-white px-2 py-1 text-[10.5px] font-medium tracking-tight text-charcoal/70 ring-1 ring-navy-900/10 transition-colors hover:bg-bone hover:text-navy-900"
+                                className="rounded-md bg-white px-2 py-1 text-[10.5px] font-medium tracking-tight text-charcoal/70 ring-1 ring-navy-900/10 transition-colors hover:bg-navy-50 hover:text-navy-900"
                               >
-                                Marquer documenté
+                                + Note interne
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(ev) => {
+                                  ev.preventDefault();
+                                  const existing = report?.content ?? "";
+                                  const addition = `\n- Élément déclaré par le patient : ${e.content}`;
+                                  k.upsertReport(
+                                    patient.id,
+                                    (existing ? existing : aiPrepareReport(patient)) + addition,
+                                    "brouillon"
+                                  );
+                                  setActiveTab("cr");
+                                }}
+                                className="rounded-md bg-white px-2 py-1 text-[10.5px] font-medium tracking-tight text-teal-700 ring-1 ring-teal-200/60 transition-colors hover:bg-teal-50 hover:text-teal-800"
+                              >
+                                + CR factuel
                               </button>
                             </div>
                           )}
@@ -819,13 +856,21 @@ export default function PatientFiche() {
                   </Button>
                 </div>
               </div>
-              {/* Rappel doctrine discret — sous le composer, visible mais non invasif. */}
-              <p className="mt-2.5 text-[10.5px] leading-relaxed tracking-tight text-charcoal/55">
-                <span className="font-medium text-amber-900">15 / 112 / urgences clinique</span>
-                {" · "}KOVELA ne prend pas en charge les urgences. Si le patient décrit une
-                situation urgente, l'orienter vers le 15 / 112 ou les consignes du chirurgien,
-                puis transmettre au cabinet.
-              </p>
+              {/* Doctrine + 15/112 — deux lignes très courtes, sobres,
+                  collées au composer pour ne jamais être perdues de vue. */}
+              <div className="mt-2.5 space-y-1">
+                <p className="text-[10.5px] leading-relaxed tracking-tight text-charcoal/60">
+                  <span className="font-medium text-navy-900">Cadre référentiel</span>
+                  {" · "}Le message patient reste dans le cadre du référentiel. KOVELA ne
+                  diagnostique pas, ne prescrit pas et ne décide pas médicalement.
+                </p>
+                <p className="text-[10.5px] leading-relaxed tracking-tight text-charcoal/55">
+                  <span className="font-medium text-amber-900">15 / 112 / urgences clinique</span>
+                  {" · "}KOVELA ne prend pas en charge les urgences. Si le patient décrit une
+                  situation urgente, l'orienter vers le 15 / 112, les urgences de la clinique ou
+                  les consignes remises par son chirurgien, puis transmettre au cabinet.
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -1046,12 +1091,69 @@ export default function PatientFiche() {
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
                     Transmissions cabinet
                   </p>
-                  {escalation?.status === "transmise" ? (
+                  {/* Pipeline statut — 4 étapes, état courant en navy. */}
+                  {(() => {
+                    const isSent =
+                      escalation?.status === "transmise" || transmissionMarkedSent;
+                    const isPrepared = !!patient.compilationDraft || isSent;
+                    const isCopied = hasCopiedTransmission || isSent;
+                    const steps = [
+                      { key: "prep", label: "Préparée", active: isPrepared },
+                      { key: "copy", label: "Copiée", active: isCopied },
+                      { key: "sent", label: "Envoyée (prototype)", active: isSent },
+                    ];
+                    return (
+                      <div className="space-y-2 rounded-lg bg-bone/50 px-3 py-2.5 ring-1 ring-navy-900/[0.04]">
+                        <div className="flex items-center gap-1.5">
+                          {steps.map((s, i) => (
+                            <div key={s.key} className="flex flex-1 items-center gap-1.5">
+                              <span
+                                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[8.5px] font-bold ${
+                                  s.active
+                                    ? "bg-navy-900 text-white"
+                                    : "bg-white text-charcoal/40 ring-1 ring-navy-900/[0.08]"
+                                }`}
+                              >
+                                {i + 1}
+                              </span>
+                              <span
+                                className={`whitespace-nowrap text-[10.5px] font-medium tracking-tight ${
+                                  s.active ? "text-navy-900" : "text-charcoal/45"
+                                }`}
+                              >
+                                {s.label}
+                              </span>
+                              {i < steps.length - 1 && (
+                                <span
+                                  className={`h-px flex-1 ${
+                                    s.active && steps[i + 1].active
+                                      ? "bg-navy-900/30"
+                                      : "bg-navy-900/[0.08]"
+                                  }`}
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        {isSent && escalation?.transmittedAt && (
+                          <p className="text-[10.5px] tracking-tight text-charcoal/55">
+                            Dernier envoi prototype : {formatDateTime(escalation.transmittedAt)}
+                          </p>
+                        )}
+                        {!isSent && !isPrepared && (
+                          <p className="text-[10.5px] tracking-tight text-charcoal/55">
+                            Aucune transmission préparée pour ce patient.
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })()}
+                  {escalation?.status === "transmise" || transmissionMarkedSent ? (
                     <>
                       <Badge className="bg-navy-900 text-teal-100 ring-navy-900">
                         Transmission cabinet en cours
                       </Badge>
-                      {escalation.compilation && (
+                      {escalation?.compilation && (
                         <pre className="max-h-40 overflow-y-auto whitespace-pre-wrap rounded-lg bg-bone/60 p-3 font-sans text-[11.5px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.04]">
                           {escalation.compilation}
                         </pre>
@@ -1352,33 +1454,89 @@ Merci de nous indiquer si vous souhaitez une action spécifique du cabinet.
 
 KOVELA — transmission factuelle, sans interprétation médicale.`;
 
+          // Capture locale pour stabiliser le narrowing TypeScript dans les
+          // closures (function declarations perdent le narrowing du parent).
+          const p = patient;
+          const lastPatientMsgText =
+            [...p.messages].reverse().find((m) => m.author === "patient")?.text ?? "—";
+
           function copy() {
             navigator.clipboard?.writeText(message).catch(() => undefined);
             setContactCabinetCopied(true);
+            setHasCopiedTransmission(true);
+            // Persiste compilationDraft si pas déjà présent → reflète l'avancée
+            // dans le pipeline (Préparée + Copiée) côté onglet Transmissions.
+            if (!p.compilationDraft) {
+              k.prepareCompilation(p.id, message);
+            }
             setTimeout(() => setContactCabinetCopied(false), 2500);
           }
 
+          function markAsSent() {
+            if (!p.compilationDraft) {
+              k.prepareCompilation(p.id, message);
+            }
+            k.transmitCompilation(p.id);
+            setTransmissionMarkedSent(true);
+            setContactCabinetOpen(false);
+          }
+
           const waLink = `https://wa.me/?text=${encodeURIComponent(message)}`;
+          const alreadySent =
+            escalation?.status === "transmise" || transmissionMarkedSent;
 
           return (
             <div className="space-y-4">
-              <div>
-                <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
-                  Destinataire
+              {/* Récap factuel structuré — destinataire, contexte patient,
+                  référentiel actif, dernier message patient, action demandée. */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl bg-white px-3.5 py-2.5 ring-1 ring-navy-900/[0.05]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+                    Destinataire
+                  </p>
+                  <p className="mt-1 text-[12.5px] font-medium tracking-tight text-navy-900">
+                    {k.surgeonName(patient.surgeonId)}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-charcoal/60">{refl.cabinet}</p>
+                  <p className="mt-0.5 text-[10.5px] text-charcoal/55">
+                    Contact prioritaire : {refl.contact_prioritaire}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white px-3.5 py-2.5 ring-1 ring-navy-900/[0.05]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+                    Patient
+                  </p>
+                  <p className="mt-1 text-[12.5px] font-medium tracking-tight text-navy-900">
+                    {initials} · {patient.id}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-charcoal/65">
+                    {patient.intervention} · {day}
+                  </p>
+                  <p className="mt-0.5 text-[10.5px] text-charcoal/55">
+                    Référentiel actif : {refl.version}
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-amber-50/40 px-3.5 py-2.5 ring-1 ring-amber-200/40">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-800">
+                  Dernier message patient
                 </p>
-                <p className="mt-1.5 text-[13.5px] font-medium tracking-tight text-navy-900">
-                  {k.surgeonName(patient.surgeonId)} · {refl.cabinet}
-                </p>
-                <p className="mt-0.5 text-[11.5px] text-charcoal/60">
-                  Contact prioritaire : {refl.contact_prioritaire}
+                <p className="mt-1 line-clamp-3 text-[11.5px] leading-relaxed tracking-tight text-amber-900">
+                  « {lastPatientMsgText} »
                 </p>
               </div>
 
               <div className="rounded-xl bg-bone/60 px-4 py-3 ring-1 ring-navy-900/[0.05]">
-                <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
-                  Message factuel pré-rempli
-                </p>
-                <pre className="mt-2 max-h-72 overflow-y-auto whitespace-pre-wrap rounded-lg bg-white p-3 font-sans text-[12.5px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.06]">
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+                    Message factuel pré-rempli
+                  </p>
+                  <p className="text-[10px] tracking-tight text-charcoal/45">
+                    Action demandée : retour cabinet
+                  </p>
+                </div>
+                <pre className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg bg-white p-3 font-sans text-[12px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.06]">
                   {message}
                 </pre>
               </div>
@@ -1395,14 +1553,28 @@ KOVELA — transmission factuelle, sans interprétation médicale.`;
                 >
                   Ouvrir WhatsApp ↗ (prototype)
                 </a>
+                <Button
+                  variant="secondary"
+                  onClick={markAsSent}
+                  disabled={alreadySent}
+                >
+                  {alreadySent
+                    ? "Transmis ✓ (prototype)"
+                    : "Marquer comme transmis — prototype"}
+                </Button>
               </div>
+              <p className="text-[10.5px] tracking-tight text-charcoal/55">
+                Marquer comme transmis : ajoute automatiquement l&apos;événement au journal
+                d&apos;action et passe le pipeline en « Envoyée (prototype) ».
+              </p>
 
               <div className="rounded-xl border border-amber-200/40 bg-amber-50/30 px-4 py-3 text-[11px] leading-relaxed text-amber-900">
-                <p className="font-semibold">Prototype</p>
+                <p className="font-semibold">Prototype — canal réel à valider en V1</p>
                 <p className="mt-1">
-                  Aucun envoi réel. Le canal de transmission cabinet (WhatsApp, SMS, email,
-                  intégration métier) reste à valider en V1 selon le cadre RGPD / HDS et le
-                  contrat de service avec le cabinet.
+                  Aucun envoi réel. Le canal de transmission cabinet (WhatsApp Business, SMS,
+                  email sécurisé, intégration métier) reste à valider en V1 selon le cadre RGPD
+                  / HDS et le contrat de service avec le cabinet. WhatsApp est présenté ici à
+                  titre de prototype d&apos;ergonomie uniquement.
                 </p>
               </div>
 
@@ -1414,6 +1586,53 @@ KOVELA — transmission factuelle, sans interprétation médicale.`;
             </div>
           );
         })()}
+      </Modal>
+
+      {/* Modal confirmation clôture suivi — workflow réel à finaliser en V1. */}
+      <Modal
+        open={closeConfirmOpen}
+        onClose={() => setCloseConfirmOpen(false)}
+        title="Clôturer le suivi"
+      >
+        <div className="space-y-4">
+          <p className="text-[13px] leading-relaxed tracking-tight text-navy-900">
+            Confirmez-vous la clôture du suivi de{" "}
+            <span className="font-semibold">{patient.name}</span> ?
+          </p>
+          <div className="rounded-xl bg-bone/60 px-3.5 py-2.5 text-[11.5px] leading-relaxed text-charcoal/70 ring-1 ring-navy-900/[0.05]">
+            <p>
+              <span className="font-medium text-navy-900">Avant clôture</span> · vérifier que
+              le CR factuel est validé et publié pour le chirurgien, et que toutes les
+              transmissions cabinet ont reçu un retour.
+            </p>
+            <p className="mt-1.5">
+              <span className="font-medium text-navy-900">Statut courant</span> ·{" "}
+              {opStatus ? operationalStatusLabels[opStatus] : "Suivi habituel"} · {followUp.label}
+            </p>
+            <p className="mt-1.5">
+              <span className="font-medium text-navy-900">Dernier CR factuel</span> ·{" "}
+              {report ? crStatusLabels[report.status] : "Aucun CR préparé"}
+            </p>
+          </div>
+          <p className="rounded-lg bg-amber-50/40 px-3 py-2 text-[11px] leading-relaxed text-amber-900 ring-1 ring-amber-200/50">
+            Le suivi sera marqué comme clôturé dans le prototype. Workflow réel à finaliser en
+            V1 (signature électronique, archivage, dossier transmis cabinet).
+          </p>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button variant="ghost" onClick={() => setCloseConfirmOpen(false)}>
+              Annuler
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                k.clotureSuivi(patient.id);
+                setCloseConfirmOpen(false);
+              }}
+            >
+              Confirmer la clôture
+            </Button>
+          </div>
+        </div>
       </Modal>
 
       {/* Modal prévisualisation message programmé */}

@@ -589,9 +589,41 @@ export default function SuperviseurInbox() {
     !!search || !!filterStatut || !!filterUrgence || !!filterSurgeon || !!filterCR || filterSilencieux;
 
   const aTraiter = sortPatients(grouped.a_traiter, sortBy, ctx, k);
-  const secondaryStatuses: OperationalStatus[] = operationalStatusOrder.filter(
-    (s) => s !== "a_traiter"
-  );
+  // Files secondaires hiérarchisées en 2 tiers :
+  //  Tier 1 (dominant, large) : transmissions cabinet · sans réponse · CR à traiter.
+  //  Tier 2 (compact, secondaire) : suivis du jour · clôtures à finaliser.
+  // Pas de grille égale = priorité visible.
+  const tier1: OperationalStatus[] = [
+    "a_transmettre_cabinet",
+    "a_relancer",
+    "en_attente_cabinet",
+  ];
+  const tier2: OperationalStatus[] = ["suivi_habituel", "cloture_a_preparer"];
+
+  // Charge du jour — synthèse opérationnelle visible en haut de page.
+  const chargeTotal = aTraiter.length + counts.a_relancer + counts.a_transmettre_cabinet;
+  const chargeLabel =
+    chargeTotal === 0
+      ? "Aucune action prioritaire — file vide"
+      : chargeTotal < 6
+      ? "Charge légère"
+      : chargeTotal < 14
+      ? "Charge soutenue"
+      : "Charge forte";
+  const chargeTone =
+    chargeTotal === 0
+      ? "bg-teal-50 text-teal-700 ring-teal-100"
+      : chargeTotal < 6
+      ? "bg-teal-50/70 text-teal-800 ring-teal-100"
+      : chargeTotal < 14
+      ? "bg-amber-50/70 text-amber-800 ring-amber-200/60"
+      : "bg-amber-100/70 text-amber-900 ring-amber-300/60";
+
+  const todayLabel = new Date().toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 
   return (
     <Shell>
@@ -606,11 +638,25 @@ export default function SuperviseurInbox() {
               Cockpit opérationnel
             </h1>
             <p className="mt-1 text-[12px] tracking-tight text-charcoal/60">
-              {patientsActifs} patients suivis · {enRetard > 0 ? `${enRetard} en retard · ` : ""}
-              prochaine action visible sur chaque file.
+              <span className="capitalize">{todayLabel}</span>
+              <span className="text-charcoal/35"> · </span>
+              {patientsActifs} patients suivis
+              {enRetard > 0 && (
+                <>
+                  <span className="text-charcoal/35"> · </span>
+                  <span className="text-amber-800">{enRetard} en retard</span>
+                </>
+              )}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2.5 text-[11.5px]">
+            <span
+              className={`rounded-md px-2.5 py-1.5 font-medium ring-1 ${chargeTone}`}
+              title={`${chargeTotal} dossiers prioritaires`}
+            >
+              <span className="opacity-70">État de charge · </span>
+              {chargeLabel}
+            </span>
             <span className="rounded-md bg-teal-50/60 px-2.5 py-1.5 font-medium text-teal-700 ring-1 ring-teal-100/70">
               Service actif · 8h–20h
             </span>
@@ -789,24 +835,46 @@ export default function SuperviseurInbox() {
         </div>
       </section>
 
-      {/* ─── FILES SECONDAIRES ────────────────────────────────────────────── */}
-      <div className="mb-3 flex items-baseline justify-between">
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
-          Files de travail
+      {/* ─── FILES PRIORITAIRES (Tier 1) ──────────────────────────────────── */}
+      <div className="mb-2.5 flex items-baseline justify-between">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-charcoal/65">
+          Files prioritaires
         </h3>
-        <p className="text-[10.5px] tracking-tight text-charcoal/45">
-          {secondaryStatuses
-            .map((s) => `${operationalStatusLabels[s]} (${grouped[s].length})`)
-            .join(" · ")}
+        <p className="text-[10.5px] tracking-tight text-charcoal/55">
+          Transmissions cabinet · sans réponse · retours cabinet
         </p>
       </div>
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {secondaryStatuses.map((status) => (
+      <div className="mb-6 grid gap-3 md:grid-cols-3">
+        {tier1.map((status) => (
           <SecondaryQueue
             key={status}
             status={status}
             patients={sortPatients(grouped[status], sortBy, ctx, k)}
             limit={expandedGroups[status] ? Infinity : QUEUE_LIMIT}
+            onExpand={() =>
+              setExpandedGroups((prev) => ({ ...prev, [status]: !prev[status] }))
+            }
+            expanded={!!expandedGroups[status]}
+          />
+        ))}
+      </div>
+
+      {/* ─── FILES SECONDAIRES (Tier 2) ───────────────────────────────────── */}
+      <div className="mb-2.5 flex items-baseline justify-between">
+        <h3 className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-charcoal/45">
+          Files secondaires
+        </h3>
+        <p className="text-[10px] tracking-tight text-charcoal/40">
+          Suivis habituels · clôtures à finaliser
+        </p>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        {tier2.map((status) => (
+          <SecondaryQueue
+            key={status}
+            status={status}
+            patients={sortPatients(grouped[status], sortBy, ctx, k)}
+            limit={expandedGroups[status] ? Infinity : 4}
             onExpand={() =>
               setExpandedGroups((prev) => ({ ...prev, [status]: !prev[status] }))
             }
