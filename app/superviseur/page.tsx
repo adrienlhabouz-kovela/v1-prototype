@@ -94,7 +94,7 @@ function HeroPatientRow({ patient }: { patient: Patient }) {
   const reason = (() => {
     const r = k.reportFor(patient.id);
     if (r?.status === "brouillon") return "CR brouillon IA à relire";
-    if (r?.status === "valide") return "CR validé à rendre disponible";
+    if (r?.status === "valide") return "CR factuel validé";
     if (patient.status === "silencieux") return "Patient sans réponse selon référentiel";
     if (patient.status === "escalade_ouverte") return "Transmission cabinet à préparer";
     if (urgence === "en_retard") return "Action en retard";

@@ -130,6 +130,7 @@ export default function PatientFiche() {
   const [contactCabinetOpen, setContactCabinetOpen] = useState(false);
   const [contactCabinetCopied, setContactCabinetCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<RightTab>("actions");
+  const [showAllScheduled, setShowAllScheduled] = useState(false);
 
   const ctx = useMemo(
     () => ({ reportFor: k.reportFor, escalationFor: k.escalationFor }),
@@ -260,10 +261,11 @@ export default function PatientFiche() {
   else if (canTransmitCompilation) primaryKey = "transmit_compilation";
   else if (patient.status === "cr_en_attente") primaryKey = "prepare_cr";
   else if (escalation?.status === "transmise") primaryKey = "wait_cabinet";
-  else if (patient.status === "silencieux") primaryKey = "relance_patient";
+  // Termine prend priorité sur silencieux : on ne relance pas un suivi terminé.
   else if (followUp.status === "termine" && !report) primaryKey = "prepare_cloture";
   else if (followUp.status === "termine" && report?.status === "disponible")
     primaryKey = "cloturer_suivi";
+  else if (patient.status === "silencieux") primaryKey = "relance_patient";
 
   const primaryConfig: Record<
     PrimaryKey,
@@ -278,7 +280,7 @@ export default function PatientFiche() {
       handler: () => k.validateReport(patient.id),
     },
     publish_cr: {
-      label: "Rendre disponible chirurgien",
+      label: "Publier pour le chirurgien",
       handler: () => k.publishReport(patient.id),
     },
     transmit_compilation: {
@@ -807,7 +809,10 @@ export default function PatientFiche() {
                         : "Aucun message prévu"}
                     </p>
                     <div className="mt-2 space-y-2">
-                      {scheduledMessages.map((m) => {
+                      {(showAllScheduled
+                        ? scheduledMessages
+                        : scheduledMessages.slice(0, 2)
+                      ).map((m) => {
                         const dt = new Date(m.targetDate);
                         const dateLabel = dt.toLocaleDateString("fr-FR");
                         const sent = m.status === "envoye";
@@ -850,6 +855,17 @@ export default function PatientFiche() {
                           </div>
                         );
                       })}
+                      {scheduledMessages.length > 2 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAllScheduled((v) => !v)}
+                          className="w-full rounded-md px-2 py-1.5 text-[11px] font-medium tracking-tight text-teal-700 transition-colors hover:bg-teal-50/40"
+                        >
+                          {showAllScheduled
+                            ? "Replier"
+                            : `Voir tout (${scheduledMessages.length - 2} de plus)`}
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -1011,7 +1027,7 @@ export default function PatientFiche() {
                     <>
                       {report.status === "valide" && (
                         <p className="text-[11px] tracking-tight text-charcoal/55">
-                          Validé KOVELA — à rendre disponible chirurgien.
+                          CR factuel validé — à publier pour le chirurgien.
                         </p>
                       )}
                       {report.status === "brouillon" && (
@@ -1037,7 +1053,7 @@ export default function PatientFiche() {
                             variant="secondary"
                             onClick={() => k.publishReport(patient.id)}
                           >
-                            Rendre disponible chirurgien
+                            Publier pour le chirurgien
                           </Button>
                         )}
                         <Button

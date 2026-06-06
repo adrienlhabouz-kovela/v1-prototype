@@ -384,7 +384,7 @@ export function getRecommendedAction(
   }
 
   if (report?.status === "valide") {
-    return { label: "Rendre disponible au chirurgien", delay: "aujourd'hui" };
+    return { label: "Publier pour le chirurgien", delay: "aujourd'hui" };
   }
 
   if (patient.compilationDraft && escalation?.status !== "transmise") {
@@ -409,11 +409,9 @@ export function getRecommendedAction(
     };
   }
 
-  if (patient.status === "silencieux") {
-    return { label: "Relancer le patient", delay: "aujourd'hui" };
-  }
-
   // Suivi terminé sans CR final / clôture → préparer la clôture.
+  // Cette branche prend priorité sur la relance pour éviter d'afficher
+  // « Relancer le patient » sur un suivi déjà terminé (incohérence de démo).
   const window = getFollowUpWindow(patient, now);
   if (window.status === "termine" && !report) {
     return {
@@ -423,6 +421,10 @@ export function getRecommendedAction(
   }
   if (window.status === "termine" && report?.status === "disponible") {
     return { label: "Clôturer le suivi", delay: "à venir" };
+  }
+
+  if (patient.status === "silencieux") {
+    return { label: "Relancer le patient", delay: "aujourd'hui" };
   }
 
   if (patient.status === "onboarding_incomplet") {
