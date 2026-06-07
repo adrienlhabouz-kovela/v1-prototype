@@ -15,7 +15,27 @@ L'IA est **uniquement assistive, interne, loggée, désactivable et human-in-the
 Elle ne répond jamais seule au patient, ne diagnostique jamais, ne qualifie jamais un symptôme,
 n'analyse jamais médicalement les photos et ne décide jamais de transmission cabinet sans validation humaine.
 
-> **Décisions canoniques** : voir [`docs/DECISIONS_LOG.md`](docs/DECISIONS_LOG.md) — source de vérité unique des arbitrages produit, messaging et pricing validés (mise à jour 2026-06-01).
+> **Décisions canoniques** : voir [`docs/DECISIONS_LOG.md`](docs/DECISIONS_LOG.md) — source de vérité unique des arbitrages produit, messaging et pricing validés.
+
+---
+
+## 0. État actuel du prototype (2026-06-07)
+
+- **Landing actuelle** conservée. Ne pas remplacer sans demande explicite.
+- **UX superviseur V1 prototype validée** (commit stable de référence : `7ff14f2`).
+  - Workspace superviseur unifié + rail patient permanent (`components/SupervisorQueueRail.tsx`).
+  - Dashboard cockpit orienté action (priorité à la file « À traiter maintenant »).
+  - Fiche patient en poste de travail conversationnel (header sticky + grid 3/6/3 sur lg, 2/7/3 sur 2xl).
+  - Transmission cabinet, CR factuel, journal d'action séparés.
+  - Détail complet : [`docs/SUPERVISOR_UX_V1.md`](docs/SUPERVISOR_UX_V1.md).
+- **Espace chirurgien** existant déjà amélioré mais **non prioritaire actuellement**.
+- **Pricing** actuel : **690 € HT / mois + 80 € HT / patient activé**. Ne pas modifier sans validation produit explicite.
+- **Prototype** avec données fictives et état non persistant (store React Context, pas de backend).
+- **Canaux prototype** (WhatsApp transmission cabinet, export PDF CR, audit trail journal) **ne doivent pas** être présentés comme conformes définitifs V1 — ils sont marqués « prototype » ou « prévu en V1 » dans l'UI.
+
+> **Handoff équipe dev** : voir [`docs/DEV_HANDOFF_EMILIEN.md`](docs/DEV_HANDOFF_EMILIEN.md) pour la source de vérité dev (routes, périmètre validé à ne pas casser, priorités backlog).
+>
+> **Doctrine wording** : voir [`docs/WORDING_DOCTRINE.md`](docs/WORDING_DOCTRINE.md) pour le lexique autorisé / interdit.
 
 ---
 

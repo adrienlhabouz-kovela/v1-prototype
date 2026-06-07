@@ -819,6 +819,45 @@ Layout permanent à 2 panneaux principaux (3 sur la fiche patient) :
 
 ---
 
+## 13decies. Documentation handoff équipe dev (2026-06-07)
+
+**Décision.** Mettre en place une **source de vérité claire** pour l'équipe dev (Émilien) afin qu'elle comprenne l'état actuel du prototype, les décisions UX validées, la doctrine produit, les routes concernées et ce qu'il ne faut pas casser.
+
+**Documents créés.**
+
+| Document | Contenu |
+|---|---|
+| [`SUPERVISOR_UX_V1.md`](SUPERVISOR_UX_V1.md) | Détail architecture UX superviseur V1 validée (commit `7ff14f2`) : routes, principe, architecture, décisions UI, largeurs responsive, backlog non bloquant. |
+| [`DEV_HANDOFF_EMILIEN.md`](DEV_HANDOFF_EMILIEN.md) | Handoff dev : contexte produit (ce que KOVELA est / n'est pas), pricing à ne pas modifier, routes principales, périmètre validé à ne pas casser, périmètre à éviter sans validation, backlog priorités dev futures, règles de travail générales, stack, index documentation. |
+| [`WORDING_DOCTRINE.md`](WORDING_DOCTRINE.md) | Doctrine wording : lexique interdit, lexique recommandé, mentions prototype/V1, doctrine à afficher UI, cadre HDS/RGPD, cadre horaire, cadre IA, cas particuliers documentés, procédure grep de vérification. |
+
+**Documents mis à jour.**
+
+- `DECISIONS_LOG.md` — cette entrée § 13decies + entrée dans liste § 14 éléments locked.
+- `README.md` — ajout section « État actuel du prototype » + commit stable superviseur de référence.
+
+**Décisions ajoutées dans cette passe.**
+
+- UX superviseur V1 prototype validée (réf. commit `7ff14f2`) comme base stable.
+- Workspace superviseur unifié + rail patient permanent verrouillés.
+- Dashboard cockpit avec priorité « À traiter maintenant » verrouillé.
+- Fiche patient en poste de travail conversationnel verrouillée.
+- Transmission cabinet (modale + pipeline) verrouillée.
+- CR factuel (wording « Transmettre au chirurgien ») verrouillé.
+- Journal d'action séparé verrouillé.
+- WhatsApp uniquement prototype verrouillé.
+- Pricing et landing **inchangés** (non touchés cette passe).
+
+**Backlog non bloquant rappelé.**
+
+- Rail collapsible en V1 production.
+- Maximiser la conversation sur laptop standard (objectif ≥ 600px).
+- Panneaux contexte / action compressibles.
+- Préparer audit trail réel (le journal d'action actuel est prototype).
+- Préparer export PDF réel (bouton actuellement désactivé).
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1
@@ -836,6 +875,7 @@ Layout permanent à 2 panneaux principaux (3 sur la fiche patient) :
 - Unit economics care = à valider en pilote
 - Parcours activation cabinet (pas d'inscription libre · lien personnalisé après qualification) — cf. § 12bis et `CABINET_ACTIVATION_FLOW.md`
 - UX superviseur V1 prototype (workspace unifié + rail patient permanent + grid adaptative 3/6/3 sur lg, 2/7/3 sur 2xl) — cf. § 13nonies. Optimisations rail collapsible / panneaux compressibles renvoyées au backlog V1 production.
+- Documentation handoff équipe dev — `SUPERVISOR_UX_V1.md`, `DEV_HANDOFF_EMILIEN.md`, `WORDING_DOCTRINE.md` constituent désormais la source de vérité pour l'équipe Émilien. Cf. § 13decies.
 
 ---
 
