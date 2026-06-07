@@ -233,6 +233,10 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
         {ctaLabel}
       </button>
 
+      <p className="text-center text-[11.5px] font-medium tracking-tight text-navy-900">
+        Pour vérifier le volume, l&apos;organisation actuelle et le cadre possible.
+      </p>
+
       <p className="text-center text-[10.5px] leading-relaxed tracking-tight text-charcoal/55">
         Réservé aux chirurgiens libéraux et cabinets avec activité opératoire régulière.
         Réponse de l&apos;équipe sous 48 h ouvrées. Aucune donnée patient n&apos;est demandée

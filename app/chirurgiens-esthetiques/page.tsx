@@ -21,21 +21,21 @@ export const metadata: Metadata = {
 };
 
 const CTA_PRIMARY = "Voir si KOVELA est adapté à votre cabinet";
-const CTA_SECONDARY = "Comprendre le fonctionnement";
+const CTA_SECONDARY = "Voir le fonctionnement";
 
 const microReassurance = [
   "Service opéré",
   "Supervision issue du terrain",
-  "IA interne assistive",
+  "Assistance interne",
   "Sans décision médicale",
 ];
 
 const pains = [
-  "Messages post-op non filtrés",
-  "Équipe cabinet sollicitée sur des sujets sensibles",
-  "Patients anxieux dès les premiers jours",
-  "Peu de traçabilité exploitable",
-  "Chirurgien sollicité avec du bruit, pas toujours avec du contexte",
+  "Messages, photos et appels post-op qui arrivent sans vrai filtre",
+  "Inquiétudes à J+1 : œdèmes, ecchymoses, douleurs, questions répétitives",
+  "Équipe cabinet sollicitée sur des sujets post-op sensibles",
+  "Interruptions entre deux consultations pour des demandes qui manquent de contexte",
+  "Peu d'historique exploitable quand il faut reconstituer le suivi",
   "Expérience patient fragilisée après un acte pourtant réussi",
 ];
 
@@ -46,14 +46,15 @@ const solutionBenefits = [
   "Transmissions cabinet factuelles",
   "CR factuel en fin de suivi",
   "Journal d'action",
+  "Expérience patient plus cohérente",
   "Aucune ressource à recruter",
 ];
 
 const steps = [
   {
     n: "01",
-    t: "Vous validez le cadre",
-    d: "Actes concernés, durée du suivi, consignes, référentiel cabinet, contacts utiles.",
+    t: "On s'aligne sur vos habitudes",
+    d: "Vous nous partagez vos consignes post-op, actes concernés et contacts utiles. KOVELA structure le cadre opérationnel avec vous.",
   },
   {
     n: "02",
@@ -63,7 +64,7 @@ const steps = [
   {
     n: "03",
     t: "KOVELA suit au quotidien",
-    d: "Les échanges sont traités par une supervision issue du terrain, avec IA interne assistive pour structurer les éléments.",
+    d: "Les échanges sont traités par une supervision issue du terrain. L'assistance interne aide à structurer les éléments, sans réponse autonome au patient.",
   },
   {
     n: "04",
@@ -78,7 +79,7 @@ const concreteBenefits = [
   "Un cabinet moins exposé à la charge invisible",
   "Des échanges documentés",
   "Un chirurgien sollicité avec contexte",
-  "Une expérience post-op plus cohérente avec le niveau du geste",
+  "Une expérience post-op plus cohérente avec le niveau premium de votre pratique",
 ];
 
 const isNot = [
@@ -91,7 +92,7 @@ const isNot = [
 
 const isThat = [
   "Un service opéré",
-  "Une supervision issue du terrain",
+  "Une supervision humaine issue du terrain",
   "Un cadre validé avec le cabinet",
   "Une transmission factuelle",
   "Une traçabilité opérationnelle",
@@ -106,9 +107,9 @@ const fitYes = [
 ];
 
 const fitNo = [
-  "votre volume post-op est très faible",
-  "vous cherchez un service d'urgence",
-  "vous souhaitez une IA autonome côté patient",
+  "votre volume post-op est encore ponctuel",
+  "vous cherchez une prise en charge d'urgence",
+  "vous souhaitez une IA autonome qui répond directement au patient",
 ];
 
 // Composants utilitaires inline ---------------------------------------------
@@ -166,9 +167,9 @@ export default function ChirurgiensEsthetiquesLanding() {
             <span className="text-teal-700">KOVELA prend le relais.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed tracking-tight text-charcoal/75 sm:text-[16px]">
-            Nous prenons en charge le suivi post-opératoire quotidien de vos patients
-            selon votre référentiel cabinet : échanges, relances, éléments déclarés,
-            transmissions cabinet et CR factuels.
+            KOVELA prend le relais opérationnel sur le suivi post-op de vos patients :
+            messages, relances, éléments déclarés, transmissions cabinet et CR
+            factuels, selon vos habitudes et votre référentiel.
           </p>
           <p className="mx-auto mt-2 max-w-xl text-[11.5px] italic leading-relaxed tracking-tight text-charcoal/55">
             CR factuel — synthèse courte des éléments déclarés et actions tracées,
@@ -256,9 +257,10 @@ export default function ChirurgiensEsthetiquesLanding() {
               KOVELA devient votre couche opérationnelle post-op.
             </SectionTitle>
             <p className="mt-5 text-[14.5px] leading-relaxed tracking-tight text-charcoal/75">
-              Votre cabinet transmet les informations utiles. KOVELA suit, documente,
-              relance, prépare les transmissions et vous remonte les éléments
-              nécessaires selon votre référentiel.
+              Votre cabinet transmet les informations utiles une fois. KOVELA structure
+              le suivi, documente les éléments déclarés, relance selon le cadre défini,
+              prépare les transmissions cabinet et vous remonte l&apos;essentiel selon
+              votre référentiel.
             </p>
           </div>
 
@@ -338,7 +340,12 @@ export default function ChirurgiensEsthetiquesLanding() {
             ))}
           </ul>
 
-          <p className="mx-auto mt-12 max-w-xl text-center font-display text-[1.4rem] font-medium leading-tight tracking-tight text-navy-900">
+          <p className="mx-auto mt-10 max-w-2xl text-center text-[13.5px] italic leading-relaxed tracking-tight text-charcoal/65">
+            Le patient ne retient pas seulement le geste. Il retient aussi la manière
+            dont il a été accompagné après.
+          </p>
+
+          <p className="mx-auto mt-8 max-w-xl text-center font-display text-[1.4rem] font-medium leading-tight tracking-tight text-navy-900">
             Vous gardez la main.{" "}
             <span className="text-teal-700">KOVELA prend le quotidien.</span>
           </p>
@@ -536,7 +543,7 @@ export default function ChirurgiensEsthetiquesLanding() {
           </div>
 
           <div>
-            <LeadForm ctaLabel="Voir si KOVELA est adapté à mon cabinet" />
+            <LeadForm ctaLabel="Demander un échange opérationnel de 20 min" />
           </div>
         </div>
       </section>
