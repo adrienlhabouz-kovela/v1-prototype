@@ -20,14 +20,19 @@ type Phase = "learn" | "quiz" | "done";
 
 export function LessonPlayer({ lesson }: { lesson: Lesson }) {
   const router = useRouter();
-  const { completeLesson } = useProgress();
+  const { completeLesson, tuning } = useProgress();
   const [phase, setPhase] = useState<Phase>("learn");
+  // Mode enfant : un bloc à la fois (moins de texte par écran).
+  const [blockIdx, setBlockIdx] = useState(0);
   const [result, setResult] = useState<{
     score: number;
     xpGained: number;
     newBadges: string[];
     leveledUp: boolean;
   } | null>(null);
+
+  const paginate = tuning.paginateLessons && lesson.blocks.length > 1;
+  const lastBlock = blockIdx >= lesson.blocks.length - 1;
 
   const finishQuiz = (score: number) => {
     const r = completeLesson(lesson.id, score);
@@ -52,15 +57,64 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
           <h1 className="font-display text-2xl text-sail">{lesson.title}</h1>
           <p className="mt-1 text-sm text-abyss-100/80">{lesson.goal}</p>
 
-          <div className="mt-5 space-y-5">
-            {lesson.blocks.map((b) => (
-              <BlockView key={b.id} block={b} />
-            ))}
-          </div>
+          {paginate ? (
+            <>
+              {/* fil de progression des blocs */}
+              <div className="mt-4 flex items-center gap-1.5">
+                {lesson.blocks.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-1.5 flex-1 rounded-full ${
+                      i < blockIdx
+                        ? "bg-sun-400"
+                        : i === blockIdx
+                          ? "bg-sun-400/60"
+                          : "bg-white/12"
+                    }`}
+                  />
+                ))}
+              </div>
 
-          <button onClick={() => setPhase("quiz")} className="btn-primary mt-6 w-full">
-            Passer aux exercices →
-          </button>
+              <div className="mt-5">
+                <BlockView key={lesson.blocks[blockIdx].id} block={lesson.blocks[blockIdx]} />
+              </div>
+
+              <div className="mt-6 flex gap-3">
+                {blockIdx > 0 && (
+                  <button
+                    onClick={() => setBlockIdx((i) => i - 1)}
+                    className="btn-ghost flex-1"
+                  >
+                    ← Retour
+                  </button>
+                )}
+                {lastBlock ? (
+                  <button onClick={() => setPhase("quiz")} className="btn-primary flex-[2]">
+                    C&apos;est parti, on joue ! 🎮
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setBlockIdx((i) => i + 1)}
+                    className="btn-primary flex-[2]"
+                  >
+                    Suivant →
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mt-5 space-y-5">
+                {lesson.blocks.map((b) => (
+                  <BlockView key={b.id} block={b} />
+                ))}
+              </div>
+
+              <button onClick={() => setPhase("quiz")} className="btn-primary mt-6 w-full">
+                Passer aux exercices →
+              </button>
+            </>
+          )}
         </motion.div>
       )}
 
@@ -72,6 +126,7 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
         <ResultView
           lesson={lesson}
           result={result}
+          positive={tuning.extraPositiveFeedback}
           onReplay={() => {
             setResult(null);
             setPhase("quiz");
@@ -134,18 +189,25 @@ function BlockView({ block }: { block: LessonBlock }) {
 function ResultView({
   lesson,
   result,
+  positive,
   onReplay,
   onNext,
 }: {
   lesson: Lesson;
   result: { score: number; xpGained: number; newBadges: string[]; leveledUp: boolean };
+  positive: boolean;
   onReplay: () => void;
   onNext: () => void;
 }) {
   const pct = Math.round(result.score * 100);
   const tone = pct >= 80 ? "spray" : pct >= 50 ? "sun" : "coral";
-  const msg =
-    pct >= 80
+  const msg = positive
+    ? pct >= 80
+      ? "Bravo, c'est super ! Tu gères comme un chef ⭐"
+      : pct >= 50
+        ? "Génial, tu progresses vite ! On rejoue pour viser le top 💪"
+        : "Trop bien d'avoir essayé ! Rejoue, tu vas y arriver 🚀"
+    : pct >= 80
       ? "Solide. Tu maîtrises l'essentiel de cette leçon."
       : pct >= 50
         ? "Pas mal ! Quelques notions à consolider — on les reverra."

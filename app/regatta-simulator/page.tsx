@@ -10,7 +10,7 @@ const FLEET = 8;
 const START_PLACE = 5;
 
 export default function RegattaSimulatorPage() {
-  const { bumpScore, flagAchievement } = useProgress();
+  const { bumpScore, flagAchievement, recordSession } = useProgress();
   const [started, setStarted] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
   const [place, setPlace] = useState(START_PLACE);
@@ -48,6 +48,12 @@ export default function RegattaSimulatorPage() {
     setLastFeedback(null);
     if (stepIdx + 1 >= REGATTA_STEPS.length) {
       setDone(true);
+      // Score : remontée au classement, normalisée sur la flotte.
+      recordSession({
+        kind: "regatta",
+        label: `Régate · ${ordinal(place)} sur ${FLEET}`,
+        score: Math.max(0, Math.min(1, (FLEET - place) / (FLEET - 1))),
+      });
     } else {
       setStepIdx((i) => i + 1);
     }

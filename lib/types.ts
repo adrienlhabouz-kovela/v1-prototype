@@ -13,7 +13,7 @@ export type PointOfSail =
   | "grand-largue"
   | "vent-arriere";
 
-/** Niveaux de progression d'Adrien. */
+/** Niveaux de progression (communs à tous les profils). */
 export interface Level {
   id: number;
   name: string;
@@ -131,6 +131,26 @@ export interface ConceptStat {
   dueAt: number;
 }
 
+/** Type d'activité enregistrée dans l'historique d'entraînement. */
+export type TrainingKind = "lesson" | "cruise" | "regatta" | "wind";
+
+/** Une entrée de l'historique d'entraînement (par profil). */
+export interface TrainingSession {
+  /** Timestamp ms. */
+  at: number;
+  /** Jour (YYYY-MM-DD). */
+  day: string;
+  kind: TrainingKind;
+  /** Id de la leçon / du scénario concerné, si applicable. */
+  ref?: string;
+  /** Libellé lisible affiché dans l'historique. */
+  label: string;
+  /** Score 0..1 quand pertinent. */
+  score?: number;
+  /** XP gagné lors de cette session, si applicable. */
+  xpGained?: number;
+}
+
 export interface ProgressState {
   version: number;
   xp: number;
@@ -153,4 +173,6 @@ export interface ProgressState {
     meteo: number;
     manoeuvres: number;
   };
+  /** Historique des sessions d'entraînement (les plus récentes en fin de tableau). */
+  trainingHistory: TrainingSession[];
 }

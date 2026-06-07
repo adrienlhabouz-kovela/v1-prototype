@@ -9,7 +9,7 @@ import { Gauge, Pill } from "@/components/ui/primitives";
 type Phase = "select" | "briefing" | "decision" | "followup" | "result";
 
 export default function CruiseSimulatorPage() {
-  const { bumpScore, flagAchievement } = useProgress();
+  const { bumpScore, flagAchievement, recordSession } = useProgress();
   const [phase, setPhase] = useState<Phase>("select");
   const [scenario, setScenario] = useState<CruiseScenario | null>(null);
   const [decisionGood, setDecisionGood] = useState(false);
@@ -37,6 +37,14 @@ export default function CruiseSimulatorPage() {
   const pickFollowUp = (c: Choice) => {
     setChoice(c);
     bumpScore("securite", c.securite ?? 0);
+    if (scenario) {
+      recordSession({
+        kind: "cruise",
+        ref: scenario.id,
+        label: `Croisière · ${scenario.title}`,
+        score: (decisionGood ? 0.6 : 0.2) + (c.good ? 0.4 : 0),
+      });
+    }
     setPhase("result");
   };
 

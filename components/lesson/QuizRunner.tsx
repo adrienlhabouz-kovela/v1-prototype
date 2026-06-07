@@ -20,6 +20,18 @@ const CONSOLE = [
   "Raté, mais c'est comme ça qu'on apprend. Relis l'explication, ça rentre.",
   "Presque. Cette notion mérite un deuxième passage, on la reverra.",
 ];
+// Variante enfant : plus courte, plus enthousiaste.
+const ENCOURAGE_KID = [
+  "Super ! 🎉",
+  "Trop fort ! ⭐",
+  "Bravo, exact ! 🐬",
+  "Bien joué, marin ! ⛵",
+];
+const CONSOLE_KID = [
+  "Presque ! Regarde l'astuce 👀",
+  "Pas grave, on apprend en essayant 💪",
+  "Encore un essai et c'est bon 🚀",
+];
 
 function pick(arr: string[]) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -32,7 +44,8 @@ export function QuizRunner({
   questions: Question[];
   onComplete: (score: number) => void;
 }) {
-  const { state, answerConcept } = useProgress();
+  const { state, answerConcept, tuning } = useProgress();
+  const kid = tuning.extraPositiveFeedback;
   // Ordonne selon le moteur adaptatif (concepts fragiles / dus en premier).
   const ordered = useMemo(
     () => prioritizeQuestions(questions, state),
@@ -105,7 +118,9 @@ export function QuizRunner({
               }`}
             >
               <div className={`mb-1 text-sm font-bold ${answered ? "text-spray-400" : "text-coral-400"}`}>
-                {answered ? pick(ENCOURAGE) : pick(CONSOLE)}
+                {answered
+                  ? pick(kid ? ENCOURAGE_KID : ENCOURAGE)
+                  : pick(kid ? CONSOLE_KID : CONSOLE)}
               </div>
               <p className="text-sm text-abyss-100">{q.explanation}</p>
             </div>

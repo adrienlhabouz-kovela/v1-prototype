@@ -9,28 +9,28 @@ import {
   useRef,
   useState,
 } from "react";
-import type { ProgressState } from "@/lib/types";
+import type { ProgressState, TrainingSession } from "@/lib/types";
 import { recordConcept } from "@/lib/engine/adaptive";
 import { evaluateBadges } from "@/lib/content/badges";
 import { MODULES, lessonById } from "@/lib/content/modules";
 import { levelForXp } from "@/lib/content/levels";
-
-const STORAGE_KEY = "cap-au-vent:v1";
-const STATE_VERSION = 1;
-
-function emptyState(): ProgressState {
-  return {
-    version: STATE_VERSION,
-    xp: 0,
-    completedLessons: [],
-    lessonScores: {},
-    badges: [],
-    streak: 0,
-    lastActiveDay: null,
-    concepts: {},
-    scores: { securite: 0, regate: 0, meteo: 0, manoeuvres: 0 },
-  };
-}
+import {
+  PROFILES,
+  profileById,
+  tuningFor,
+  type ProfileId,
+  type ProfileMeta,
+  type ProfileTuning,
+} from "@/lib/profiles/profiles";
+import {
+  HISTORY_LIMIT,
+  clearActiveProfile,
+  emptyState,
+  loadActiveProfile,
+  loadProfileState,
+  saveActiveProfile,
+  saveProfileState,
+} from "@/lib/progress/storage";
 
 function todayKey(d = new Date()): string {
   return d.toISOString().slice(0, 10);
@@ -42,11 +42,28 @@ function dayDiff(a: string, b: string): number {
   );
 }
 
+/** Charge un profil et remet à zéro le streak si la série est rompue. */
+function loadWithStreak(id: ProfileId): ProgressState {
+  const s = loadProfileState(id);
+  if (s.lastActiveDay) {
+    const diff = dayDiff(s.lastActiveDay, todayKey());
+    if (diff >= 2) return { ...s, streak: 0 };
+  }
+  return s;
+}
+
 /** Liste des modules entièrement complétés. */
 function completedModuleIds(state: ProgressState): string[] {
   return MODULES.filter((m) =>
     m.lessons.every((l) => state.completedLessons.includes(l.id)),
   ).map((m) => m.id);
+}
+
+function appendHistory(
+  state: ProgressState,
+  session: TrainingSession,
+): TrainingSession[] {
+  return [...state.trainingHistory, session].slice(-HISTORY_LIMIT);
 }
 
 interface CompleteLessonResult {
@@ -55,23 +72,38 @@ interface CompleteLessonResult {
   leveledUp: boolean;
 }
 
+/** Entrée d'historique fournie par l'appelant (date remplie automatiquement). */
+type SessionInput = Omit<TrainingSession, "at" | "day">;
+
 interface ProgressContextValue {
   state: ProgressState;
   ready: boolean;
+  // ── Profils ────────────────────────────────────────────────────────────
+  /** Profil actif, ou null tant qu'aucun profil n'est choisi. */
+  activeId: ProfileId | null;
+  profile: ProfileMeta | null;
+  /** Tuning de présentation (toujours défini ; adulte par défaut). */
+  tuning: ProfileTuning;
+  profiles: ProfileMeta[];
+  /** Sélectionne un profil (charge sa progression). */
+  chooseProfile: (id: ProfileId) => void;
+  /** Revient à l'écran « Qui apprend aujourd'hui ? ». */
+  switchProfile: () => void;
+  // ── Progression ──────────────────────────────────────────────────────────
   /** Enregistre la réussite/échec d'un concept (tests). */
   answerConcept: (concept: string, correct: boolean) => void;
   /** Valide une leçon avec un score 0..1 et marque la journée active. */
   completeLesson: (lessonId: string, score: number) => CompleteLessonResult;
   /** Ajoute des points à un score thématique (0..100, borné). */
-  bumpScore: (
-    key: keyof ProgressState["scores"],
-    delta: number,
-  ) => void;
+  bumpScore: (key: keyof ProgressState["scores"], delta: number) => void;
   /** Débloque un badge par condition contextuelle (simulateurs). */
   flagAchievement: (ctx: {
     goNoGoSuccess?: boolean;
     regattaPlaceGained?: boolean;
   }) => string[];
+  /** Ajoute une entrée à l'historique d'entraînement. */
+  recordSession: (session: SessionInput) => void;
+  /** Réinitialise la progression du profil actif. */
   reset: () => void;
 }
 
@@ -79,41 +111,43 @@ const ProgressContext = createContext<ProgressContextValue | null>(null);
 
 export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<ProgressState>(emptyState);
+  const [activeId, setActiveId] = useState<ProfileId | null>(null);
   const [ready, setReady] = useState(false);
-  const loaded = useRef(false);
+  const mounted = useRef(false);
 
-  // Chargement initial depuis LocalStorage + mise à jour du streak.
+  // Chargement initial : profil actif + sa progression.
   useEffect(() => {
-    if (loaded.current) return;
-    loaded.current = true;
+    if (mounted.current) return;
+    mounted.current = true;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      let next = raw ? (JSON.parse(raw) as ProgressState) : emptyState();
-      if (!next || next.version !== STATE_VERSION) next = emptyState();
-
-      // Gestion du streak à l'ouverture.
-      const today = todayKey();
-      if (next.lastActiveDay) {
-        const diff = dayDiff(next.lastActiveDay, today);
-        if (diff >= 2) next.streak = 0; // série rompue
+      const id = loadActiveProfile();
+      if (id) {
+        // setActiveId + setState dans le même tick → pas d'état incohérent.
+        setActiveId(id);
+        setState(loadWithStreak(id));
       }
-      setState(next);
-    } catch {
-      setState(emptyState());
     } finally {
       setReady(true);
     }
   }, []);
 
-  // Persistance.
+  // Persistance : on n'écrit que pour le profil actif, jamais sans profil.
   useEffect(() => {
-    if (!ready) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      /* quota / mode privé : on ignore silencieusement */
-    }
-  }, [state, ready]);
+    if (!ready || !activeId) return;
+    saveProfileState(activeId, state);
+  }, [state, activeId, ready]);
+
+  const chooseProfile = useCallback((id: ProfileId) => {
+    saveActiveProfile(id);
+    // Les deux setState sont groupés : l'état chargé correspond bien à `id`.
+    setActiveId(id);
+    setState(loadWithStreak(id));
+  }, []);
+
+  const switchProfile = useCallback(() => {
+    clearActiveProfile();
+    setActiveId(null);
+  }, []);
 
   const answerConcept = useCallback((concept: string, correct: boolean) => {
     setState((s) => ({
@@ -166,6 +200,15 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
             ...s.lessonScores,
             [lessonId]: Math.max(prevBest, score),
           },
+          trainingHistory: appendHistory(s, {
+            at: Date.now(),
+            day: today,
+            kind: "lesson",
+            ref: lessonId,
+            label: lesson?.title ?? "Leçon",
+            score,
+            xpGained,
+          }),
         };
 
         const newBadges = evaluateBadges(next, {
@@ -217,19 +260,59 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  const recordSession = useCallback<ProgressContextValue["recordSession"]>(
+    (session) => {
+      const today = todayKey();
+      setState((s) => ({
+        ...s,
+        lastActiveDay: today,
+        trainingHistory: appendHistory(s, {
+          ...session,
+          at: Date.now(),
+          day: today,
+        }),
+      }));
+    },
+    [],
+  );
+
   const reset = useCallback(() => setState(emptyState()), []);
+
+  const profile = useMemo(() => profileById(activeId) ?? null, [activeId]);
+  const tuning = useMemo(() => tuningFor(profile?.kind), [profile]);
 
   const value = useMemo<ProgressContextValue>(
     () => ({
       state,
       ready,
+      activeId,
+      profile,
+      tuning,
+      profiles: PROFILES,
+      chooseProfile,
+      switchProfile,
       answerConcept,
       completeLesson,
       bumpScore,
       flagAchievement,
+      recordSession,
       reset,
     }),
-    [state, ready, answerConcept, completeLesson, bumpScore, flagAchievement, reset],
+    [
+      state,
+      ready,
+      activeId,
+      profile,
+      tuning,
+      chooseProfile,
+      switchProfile,
+      answerConcept,
+      completeLesson,
+      bumpScore,
+      flagAchievement,
+      recordSession,
+      reset,
+    ],
   );
 
   return (
@@ -239,8 +322,26 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useProgress(): ProgressContextValue {
+function useProgressContext(): ProgressContextValue {
   const ctx = useContext(ProgressContext);
   if (!ctx) throw new Error("useProgress doit être utilisé dans ProgressProvider");
   return ctx;
+}
+
+export function useProgress(): ProgressContextValue {
+  return useProgressContext();
+}
+
+/** Accès ciblé au profil actif et au changement de profil. */
+export function useProfile() {
+  const {
+    ready,
+    activeId,
+    profile,
+    tuning,
+    profiles,
+    chooseProfile,
+    switchProfile,
+  } = useProgressContext();
+  return { ready, activeId, profile, tuning, profiles, chooseProfile, switchProfile };
 }

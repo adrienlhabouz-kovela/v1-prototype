@@ -9,7 +9,7 @@ import { weakestConcepts } from "@/lib/engine/adaptive";
 import { ProgressBar, ScoreRing, Card, Pill } from "@/components/ui/primitives";
 
 export default function DashboardPage() {
-  const { state, ready } = useProgress();
+  const { state, ready, profile, tuning } = useProgress();
 
   if (!ready) return <DashboardSkeleton />;
 
@@ -26,8 +26,12 @@ export default function DashboardPage() {
   const nextModule = nextLesson ? moduleById(nextLesson.moduleId) : null;
 
   const errors = weakestConcepts(state, 3);
+  const name = profile?.name ?? "marin";
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bel après-midi" : "Bonsoir";
+  const title = tuning.playful
+    ? `Salut ${name} ! On embarque ? ${profile?.avatar ?? "⛵"}`
+    : `${greeting}, ${name} 👋`;
 
   return (
     <div className="space-y-5">
@@ -36,9 +40,7 @@ export default function DashboardPage() {
         <div className="flex items-start justify-between">
           <div>
             <div className="label-caps">Cap au Vent</div>
-            <h1 className="mt-1 font-display text-2xl text-sail">
-              {greeting}, Adrien 👋
-            </h1>
+            <h1 className="mt-1 font-display text-2xl text-sail">{title}</h1>
           </div>
           <StreakBadge streak={state.streak} />
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { useProgress } from "@/lib/progress/store";
 import { levelForXp, nextLevelFor, levelProgress, LEVELS } from "@/lib/content/levels";
@@ -8,10 +8,10 @@ import { BADGES } from "@/lib/content/badges";
 import { ALL_LESSONS, conceptLabel } from "@/lib/content/modules";
 import { weakestConcepts } from "@/lib/engine/adaptive";
 import { ProgressBar, ScoreRing, Gauge, Pill } from "@/components/ui/primitives";
+import type { TrainingSession } from "@/lib/types";
 
 export default function ProgressPage() {
-  const { state, ready, reset } = useProgress();
-  const [confirmReset, setConfirmReset] = useState(false);
+  const { state, ready, tuning } = useProgress();
 
   if (!ready) return <div className="pt-10 text-center text-abyss-100/60">Chargement…</div>;
 
@@ -19,6 +19,7 @@ export default function ProgressPage() {
   const next = nextLevelFor(state.xp);
   const errors = weakestConcepts(state, 5);
   const unlocked = new Set(state.badges);
+  const history = [...state.trainingHistory].reverse().slice(0, 8);
 
   return (
     <div className="space-y-6">
@@ -122,9 +123,23 @@ export default function ProgressPage() {
               </div>
             ))}
           </div>
-          <p className="mt-2 text-[0.7rem] text-abyss-100/50">
-            Le moteur de tests te reposera ces notions en priorité, et plus souvent tant qu'elles ne sont pas acquises (répétition espacée).
-          </p>
+          {!tuning.hideJargon && (
+            <p className="mt-2 text-[0.7rem] text-abyss-100/50">
+              Le moteur de tests te reposera ces notions en priorité, et plus souvent tant qu'elles ne sont pas acquises (répétition espacée).
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* historique d'entraînement */}
+      {history.length > 0 && (
+        <div>
+          <div className="label-caps mb-2">Historique d'entraînement</div>
+          <div className="space-y-2">
+            {history.map((s, i) => (
+              <TrainingRow key={`${s.at}-${i}`} session={s} />
+            ))}
+          </div>
         </div>
       )}
 
@@ -142,30 +157,46 @@ export default function ProgressPage() {
         </div>
       </div>
 
-      {/* reset */}
-      <div className="pt-2">
-        {!confirmReset ? (
-          <button onClick={() => setConfirmReset(true)} className="w-full text-center text-xs text-abyss-100/40 hover:text-coral-400">
-            Réinitialiser ma progression
-          </button>
-        ) : (
-          <div className="rounded-2xl bg-coral-500/10 p-4 text-center ring-1 ring-coral-500/25">
-            <p className="text-sm text-coral-400">Effacer toute ta progression ? C'est irréversible.</p>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <button onClick={() => setConfirmReset(false)} className="btn-ghost">Annuler</button>
-              <button
-                onClick={() => {
-                  reset();
-                  setConfirmReset(false);
-                }}
-                className="btn bg-coral-500 text-white hover:bg-coral-400"
-              >
-                Effacer
-              </button>
-            </div>
-          </div>
-        )}
+      {/* paramètres */}
+      <div className="pt-2 text-center">
+        <Link href="/settings" className="text-xs text-abyss-100/40 hover:text-spray-400">
+          Paramètres du profil
+        </Link>
       </div>
     </div>
   );
+}
+
+function TrainingRow({ session }: { session: TrainingSession }) {
+  const glyph =
+    session.kind === "lesson"
+      ? "📘"
+      : session.kind === "cruise"
+        ? "⚓"
+        : session.kind === "regatta"
+          ? "🏁"
+          : "🌬️";
+  const pct = session.score != null ? Math.round(session.score * 100) : null;
+  const tone = pct == null ? "muted" : pct >= 80 ? "spray" : pct >= 50 ? "sun" : "coral";
+  return (
+    <div className="flex items-center gap-3 rounded-xl bg-white/5 p-3 ring-1 ring-white/10">
+      <span className="text-lg">{glyph}</span>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm text-sail">{session.label}</div>
+        <div className="text-[0.65rem] text-abyss-100/50">
+          {formatDay(session.day)}
+          {session.xpGained ? ` · +${session.xpGained} XP` : ""}
+        </div>
+      </div>
+      {pct != null && <Pill tone={tone}>{pct}%</Pill>}
+    </div>
+  );
+}
+
+function formatDay(day: string): string {
+  const today = new Date().toISOString().slice(0, 10);
+  if (day === today) return "Aujourd'hui";
+  const d = new Date(day + "T00:00:00");
+  if (Number.isNaN(d.getTime())) return day;
+  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }

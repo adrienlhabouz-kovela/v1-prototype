@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { ProfileMenu } from "@/components/profile/ProfileMenu";
 
 const NAV = [
   { href: "/", label: "Accueil", icon: HomeIcon },
@@ -18,7 +19,16 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col">
-      <main className="flex-1 px-4 pb-28 pt-4">{children}</main>
+      {/* en-tête : bouton profil visible sur toutes les pages */}
+      <header className="sticky top-0 z-30 flex items-center justify-between px-4 pb-2 pt-3 backdrop-blur-md">
+        <Link href="/" className="flex items-center gap-2 focus-ring rounded-lg">
+          <span className="text-lg">⛵</span>
+          <span className="font-display text-base text-sail">Cap au Vent</span>
+        </Link>
+        <ProfileMenu />
+      </header>
+
+      <main className="flex-1 px-4 pb-28 pt-1">{children}</main>
 
       <nav className="fixed inset-x-0 bottom-0 z-40">
         <div className="mx-auto max-w-md px-3 pb-3">
