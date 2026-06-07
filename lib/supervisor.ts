@@ -384,7 +384,7 @@ export function getRecommendedAction(
   }
 
   if (report?.status === "valide") {
-    return { label: "Publier pour le chirurgien", delay: "aujourd'hui" };
+    return { label: "Transmettre au chirurgien", delay: "aujourd'hui" };
   }
 
   if (patient.compilationDraft && escalation?.status !== "transmise") {

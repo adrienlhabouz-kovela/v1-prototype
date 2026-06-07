@@ -278,7 +278,7 @@ export default function PatientFiche() {
       handler: () => k.validateReport(patient.id),
     },
     publish_cr: {
-      label: "Publier pour le chirurgien",
+      label: "Transmettre au chirurgien",
       handler: () => k.publishReport(patient.id),
     },
     transmit_compilation: {
@@ -331,7 +331,7 @@ export default function PatientFiche() {
           ============================================================ */}
       <div className="flex gap-4">
         {/* Rail gauche — permanent, scrollable indépendamment */}
-        <div className="hidden w-[300px] shrink-0 lg:block">
+        <div className="hidden w-[264px] shrink-0 lg:block">
           <div className="sticky top-2 h-[calc(100vh-6rem)]">
             <QueueRail selectedPatientId={patient.id} />
           </div>
@@ -386,11 +386,9 @@ export default function PatientFiche() {
                     Réf. {refl.version}
                   </Badge>
                 </div>
-                {/* Fenêtre prévue + temps humain cible — repère opérationnel
-                    pour piloter la marge (~1h cible / patient sur l'ensemble
-                    du suivi 3-12j selon intervention). */}
-                <p className="mt-1.5 text-[10.5px] tracking-tight text-charcoal/55">
-                  Fenêtre prévue J0 → J+{Math.max(
+                {/* Fenêtre prévue + temps humain — compact, repère métier. */}
+                <p className="mt-1.5 text-[10px] tracking-tight text-charcoal/55">
+                  J0 → J+{Math.max(
                     1,
                     Math.round(
                       (new Date(followUp.endDate).getTime() -
@@ -399,14 +397,14 @@ export default function PatientFiche() {
                     )
                   )}
                   <span className="text-charcoal/35"> · </span>
-                  cible temps humain ~1h
+                  cible humaine ~1h
                   <span className="text-charcoal/35"> · </span>
                   consommé ~
                   {Math.min(
                     60,
                     Math.round(patientLogs.length * 2 + patient.messages.length * 1.5)
-                  )}{" "}
-                  min (estimation prototype)
+                  )}
+                  min
                 </p>
               </div>
             </div>
@@ -508,108 +506,96 @@ export default function PatientFiche() {
           LAYOUT 3 COLONNES — 3 / 6 / 3 = conversation dominante.
           ============================================================ */}
       <div className="grid gap-4 lg:grid-cols-12">
-        {/* ===== COLONNE GAUCHE — Contexte patient compact ===== */}
-        <aside className="space-y-3 lg:col-span-3">
-          <div className="rounded-2xl bg-teal-50/40 px-4 py-3 ring-1 ring-teal-100/60">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-teal-700">
-              Référentiel actif
+        {/* ===== COLONNE GAUCHE — Contexte stable, scannable, NON redondant
+            avec le header sticky. On enlève intervention / J+ / chirurgien /
+            cabinet / fenêtre J0→J+N qui sont déjà dans le bandeau. ===== */}
+        <aside className="space-y-3 lg:col-span-2">
+          {/* Bloc référentiel — version + cabinet contact, suffisant. */}
+          <div className="rounded-xl bg-teal-50/40 px-3 py-2.5 ring-1 ring-teal-100/60">
+            <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+              Référentiel
             </p>
-            <p className="mt-1.5 text-[12.5px] font-medium tracking-tight text-navy-900">
-              {refl.intervention}
+            <p className="mt-1 text-[11.5px] font-semibold tracking-tight text-navy-900">
+              {refl.version}
             </p>
-            <p className="mt-0.5 text-[11px] text-charcoal/65">
-              {k.surgeonName(patient.surgeonId)} · {refl.version}
+            <p className="mt-0.5 text-[10px] tracking-tight text-charcoal/60">
+              Contact prioritaire : {refl.contact_prioritaire}
             </p>
           </div>
 
-          <Card>
-            <CardHeader title="Contexte patient" />
-            <dl className="space-y-2 px-4 py-3 text-[12px]">
+          {/* Bloc dates / canal — informations non répétées dans le header. */}
+          <div className="rounded-xl bg-white px-3 py-2.5 shadow-card ring-1 ring-navy-900/[0.045]">
+            <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+              Dossier
+            </p>
+            <dl className="mt-1.5 space-y-1.5 text-[11px]">
               {[
-                ["Intervention", patient.intervention],
-                ["Date", formatDate(patient.interventionDate)],
-                ["Jour post-op", day],
-                ["Suivi prévu", patient.protocol],
-                ["Cabinet", refl.cabinet],
+                ["Intervention", formatDate(patient.interventionDate)],
+                ["Protocole", patient.protocol],
                 ["Canal patient", "Interface KOVELA"],
                 [
                   "Dernier contact",
-                  last.ageLabel ? `${last.label} — ${last.ageLabel}` : "—",
+                  last.ageLabel ? last.ageLabel : "—",
                 ],
-                ["Contact prioritaire", refl.contact_prioritaire],
               ].map(([label, value]) => (
                 <div
                   key={label}
-                  className="flex justify-between gap-3 border-b border-navy-900/[0.04] pb-1.5 last:border-0"
+                  className="flex justify-between gap-2 border-b border-navy-900/[0.04] pb-1 last:border-0"
                 >
-                  <dt className="shrink-0 text-charcoal/55">{label}</dt>
-                  <dd className="text-right font-medium tracking-tight text-navy-900">
+                  <dt className="shrink-0 text-[10px] text-charcoal/55">{label}</dt>
+                  <dd className="truncate text-right font-medium tracking-tight text-navy-900">
                     {value || "—"}
                   </dd>
                 </div>
               ))}
             </dl>
-          </Card>
+          </div>
 
-          <Card>
-            <CardHeader
-              title="Fenêtre de suivi"
-              action={
-                <Badge className={followUpStatusStyles[followUp.status]}>
-                  {followUp.status === "en_cours"
-                    ? "En cours"
+          {/* Fenêtre suivi — compact : 2 dates + barre de progression. */}
+          <div className="rounded-xl bg-white px-3 py-2.5 shadow-card ring-1 ring-navy-900/[0.045]">
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+                Fenêtre de suivi
+              </p>
+              <span
+                className={`text-[9.5px] font-medium tracking-tight ${
+                  followUp.status === "termine"
+                    ? "text-amber-800"
                     : followUp.status === "proche_cloture"
-                    ? "Proche clôture"
-                    : followUp.status === "termine"
-                    ? "Terminé"
-                    : "Hors fenêtre"}
-                </Badge>
-              }
-            />
-            <div className="px-4 py-3">
-              <dl className="space-y-2 text-[12px]">
-                {[
-                  ["Début", formatDate(followUp.startDate)],
-                  ["Fin prévue", formatDate(followUp.endDate)],
-                  [
-                    "Restant",
-                    followUp.daysRemaining === 0
-                      ? "Fin aujourd'hui"
-                      : followUp.daysRemaining > 0
-                      ? `${followUp.daysRemaining}j`
-                      : `Terminé depuis ${Math.abs(followUp.daysRemaining)}j`,
-                  ],
-                  ["Progression", `${followUp.progressPercent} %`],
-                ].map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="flex justify-between gap-3 border-b border-navy-900/[0.04] pb-1.5 last:border-0"
-                  >
-                    <dt className="shrink-0 text-charcoal/55">{label}</dt>
-                    <dd className="text-right font-medium tracking-tight text-navy-900">
-                      {value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-              <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-navy-900/[0.06]">
-                <div
-                  className={`h-full rounded-full transition-all ${
-                    followUp.status === "termine"
-                      ? "bg-amber-500/80"
-                      : followUp.status === "proche_cloture"
-                      ? "bg-amber-400/80"
-                      : "bg-teal-500"
-                  }`}
-                  style={{ width: `${followUp.progressPercent}%` }}
-                />
-              </div>
+                    ? "text-amber-700"
+                    : "text-teal-700"
+                }`}
+              >
+                {followUp.progressPercent}%
+              </span>
             </div>
-          </Card>
+            <p className="mt-1 text-[10.5px] tracking-tight text-charcoal/65">
+              {formatDate(followUp.startDate)} → {formatDate(followUp.endDate)}
+            </p>
+            <p className="mt-0.5 text-[10px] tracking-tight text-charcoal/55">
+              {followUp.daysRemaining === 0
+                ? "Fin aujourd'hui"
+                : followUp.daysRemaining > 0
+                ? `Reste ${followUp.daysRemaining}j`
+                : `Terminé depuis ${Math.abs(followUp.daysRemaining)}j`}
+            </p>
+            <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-navy-900/[0.06]">
+              <div
+                className={`h-full rounded-full transition-all ${
+                  followUp.status === "termine"
+                    ? "bg-amber-500/80"
+                    : followUp.status === "proche_cloture"
+                    ? "bg-amber-400/80"
+                    : "bg-teal-500"
+                }`}
+                style={{ width: `${followUp.progressPercent}%` }}
+              />
+            </div>
+          </div>
         </aside>
 
         {/* ===== COLONNE CENTRE — Conversation patient (zone dominante) ===== */}
-        <section className="lg:col-span-6">
+        <section className="lg:col-span-7">
           <div className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
             {/* En-tête conversation — discret pour ne pas voler la vedette à la conversation. */}
             <div className="flex items-center justify-between gap-3 border-b border-navy-900/[0.05] px-5 py-3">
@@ -811,33 +797,59 @@ export default function PatientFiche() {
               )}
             </div>
 
-            {/* Composer — collé en bas, dominé visuellement par la conversation. */}
-            <div className="border-t border-navy-900/[0.05] bg-white px-5 py-4">
+            {/* Composer — zone de réponse premium, plus de respiration
+                + label visible + 2 modes de bouton primary (Envoyer prototype
+                / Copier message). */}
+            <div className="border-t border-navy-900/[0.06] bg-bone/30 px-5 py-4">
+              <div className="mb-2 flex items-baseline justify-between gap-2">
+                <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/60">
+                  Réponse patient
+                </p>
+                <span className="text-[9.5px] tracking-tight text-charcoal/40">
+                  Prototype — pas d&apos;envoi réel au patient
+                </span>
+              </div>
               <textarea
                 value={reply}
                 onChange={(e) => setReply(e.target.value)}
-                rows={3}
-                placeholder="Écrire une réponse de coordination — pas d'avis médical."
-                className="w-full resize-none rounded-xl border border-navy-900/[0.08] p-3 text-[13px] outline-none transition-colors focus:border-teal-500/60 focus:ring-2 focus:ring-teal-500/10"
+                rows={4}
+                placeholder="Écrire une réponse de coordination, sans avis médical…"
+                className="w-full resize-none rounded-xl border border-navy-900/[0.08] bg-white p-3 text-[13px] leading-relaxed outline-none transition-colors focus:border-teal-500/60 focus:ring-2 focus:ring-teal-500/10"
               />
-              <div className="mt-2.5 flex flex-wrap items-center gap-2">
-                <Button variant="subtle" onClick={() => setTemplatesOpen(true)}>
-                  Templates
-                </Button>
-                <Button
-                  variant="subtle"
+              <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setTemplatesOpen(true)}
+                  className="rounded-md bg-white px-2.5 py-1.5 text-[11px] font-medium tracking-tight text-charcoal/75 ring-1 ring-navy-900/[0.08] transition-colors hover:bg-bone hover:text-navy-900"
+                >
+                  Modèles de réponse
+                </button>
+                <button
+                  type="button"
                   onClick={() => runAi("reformulation")}
                   disabled={!reply.trim()}
+                  className="rounded-md bg-white px-2.5 py-1.5 text-[11px] font-medium tracking-tight text-charcoal/75 ring-1 ring-navy-900/[0.08] transition-colors hover:bg-bone hover:text-navy-900 disabled:cursor-not-allowed disabled:text-charcoal/30"
                 >
-                  Reformuler (IA)
-                </Button>
-                <Button
-                  variant="subtle"
+                  Reformuler · IA interne
+                </button>
+                <button
+                  type="button"
                   onClick={() => runAi("resume_conversation")}
+                  className="rounded-md bg-white px-2.5 py-1.5 text-[11px] font-medium tracking-tight text-charcoal/75 ring-1 ring-navy-900/[0.08] transition-colors hover:bg-bone hover:text-navy-900"
                 >
                   Résumer la conversation
-                </Button>
-                <div className="ml-auto">
+                </button>
+                <div className="ml-auto flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    disabled={!reply.trim()}
+                    onClick={() => {
+                      navigator.clipboard?.writeText(reply.trim());
+                    }}
+                    className="rounded-md bg-white px-2.5 py-1.5 text-[11px] font-medium tracking-tight text-charcoal/75 ring-1 ring-navy-900/[0.08] transition-colors hover:bg-bone hover:text-navy-900 disabled:cursor-not-allowed disabled:text-charcoal/30"
+                  >
+                    Copier
+                  </button>
                   <Button
                     variant="primary"
                     disabled={!reply.trim()}
@@ -846,7 +858,7 @@ export default function PatientFiche() {
                       setReply("");
                     }}
                   >
-                    Envoyer
+                    Envoyer · prototype
                   </Button>
                 </div>
               </div>
@@ -1163,7 +1175,7 @@ export default function PatientFiche() {
                 <>
                   {report.status === "valide" && (
                     <p className="text-[10.5px] tracking-tight text-charcoal/55">
-                      CR factuel validé — à publier pour le chirurgien.
+                      CR factuel validé — à transmettre au chirurgien.
                     </p>
                   )}
                   {report.status === "brouillon" && (

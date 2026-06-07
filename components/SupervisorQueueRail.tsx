@@ -259,49 +259,55 @@ function QueueRow({
   return (
     <Link
       href={`/superviseur/patient/${patient.id}`}
-      className={`group block border-b border-navy-900/[0.04] px-3 py-2.5 transition-colors ${
+      className={`group relative block border-b border-navy-900/[0.04] px-3 py-2 transition-colors ${
         selected
-          ? "bg-teal-50/60 ring-1 ring-inset ring-teal-200/60"
+          ? "bg-teal-50/40"
           : "hover:bg-bone/40"
       }`}
     >
-      <div className="flex items-start gap-2.5">
-        {/* Avatar + point de priorité */}
+      {/* Accent bar gauche — état sélectionné élégant, sans ring de carte. */}
+      {selected && (
+        <span className="absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-full bg-teal-500" />
+      )}
+      <div className="flex items-start gap-2">
+        {/* Avatar compact + point de priorité */}
         <div className="relative shrink-0">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-navy-50 text-[11px] font-semibold tracking-tight text-navy-900 ring-1 ring-navy-100">
+          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-navy-50 text-[10.5px] font-semibold tracking-tight text-navy-900 ring-1 ring-navy-100">
             {initials}
           </span>
           <span
-            className={`absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${dotColor}`}
+            className={`absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full ring-2 ring-white ${dotColor}`}
           />
         </div>
 
-        {/* Identité + meta */}
+        {/* Identité + meta — densifié */}
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-1.5">
-            <p className="truncate text-[12px] font-semibold tracking-tight text-navy-900">
+            <p
+              className={`truncate text-[11.5px] tracking-tight ${
+                selected ? "font-semibold text-navy-900" : "font-medium text-navy-900"
+              }`}
+            >
               {patient.name}
             </p>
-            <span className="shrink-0 font-mono text-[10px] font-medium text-teal-700">
+            <span className="shrink-0 font-mono text-[9.5px] font-medium text-teal-700">
               {day}
             </span>
           </div>
-          <p className="truncate text-[10.5px] tracking-tight text-charcoal/60">
+          <p className="truncate text-[10px] tracking-tight text-charcoal/55">
             {patient.intervention}
+            {last.ageLabel && (
+              <span className="text-charcoal/35"> · {last.ageLabel}</span>
+            )}
           </p>
           {preview ? (
-            <p className="mt-0.5 truncate text-[10px] italic tracking-tight text-charcoal/55">
+            <p className="mt-0.5 truncate text-[10px] italic tracking-tight text-charcoal/65">
               <span className="not-italic text-amber-700">«</span> {preview}{" "}
               <span className="not-italic text-amber-700">»</span>
             </p>
           ) : (
             <p className="mt-0.5 truncate text-[10px] tracking-tight text-charcoal/45">
-              {action.label}
-            </p>
-          )}
-          {last.ageLabel && (
-            <p className="mt-0.5 text-[9.5px] tracking-tight text-charcoal/40">
-              {last.ageLabel}
+              → {action.label}
             </p>
           )}
         </div>

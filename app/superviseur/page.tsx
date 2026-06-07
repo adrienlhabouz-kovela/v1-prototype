@@ -669,7 +669,7 @@ export default function SuperviseurInbox() {
     {
       key: "cr_factuels",
       title: "CR factuels",
-      hint: "Brouillons IA à relire · validés à publier.",
+      hint: "Brouillons IA à relire · validés à transmettre.",
       accentColor: "bg-teal-600/70",
       patients: crFactuelsList,
     },
@@ -692,7 +692,7 @@ export default function SuperviseurInbox() {
     {
       key: "clotures",
       title: "Clôtures à finaliser",
-      hint: "Suivi terminé · CR à publier · clôture à valider.",
+      hint: "Suivi terminé · CR à transmettre · clôture à valider.",
       accentColor: "bg-navy-900/40",
       patients: sortPatients(grouped.cloture_a_preparer, sortBy, ctx, k),
     },
@@ -735,7 +735,7 @@ export default function SuperviseurInbox() {
           ──────────────────────────────────────────────────────────────── */}
       <div className="flex gap-4">
         {/* Rail gauche — permanent, scrollable indépendamment */}
-        <div className="hidden w-[300px] shrink-0 lg:block">
+        <div className="hidden w-[264px] shrink-0 lg:block">
           <div className="sticky top-2 h-[calc(100vh-6rem)]">
             <QueueRail />
           </div>
@@ -788,27 +788,26 @@ export default function SuperviseurInbox() {
           </div>
         </div>
 
-        {/* Métriques opérationnelles */}
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        {/* Bandeau métriques compact — 1 ligne pills, ne vole pas la vedette
+            à la file prioritaire. */}
+        <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px] tracking-tight">
           {(
             [
               ["À traiter", counts.a_traiter, "amber"],
-              ["Patients sans réponse", counts.a_relancer, "amber"],
-              ["CR & transmissions", counts.a_transmettre_cabinet, "teal"],
-              ["En attente cabinet", counts.en_attente_cabinet, "navy"],
-              ["CR brouillon à relire", crBrouillonARelire, "teal"],
-              ["Clôtures à finaliser", counts.cloture_a_preparer, "navy"],
+              ["Sans réponse", counts.a_relancer, "amber"],
+              ["Transmissions", counts.a_transmettre_cabinet, "teal"],
+              ["Retours cabinet", counts.en_attente_cabinet, "navy"],
+              ["CR à relire", crBrouillonARelire, "teal"],
+              ["Clôtures", counts.cloture_a_preparer, "navy"],
             ] as const
           ).map(([label, value, tone]) => (
-            <div
+            <span
               key={label}
-              className="rounded-lg bg-white px-3 py-2.5 ring-1 ring-navy-900/[0.06]"
+              className="inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 ring-1 ring-navy-900/[0.06]"
             >
-              <p className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/45">
-                {label}
-              </p>
-              <p
-                className={`mt-1 font-sans text-[18px] font-semibold tracking-tight ${
+              <span className="text-charcoal/55">{label}</span>
+              <span
+                className={`font-mono text-[11.5px] font-semibold ${
                   value === 0
                     ? "text-charcoal/30"
                     : tone === "amber"
@@ -819,13 +818,58 @@ export default function SuperviseurInbox() {
                 }`}
               >
                 {value}
-              </p>
-            </div>
+              </span>
+            </span>
           ))}
         </div>
-
-        <MetricsBlock patients={scope} />
       </div>
+
+      {/* ─── HERO — À TRAITER MAINTENANT ───────────────────────────────────── */}
+      <section className="mb-8 overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.05]">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-navy-900/[0.06] bg-amber-50/40 px-5 py-3.5">
+          <div className="flex items-center gap-3">
+            <span className="h-7 w-[3px] rounded-full bg-amber-500" />
+            <div>
+              <h2 className="font-sans text-[15px] font-semibold tracking-tight text-navy-900">
+                À traiter maintenant
+              </h2>
+              <p className="text-[11.5px] tracking-tight text-charcoal/60">
+                {operationalStatusHints.a_traiter}
+              </p>
+            </div>
+          </div>
+          <span className="rounded-md bg-amber-100 px-3 py-1 text-[12.5px] font-semibold text-amber-800 ring-1 ring-amber-200/60">
+            {aTraiter.length} patient{aTraiter.length > 1 ? "s" : ""}
+          </span>
+        </div>
+        <div>
+          {aTraiter.length === 0 ? (
+            <p className="px-5 py-10 text-center text-[12.5px] tracking-tight text-charcoal/50">
+              ✓ Aucun patient à traiter immédiatement. Bon début de journée.
+            </p>
+          ) : (
+            <>
+              <HeroTableHeader />
+              {(expandedGroups.a_traiter ? aTraiter : aTraiter.slice(0, HERO_LIMIT)).map((p) => (
+                <HeroPatientRow key={p.id} patient={p} />
+              ))}
+              {aTraiter.length > HERO_LIMIT && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setExpandedGroups((prev) => ({ ...prev, a_traiter: !prev.a_traiter }))
+                  }
+                  className="w-full border-t border-navy-900/[0.05] px-5 py-3 text-center text-[12px] font-medium tracking-tight text-teal-700 hover:bg-bone/40"
+                >
+                  {expandedGroups.a_traiter
+                    ? "Replier"
+                    : `Voir les ${aTraiter.length - HERO_LIMIT} suivants ↓`}
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </section>
 
       {/* ─── BARRE FILTRES COMPACTE ───────────────────────────────────────── */}
       <div className="mb-6 flex flex-wrap items-center gap-2 rounded-xl bg-white px-3 py-2.5 ring-1 ring-navy-900/[0.045]">
@@ -877,7 +921,7 @@ export default function SuperviseurInbox() {
         >
           <option value="">CR</option>
           <option value="brouillon">Brouillon à relire</option>
-          <option value="valide">Validé à publier</option>
+          <option value="valide">Validé à transmettre</option>
         </select>
         <select
           value={sortBy}
@@ -904,53 +948,6 @@ export default function SuperviseurInbox() {
           </span>
         )}
       </div>
-
-      {/* ─── HERO — À TRAITER MAINTENANT ───────────────────────────────────── */}
-      <section className="mb-8 overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.05]">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-navy-900/[0.06] bg-amber-50/40 px-5 py-3.5">
-          <div className="flex items-center gap-3">
-            <span className="h-7 w-[3px] rounded-full bg-amber-500" />
-            <div>
-              <h2 className="font-sans text-[15px] font-semibold tracking-tight text-navy-900">
-                À traiter maintenant
-              </h2>
-              <p className="text-[11.5px] tracking-tight text-charcoal/60">
-                {operationalStatusHints.a_traiter}
-              </p>
-            </div>
-          </div>
-          <span className="rounded-md bg-amber-100 px-3 py-1 text-[12.5px] font-semibold text-amber-800 ring-1 ring-amber-200/60">
-            {aTraiter.length} patient{aTraiter.length > 1 ? "s" : ""}
-          </span>
-        </div>
-        <div>
-          {aTraiter.length === 0 ? (
-            <p className="px-5 py-10 text-center text-[12.5px] tracking-tight text-charcoal/50">
-              ✓ Aucun patient à traiter immédiatement. Bon début de journée.
-            </p>
-          ) : (
-            <>
-              <HeroTableHeader />
-              {(expandedGroups.a_traiter ? aTraiter : aTraiter.slice(0, HERO_LIMIT)).map((p) => (
-                <HeroPatientRow key={p.id} patient={p} />
-              ))}
-              {aTraiter.length > HERO_LIMIT && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setExpandedGroups((prev) => ({ ...prev, a_traiter: !prev.a_traiter }))
-                  }
-                  className="w-full border-t border-navy-900/[0.05] px-5 py-3 text-center text-[12px] font-medium tracking-tight text-teal-700 hover:bg-bone/40"
-                >
-                  {expandedGroups.a_traiter
-                    ? "Replier"
-                    : `Voir les ${aTraiter.length - HERO_LIMIT} suivants ↓`}
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      </section>
 
       {/* ─── FILES PRIORITAIRES (Tier 1) ──────────────────────────────────── */}
       <div className="mb-2.5 flex items-baseline justify-between">
@@ -1002,6 +999,10 @@ export default function SuperviseurInbox() {
             expanded={!!expandedGroups[f.key]}
           />
         ))}
+      </div>
+
+      <div className="mt-6">
+        <MetricsBlock patients={scope} />
       </div>
 
       <SuggestionsBlock />
