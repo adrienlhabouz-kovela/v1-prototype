@@ -790,6 +790,35 @@ Layout permanent à 2 panneaux principaux (3 sur la fiche patient) :
 
 ---
 
+## 13nonies. Validation UX superviseur V1 prototype (2026-06-07)
+
+**Statut.** Validée comme base stable pour démo, tests utilisateurs et retours terrain. Ne plus refondre dans cette V1.
+
+**Points validés (verrouillés).**
+
+- Workspace superviseur unifié à panneaux permanents (pattern Front / Intercom adapté KOVELA).
+- Rail patient permanent partagé entre `/superviseur` et `/superviseur/patient/[id]`.
+- Dashboard orienté action : « À traiter maintenant » remonté en priorité, KPIs en bandeau pills secondaire, filtres après le HERO.
+- Fiche patient structurée en poste de travail : header sticky compact + grid 3/6/3 (lg) / 2/7/3 (2xl).
+- Conversation patient centrale et dominante, composer refondu (eyebrow, 4 rangs, primary group droit).
+- Action principale claire — bouton primary pleine largeur en card 1 du panneau droit.
+- Transmission cabinet : modale structurée, pipeline 3 étapes (Préparée → Copiée → Envoyée proto), bouton « Marquer comme transmis — prototype » avec journalisation auto.
+- CR factuel correctement formulé : « CR factuel », « Transmettre au chirurgien », « Marquer prêt pour chirurgien », « Export PDF prévu en V1 » désactivé.
+- Journal d'action en card autonome avec compteur, bandeau « audit trail réel prévu en V1 ».
+- WhatsApp présenté uniquement comme prototype d'ergonomie + bandeau RGPD/HDS explicite.
+- Aucun wording médical risqué (vérification grep complète).
+- Pricing (690 € + 80 €), landing, deck, BP, CRM, activation cabinet, espace chirurgien, interface patient : non touchés.
+- Build OK (19/19 pages).
+
+**Backlog production V1 — à traiter ultérieurement, pas maintenant.**
+
+- Sur laptop standard (1366px), la conversation reste lisible mais relativement compacte (377px). Pour la V1 production, prévoir :
+  - soit un **rail collapsible** (toggle icons-only / expanded) pour libérer la zone conversation à la demande ;
+  - soit des **panneaux contexte / action compressibles** (collapse to header strip) pour maximiser la conversation quand la superviseuse est en mode réponse intensive.
+- Le but est d'atteindre ≥ 600px de largeur conversation sur laptop standard sans perdre l'accès rapide au rail et au panneau d'action.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1
@@ -806,6 +835,7 @@ Layout permanent à 2 panneaux principaux (3 sur la fiche patient) :
 - Référentiel avec relecture KOVELA obligatoire
 - Unit economics care = à valider en pilote
 - Parcours activation cabinet (pas d'inscription libre · lien personnalisé après qualification) — cf. § 12bis et `CABINET_ACTIVATION_FLOW.md`
+- UX superviseur V1 prototype (workspace unifié + rail patient permanent + grid adaptative 3/6/3 sur lg, 2/7/3 sur 2xl) — cf. § 13nonies. Optimisations rail collapsible / panneaux compressibles renvoyées au backlog V1 production.
 
 ---
 
