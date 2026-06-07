@@ -16,7 +16,7 @@ const logKindLabel: Record<LogKind, string> = {
   ia_utilisee: "IA utilisée",
   ia_suggestion: "Suggestion IA",
   compilation_preparee: "Compilation factuelle préparée",
-  escalade_transmise: "Escalade transmise au chirurgien",
+  escalade_transmise: "Transmission cabinet envoyée au chirurgien",
   onboarding_complete: "Onboarding complété",
   onboarding_envoye: "Lien onboarding envoyé",
   patient_relance: "Patient relancé",
@@ -66,7 +66,7 @@ const aiFnLabel: Record<AiFunction, string> = {
   resume_conversation: "Résumé conversation",
   preparation_cr: "Préparation CR",
   reformulation: "Reformulation",
-  compilation_escalade: "Compilation escalade",
+  compilation_escalade: "Compilation transmission cabinet",
 };
 
 const aiDecisionStyle: Record<AiDecision, string> = {
@@ -175,7 +175,7 @@ export default function LogsPage() {
             ["all", "Tous"],
             ["ia", "IA"],
             ["cr", "CR"],
-            ["escalade", "Escalade"],
+            ["escalade", "Transmissions"],
             ["patient", "Patient"],
             ["attribution", "Attribution"],
             ["cabinet", "Cabinet"],

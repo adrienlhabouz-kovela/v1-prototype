@@ -140,8 +140,8 @@ export function DoctrineNote({ className = "" }: { className?: string }) {
       </span>
       <p className="leading-relaxed">
         <span className="font-semibold text-navy-900">KOVELA ne décide pas médicalement.</span>{" "}
-        KOVELA structure, trace, priorise opérationnellement et escalade. L'IA est assistive,
-        interne, loggée et human-in-the-loop.
+        KOVELA structure, trace, priorise opérationnellement et transmet au cabinet selon le
+        référentiel. L'IA est assistive, interne, loggée et human-in-the-loop.
       </p>
     </div>
   );

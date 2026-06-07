@@ -26,7 +26,7 @@ const CASES = [
     context:
       "Un patient envoie un message + une photo en demandant que le chirurgien voie l'élément avant la prochaine consultation.",
     goodAnswer:
-      "Préparer la compilation factuelle (brouillon interne), faire valider par un humain le contenu, puis cliquer explicitement « Transmettre au chirurgien ». Vérifier le log d'escalade.",
+      "Préparer la compilation factuelle (brouillon interne), faire valider par un humain le contenu, puis cliquer explicitement « Transmettre au chirurgien ». Vérifier le log de transmission cabinet.",
     badAnswer: "Cliquer directement sur un bouton « urgence » qui transmettrait sans validation humaine.",
   },
   {
@@ -45,9 +45,9 @@ const CASES = [
     context:
       "Vous avez généré une compilation factuelle via l'IA pour un patient. Le brouillon est sauvegardé.",
     goodAnswer:
-      "Préparer la compilation = brouillon interne ; le chirurgien ne la voit pas. La transmission au chirurgien est une action humaine explicite via « Transmettre au chirurgien ». Le log compilation_preparee précède escalade_transmise.",
+      "Préparer la compilation = brouillon interne ; le chirurgien ne la voit pas. La transmission au chirurgien est une action humaine explicite via « Transmettre au chirurgien ». Le log compilation_preparee précède la transmission cabinet effective.",
     badAnswer:
-      "Confondre les deux étapes et supposer que préparer une compilation déclenche une escalade visible chirurgien.",
+      "Confondre les deux étapes et supposer que préparer une compilation déclenche une transmission cabinet visible chirurgien.",
   },
 ];
 
@@ -83,7 +83,7 @@ const QUIZ: { q: string; options: string[]; correct: number }[] = [
   {
     q: "Où consulter les logs ?",
     options: [
-      "Page /logs (filtres par type : IA / CR / Escalade / Patient / Cabinet / CRM)",
+      "Page /logs (filtres par type : IA / CR / Transmissions / Patient / Cabinet / CRM)",
       "Aucun log n'est conservé",
       "Sur la page Patient",
     ],
@@ -109,7 +109,7 @@ const TEMPLATES = [
   "Demande de photo",
   "Rappel 15 / 112",
   "Relance patient silencieux",
-  "Escalade en cours",
+  "Transmission cabinet en cours",
   "Clôture",
 ];
 
@@ -170,7 +170,7 @@ export default function FormationPage() {
       <SectionTitle>Règles KOVELA</SectionTitle>
       <Card className="mb-8 p-5">
         <ul className="space-y-2 text-sm text-charcoal/75">
-          <li>• KOVELA structure, trace, priorise opérationnellement et escalade.</li>
+          <li>• KOVELA structure, trace, priorise opérationnellement et transmet au cabinet selon le référentiel.</li>
           <li>• KOVELA est un service opéré — pas un logiciel laissé au chirurgien.</li>
           <li>• Le superviseur ne formule pas d'avis médical.</li>
           <li>• L'IA assiste, l'humain valide.</li>

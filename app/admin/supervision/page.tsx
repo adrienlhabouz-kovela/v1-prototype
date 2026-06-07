@@ -173,7 +173,7 @@ export default function SupervisionPage() {
         <StatCard label="Délai moyen de traitement" value={`${global.delayH.toFixed(1)} h`} />
         <StatCard label="CR disponibles chirurgien" value={global.crFinalises} />
         <StatCard label="CR en retard de validation" value={global.crEnRetard} />
-        <StatCard label="Escalades transmises" value={global.escalades} />
+        <StatCard label="Transmissions cabinet envoyées" value={global.escalades} />
         <StatCard label="IA — acceptées" value={global.accepted} />
         <StatCard label="IA — modifiées" value={global.modified} />
         <StatCard label="IA — refusées" value={global.refused} />
@@ -203,7 +203,7 @@ export default function SupervisionPage() {
                   <th className="px-5 py-3.5 font-medium">Délai moyen</th>
                   <th className="px-5 py-3.5 font-medium">CR dispo. chir.</th>
                   <th className="px-5 py-3.5 font-medium">CR en retard valid.</th>
-                  <th className="px-5 py-3.5 font-medium">Escalades</th>
+                  <th className="px-5 py-3.5 font-medium">Transmissions cabinet</th>
                   <th className="px-5 py-3.5 font-medium">Usage IA</th>
                   <th className="px-5 py-3.5 font-medium">IA A/M/R</th>
                   <th className="px-5 py-3.5 font-medium">Temps gagné</th>
@@ -378,7 +378,7 @@ export default function SupervisionPage() {
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              ["Procédures", "Procédures internes documentées (mise en place cabinet, supervision, escalade, CR)."],
+              ["Procédures", "Procédures internes documentées (mise en place cabinet, supervision, transmission cabinet, CR)."],
               ["Formation superviseur", "Checklist de démarrage, règles KOVELA, lexique, cas pratiques, quiz."],
               ["Logs", "Traçabilité opérationnelle de chaque action humaine et IA."],
               ["Revue qualité", "Échantillonnage des conversations et des CR par le Head of Care."],

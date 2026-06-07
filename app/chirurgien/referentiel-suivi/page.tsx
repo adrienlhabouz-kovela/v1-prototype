@@ -15,7 +15,7 @@ const CR_FREQUENCIES = [
   "CR fin de suivi",
   "CR hebdomadaire",
   "CR à la demande",
-  "CR si escalade transmise",
+  "CR si transmission cabinet effectuée",
 ];
 const CHANNELS = ["Email cabinet", "Interface KOVELA", "Contact cabinet référent", "Autre canal"];
 const HOURS = [

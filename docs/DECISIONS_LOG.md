@@ -957,6 +957,55 @@ Layout permanent à 2 panneaux principaux (3 sur la fiche patient) :
 
 ---
 
+## 13terdecies. Stabilisation landing principale / + nettoyage wording global (2026-06-07)
+
+**Décision.** Stabiliser la landing principale `/` comme **page de crédibilité KOVELA**. Elle reste **distincte** de la landing acquisition `/chirurgiens-esthetiques`, qui n'a **pas** été modifiée dans cette passe.
+
+**Positionnement central intégré dans le hero `/`.**
+
+- Sous-titre actualisé : *« KOVELA est une **extension opérationnelle premium du cabinet** pour chirurgiens libéraux : suivi patient structuré, transmissions cabinet, CR factuels et journal d'action, selon le référentiel validé avec le cabinet. »*
+- Micro-réassurance hero (4 pills) actualisée pour mettre l'humain et le cadre en premier : **Supervision humaine issue du terrain · Assistance interne · Cadre RGPD / HDS pensé dès la conception · Sans diagnostic ni décision médicale.**
+- **H1 préservée** : « Votre suivi post-opératoire, structuré et opéré. » (locked § 14, non modifiée).
+
+**Nettoyage wording global.**
+
+Texte UI visible — remplacements appliqués sur l'ensemble du prototype (hors `/chirurgiens-esthetiques`) :
+
+| Avant (UI visible) | Après |
+|---|---|
+| « CR et escalades » (`/login`) | « CR factuels et transmissions cabinet » |
+| « priorise opérationnellement et escalade » (DoctrineNote) | « priorise opérationnellement et transmet au cabinet selon le référentiel » |
+| « Escalade transmise au chirurgien » (logs label) | « Transmission cabinet envoyée au chirurgien » |
+| « Compilation escalade » (logs label) | « Compilation transmission cabinet » |
+| Filtre logs « Escalade » | « Transmissions » |
+| « Compilation factuelle d'escalade » (titre modal IA fiche patient) | « Compilation factuelle pour transmission cabinet » |
+| « Escalades transmises » (KPI admin supervision) | « Transmissions cabinet envoyées » |
+| Colonne « Escalades » (table admin supervision) | « Transmissions cabinet » |
+| « escalade, CR » (procédures admin) | « transmission cabinet, CR » |
+| « Escalade en cours » (statut formation) | « Transmission cabinet en cours » |
+| « priorise opérationnellement et escalade » (formation) | « priorise opérationnellement et transmet au cabinet selon le référentiel » |
+| « CR si escalade transmise » (référentiel chirurgien) | « CR si transmission cabinet effectuée » |
+| « gating des comptes-rendus, escalades vers le cabinet » (onboarding chirurgien) | « gating des CR factuels, transmissions cabinet » |
+| « messagerie sécurisée » (`/login` + onboarding patient) | « messagerie encadrée » / « messagerie encadrée par KOVELA » |
+
+**Identifiants techniques internes préservés** (cf. `WORDING_DOCTRINE.md` § 8) : `escalade_transmise`, `compilation_escalade`, `escalade_ouverte`, `OpsFilter` key `"escalade"`, variable locale `escalades`. Ils restent dans le code source mais ne sont **plus visibles UI**.
+
+**Vérifications doctrinales globales.**
+
+- Zéro match UI sur : tri médical · surveillance médicale · patient à risque · qualité médicale · validation médicale · synthèse clinique · rapport médical · compte-rendu médical · certifié HDS · conforme HDS · preuve juridique · bouclier médico-légal · avis 5 étoiles · e-réputation protégée · alerte médicale.
+- Zéro match pricing incohérent : `50 €` / `50€` absent.
+- Toutes les occurrences de « diagnostic », « prescription », « décision médicale », « interprétation médicale » sont en négation explicite ou dans des banlists internes (MedicalGuard côté `chirurgien/referentiel`).
+
+**Pricing intact.** 690 € HT / mois + 80 € HT / patient activé. Aucun affichage tarifaire sur `/chirurgiens-esthetiques`.
+
+**Périmètre non touché.**
+
+- `/chirurgiens-esthetiques` : **non modifiée**.
+- Pricing : aucun changement.
+- UX superviseur V1 prototype (commit `7ff14f2`) : structure préservée, seuls 2 labels visibles ajustés (`Compilation factuelle d'escalade` → `Compilation factuelle pour transmission cabinet`).
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1

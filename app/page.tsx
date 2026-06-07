@@ -43,9 +43,10 @@ function HeroGraphic() {
 }
 
 const heroBadges = [
-  "Service opéré · pas un logiciel",
-  "IA assistive · jamais autonome",
-  "Construit avec des chirurgiens",
+  "Supervision humaine issue du terrain",
+  "Assistance interne",
+  "Cadre RGPD / HDS pensé dès la conception",
+  "Sans diagnostic ni décision médicale",
 ];
 
 const pains = [
@@ -150,8 +151,9 @@ export default function Landing() {
           </h1>
 
           <p className="mt-7 max-w-2xl text-[17px] leading-relaxed text-navy-100/80">
-            Supervision humaine, référentiel cabinet, comptes-rendus factuels et IA assistive. Le
-            chirurgien garde la main, KOVELA organise le flux.
+            KOVELA est une <span className="font-semibold text-white">extension opérationnelle premium du cabinet</span>{" "}
+            pour chirurgiens libéraux : suivi patient structuré, transmissions cabinet, CR factuels
+            et journal d&apos;action, selon le référentiel validé avec le cabinet.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-2">

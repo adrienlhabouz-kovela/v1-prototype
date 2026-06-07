@@ -49,7 +49,7 @@ const aiTitles: Record<AiKind, string> = {
   resume_conversation: "Résumé de conversation",
   preparation_cr: "Préparation du brouillon de CR",
   reformulation: "Reformulation du message",
-  compilation_escalade: "Compilation factuelle d'escalade",
+  compilation_escalade: "Compilation factuelle pour transmission cabinet",
 };
 
 // ---------------------------------------------------------------------------

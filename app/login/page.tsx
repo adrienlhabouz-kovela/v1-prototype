@@ -15,7 +15,7 @@ const roles: { role: Role; label: string; desc: string; href: string }[] = [
   {
     role: "superviseur",
     label: "Superviseur",
-    desc: "Inbox opérationnelle, fiches patients, IA assistive, CR et escalades.",
+    desc: "Inbox opérationnelle, fiches patients, IA assistive, CR factuels et transmissions cabinet.",
     href: "/superviseur",
   },
   {
@@ -27,7 +27,7 @@ const roles: { role: Role; label: string; desc: string; href: string }[] = [
   {
     role: "patient",
     label: "Patient",
-    desc: "Onboarding, consentement, messagerie sécurisée, rappel urgence.",
+    desc: "Onboarding, consentement, messagerie encadrée, rappel urgence.",
     href: "/patient/onboarding",
   },
 ];

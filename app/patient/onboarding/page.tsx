@@ -214,8 +214,8 @@ export default function PatientOnboarding() {
               <div className="mt-3 rounded-xl bg-navy-50/50 p-3 text-xs text-charcoal/70">
                 <p className="font-medium text-navy-900">Prochaine étape</p>
                 <p className="mt-0.5">
-                  Échangez avec l'équipe de coordination depuis votre messagerie sécurisée. Aucune
-                  réponse automatique : un humain vous répondra.
+                  Échangez avec l'équipe de coordination depuis votre messagerie encadrée par
+                  KOVELA. Aucune réponse automatique : un humain vous répondra.
                 </p>
               </div>
             </div>

@@ -81,7 +81,7 @@ const DOCS: { key: DocKey; title: string; version: string; placeholder: string }
     title: "Annexe opérationnelle de service",
     version: "v0.1",
     placeholder:
-      "Annexe détaillant les modalités opérationnelles du service KOVELA : supervision humaine, IA assistive interne, gating des comptes-rendus, escalades vers le cabinet, plages de traitement indicatives. Document de démonstration — version prototype v0.1.",
+      "Annexe détaillant les modalités opérationnelles du service KOVELA : supervision humaine, IA assistive interne, gating des CR factuels, transmissions cabinet, plages de traitement indicatives. Document de démonstration — version prototype v0.1.",
   },
   {
     key: "regles",
