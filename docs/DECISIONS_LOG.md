@@ -743,6 +743,53 @@ n'est jamais présenté comme le canal conforme définitif.
 
 ---
 
+## 13octies. Paradigme workspace unifié superviseur (2026-06-07)
+
+**Décision de fond.** Sortir du paradigme « dashboard → naviguer vers fiche → revenir au dashboard » pour adopter un **workspace unifié à panneaux permanents**, pattern Front / Intercom / Help Scout, adapté au métier KOVELA.
+
+**Justification opérationnelle.**
+- Suivi KOVELA = 3 à 12 jours · cible ~1h humaine par patient sur l'ensemble du suivi.
+- La superviseuse traite 60-120 patients sur 8h-20h → elle vit dans son outil toute la journée.
+- Chaque navigation dashboard ⇄ fiche = perte de contexte + perte de temps.
+- Le bon pattern métier est l'**inbox-conversation** des outils de support client de référence.
+
+**Architecture nouvelle.**
+
+Layout permanent à 2 panneaux principaux (3 sur la fiche patient) :
+
+```
+┌──────────┬──────────────────────────────────────────────────────┐
+│ Rail     │ Pane droit                                          │
+│ patient  │                                                     │
+│          │ /superviseur :                                       │
+│ filtres  │   header + KPIs + filtres + HERO table + 6 files    │
+│ recherche│                                                     │
+│ liste    │ /superviseur/patient/[id] :                          │
+│ scrolla- │   header sticky + grid 3/6/3                        │
+│ ble      │   (contexte / conversation / panneau d'action)      │
+└──────────┴──────────────────────────────────────────────────────┘
+```
+
+**Composant clé.** `components/SupervisorQueueRail.tsx` — partagé entre les deux routes.
+- 7 chips filtres compactes avec compteurs : Toutes · À traiter · Sans réponse · Transmissions · CR factuels · Retours cabinet · Suivis · Clôtures.
+- Recherche libre (patient · chirurgien · intervention).
+- Toggle « Mes patients » persistant.
+- Tri auto : urgence en retard > aujourd'hui > à venir, puis par âge du dernier message (plus ancien en haut).
+- Chaque ligne : avatar + point de priorité (ambre / teal / navy) + nom + J+ + intervention + citation du dernier message patient + âge.
+- État sélectionné : fond teal + ring teal pour le patient actuellement ouvert.
+
+**Bénéfices.**
+- La superviseuse ne quitte plus jamais le workspace.
+- Le contexte (file + qui est en cours) reste visible en permanence.
+- Changer de patient = 1 clic dans le rail (pas de page transition).
+- La file est toujours pré-filtrée et triée, jamais à reconstruire.
+
+**Wording / doctrine.** Inchangés. Termes interdits absents. WhatsApp marqué prototype. 15/112 sous le composer.
+
+**Périmètre non touché.** Landing / deck / BP / CRM / activation cabinet / chirurgien / interface patient. Pricing intact.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
+import { QueueRail } from "@/components/SupervisorQueueRail";
 import { Badge, Button, Card, Modal } from "@/components/ui";
 import { useKovela, type SuggestionInput } from "@/lib/store";
 import { aiEstimatedMinutes, formatMinutes } from "@/lib/ai";
@@ -724,6 +725,24 @@ export default function SuperviseurInbox() {
 
   return (
     <Shell>
+      {/* ─── WORKSPACE SUPERVISEUR ──────────────────────────────────────────
+          Layout 2 panneaux permanent :
+            · Rail patient (gauche) — toujours visible, navigation en place.
+            · Pane droit — vue cockpit dashboard (charge globale, file
+              prioritaire, files secondaires).
+          La superviseuse peut cliquer un patient dans le rail à tout
+          moment pour basculer en vue fiche, sans quitter le workspace.
+          ──────────────────────────────────────────────────────────────── */}
+      <div className="flex gap-4">
+        {/* Rail gauche — permanent, scrollable indépendamment */}
+        <div className="hidden w-[300px] shrink-0 lg:block">
+          <div className="sticky top-2 h-[calc(100vh-6rem)]">
+            <QueueRail />
+          </div>
+        </div>
+
+        {/* Pane droit — vue cockpit dashboard existante */}
+        <div className="min-w-0 flex-1">
       {/* ─── COCKPIT HEADER ───────────────────────────────────────────────── */}
       <div className="mb-5 border-b border-navy-900/[0.06] pb-4">
         <div className="flex flex-wrap items-end justify-between gap-4">
@@ -986,6 +1005,10 @@ export default function SuperviseurInbox() {
       </div>
 
       <SuggestionsBlock />
+        </div>
+        {/* /Pane droit */}
+      </div>
+      {/* /Workspace flex */}
     </Shell>
   );
 }

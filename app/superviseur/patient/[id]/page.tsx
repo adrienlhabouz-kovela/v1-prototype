@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Shell } from "@/components/Shell";
+import { QueueRail } from "@/components/SupervisorQueueRail";
 import { AiSuggestion, Badge, Button, Card, CardHeader, Modal } from "@/components/ui";
 import { useKovela } from "@/lib/store";
 import {
@@ -321,17 +322,24 @@ export default function PatientFiche() {
   return (
     <Shell>
       {/* ============================================================
-          BANDEAU PATIENT — compact, dense, action immédiatement visible.
+          WORKSPACE SUPERVISEUR — 2 panneaux principaux :
+            · Rail patient (gauche, permanent) — change de patient sans
+              jamais quitter le workspace.
+            · Pane patient (centre + droite) — header sticky + grid 3/6/3.
+          Pattern Front / Intercom / Help Scout adapté au métier
+          superviseur post-opératoire.
           ============================================================ */}
-      <Link
-        href="/superviseur"
-        className="mb-3 inline-block text-[12px] tracking-tight text-teal-700 hover:text-teal-800"
-      >
-        ← Cockpit
-      </Link>
+      <div className="flex gap-4">
+        {/* Rail gauche — permanent, scrollable indépendamment */}
+        <div className="hidden w-[300px] shrink-0 lg:block">
+          <div className="sticky top-2 h-[calc(100vh-6rem)]">
+            <QueueRail selectedPatientId={patient.id} />
+          </div>
+        </div>
 
-      {/* Header patient — sticky pour rester visible pendant la conversation.
-          backdrop-blur garde le contexte (qui · J+ · action) en permanence. */}
+        {/* Pane droit — contient le header sticky + le contenu fiche */}
+        <div className="min-w-0 flex-1">
+          {/* Header patient — sticky pour rester visible pendant la conversation. */}
       <div className="sticky top-2 z-30 mb-4 overflow-hidden rounded-2xl bg-white/95 shadow-card ring-1 ring-navy-900/[0.045] backdrop-blur supports-[backdrop-filter]:bg-white/85">
         <div className="border-l-[3px] border-teal-500/80 px-5 py-4">
           <div className="flex flex-wrap items-start gap-x-5 gap-y-3">
@@ -1379,6 +1387,10 @@ export default function PatientFiche() {
           </div>
         </aside>
       </div>
+        </div>
+        {/* /Pane droit */}
+      </div>
+      {/* /Workspace flex */}
 
       {/* ============================================================
           MODALES — préservées intégralement.
