@@ -2,71 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Georgia", serif;
+}
+
 html,
 body {
-  background-color: #f4f1ec;
-  color: #0a1f2d;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "ss01", "cv11";
+  height: 100%;
 }
 
-/* Police display (Fraunces) — neutralisation des alternates stylistiques et
-   ligatures (standard ET discrétionnaires) héritées du réglage global ci-dessus.
-   Conservation du crénage uniquement.
-   Désactivation explicite des sets stylistiques SS01–SS07, des Character
-   Variants cv01–cv11, et des ligatures fi/fl/ff qui rendent f / s / j / g
-   trop décoratifs aux grandes tailles avec Fraunces. */
-.font-display {
-  font-feature-settings:
-    "kern" 1,
-    "liga" 0, "clig" 0, "dlig" 0, "calt" 0, "salt" 0,
-    "ss01" 0, "ss02" 0, "ss03" 0, "ss04" 0, "ss05" 0, "ss06" 0, "ss07" 0,
-    "cv01" 0, "cv02" 0, "cv03" 0, "cv04" 0, "cv05" 0, "cv06" 0, "cv07" 0,
-    "cv08" 0, "cv09" 0, "cv10" 0, "cv11" 0;
-  font-variant-ligatures: none;
+body {
+  @apply bg-abyss-900 text-sail antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
-@layer base {
-  h1,
-  h2,
-  h3 {
-    letter-spacing: -0.018em;
-  }
-  h1 {
-    letter-spacing: -0.025em;
-  }
+/* Empêche le rebond / zoom involontaire sur les contrôles tactiles */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  touch-action: none;
 }
 
 @layer components {
-  /* Motif discret de lignes fluides / wave teal pour les headers */
-  .wave-motif {
-    background-image:
-      radial-gradient(60% 120% at 92% -20%, rgba(31, 167, 160, 0.16) 0%, rgba(31, 167, 160, 0) 60%),
-      url("data:image/svg+xml,%3Csvg width='1200' height='240' viewBox='0 0 1200 240' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%231FA7A0' stroke-opacity='0.16' fill='none' stroke-width='1.2'%3E%3Cpath d='M0 150 C 220 90, 420 210, 640 140 S 1020 60, 1200 130'/%3E%3Cpath d='M0 185 C 240 125, 440 235, 660 170 S 1040 95, 1200 160'/%3E%3Cpath d='M0 115 C 200 70, 400 175, 620 110 S 1000 35, 1200 100'/%3E%3C/g%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: top right, bottom right;
-    background-size: auto, 1200px 240px;
+  .glass {
+    @apply bg-white/[0.04] backdrop-blur-sm ring-1 ring-white/10;
   }
-
-  .hero-lines {
-    background-image: url("data:image/svg+xml,%3Csvg width='1440' height='760' viewBox='0 0 1440 760' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%231FA7A0' stroke-opacity='0.22' fill='none' stroke-width='1.1'%3E%3Cpath d='M-50 470 C 320 330, 620 600, 980 430 S 1520 200, 1620 380'/%3E%3Cpath d='M-50 540 C 360 400, 660 660, 1020 500 S 1520 280, 1620 450'/%3E%3Cpath d='M-50 400 C 300 280, 600 520, 960 360 S 1520 140, 1620 320'/%3E%3Cpath d='M-50 610 C 380 470, 700 720, 1060 560 S 1520 360, 1620 520'/%3E%3C/g%3E%3Ccircle cx='1180' cy='250' r='4' fill='%231FA7A0' fill-opacity='0.55'/%3E%3Ccircle cx='1020' cy='470' r='3' fill='%231FA7A0' fill-opacity='0.4'/%3E%3Ccircle cx='860' cy='360' r='3' fill='%23BFE3DE' fill-opacity='0.5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: center right;
-    background-size: cover;
+  .card {
+    @apply rounded-2xl bg-white/[0.04] ring-1 ring-white/10 shadow-card;
+  }
+  .card-light {
+    @apply rounded-2xl bg-sail text-abyss-900 shadow-card;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold
+      transition-all duration-150 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-spray-500 text-abyss-950 shadow-glow hover:bg-spray-400;
+  }
+  .btn-ghost {
+    @apply btn bg-white/5 text-sail ring-1 ring-white/10 hover:bg-white/10;
+  }
+  .btn-sun {
+    @apply btn bg-sun-500 text-abyss-950 hover:bg-sun-400;
+  }
+  .label-caps {
+    @apply text-[0.68rem] font-bold uppercase tracking-brand text-spray-400/90;
+  }
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-spray-400 focus-visible:ring-offset-2 focus-visible:ring-offset-abyss-900;
   }
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #c0ccd2 transparent;
+/* Masque le scrollbar horizontal des carrousels mobiles */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-thumb {
-  background-color: #c0ccd2;
-  border-radius: 8px;
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

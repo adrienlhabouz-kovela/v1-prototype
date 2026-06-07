@@ -1,34 +1,33 @@
-import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { KovelaProvider } from "@/lib/store";
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans",
-  display: "swap",
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-display",
-  display: "swap",
-});
+import { ProgressProvider } from "@/lib/progress/store";
+import { AppShell } from "@/components/layout/AppShell";
 
 export const metadata: Metadata = {
-  title: "KOVELA — Infrastructure de suivi post-opératoire (prototype)",
+  title: "Cap au Vent — Apprends la voile",
   description:
-    "Prototype de démonstration KOVELA. Données fictives. Pas une plateforme de production HDS.",
+    "L'app privée d'Adrien pour apprendre la voile : vent, allures, manœuvres, croisière et régate. Visuel, interactif, 15 minutes par jour.",
+  applicationName: "Cap au Vent",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const viewport: Viewport = {
+  themeColor: "#0B1B2B",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="fr" className={`${inter.variable} ${fraunces.variable}`}>
-      <body className="font-sans">
-        <KovelaProvider>{children}</KovelaProvider>
+    <html lang="fr">
+      <body className="min-h-screen bg-sea-deep">
+        <ProgressProvider>
+          <AppShell>{children}</AppShell>
+        </ProgressProvider>
       </body>
     </html>
   );
