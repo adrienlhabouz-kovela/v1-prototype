@@ -97,9 +97,12 @@ export default function ChirurgiensEsthetiquesLanding() {
           </Link>
           <Link
             href="#contact"
-            className="rounded-md bg-navy-900 px-4 py-2 text-[12px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
+            className="whitespace-nowrap rounded-md bg-navy-900 px-3.5 py-2 text-[11.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800 sm:px-4 sm:text-[12px]"
           >
-            {CTA_PRIMARY}
+            {/* Label court sur mobile, complet sur sm+, pour éviter
+                l'overflow du top bar à côté du Wordmark. */}
+            <span className="sm:hidden">Échange 20 min</span>
+            <span className="hidden sm:inline">{CTA_PRIMARY}</span>
           </Link>
         </div>
       </header>
@@ -123,7 +126,11 @@ export default function ChirurgiensEsthetiquesLanding() {
           <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed tracking-tight text-charcoal/75 sm:text-[16px]">
             Messages, photos, appels, inquiétudes à J+1, relances, historique à
             reconstituer : KOVELA structure le suivi post-op de vos patients selon vos
-            habitudes, sans recruter ni ajouter un logiciel à gérer.
+            habitudes,{" "}
+            <span className="font-semibold text-navy-900">
+              sans recruter ni ajouter un logiciel à gérer
+            </span>
+            .
           </p>
           <p className="mx-auto mt-4 max-w-xl text-[14px] font-medium tracking-tight text-navy-900">
             Votre cabinet transmet.{" "}
