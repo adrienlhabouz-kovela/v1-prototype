@@ -83,6 +83,30 @@ function sortPatients(
 // Ligne patient — version hero (À traiter maintenant) : dense, action visible.
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Tête de la table opérationnelle « À traiter maintenant ».
+// Colonnes alignées avec les rangs HeroRow → lecture verticale possible.
+// ---------------------------------------------------------------------------
+
+function HeroTableHeader() {
+  return (
+    <div className="hidden border-b border-navy-900/[0.06] bg-bone/40 px-5 py-2 text-[9.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55 sm:grid sm:grid-cols-[1.5fr_1.2fr_3rem_1.2fr_1.2fr_1.4fr_6rem] sm:items-center sm:gap-3">
+      <span>Patient</span>
+      <span>Intervention</span>
+      <span className="text-center">J+</span>
+      <span>Cabinet</span>
+      <span>Dernier événement</span>
+      <span>Action attendue</span>
+      <span className="text-right">CTA</span>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Ligne patient « À traiter maintenant » — format LISTE / TABLE opérationnelle
+// (et non card). Colonnes alignées, scan vertical fluide, rythme premium.
+// ---------------------------------------------------------------------------
+
 function HeroPatientRow({ patient }: { patient: Patient }) {
   const k = useKovela();
   const ctx = { reportFor: k.reportFor, escalationFor: k.escalationFor };
@@ -91,13 +115,12 @@ function HeroPatientRow({ patient }: { patient: Patient }) {
   const action = getRecommendedAction(patient, ctx);
   const urgence = getUrgence(patient, ctx);
 
-  // Dernier message patient — utile pour scanner sans ouvrir la fiche.
   const lastPatientMsg = [...patient.messages]
     .reverse()
     .find((m) => m.author === "patient");
   const preview = lastPatientMsg
-    ? lastPatientMsg.text.length > 90
-      ? lastPatientMsg.text.slice(0, 90) + "…"
+    ? lastPatientMsg.text.length > 70
+      ? lastPatientMsg.text.slice(0, 70) + "…"
       : lastPatientMsg.text
     : null;
 
@@ -111,56 +134,75 @@ function HeroPatientRow({ patient }: { patient: Patient }) {
     return "À revoir selon référentiel";
   })();
 
+  const initials = patient.name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2);
+
   return (
     <Link
       href={`/superviseur/patient/${patient.id}`}
-      className="group block border-t border-navy-900/[0.05] transition-colors first:border-t-0 hover:bg-bone/30"
+      className="group block border-t border-navy-900/[0.05] transition-colors first:border-t-0 hover:bg-bone/40"
     >
-      <div className="flex items-center gap-4 px-5 py-3.5">
-        {/* Initiales */}
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-navy-50 text-[12px] font-semibold tracking-tight text-navy-900 ring-1 ring-navy-100">
-          {patient.name
-            .split(" ")
-            .map((w) => w[0])
-            .join("")
-            .slice(0, 2)}
-        </span>
-
-        {/* Identité + contexte */}
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-baseline gap-x-2">
-            <span className="truncate text-[13.5px] font-semibold tracking-tight text-navy-900">
+      {/* Layout mobile : empilé. Layout desktop : grille alignée. */}
+      <div className="flex flex-col gap-1.5 px-5 py-3 sm:grid sm:grid-cols-[1.5fr_1.2fr_3rem_1.2fr_1.2fr_1.4fr_6rem] sm:items-center sm:gap-3 sm:py-2.5">
+        {/* Colonne 1 — Patient (avatar + nom + raison) */}
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-navy-50 text-[11px] font-semibold tracking-tight text-navy-900 ring-1 ring-navy-100">
+            {initials}
+          </span>
+          <div className="min-w-0">
+            <p className="truncate text-[12.5px] font-semibold tracking-tight text-navy-900">
               {patient.name}
-            </span>
-            <span className="font-mono text-[11.5px] font-medium text-teal-700">{day}</span>
-            <span className="truncate text-[11.5px] text-charcoal/55">
-              · {patient.intervention}
-            </span>
-            <span className="truncate text-[11px] text-charcoal/45">
-              · {k.surgeonName(patient.surgeonId)}
-            </span>
+            </p>
+            <p className="truncate text-[10.5px] font-medium tracking-tight text-amber-800">
+              {reason}
+            </p>
           </div>
-          <p className="mt-0.5 flex items-center gap-x-2 text-[11.5px] tracking-tight text-charcoal/65">
-            <span className="font-medium text-amber-800">{reason}</span>
-            {last.ageLabel && (
-              <span className="text-charcoal/45">· dernier événement {last.ageLabel}</span>
-            )}
-          </p>
-          {preview && (
-            <p className="mt-0.5 truncate text-[11px] italic tracking-tight text-charcoal/55">
+        </div>
+
+        {/* Colonne 2 — Intervention */}
+        <p className="truncate text-[11.5px] tracking-tight text-charcoal/75 sm:text-[11px]">
+          {patient.intervention}
+        </p>
+
+        {/* Colonne 3 — J+ */}
+        <p className="font-mono text-[11.5px] font-medium tracking-tight text-teal-700 sm:text-center">
+          {day}
+        </p>
+
+        {/* Colonne 4 — Cabinet (chirurgien) */}
+        <p className="truncate text-[11px] tracking-tight text-charcoal/65">
+          {k.surgeonName(patient.surgeonId)}
+        </p>
+
+        {/* Colonne 5 — Dernier événement (preview message si présent, sinon âge) */}
+        <div className="min-w-0">
+          {preview ? (
+            <p className="truncate text-[10.5px] italic tracking-tight text-charcoal/65">
               <span className="not-italic text-amber-700">«</span> {preview}{" "}
               <span className="not-italic text-amber-700">»</span>
+            </p>
+          ) : (
+            <p className="text-[10.5px] tracking-tight text-charcoal/55">—</p>
+          )}
+          {last.ageLabel && (
+            <p className="text-[9.5px] tracking-tight text-charcoal/45">
+              {last.ageLabel}
             </p>
           )}
         </div>
 
-        {/* Action */}
-        <div className="hidden shrink-0 items-center gap-3 sm:flex">
-          <span className="text-[11.5px] tracking-tight text-navy-900">
-            <span className="font-medium text-teal-700">→</span> {action.label}
-          </span>
-          <span className="rounded-md bg-navy-900 px-3 py-1.5 text-[11.5px] font-medium text-white transition-colors group-hover:bg-navy-800">
-            Ouvrir
+        {/* Colonne 6 — Action attendue */}
+        <p className="truncate text-[11px] font-medium tracking-tight text-navy-900">
+          <span className="text-teal-700">→</span> {action.label}
+        </p>
+
+        {/* Colonne 7 — CTA */}
+        <div className="flex justify-end">
+          <span className="rounded-md bg-navy-900 px-3 py-1.5 text-[11px] font-medium text-white transition-colors group-hover:bg-navy-800">
+            Ouvrir le dossier
           </span>
         </div>
       </div>
@@ -213,29 +255,22 @@ function QueuePatientRow({ patient }: { patient: Patient }) {
 // ---------------------------------------------------------------------------
 
 function SecondaryQueue({
-  status,
+  title,
+  hint,
+  accentColor,
   patients,
   limit,
   onExpand,
   expanded,
 }: {
-  status: OperationalStatus;
+  title: string;
+  hint: string;
+  accentColor: string;
   patients: Patient[];
   limit: number;
   onExpand: () => void;
   expanded: boolean;
 }) {
-  const accentColor =
-    status === "a_relancer"
-      ? "bg-amber-300/70"
-      : status === "a_transmettre_cabinet"
-      ? "bg-teal-500/80"
-      : status === "en_attente_cabinet"
-      ? "bg-navy-900/30"
-      : status === "cloture_a_preparer"
-      ? "bg-navy-900/40"
-      : "bg-navy-900/[0.08]";
-
   return (
     <Card className="flex flex-col overflow-hidden">
       <div className="flex items-start gap-3 border-b border-navy-900/[0.05] px-4 py-3">
@@ -243,14 +278,14 @@ function SecondaryQueue({
         <div className="flex-1">
           <div className="flex items-baseline justify-between gap-2">
             <h3 className="text-[13px] font-semibold tracking-tight text-navy-900">
-              {operationalStatusLabels[status]}
+              {title}
             </h3>
             <span className="flex h-5 min-w-[22px] items-center justify-center rounded-md bg-navy-900 px-1.5 text-[10.5px] font-semibold text-white">
               {patients.length}
             </span>
           </div>
           <p className="mt-0.5 text-[10.5px] leading-relaxed text-charcoal/55">
-            {operationalStatusHints[status]}
+            {hint}
           </p>
         </div>
       </div>
@@ -589,16 +624,78 @@ export default function SuperviseurInbox() {
     !!search || !!filterStatut || !!filterUrgence || !!filterSurgeon || !!filterCR || filterSilencieux;
 
   const aTraiter = sortPatients(grouped.a_traiter, sortBy, ctx, k);
-  // Files secondaires hiérarchisées en 2 tiers :
-  //  Tier 1 (dominant, large) : transmissions cabinet · sans réponse · CR à traiter.
-  //  Tier 2 (compact, secondaire) : suivis du jour · clôtures à finaliser.
-  // Pas de grille égale = priorité visible.
-  const tier1: OperationalStatus[] = [
-    "a_transmettre_cabinet",
-    "a_relancer",
-    "en_attente_cabinet",
+
+  // CR factuels = file dédiée (séparée des transmissions cabinet).
+  // Patients dont le CR est en brouillon (à relire) ou validé (à publier).
+  const crFactuelsList = useMemo(
+    () =>
+      sortPatients(
+        scope.filter((p) => {
+          const r = k.reportFor(p.id);
+          return r?.status === "brouillon" || r?.status === "valide";
+        }),
+        sortBy,
+        ctx,
+        k
+      ),
+    [scope, sortBy, ctx, k]
+  );
+
+  // Files configurées explicitement — 5 files métier, regroupées en 2 tiers
+  // visuellement distincts.
+  type FileConfig = {
+    key: string;
+    title: string;
+    hint: string;
+    accentColor: string;
+    patients: Patient[];
+  };
+  const tier1Files: FileConfig[] = [
+    {
+      key: "transmissions_cabinet",
+      title: "Transmissions cabinet",
+      hint: "Compilations préparées · transmissions à envoyer.",
+      accentColor: "bg-teal-500/80",
+      patients: sortPatients(grouped.a_transmettre_cabinet, sortBy, ctx, k),
+    },
+    {
+      key: "patients_sans_reponse",
+      title: "Patients sans réponse",
+      hint: "Relance attendue selon référentiel.",
+      accentColor: "bg-amber-300/70",
+      patients: sortPatients(grouped.a_relancer, sortBy, ctx, k),
+    },
+    {
+      key: "cr_factuels",
+      title: "CR factuels",
+      hint: "Brouillons IA à relire · validés à publier.",
+      accentColor: "bg-teal-600/70",
+      patients: crFactuelsList,
+    },
   ];
-  const tier2: OperationalStatus[] = ["suivi_habituel", "cloture_a_preparer"];
+  const tier2Files: FileConfig[] = [
+    {
+      key: "en_attente_cabinet",
+      title: "Retours cabinet attendus",
+      hint: "Transmission envoyée · réponse cabinet à intégrer.",
+      accentColor: "bg-navy-900/30",
+      patients: sortPatients(grouped.en_attente_cabinet, sortBy, ctx, k),
+    },
+    {
+      key: "suivis_du_jour",
+      title: "Suivis du jour",
+      hint: "Pas d'action immédiate · veille référentiel.",
+      accentColor: "bg-navy-900/[0.08]",
+      patients: sortPatients(grouped.suivi_habituel, sortBy, ctx, k),
+    },
+    {
+      key: "clotures",
+      title: "Clôtures à finaliser",
+      hint: "Suivi terminé · CR à publier · clôture à valider.",
+      accentColor: "bg-navy-900/40",
+      patients: sortPatients(grouped.cloture_a_preparer, sortBy, ctx, k),
+    },
+  ];
 
   // Charge du jour — synthèse opérationnelle visible en haut de page.
   const chargeTotal = aTraiter.length + counts.a_relancer + counts.a_transmettre_cabinet;
@@ -814,6 +911,7 @@ export default function SuperviseurInbox() {
             </p>
           ) : (
             <>
+              <HeroTableHeader />
               {(expandedGroups.a_traiter ? aTraiter : aTraiter.slice(0, HERO_LIMIT)).map((p) => (
                 <HeroPatientRow key={p.id} patient={p} />
               ))}
@@ -845,16 +943,18 @@ export default function SuperviseurInbox() {
         </p>
       </div>
       <div className="mb-6 grid gap-3 md:grid-cols-3">
-        {tier1.map((status) => (
+        {tier1Files.map((f) => (
           <SecondaryQueue
-            key={status}
-            status={status}
-            patients={sortPatients(grouped[status], sortBy, ctx, k)}
-            limit={expandedGroups[status] ? Infinity : QUEUE_LIMIT}
+            key={f.key}
+            title={f.title}
+            hint={f.hint}
+            accentColor={f.accentColor}
+            patients={f.patients}
+            limit={expandedGroups[f.key] ? Infinity : QUEUE_LIMIT}
             onExpand={() =>
-              setExpandedGroups((prev) => ({ ...prev, [status]: !prev[status] }))
+              setExpandedGroups((prev) => ({ ...prev, [f.key]: !prev[f.key] }))
             }
-            expanded={!!expandedGroups[status]}
+            expanded={!!expandedGroups[f.key]}
           />
         ))}
       </div>
@@ -865,20 +965,22 @@ export default function SuperviseurInbox() {
           Files secondaires
         </h3>
         <p className="text-[10px] tracking-tight text-charcoal/40">
-          Suivis habituels · clôtures à finaliser
+          Retours cabinet · suivis du jour · clôtures
         </p>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        {tier2.map((status) => (
+      <div className="grid gap-3 md:grid-cols-3">
+        {tier2Files.map((f) => (
           <SecondaryQueue
-            key={status}
-            status={status}
-            patients={sortPatients(grouped[status], sortBy, ctx, k)}
-            limit={expandedGroups[status] ? Infinity : 4}
+            key={f.key}
+            title={f.title}
+            hint={f.hint}
+            accentColor={f.accentColor}
+            patients={f.patients}
+            limit={expandedGroups[f.key] ? Infinity : 4}
             onExpand={() =>
-              setExpandedGroups((prev) => ({ ...prev, [status]: !prev[status] }))
+              setExpandedGroups((prev) => ({ ...prev, [f.key]: !prev[f.key] }))
             }
-            expanded={!!expandedGroups[status]}
+            expanded={!!expandedGroups[f.key]}
           />
         ))}
       </div>

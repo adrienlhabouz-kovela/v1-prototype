@@ -121,9 +121,9 @@ export default function PatientFiche() {
   const [contactCabinetCopied, setContactCabinetCopied] = useState(false);
   const [showAllScheduled, setShowAllScheduled] = useState(false);
   const [closeConfirmOpen, setCloseConfirmOpen] = useState(false);
-  // Notes / Journal sont relégués en bas du panneau d'action (visuellement
-  // secondaires). On garde un mini-tab pour basculer entre les deux.
-  const [bottomTab, setBottomTab] = useState<"notes" | "journal">("notes");
+  // Journal et Notes sont désormais 2 cards autonomes au pied du panneau
+  // d'action — visuellement secondaires mais toujours visibles, plus en
+  // mini-tabs.
   // Pipeline transmission cabinet — copié reste localement (le store ne le
   // persiste pas), envoyé est lu depuis escalation.status.
   const [hasCopiedTransmission, setHasCopiedTransmission] = useState(false);
@@ -330,7 +330,9 @@ export default function PatientFiche() {
         ← Cockpit
       </Link>
 
-      <div className="mb-4 overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
+      {/* Header patient — sticky pour rester visible pendant la conversation.
+          backdrop-blur garde le contexte (qui · J+ · action) en permanence. */}
+      <div className="sticky top-2 z-30 mb-4 overflow-hidden rounded-2xl bg-white/95 shadow-card ring-1 ring-navy-900/[0.045] backdrop-blur supports-[backdrop-filter]:bg-white/85">
         <div className="border-l-[3px] border-teal-500/80 px-5 py-4">
           <div className="flex flex-wrap items-start gap-x-5 gap-y-3">
             {/* Identité — avatar + nom + métadonnées en ligne */}
@@ -770,7 +772,6 @@ export default function PatientFiche() {
                                     patient.id,
                                     `Capturé depuis message patient : « ${e.content} »`
                                   );
-                                  setBottomTab("notes");
                                 }}
                                 className="rounded-md bg-white px-2 py-1 text-[10.5px] font-medium tracking-tight text-charcoal/70 ring-1 ring-navy-900/10 transition-colors hover:bg-navy-50 hover:text-navy-900"
                               >
@@ -1271,136 +1272,107 @@ export default function PatientFiche() {
             </div>
           </div>
 
-          {/* ─── 5. NOTES / JOURNAL — mini-tabs secondaires ─────────────────── */}
+          {/* ─── 5. JOURNAL D'ACTION — bloc autonome (plus en mini-tab) ─────── */}
           <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
-            <div className="flex border-b border-navy-900/[0.06] bg-bone/40">
-              <button
-                type="button"
-                onClick={() => setBottomTab("notes")}
-                className={`relative flex-1 px-3 py-2 text-[10.5px] font-medium tracking-tight transition-colors ${
-                  bottomTab === "notes"
-                    ? "bg-white text-navy-900"
-                    : "text-charcoal/55 hover:text-navy-900"
-                }`}
-              >
-                Notes internes
-                {notesCount > 0 && (
-                  <span
-                    className={`ml-1 inline-flex items-center rounded-full px-1 py-0.5 text-[9px] font-semibold ${
-                      bottomTab === "notes"
-                        ? "bg-teal-50 text-teal-700 ring-1 ring-teal-100"
-                        : "bg-navy-900/[0.06] text-charcoal/70"
-                    }`}
-                  >
-                    {notesCount}
-                  </span>
-                )}
-                {bottomTab === "notes" && (
-                  <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-teal-500" />
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setBottomTab("journal")}
-                className={`relative flex-1 px-3 py-2 text-[10.5px] font-medium tracking-tight transition-colors ${
-                  bottomTab === "journal"
-                    ? "bg-white text-navy-900"
-                    : "text-charcoal/55 hover:text-navy-900"
-                }`}
-              >
-                Journal d\'action
-                {journalCount > 0 && (
-                  <span
-                    className={`ml-1 inline-flex items-center rounded-full px-1 py-0.5 text-[9px] font-semibold ${
-                      bottomTab === "journal"
-                        ? "bg-teal-50 text-teal-700 ring-1 ring-teal-100"
-                        : "bg-navy-900/[0.06] text-charcoal/70"
-                    }`}
-                  >
-                    {journalCount}
-                  </span>
-                )}
-                {bottomTab === "journal" && (
-                  <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-teal-500" />
-                )}
-              </button>
+            <div className="flex items-center justify-between border-b border-navy-900/[0.05] px-4 py-2.5">
+              <div>
+                <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-navy-900/70">
+                  Journal d&apos;action
+                </p>
+                <p className="mt-0.5 text-[10.5px] tracking-tight text-charcoal/55">
+                  Traçabilité opérationnelle horodatée
+                </p>
+              </div>
+              <span className="flex h-5 min-w-[22px] items-center justify-center rounded-md bg-navy-900 px-1.5 text-[10.5px] font-semibold text-white">
+                {journalCount}
+              </span>
             </div>
-            <div className="max-h-[280px] overflow-y-auto px-3 py-3">
-              {bottomTab === "notes" && (
-                <div className="space-y-2.5">
-                  <div className="flex gap-1.5">
-                    <input
-                      value={noteText}
-                      onChange={(e) => setNoteText(e.target.value)}
-                      placeholder="Ajouter une note interne…"
-                      className="flex-1 rounded-lg border border-navy-900/[0.08] px-2.5 py-1.5 text-[11.5px] outline-none focus:border-teal-500/60"
-                    />
-                    <button
-                      type="button"
-                      disabled={!noteText.trim()}
-                      onClick={() => {
-                        k.addNote(patient.id, noteText.trim());
-                        setNoteText("");
-                      }}
-                      className="rounded-md bg-navy-900 px-2.5 py-1.5 text-[11px] font-medium text-white transition-colors hover:bg-navy-800 disabled:cursor-not-allowed disabled:bg-charcoal/20"
-                    >
-                      +
-                    </button>
-                  </div>
-                  {patient.notes.length === 0 ? (
-                    <p className="rounded-lg bg-bone/50 p-2.5 text-[10.5px] tracking-tight text-charcoal/55">
-                      Aucune note pour le moment. Les notes internes ne sont jamais
-                      envoyées au patient.
-                    </p>
-                  ) : (
-                    <div className="space-y-1.5">
-                      {patient.notes.map((n) => (
-                        <div
-                          key={n.id}
-                          // Style très différent du message patient : fond
-                          // navy léger, bord pointillé, tag INTERNE — pour
-                          // garantir qu\'une note ne ressemble jamais à une
-                          // réponse envoyée au patient.
-                          className="rounded-lg border border-dashed border-navy-900/15 bg-navy-50/40 p-2.5"
-                        >
-                          <p className="mb-1 text-[8.5px] font-semibold uppercase tracking-[0.16em] text-navy-700">
-                            ✦ Note interne
-                          </p>
-                          <p className="whitespace-pre-wrap text-[11.5px] text-navy-900">
-                            {n.text}
-                          </p>
-                          <p className="mt-1 text-[9.5px] tracking-tight text-charcoal/45">
-                            {n.author} · {formatDateTime(n.at)}
-                          </p>
-                        </div>
-                      ))}
+            <div className="max-h-[260px] space-y-2 overflow-y-auto px-3 py-3">
+              <p className="rounded-md bg-bone/60 px-2.5 py-1.5 text-[9.5px] leading-relaxed tracking-tight text-charcoal/60 ring-1 ring-navy-900/[0.04]">
+                Journal d&apos;action prototype — audit trail réel prévu en V1.
+              </p>
+              {patientLogs.length === 0 ? (
+                <p className="rounded-lg bg-bone/50 p-2.5 text-[10.5px] tracking-tight text-charcoal/55">
+                  Aucun log.
+                </p>
+              ) : (
+                <div className="space-y-1.5">
+                  {patientLogs.map((l) => (
+                    <div key={l.id} className="border-l-2 border-teal-200 pl-2.5">
+                      <p className="text-[10.5px] leading-relaxed text-navy-900">
+                        {l.detail}
+                      </p>
+                      <p className="text-[9.5px] tracking-tight text-charcoal/45">
+                        {l.user} · {formatDateTime(l.at)}
+                      </p>
                     </div>
-                  )}
+                  ))}
                 </div>
               )}
-              {bottomTab === "journal" && (
-                <div className="space-y-2">
-                  <p className="rounded-md bg-bone/60 px-2.5 py-1.5 text-[9.5px] leading-relaxed tracking-tight text-charcoal/60 ring-1 ring-navy-900/[0.04]">
-                    Journal d\'action prototype — audit trail réel prévu en V1.
-                  </p>
-                  {patientLogs.length === 0 ? (
-                    <p className="rounded-lg bg-bone/50 p-2.5 text-[10.5px] tracking-tight text-charcoal/55">
-                      Aucun log.
-                    </p>
-                  ) : (
-                    <div className="space-y-1.5">
-                      {patientLogs.map((l) => (
-                        <div key={l.id} className="border-l-2 border-teal-200 pl-2.5">
-                          <p className="text-[10.5px] leading-relaxed text-navy-900">
-                            {l.detail}
-                          </p>
-                          <p className="text-[9.5px] tracking-tight text-charcoal/45">
-                            {l.user} · {formatDateTime(l.at)}
-                          </p>
-                        </div>
-                      ))}
+            </div>
+          </div>
+
+          {/* ─── 6. NOTES INTERNES — bloc dernier (visuellement secondaire) ───
+              Style délibérément distinct : fond navy léger + bord pointillé +
+              tag uppercase ✦ Note interne. Impossible de confondre avec une
+              réponse envoyée au patient. */}
+          <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
+            <div className="flex items-center justify-between border-b border-navy-900/[0.05] px-4 py-2.5">
+              <div>
+                <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-navy-900/70">
+                  Notes internes
+                </p>
+                <p className="mt-0.5 text-[10.5px] tracking-tight text-charcoal/55">
+                  Visibles équipe uniquement · jamais envoyées au patient
+                </p>
+              </div>
+              <span className="flex h-5 min-w-[22px] items-center justify-center rounded-md bg-navy-900 px-1.5 text-[10.5px] font-semibold text-white">
+                {notesCount}
+              </span>
+            </div>
+            <div className="max-h-[260px] space-y-2.5 overflow-y-auto px-3 py-3">
+              <div className="flex gap-1.5">
+                <input
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  placeholder="Ajouter une note interne…"
+                  className="flex-1 rounded-lg border border-navy-900/[0.08] px-2.5 py-1.5 text-[11.5px] outline-none focus:border-teal-500/60"
+                />
+                <button
+                  type="button"
+                  disabled={!noteText.trim()}
+                  onClick={() => {
+                    k.addNote(patient.id, noteText.trim());
+                    setNoteText("");
+                  }}
+                  className="rounded-md bg-navy-900 px-2.5 py-1.5 text-[11px] font-medium text-white transition-colors hover:bg-navy-800 disabled:cursor-not-allowed disabled:bg-charcoal/20"
+                >
+                  +
+                </button>
+              </div>
+              {patient.notes.length === 0 ? (
+                <p className="rounded-lg bg-bone/50 p-2.5 text-[10.5px] tracking-tight text-charcoal/55">
+                  Aucune note pour le moment. Les notes internes ne sont jamais
+                  envoyées au patient.
+                </p>
+              ) : (
+                <div className="space-y-1.5">
+                  {patient.notes.map((n) => (
+                    <div
+                      key={n.id}
+                      className="rounded-lg border border-dashed border-navy-900/15 bg-navy-50/40 p-2.5"
+                    >
+                      <p className="mb-1 text-[8.5px] font-semibold uppercase tracking-[0.16em] text-navy-700">
+                        ✦ Note interne
+                      </p>
+                      <p className="whitespace-pre-wrap text-[11.5px] text-navy-900">
+                        {n.text}
+                      </p>
+                      <p className="mt-1 text-[9.5px] tracking-tight text-charcoal/45">
+                        {n.author} · {formatDateTime(n.at)}
+                      </p>
                     </div>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
