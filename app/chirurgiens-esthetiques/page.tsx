@@ -175,7 +175,7 @@ function ProductMockup() {
   return (
     <section
       aria-label="Aperçu cockpit KOVELA"
-      className="bg-bone px-5 pb-12 sm:px-8 sm:pb-16"
+      className="bg-bone px-5 pb-14 pt-2 sm:px-8 sm:pb-20 sm:pt-4"
     >
       <div className="mx-auto max-w-5xl">
         <div className="overflow-hidden rounded-2xl bg-navy-depth shadow-lift ring-1 ring-navy-900/15">
@@ -357,7 +357,7 @@ export default function ChirurgiensEsthetiquesLanding() {
       {/* ============================================================
           1. HERO — promesse en 5 secondes
           ============================================================ */}
-      <section className="bg-bone px-5 pb-12 pt-14 sm:px-8 sm:pt-20">
+      <section className="bg-bone px-5 pb-8 pt-14 sm:px-8 sm:pb-10 sm:pt-20">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto mb-7 flex h-12 w-12 items-center justify-center">
             <BrandMark />
@@ -424,7 +424,7 @@ export default function ChirurgiensEsthetiquesLanding() {
       {/* ============================================================
           2. DOULEUR CABINET — courte et concrète
           ============================================================ */}
-      <section className="border-t border-navy-900/[0.05] bg-white px-5 py-16 sm:px-8 sm:py-20">
+      <section className="border-t border-navy-900/[0.05] bg-white px-5 py-12 sm:px-8 sm:py-16">
         <div className="mx-auto max-w-5xl">
           <div className="mx-auto max-w-3xl text-center">
             <SectionEyebrow>Constat cabinet</SectionEyebrow>
@@ -432,17 +432,17 @@ export default function ChirurgiensEsthetiquesLanding() {
               Ce qui fatigue votre cabinet n&apos;est pas l&apos;intervention.
               C&apos;est l&apos;après.
             </SectionTitle>
-            <p className="mt-5 text-[14.5px] leading-relaxed tracking-tight text-charcoal/75">
+            <p className="mt-4 text-[14.5px] leading-relaxed tracking-tight text-charcoal/75">
               Le post-op crée une charge diffuse : rarement simple, souvent
               chronophage, et difficile à tracer proprement.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
             {pains.map((p) => (
               <div
                 key={p}
-                className="rounded-xl border border-navy-900/[0.06] bg-bone/40 px-4 py-3.5"
+                className="rounded-xl border border-navy-900/[0.06] bg-bone/40 px-4 py-2.5"
               >
                 <p className="flex items-start gap-2.5 text-[13px] leading-relaxed tracking-tight text-navy-900">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/80" />
@@ -452,7 +452,7 @@ export default function ChirurgiensEsthetiquesLanding() {
             ))}
           </div>
 
-          <p className="mx-auto mt-10 max-w-2xl text-center font-display text-[1.15rem] italic leading-relaxed tracking-tight text-navy-900">
+          <p className="mx-auto mt-8 max-w-2xl text-center font-display text-[1.15rem] italic leading-relaxed tracking-tight text-navy-900">
             « Le sujet n&apos;est pas de répondre plus.
             <br />
             C&apos;est de structurer mieux. »
@@ -494,12 +494,12 @@ export default function ChirurgiensEsthetiquesLanding() {
           </div>
 
           {/* Mini-flow 5 étapes en 10 secondes — compact, horizontal sur
-              desktop, empilé sur mobile. */}
-          <div className="mt-12">
+              desktop, 2 colonnes sur tablette, empilé sur mobile. */}
+          <div className="mt-10 sm:mt-12">
             <p className="mb-4 text-center text-[10.5px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
               Comment ça marche · 5 étapes
             </p>
-            <ol className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+            <ol className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
               {flow.map((s) => (
                 <li
                   key={s.n}
@@ -551,7 +551,7 @@ export default function ChirurgiensEsthetiquesLanding() {
             <SectionEyebrow>Différenciation</SectionEyebrow>
             <SectionTitle>Ce n&apos;est pas un logiciel de plus.</SectionTitle>
             <p className="mx-auto mt-5 max-w-2xl text-[14.5px] font-medium leading-relaxed tracking-tight text-navy-900">
-              Rien à implémenter. Rien à manager.{" "}
+              Rien à installer. Rien à manager.{" "}
               <span className="text-teal-700">Rien à apprendre côté cabinet.</span>
             </p>
           </div>
@@ -619,23 +619,18 @@ export default function ChirurgiensEsthetiquesLanding() {
               votre organisation et vos habitudes de suivi.
             </p>
 
-            {/* Micro-bloc doctrine discret — ne pas en faire une section
-                dédiée. Reste lisible, sobre, non anxiogène. */}
-            <div className="mt-8 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[11px] leading-relaxed tracking-tight text-navy-100/70">
-              <p>
-                KOVELA ne remplace pas le chirurgien, ne pose pas de diagnostic, ne
-                prescrit pas et ne prend aucune décision médicale. En cas de situation
-                urgente ou de doute important, le patient doit contacter le 15 / 112,
-                les urgences de la clinique ou suivre les consignes remises par son
-                chirurgien.
-              </p>
-              <p className="mt-2 text-navy-100/45">
-                Prototype de présentation — canaux et architecture de production à
-                valider en V1 selon le cadre RGPD / HDS.
-              </p>
-            </div>
+            {/* Micro-bloc doctrine plus discret — police plus petite, fond
+                moins contrasté. La mention prototype est déplacée vers le
+                footer pour ne pas concurrencer le CTA. */}
+            <p className="mt-6 text-[10.5px] leading-relaxed tracking-tight text-navy-100/50">
+              KOVELA ne remplace pas le chirurgien, ne pose pas de diagnostic, ne
+              prescrit pas et ne prend aucune décision médicale. En cas de situation
+              urgente ou de doute important, le patient doit contacter le 15 / 112,
+              les urgences de la clinique ou suivre les consignes remises par son
+              chirurgien.
+            </p>
 
-            <p className="mt-6 text-[11px] tracking-tight text-navy-100/50">
+            <p className="mt-5 text-[11px] tracking-tight text-navy-100/50">
               Vous pouvez aussi écrire directement à{" "}
               <a
                 href="mailto:contact@kovela.care"
@@ -653,13 +648,18 @@ export default function ChirurgiensEsthetiquesLanding() {
         </div>
       </section>
 
-      {/* Footer minimal */}
-      <footer className="border-t border-navy-900/10 bg-navy-depth px-5 py-7 text-white sm:px-8">
+      {/* Footer minimal — accueille la mention prototype RGPD/HDS pour
+          la sortir du bandeau CTA sans la cacher. */}
+      <footer className="border-t border-navy-900/10 bg-navy-depth px-5 py-6 text-white sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
           <Wordmark light />
+          <p className="text-center text-[10.5px] leading-relaxed tracking-tight text-navy-100/45 sm:text-left">
+            Prototype de présentation — canaux et architecture de production à valider
+            en V1 selon le cadre RGPD / HDS.
+          </p>
           <Link
             href="/"
-            className="text-[11.5px] font-medium tracking-tight text-teal-300 hover:text-teal-200"
+            className="shrink-0 text-[11.5px] font-medium tracking-tight text-teal-300 hover:text-teal-200"
           >
             Landing institutionnelle →
           </Link>
