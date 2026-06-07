@@ -4,13 +4,17 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 // ---------------------------------------------------------------------------
-// LeadForm — formulaire d'acquisition chirurgiens esthétiques.
+// LeadForm V3 — formulaire d'acquisition chirurgiens esthétiques.
 //
-// Objectif : capturer un lead qualifié avec structure compatible CRM /
-// RevOps (UTM + segment + meta). Pas de backend branché : la soumission
-// affiche un état de succès et logge en console côté prototype. La
-// structure du lead est prête pour intégration HubSpot / Pipedrive /
-// Salesforce / API maison en V1.
+// Réduit au strict nécessaire :
+//   visibles  : Nom complet · Email pro · Téléphone · Ville · Volume mensuel.
+//   cachés    : specialty (chirurgie_esthetique) · UTM × 5 · landing_version ·
+//               lead_segment · route · submitted_at · status.
+//   supprimé  : sélecteur de spécialité visible (segmentation déjà connue
+//               par la route) · message libre · paragraphes verbeux.
+//
+// Pas de backend branché : la soumission affiche un état de succès et logge
+// en console. Structure prête pour intégration CRM en V1.
 // ---------------------------------------------------------------------------
 
 type LeadFormFields = {
@@ -18,9 +22,7 @@ type LeadFormFields = {
   email: string;
   phone: string;
   city: string;
-  specialty: string;
   monthlyVolume: string;
-  message: string;
 };
 
 const INITIAL_FIELDS: LeadFormFields = {
@@ -28,24 +30,15 @@ const INITIAL_FIELDS: LeadFormFields = {
   email: "",
   phone: "",
   city: "",
-  specialty: "Chirurgie esthétique",
   monthlyVolume: "",
-  message: "",
 };
 
 const VOLUME_OPTIONS = [
   { value: "", label: "Sélectionner…" },
-  { value: "<10", label: "Moins de 10 / mois" },
-  { value: "10-25", label: "10 à 25 / mois" },
-  { value: "25-50", label: "25 à 50 / mois" },
-  { value: "50+", label: "Plus de 50 / mois" },
-];
-
-const SPECIALTY_OPTIONS = [
-  "Chirurgie esthétique",
-  "Chirurgie plastique reconstructrice",
-  "Médecine esthétique opératoire",
-  "Autre activité opératoire régulière",
+  { value: "<10", label: "Moins de 10" },
+  { value: "10-25", label: "10 à 25" },
+  { value: "25-50", label: "25 à 50" },
+  { value: "50+", label: "50+" },
 ];
 
 function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
@@ -53,15 +46,17 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
   const [fields, setFields] = useState<LeadFormFields>(INITIAL_FIELDS);
   const [submitted, setSubmitted] = useState(false);
 
-  // Capture des UTM + métadonnées RevOps au montage. Champs cachés
-  // persistés dans l'état pour être envoyés au backend en V1.
+  // Métadonnées RevOps capturées au montage. specialty est en dur côté
+  // landing : la route /chirurgiens-esthetiques sert exclusivement ce
+  // segment.
   const [meta, setMeta] = useState({
+    specialty: "chirurgie_esthetique",
     utm_source: "",
     utm_medium: "",
     utm_campaign: "",
     utm_content: "",
     utm_term: "",
-    landing_version: "chirurgiens-esthetiques-v1",
+    landing_version: "chirurgiens-esthetiques-v3",
     lead_segment: "chirurgien_esthetique",
     route: "/chirurgiens-esthetiques",
   });
@@ -133,7 +128,7 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
   return (
     <form
       onSubmit={submit}
-      className="space-y-4 rounded-2xl bg-white p-6 shadow-lift ring-1 ring-navy-900/[0.06] sm:p-8"
+      className="space-y-4 rounded-2xl bg-white p-6 shadow-lift ring-1 ring-navy-900/[0.06] sm:p-7"
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <label>
@@ -184,21 +179,7 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
             placeholder="Paris, Lyon, Bordeaux…"
           />
         </label>
-        <label>
-          <span className={labelCls}>Spécialité</span>
-          <select
-            value={fields.specialty}
-            onChange={(e) => update("specialty", e.target.value)}
-            className={inputCls}
-          >
-            {SPECIALTY_OPTIONS.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
+        <label className="sm:col-span-2">
           <span className={labelCls}>Interventions / mois</span>
           <select
             required
@@ -215,17 +196,6 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
         </label>
       </div>
 
-      <label className="block">
-        <span className={labelCls}>Message (optionnel)</span>
-        <textarea
-          value={fields.message}
-          onChange={(e) => update("message", e.target.value)}
-          rows={3}
-          className={`${inputCls} resize-none`}
-          placeholder="Quelques mots sur votre organisation actuelle, vos interventions principales…"
-        />
-      </label>
-
       <button
         type="submit"
         className="w-full rounded-xl bg-navy-900 px-5 py-3.5 text-[14px] font-semibold tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
@@ -233,14 +203,9 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
         {ctaLabel}
       </button>
 
-      <p className="text-center text-[11.5px] font-medium tracking-tight text-navy-900">
-        Pour vérifier le volume, l&apos;organisation actuelle et le cadre possible.
-      </p>
-
-      <p className="text-center text-[10.5px] leading-relaxed tracking-tight text-charcoal/55">
-        Réservé aux chirurgiens libéraux et cabinets avec activité opératoire régulière.
-        Réponse de l&apos;équipe sous 48 h ouvrées. Aucune donnée patient n&apos;est demandée
-        ici.
+      <p className="text-center text-[11px] leading-relaxed tracking-tight text-charcoal/60">
+        Pensé pour les chirurgiens libéraux et cabinets avec activité opératoire
+        régulière. Aucune donnée patient demandée.
       </p>
     </form>
   );
@@ -248,15 +213,14 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
 
 export function LeadForm({ ctaLabel }: { ctaLabel: string }) {
   // useSearchParams nécessite une Suspense boundary en App Router.
-  // Fallback : skeleton invisible (mêmes dimensions que le formulaire)
-  // pour éviter l'apparition fugace d'un texte « Chargement… » avant
-  // hydratation. L'utilisateur voit directement le formulaire propre.
+  // Fallback : skeleton invisible (mêmes dimensions) pour éviter
+  // l'apparition fugace d'un texte « Chargement… » avant hydratation.
   return (
     <Suspense
       fallback={
         <div
           aria-hidden
-          className="min-h-[520px] rounded-2xl bg-white shadow-lift ring-1 ring-navy-900/[0.06]"
+          className="min-h-[440px] rounded-2xl bg-white shadow-lift ring-1 ring-navy-900/[0.06]"
         />
       }
     >
