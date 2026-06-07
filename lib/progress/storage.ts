@@ -9,7 +9,7 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 import type { ProgressState } from "@/lib/types";
-import { DEFAULT_PROFILE_ID, type ProfileId } from "@/lib/profiles/profiles";
+import { DEFAULT_PROFILE_ID, isProfileId, type ProfileId } from "@/lib/profiles/profiles";
 
 export const STATE_VERSION = 2;
 
@@ -100,10 +100,15 @@ export function saveProfileState(id: ProfileId, state: ProgressState): void {
 }
 
 export function loadActiveProfile(): ProfileId | null {
-  const v = safeGet(ACTIVE_KEY);
-  return typeof v === "string" && (v === "adrien" || v === "andy")
-    ? (v as ProfileId)
-    : null;
+  if (typeof window === "undefined") return null;
+  // Le pointeur est stocké en chaîne brute (pas en JSON) — relire à l'identique.
+  let v: string | null = null;
+  try {
+    v = localStorage.getItem(ACTIVE_KEY);
+  } catch {
+    return null;
+  }
+  return isProfileId(v) ? v : null;
 }
 
 export function saveActiveProfile(id: ProfileId): void {
