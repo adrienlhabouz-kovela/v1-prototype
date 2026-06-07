@@ -717,6 +717,32 @@ n'est jamais présenté comme le canal conforme définitif.
 
 ---
 
+## 13septies. Refonte structurelle colonne droite fiche patient (2026-06-07)
+
+**Contexte.** Malgré les passes précédentes, la colonne droite restait organisée en 5 onglets de poids visuel égal (Actions · Transmissions · CR · Notes · Journal). La hiérarchie d'action n'était pas immédiatement visible — la superviseuse devait cliquer entre onglets pour voir l'état du dossier.
+
+**Décision.** Supprimer les 5 onglets égaux. Remplacer par un **panneau d'action vertical hiérarchisé** en 5 blocs empilés selon la priorité opérationnelle :
+
+1. **Action principale** — CTA dominant + délai + messages programmés (jusqu'à 2 + Voir tout).
+2. **Cabinet** — Contacter le cabinet + pipeline statut 3 étapes (Préparée → Copiée → Envoyée (proto)) + boutons Préparer compilation / Transmettre + référentiel applicable (4 catégories) en details replié.
+3. **CR factuel** — statut + brouillon + Relire/valider · Marquer prêt pour chirurgien · Copier · Export PDF prévu en V1 (désactivé).
+4. **Suivi** — fenêtre + progression + Clôturer le suivi (modale confirm).
+5. **Notes / Journal** — mini-tabs au pied du panneau (visuellement secondaires). Notes affichées avec **style très distinct** (fond navy léger, bord pointillé, tag ✦ Note interne) pour qu'elles ne soient jamais confondues avec une réponse patient.
+
+**Bénéfices.**
+- Hiérarchie d'action visible immédiatement — plus besoin de chercher dans un onglet.
+- Pipeline transmission cabinet visible en permanence dans le bloc Cabinet.
+- Notes internes visuellement distinctes des messages envoyés (sécurité d'usage).
+- Journal d'action toujours accessible mais relégué au pied (visuellement secondaire).
+
+**Dashboard /superviseur.** Le tier 1 (transmissions cabinet · sans réponse · retours cabinet) reste prioritaire visuellement. Le tier 2 (suivis habituels · clôtures) reste plus compact. État de charge calculé en temps réel dans le header.
+
+**Wording.** Aucune réintroduction de terme interdit. Pipeline transmission affiche "Envoyée (proto)" pour préserver la mention prototype dans l'UI même condensée. WhatsApp toujours marqué prototype dans la modale + bandeau RGPD/HDS renforcé.
+
+**Pricing intact** (690 € + 80 €). Périmètre landing / deck / BP / CRM / activation cabinet / chirurgien non touché.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1

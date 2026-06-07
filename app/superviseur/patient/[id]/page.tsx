@@ -51,16 +51,6 @@ const aiTitles: Record<AiKind, string> = {
   compilation_escalade: "Compilation factuelle d'escalade",
 };
 
-type RightTab = "actions" | "transmissions" | "cr" | "notes" | "journal";
-
-const rightTabLabels: Record<RightTab, string> = {
-  actions: "Actions",
-  transmissions: "Transmissions",
-  cr: "CR",
-  notes: "Notes",
-  journal: "Journal",
-};
-
 // ---------------------------------------------------------------------------
 // Helpers visuels timeline.
 // ---------------------------------------------------------------------------
@@ -129,9 +119,11 @@ export default function PatientFiche() {
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [contactCabinetOpen, setContactCabinetOpen] = useState(false);
   const [contactCabinetCopied, setContactCabinetCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<RightTab>("actions");
   const [showAllScheduled, setShowAllScheduled] = useState(false);
   const [closeConfirmOpen, setCloseConfirmOpen] = useState(false);
+  // Notes / Journal sont relégués en bas du panneau d'action (visuellement
+  // secondaires). On garde un mini-tab pour basculer entre les deux.
+  const [bottomTab, setBottomTab] = useState<"notes" | "journal">("notes");
   // Pipeline transmission cabinet — copié reste localement (le store ne le
   // persiste pas), envoyé est lu depuis escalation.status.
   const [hasCopiedTransmission, setHasCopiedTransmission] = useState(false);
@@ -320,15 +312,9 @@ export default function PatientFiche() {
   };
   const primary = primaryConfig[primaryKey];
 
-  // Compteurs sur tabs — alertent visuellement quand action requise.
-  const transmissionsCount =
-    (patient.compilationDraft ? 1 : 0) + (escalation?.status === "transmise" ? 1 : 0);
-  const crBadge = report ? crStatusLabels[report.status] : null;
+  // Compteurs sur mini-tabs Notes / Journal.
   const notesCount = patient.notes.length;
   const journalCount = patientLogs.length;
-  const scheduledTodayCount = scheduledMessages.filter(
-    (m) => m.status === "a_valider" || m.status === "en_retard"
-  ).length;
 
   const initials = getInitials(patient.name);
 
@@ -784,7 +770,7 @@ export default function PatientFiche() {
                                     patient.id,
                                     `Capturé depuis message patient : « ${e.content} »`
                                   );
-                                  setActiveTab("notes");
+                                  setBottomTab("notes");
                                 }}
                                 className="rounded-md bg-white px-2 py-1 text-[10.5px] font-medium tracking-tight text-charcoal/70 ring-1 ring-navy-900/10 transition-colors hover:bg-navy-50 hover:text-navy-900"
                               >
@@ -801,7 +787,6 @@ export default function PatientFiche() {
                                     (existing ? existing : aiPrepareReport(patient)) + addition,
                                     "brouillon"
                                   );
-                                  setActiveTab("cr");
                                 }}
                                 className="rounded-md bg-white px-2 py-1 text-[10.5px] font-medium tracking-tight text-teal-700 ring-1 ring-teal-200/60 transition-colors hover:bg-teal-50 hover:text-teal-800"
                               >
@@ -875,501 +860,516 @@ export default function PatientFiche() {
           </div>
         </section>
 
-        {/* ===== COLONNE DROITE — Onglets opérationnels ===== */}
-        <aside className="lg:col-span-3">
-          <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
-            {/* Barre d'onglets — séparation visuelle forte avec la conversation. */}
-            <div className="flex border-b border-navy-900/[0.06] bg-bone/40">
-              {(Object.keys(rightTabLabels) as RightTab[]).map((t) => {
-                const isActive = activeTab === t;
-                let badge: string | null = null;
-                if (t === "transmissions" && transmissionsCount > 0)
-                  badge = String(transmissionsCount);
-                if (t === "cr" && crBadge) badge = crBadge.slice(0, 3).toUpperCase();
-                if (t === "notes" && notesCount > 0) badge = String(notesCount);
-                if (t === "journal" && journalCount > 0) badge = String(journalCount);
-                if (t === "actions" && scheduledTodayCount > 0)
-                  badge = String(scheduledTodayCount);
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setActiveTab(t)}
-                    className={`relative flex-1 px-2 py-2.5 text-[11.5px] font-medium tracking-tight transition-colors ${
-                      isActive
-                        ? "bg-white text-navy-900"
-                        : "text-charcoal/55 hover:bg-white/60 hover:text-navy-900"
-                    }`}
-                  >
-                    <span>{rightTabLabels[t]}</span>
-                    {badge && (
-                      <span
-                        className={`ml-1 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9.5px] font-semibold ${
-                          isActive
-                            ? "bg-teal-50 text-teal-700 ring-1 ring-teal-100"
-                            : "bg-navy-900/[0.06] text-charcoal/70"
-                        }`}
-                      >
-                        {badge}
-                      </span>
-                    )}
-                    {isActive && (
-                      <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-teal-500" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Contenu d'onglet — défile indépendamment de la conversation. */}
-            <div className="max-h-[calc(100vh-18rem)] overflow-y-auto px-4 py-4">
-              {activeTab === "actions" && (
-                <div className="space-y-4">
-                  {/* Action recommandée — résumé. */}
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
-                      Action recommandée
-                    </p>
-                    <p className="mt-1.5 text-[13px] font-medium tracking-tight text-navy-900">
-                      {recommended.label}
-                    </p>
-                    {recommended.delay && (
-                      <p className="mt-0.5 text-[11.5px] tracking-tight text-charcoal/60">
-                        {recommended.delay}
-                      </p>
-                    )}
-                    <div className="mt-2.5">
-                      <Button
-                        variant="primary"
-                        className="w-full"
-                        onClick={primary.handler}
-                        disabled={primary.disabled}
-                      >
-                        {primary.label}
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Messages programmés — selon référentiel. */}
-                  <div className="border-t border-navy-900/[0.05] pt-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
-                      Messages programmés
-                    </p>
-                    <p className="mt-1 text-[11px] tracking-tight text-charcoal/55">
-                      {nextScheduled
-                        ? `Prochain : ${nextScheduled.label} · ${new Date(
-                            nextScheduled.targetDate
-                          ).toLocaleDateString("fr-FR")}`
-                        : "Aucun message prévu"}
-                    </p>
-                    <div className="mt-2 space-y-2">
-                      {(showAllScheduled
-                        ? scheduledMessages
-                        : scheduledMessages.slice(0, 2)
-                      ).map((m) => {
-                        const dt = new Date(m.targetDate);
-                        const dateLabel = dt.toLocaleDateString("fr-FR");
-                        const sent = m.status === "envoye";
-                        const late = m.status === "en_retard";
-                        return (
-                          <div
-                            key={m.id}
-                            className="rounded-lg bg-bone/50 px-3 py-2 ring-1 ring-navy-900/[0.04]"
-                          >
-                            <div className="flex flex-wrap items-baseline justify-between gap-2">
-                              <p className="text-[12px] font-medium tracking-tight text-navy-900">
-                                {m.label}
-                              </p>
-                              <Badge className={scheduledMessageStatusStyles[m.status]}>
-                                {scheduledMessageStatusLabels[m.status]}
-                              </Badge>
-                            </div>
-                            <p className="mt-1 text-[10.5px] tracking-tight text-charcoal/55">
-                              {late ? "Échéance " : "Prévu "}
-                              {dateLabel}
+        {/* ===== COLONNE DROITE — Panneau d'action vertical hiérarchisé =====
+            5 blocs empilés par priorité opérationnelle :
+              1. Action principale (CTA dominant)
+              2. Cabinet (Contacter + pipeline transmission + Marquer transmis)
+              3. CR factuel (statut + Préparer / Valider / Publier)
+              4. Suivi (fenêtre + clôture)
+              5. Notes / Journal (mini-tabs, visuellement secondaires)
+            Plus de tabs égaux = la hiérarchie d'action est immédiatement
+            visible côté UI. */}
+        <aside className="space-y-3 lg:col-span-3">
+          {/* ─── 1. ACTION PRINCIPALE ─────────────────────────────────────── */}
+          <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-teal-200/40">
+            <div className="border-l-[3px] border-teal-500/80 px-4 py-3.5">
+              <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+                Action principale
+              </p>
+              <p className="mt-1.5 text-[14px] font-semibold tracking-tight text-navy-900">
+                {recommended.label}
+              </p>
+              {recommended.delay && (
+                <p className="mt-0.5 text-[11.5px] tracking-tight text-charcoal/60">
+                  {recommended.delay}
+                </p>
+              )}
+              <Button
+                variant="primary"
+                className="mt-3 w-full"
+                onClick={primary.handler}
+                disabled={primary.disabled}
+              >
+                {primary.label}
+              </Button>
+              {/* Messages programmés — sous l'action principale car ce
+                  sont les prochaines actions à effectuer. Limité à 2 +
+                  Voir tout pour ne pas saturer. */}
+              {scheduledMessages.length > 0 && (
+                <div className="mt-3 border-t border-navy-900/[0.05] pt-3">
+                  <p className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+                    Messages programmés
+                  </p>
+                  <p className="mt-1 text-[10.5px] tracking-tight text-charcoal/55">
+                    {nextScheduled
+                      ? `Prochain : ${nextScheduled.label} · ${new Date(
+                          nextScheduled.targetDate
+                        ).toLocaleDateString("fr-FR")}`
+                      : "Aucun message prévu"}
+                  </p>
+                  <div className="mt-1.5 space-y-1.5">
+                    {(showAllScheduled
+                      ? scheduledMessages
+                      : scheduledMessages.slice(0, 2)
+                    ).map((m) => {
+                      const dt = new Date(m.targetDate);
+                      const dateLabel = dt.toLocaleDateString("fr-FR");
+                      const sent = m.status === "envoye";
+                      const late = m.status === "en_retard";
+                      return (
+                        <div
+                          key={m.id}
+                          className="rounded-md bg-bone/50 px-2.5 py-1.5 ring-1 ring-navy-900/[0.04]"
+                        >
+                          <div className="flex flex-wrap items-baseline justify-between gap-1.5">
+                            <p className="text-[11px] font-medium tracking-tight text-navy-900">
+                              {m.label}
                             </p>
-                            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                            <Badge className={scheduledMessageStatusStyles[m.status]}>
+                              {scheduledMessageStatusLabels[m.status]}
+                            </Badge>
+                          </div>
+                          <p className="mt-0.5 text-[10px] tracking-tight text-charcoal/55">
+                            {late ? "Échéance " : "Prévu "}
+                            {dateLabel}
+                          </p>
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setScheduledPreview(m)}
+                              className="rounded-md bg-white px-1.5 py-0.5 text-[10px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/10 transition-colors hover:bg-bone"
+                            >
+                              Prévisualiser
+                            </button>
+                            {!sent && (
                               <button
                                 type="button"
-                                onClick={() => setScheduledPreview(m)}
-                                className="rounded-md bg-white px-2 py-1 text-[10.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/10 transition-colors hover:bg-bone"
+                                onClick={() => sendScheduledNow(m)}
+                                className="rounded-md bg-teal-600 px-1.5 py-0.5 text-[10px] font-medium tracking-tight text-white transition-colors hover:bg-teal-700"
                               >
-                                Prévisualiser
+                                Simuler l\'envoi
                               </button>
-                              {!sent && (
-                                <button
-                                  type="button"
-                                  onClick={() => sendScheduledNow(m)}
-                                  className="rounded-md bg-teal-600 px-2 py-1 text-[10.5px] font-medium tracking-tight text-white transition-colors hover:bg-teal-700"
-                                >
-                                  Simuler l'envoi
-                                </button>
-                              )}
-                            </div>
+                            )}
                           </div>
-                        );
-                      })}
-                      {scheduledMessages.length > 2 && (
-                        <button
-                          type="button"
-                          onClick={() => setShowAllScheduled((v) => !v)}
-                          className="w-full rounded-md px-2 py-1.5 text-[11px] font-medium tracking-tight text-teal-700 transition-colors hover:bg-teal-50/40"
-                        >
-                          {showAllScheduled
-                            ? "Replier"
-                            : `Voir tout (${scheduledMessages.length - 2} de plus)`}
-                        </button>
-                      )}
-                    </div>
+                        </div>
+                      );
+                    })}
+                    {scheduledMessages.length > 2 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllScheduled((v) => !v)}
+                        className="w-full rounded-md px-1.5 py-1 text-[10.5px] font-medium tracking-tight text-teal-700 transition-colors hover:bg-teal-50/40"
+                      >
+                        {showAllScheduled
+                          ? "Replier"
+                          : `Voir tout (${scheduledMessages.length - 2} de plus)`}
+                      </button>
+                    )}
                   </div>
+                </div>
+              )}
+            </div>
+          </div>
 
-                  {/* Référentiel applicable — quatre catégories opérables. */}
-                  <div className="border-t border-navy-900/[0.05] pt-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
-                      Référentiel applicable
-                    </p>
-                    <p className="mt-1 text-[11px] tracking-tight text-charcoal/55">
-                      {refl.intervention} — {refl.version}
-                    </p>
-                    <div className="mt-2 space-y-2">
-                      {(
-                        [
-                          {
-                            label: "KOVELA peut rappeler",
-                            items: refl.peut_rappeler,
-                            eyebrowCls: "text-teal-700/80",
-                            dotCls: "bg-teal-600/70",
-                          },
-                          {
-                            label: "Ne pas traiter",
-                            items: refl.ne_pas_traiter,
-                            eyebrowCls: "text-charcoal/55",
-                            dotCls: "bg-charcoal/40",
-                          },
-                          {
-                            label: "À transmettre au cabinet",
-                            items: refl.a_transmettre_cabinet,
-                            eyebrowCls: "text-amber-800/80",
-                            dotCls: "bg-amber-500/70",
-                          },
-                          {
-                            label: "Transmission prioritaire",
-                            items: refl.transmission_prioritaire,
-                            eyebrowCls: "text-navy-900/70",
-                            dotCls: "bg-navy-900/70",
-                          },
-                        ] as const
-                      ).map((bloc) => (
-                        <div key={bloc.label}>
-                          <p
-                            className={`text-[10px] font-semibold uppercase tracking-[0.12em] ${bloc.eyebrowCls}`}
+          {/* ─── 2. CABINET — transmission opérationnelle ───────────────────── */}
+          <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
+            <div className="border-b border-navy-900/[0.05] px-4 py-2.5">
+              <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-navy-900/70">
+                Cabinet
+              </p>
+              <p className="mt-0.5 text-[10.5px] tracking-tight text-charcoal/55">
+                Transmission factuelle selon référentiel
+              </p>
+            </div>
+            <div className="space-y-2.5 px-4 py-3">
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => {
+                  setContactCabinetOpen(true);
+                  setContactCabinetCopied(false);
+                }}
+              >
+                Contacter le cabinet
+              </Button>
+
+              {/* Pipeline 3 étapes — toujours visible, donne le statut courant
+                  sans cliquer dans un onglet. */}
+              {(() => {
+                const isSent =
+                  escalation?.status === "transmise" || transmissionMarkedSent;
+                const isPrepared = !!patient.compilationDraft || isSent;
+                const isCopied = hasCopiedTransmission || isSent;
+                const steps = [
+                  { key: "prep", label: "Préparée", active: isPrepared },
+                  { key: "copy", label: "Copiée", active: isCopied },
+                  { key: "sent", label: "Envoyée (proto)", active: isSent },
+                ];
+                return (
+                  <div className="rounded-lg bg-bone/50 px-2.5 py-2 ring-1 ring-navy-900/[0.04]">
+                    <div className="flex items-center gap-1">
+                      {steps.map((s, i) => (
+                        <div key={s.key} className="flex flex-1 items-center gap-1">
+                          <span
+                            className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-[8px] font-bold ${
+                              s.active
+                                ? "bg-navy-900 text-white"
+                                : "bg-white text-charcoal/40 ring-1 ring-navy-900/[0.08]"
+                            }`}
                           >
-                            {bloc.label}
-                          </p>
-                          <ul className="mt-1 space-y-0.5">
-                            {bloc.items.map((it) => (
-                              <li
-                                key={it}
-                                className="flex items-start gap-1.5 text-[11px] leading-relaxed tracking-tight text-charcoal/75"
-                              >
-                                <span
-                                  className={`mt-1.5 h-[3px] w-[3px] shrink-0 rounded-full ${bloc.dotCls}`}
-                                />
-                                <span>{it}</span>
-                              </li>
-                            ))}
-                          </ul>
+                            {i + 1}
+                          </span>
+                          <span
+                            className={`whitespace-nowrap text-[9.5px] font-medium tracking-tight ${
+                              s.active ? "text-navy-900" : "text-charcoal/45"
+                            }`}
+                          >
+                            {s.label}
+                          </span>
+                          {i < steps.length - 1 && (
+                            <span
+                              className={`h-px flex-1 ${
+                                s.active && steps[i + 1].active
+                                  ? "bg-navy-900/30"
+                                  : "bg-navy-900/[0.08]"
+                              }`}
+                            />
+                          )}
                         </div>
                       ))}
                     </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "transmissions" && (
-                <div className="space-y-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
-                    Transmissions cabinet
-                  </p>
-                  {/* Pipeline statut — 4 étapes, état courant en navy. */}
-                  {(() => {
-                    const isSent =
-                      escalation?.status === "transmise" || transmissionMarkedSent;
-                    const isPrepared = !!patient.compilationDraft || isSent;
-                    const isCopied = hasCopiedTransmission || isSent;
-                    const steps = [
-                      { key: "prep", label: "Préparée", active: isPrepared },
-                      { key: "copy", label: "Copiée", active: isCopied },
-                      { key: "sent", label: "Envoyée (prototype)", active: isSent },
-                    ];
-                    return (
-                      <div className="space-y-2 rounded-lg bg-bone/50 px-3 py-2.5 ring-1 ring-navy-900/[0.04]">
-                        <div className="flex items-center gap-1.5">
-                          {steps.map((s, i) => (
-                            <div key={s.key} className="flex flex-1 items-center gap-1.5">
-                              <span
-                                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[8.5px] font-bold ${
-                                  s.active
-                                    ? "bg-navy-900 text-white"
-                                    : "bg-white text-charcoal/40 ring-1 ring-navy-900/[0.08]"
-                                }`}
-                              >
-                                {i + 1}
-                              </span>
-                              <span
-                                className={`whitespace-nowrap text-[10.5px] font-medium tracking-tight ${
-                                  s.active ? "text-navy-900" : "text-charcoal/45"
-                                }`}
-                              >
-                                {s.label}
-                              </span>
-                              {i < steps.length - 1 && (
-                                <span
-                                  className={`h-px flex-1 ${
-                                    s.active && steps[i + 1].active
-                                      ? "bg-navy-900/30"
-                                      : "bg-navy-900/[0.08]"
-                                  }`}
-                                />
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                        {isSent && escalation?.transmittedAt && (
-                          <p className="text-[10.5px] tracking-tight text-charcoal/55">
-                            Dernier envoi prototype : {formatDateTime(escalation.transmittedAt)}
-                          </p>
-                        )}
-                        {!isSent && !isPrepared && (
-                          <p className="text-[10.5px] tracking-tight text-charcoal/55">
-                            Aucune transmission préparée pour ce patient.
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })()}
-                  {escalation?.status === "transmise" || transmissionMarkedSent ? (
-                    <>
-                      <Badge className="bg-navy-900 text-teal-100 ring-navy-900">
-                        Transmission cabinet en cours
-                      </Badge>
-                      {escalation?.compilation && (
-                        <pre className="max-h-40 overflow-y-auto whitespace-pre-wrap rounded-lg bg-bone/60 p-3 font-sans text-[11.5px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.04]">
-                          {escalation.compilation}
-                        </pre>
-                      )}
-                      <p className="text-[11px] tracking-tight text-charcoal/55">
-                        En attente de retour cabinet — consigner la réponse dans le journal
-                        d'action une fois reçue.
+                    {isSent && escalation?.transmittedAt && (
+                      <p className="mt-1.5 text-[10px] tracking-tight text-charcoal/55">
+                        Dernier envoi : {formatDateTime(escalation.transmittedAt)}
                       </p>
-                    </>
-                  ) : patient.compilationDraft ? (
-                    <>
-                      <Badge className="bg-amber-50/50 text-amber-800 ring-amber-200/50">
-                        Brouillon préparé (interne)
-                      </Badge>
-                      <p className="text-[11px] tracking-tight text-charcoal/55">
-                        Préparée en interne — n'ouvre pas de transmission tant qu'elle n'est
-                        pas envoyée.
-                      </p>
-                      <pre className="max-h-40 overflow-y-auto whitespace-pre-wrap rounded-lg bg-bone/60 p-3 font-sans text-[11.5px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.04]">
-                        {patient.compilationDraft}
-                      </pre>
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          variant="primary"
-                          onClick={() => k.transmitCompilation(patient.id)}
-                        >
-                          Transmettre au cabinet
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          onClick={() => {
-                            setContactCabinetOpen(true);
-                            setContactCabinetCopied(false);
-                          }}
-                        >
-                          Préparer message cabinet
-                        </Button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-[11.5px] leading-relaxed tracking-tight text-charcoal/65">
-                        Aucune compilation préparée. Utilisez « Préparer compilation factuelle »
-                        pour réunir les éléments selon le référentiel. La transmission cabinet
-                        reste une action explicite.
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          variant="primary"
-                          onClick={() => runAi("compilation_escalade")}
-                        >
-                          Préparer compilation factuelle
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          onClick={() => {
-                            setContactCabinetOpen(true);
-                            setContactCabinetCopied(false);
-                          }}
-                        >
-                          Contacter le cabinet
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {activeTab === "cr" && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
-                      Compte-rendu factuel
-                    </p>
-                    {report && (
-                      <Badge className={crStatusStyles[report.status]}>
-                        {crStatusLabels[report.status]}
-                      </Badge>
                     )}
                   </div>
-                  {report ? (
-                    <>
-                      {report.status === "valide" && (
-                        <p className="text-[11px] tracking-tight text-charcoal/55">
-                          CR factuel validé — à publier pour le chirurgien.
-                        </p>
-                      )}
-                      {report.status === "brouillon" && (
-                        <p className="text-[11px] tracking-tight text-charcoal/55">
-                          Brouillon préparé par l&apos;IA — à relire, corriger si besoin, puis
-                          valider.
-                        </p>
-                      )}
-                      <pre className="max-h-56 overflow-y-auto whitespace-pre-wrap rounded-lg bg-bone/60 p-3 font-sans text-[11.5px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.04]">
-                        {report.content}
-                      </pre>
-                      <div className="flex flex-wrap gap-2">
-                        {report.status === "brouillon" && (
-                          <Button
-                            variant="primary"
-                            onClick={() => k.validateReport(patient.id)}
-                          >
-                            Relire et valider
-                          </Button>
-                        )}
-                        {report.status !== "disponible" && (
-                          <Button
-                            variant="secondary"
-                            onClick={() => k.publishReport(patient.id)}
-                          >
-                            Publier pour le chirurgien
-                          </Button>
-                        )}
-                        <Button
-                          variant="subtle"
-                          onClick={() => navigator.clipboard?.writeText(report.content)}
-                        >
-                          Copier
-                        </Button>
-                        <button
-                          type="button"
-                          disabled
-                          title="Export PDF prévu en V1"
-                          className="cursor-not-allowed rounded-lg bg-white px-3 py-1.5 text-[11.5px] font-medium tracking-tight text-charcoal/45 ring-1 ring-navy-900/10"
-                        >
-                          Export PDF prévu en V1
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <dl className="space-y-1.5 rounded-lg bg-bone/60 p-3 text-[11.5px] leading-relaxed ring-1 ring-navy-900/[0.04]">
-                        {[
-                          ["Intervention", patient.intervention],
-                          ["Jour post-op", day],
-                          [
-                            "Dernier contact",
-                            last.ageLabel ? `${last.label} — ${last.ageLabel}` : "—",
-                          ],
-                          [
-                            "Photos reçues",
-                            patient.messages.some((m) =>
-                              m.attachments?.some((a) => a.kind === "photo")
-                            )
-                              ? "Oui"
-                              : "Non",
-                          ],
-                          ["Statut", opStatus ? operationalStatusLabels[opStatus] : "—"],
-                          ["Prochaine étape", recommended.label],
-                        ].map(([label, value]) => (
-                          <div
-                            key={label}
-                            className="flex items-baseline justify-between gap-3"
-                          >
-                            <dt className="shrink-0 text-charcoal/55">{label}</dt>
-                            <dd className="text-right tracking-tight text-navy-900">
-                              {value || "—"}
-                            </dd>
-                          </div>
-                        ))}
-                      </dl>
-                      <Button
-                        variant="primary"
-                        className="w-full"
-                        onClick={() => runAi("preparation_cr")}
-                      >
-                        Préparer brouillon IA
-                      </Button>
-                    </>
-                  )}
-                </div>
-              )}
+                );
+              })()}
 
-              {activeTab === "notes" && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
-                      Notes internes
+              {/* Boutons compilation — si non transmise, on propose de préparer
+                  puis transmettre directement. */}
+              {!patient.compilationDraft && escalation?.status !== "transmise" && (
+                <button
+                  type="button"
+                  onClick={() => runAi("compilation_escalade")}
+                  className="w-full rounded-lg bg-white px-3 py-2 text-[11.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/10 transition-colors hover:bg-bone"
+                >
+                  Préparer compilation factuelle
+                </button>
+              )}
+              {patient.compilationDraft && escalation?.status !== "transmise" && (
+                <button
+                  type="button"
+                  onClick={() => k.transmitCompilation(patient.id)}
+                  className="w-full rounded-lg bg-navy-900 px-3 py-2 text-[11.5px] font-medium tracking-tight text-white transition-colors hover:bg-navy-800"
+                >
+                  Transmettre au cabinet
+                </button>
+              )}
+            </div>
+
+            {/* Référentiel applicable — directement dans le bloc Cabinet
+                car c'est ce qui pilote les décisions de transmission. */}
+            <details className="border-t border-navy-900/[0.05]">
+              <summary className="cursor-pointer list-none px-4 py-2 text-[10.5px] font-medium tracking-tight text-charcoal/65 hover:bg-bone/40">
+                Référentiel applicable ▾
+              </summary>
+              <div className="space-y-2 border-t border-navy-900/[0.04] bg-bone/20 px-4 py-3">
+                <p className="text-[10.5px] tracking-tight text-charcoal/55">
+                  {refl.intervention} — {refl.version}
+                </p>
+                {(
+                  [
+                    {
+                      label: "KOVELA peut rappeler",
+                      items: refl.peut_rappeler,
+                      eyebrowCls: "text-teal-700/80",
+                      dotCls: "bg-teal-600/70",
+                    },
+                    {
+                      label: "Ne pas traiter",
+                      items: refl.ne_pas_traiter,
+                      eyebrowCls: "text-charcoal/55",
+                      dotCls: "bg-charcoal/40",
+                    },
+                    {
+                      label: "À transmettre au cabinet",
+                      items: refl.a_transmettre_cabinet,
+                      eyebrowCls: "text-amber-800/80",
+                      dotCls: "bg-amber-500/70",
+                    },
+                    {
+                      label: "Transmission prioritaire",
+                      items: refl.transmission_prioritaire,
+                      eyebrowCls: "text-navy-900/70",
+                      dotCls: "bg-navy-900/70",
+                    },
+                  ] as const
+                ).map((bloc) => (
+                  <div key={bloc.label}>
+                    <p
+                      className={`text-[9.5px] font-semibold uppercase tracking-[0.12em] ${bloc.eyebrowCls}`}
+                    >
+                      {bloc.label}
                     </p>
-                    <span className="text-[10.5px] tracking-tight text-charcoal/55">
-                      Visibles équipe uniquement
-                    </span>
+                    <ul className="mt-0.5 space-y-0.5">
+                      {bloc.items.map((it) => (
+                        <li
+                          key={it}
+                          className="flex items-start gap-1.5 text-[10.5px] leading-relaxed tracking-tight text-charcoal/75"
+                        >
+                          <span
+                            className={`mt-1.5 h-[3px] w-[3px] shrink-0 rounded-full ${bloc.dotCls}`}
+                          />
+                          <span>{it}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <div className="flex gap-2">
+                ))}
+              </div>
+            </details>
+          </div>
+
+          {/* ─── 3. CR FACTUEL ───────────────────────────────────────────── */}
+          <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
+            <div className="flex items-center justify-between border-b border-navy-900/[0.05] px-4 py-2.5">
+              <div>
+                <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-navy-900/70">
+                  CR factuel
+                </p>
+                <p className="mt-0.5 text-[10.5px] tracking-tight text-charcoal/55">
+                  Synthèse opérationnelle non médicale
+                </p>
+              </div>
+              {report && (
+                <Badge className={crStatusStyles[report.status]}>
+                  {crStatusLabels[report.status]}
+                </Badge>
+              )}
+            </div>
+            <div className="space-y-2.5 px-4 py-3">
+              {report ? (
+                <>
+                  {report.status === "valide" && (
+                    <p className="text-[10.5px] tracking-tight text-charcoal/55">
+                      CR factuel validé — à publier pour le chirurgien.
+                    </p>
+                  )}
+                  {report.status === "brouillon" && (
+                    <p className="text-[10.5px] tracking-tight text-charcoal/55">
+                      Brouillon IA — à relire, corriger si besoin, puis valider.
+                    </p>
+                  )}
+                  <pre className="max-h-40 overflow-y-auto whitespace-pre-wrap rounded-lg bg-bone/60 p-2.5 font-sans text-[11px] leading-relaxed text-navy-900 ring-1 ring-navy-900/[0.04]">
+                    {report.content}
+                  </pre>
+                  <div className="flex flex-wrap gap-1.5">
+                    {report.status === "brouillon" && (
+                      <button
+                        type="button"
+                        onClick={() => k.validateReport(patient.id)}
+                        className="rounded-md bg-teal-600 px-2.5 py-1 text-[11px] font-medium tracking-tight text-white transition-colors hover:bg-teal-700"
+                      >
+                        Relire et valider
+                      </button>
+                    )}
+                    {report.status !== "disponible" && (
+                      <button
+                        type="button"
+                        onClick={() => k.publishReport(patient.id)}
+                        className="rounded-md bg-white px-2.5 py-1 text-[11px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/10 transition-colors hover:bg-bone"
+                      >
+                        Marquer prêt pour chirurgien
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard?.writeText(report.content)}
+                      className="rounded-md bg-white px-2.5 py-1 text-[11px] font-medium tracking-tight text-charcoal/70 ring-1 ring-navy-900/10 transition-colors hover:bg-bone"
+                    >
+                      Copier
+                    </button>
+                    <button
+                      type="button"
+                      disabled
+                      title="Export PDF prévu en V1"
+                      className="cursor-not-allowed rounded-md bg-white px-2.5 py-1 text-[11px] font-medium tracking-tight text-charcoal/40 ring-1 ring-navy-900/[0.08]"
+                    >
+                      Export PDF prévu en V1
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-[11px] leading-relaxed tracking-tight text-charcoal/60">
+                    Aucun CR préparé. Le CR factuel est une synthèse opérationnelle
+                    non médicale, validée par KOVELA avant publication chirurgien.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => runAi("preparation_cr")}
+                    className="w-full rounded-lg bg-navy-900 px-3 py-2 text-[11.5px] font-medium tracking-tight text-white transition-colors hover:bg-navy-800"
+                  >
+                    Préparer brouillon IA
+                  </button>
+                  <button
+                    type="button"
+                    disabled
+                    title="Export PDF prévu en V1"
+                    className="w-full cursor-not-allowed rounded-lg bg-white px-3 py-2 text-[11px] font-medium tracking-tight text-charcoal/40 ring-1 ring-navy-900/[0.08]"
+                  >
+                    Export PDF prévu en V1
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* ─── 4. SUIVI — fenêtre + clôture ──────────────────────────────── */}
+          <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
+            <div className="flex items-center justify-between border-b border-navy-900/[0.05] px-4 py-2.5">
+              <div>
+                <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-navy-900/70">
+                  Suivi
+                </p>
+                <p className="mt-0.5 text-[10.5px] tracking-tight text-charcoal/55">
+                  {followUp.label}
+                </p>
+              </div>
+              <Badge className={followUpStatusStyles[followUp.status]}>
+                {followUp.status === "en_cours"
+                  ? "En cours"
+                  : followUp.status === "proche_cloture"
+                  ? "Proche clôture"
+                  : followUp.status === "termine"
+                  ? "Terminé"
+                  : "Hors fenêtre"}
+              </Badge>
+            </div>
+            <div className="space-y-2.5 px-4 py-3">
+              <div className="h-1 w-full overflow-hidden rounded-full bg-navy-900/[0.06]">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    followUp.status === "termine"
+                      ? "bg-amber-500/80"
+                      : followUp.status === "proche_cloture"
+                      ? "bg-amber-400/80"
+                      : "bg-teal-500"
+                  }`}
+                  style={{ width: `${followUp.progressPercent}%` }}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setCloseConfirmOpen(true)}
+                className="w-full rounded-lg bg-white px-3 py-2 text-[11.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/10 transition-colors hover:bg-bone"
+              >
+                Clôturer le suivi
+              </button>
+            </div>
+          </div>
+
+          {/* ─── 5. NOTES / JOURNAL — mini-tabs secondaires ─────────────────── */}
+          <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
+            <div className="flex border-b border-navy-900/[0.06] bg-bone/40">
+              <button
+                type="button"
+                onClick={() => setBottomTab("notes")}
+                className={`relative flex-1 px-3 py-2 text-[10.5px] font-medium tracking-tight transition-colors ${
+                  bottomTab === "notes"
+                    ? "bg-white text-navy-900"
+                    : "text-charcoal/55 hover:text-navy-900"
+                }`}
+              >
+                Notes internes
+                {notesCount > 0 && (
+                  <span
+                    className={`ml-1 inline-flex items-center rounded-full px-1 py-0.5 text-[9px] font-semibold ${
+                      bottomTab === "notes"
+                        ? "bg-teal-50 text-teal-700 ring-1 ring-teal-100"
+                        : "bg-navy-900/[0.06] text-charcoal/70"
+                    }`}
+                  >
+                    {notesCount}
+                  </span>
+                )}
+                {bottomTab === "notes" && (
+                  <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-teal-500" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setBottomTab("journal")}
+                className={`relative flex-1 px-3 py-2 text-[10.5px] font-medium tracking-tight transition-colors ${
+                  bottomTab === "journal"
+                    ? "bg-white text-navy-900"
+                    : "text-charcoal/55 hover:text-navy-900"
+                }`}
+              >
+                Journal d\'action
+                {journalCount > 0 && (
+                  <span
+                    className={`ml-1 inline-flex items-center rounded-full px-1 py-0.5 text-[9px] font-semibold ${
+                      bottomTab === "journal"
+                        ? "bg-teal-50 text-teal-700 ring-1 ring-teal-100"
+                        : "bg-navy-900/[0.06] text-charcoal/70"
+                    }`}
+                  >
+                    {journalCount}
+                  </span>
+                )}
+                {bottomTab === "journal" && (
+                  <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-teal-500" />
+                )}
+              </button>
+            </div>
+            <div className="max-h-[280px] overflow-y-auto px-3 py-3">
+              {bottomTab === "notes" && (
+                <div className="space-y-2.5">
+                  <div className="flex gap-1.5">
                     <input
                       value={noteText}
                       onChange={(e) => setNoteText(e.target.value)}
                       placeholder="Ajouter une note interne…"
-                      className="flex-1 rounded-lg border border-navy-900/[0.08] px-3 py-2 text-[12px] outline-none focus:border-teal-500/60"
+                      className="flex-1 rounded-lg border border-navy-900/[0.08] px-2.5 py-1.5 text-[11.5px] outline-none focus:border-teal-500/60"
                     />
-                    <Button
-                      variant="subtle"
+                    <button
+                      type="button"
                       disabled={!noteText.trim()}
                       onClick={() => {
                         k.addNote(patient.id, noteText.trim());
                         setNoteText("");
                       }}
+                      className="rounded-md bg-navy-900 px-2.5 py-1.5 text-[11px] font-medium text-white transition-colors hover:bg-navy-800 disabled:cursor-not-allowed disabled:bg-charcoal/20"
                     >
                       +
-                    </Button>
+                    </button>
                   </div>
                   {patient.notes.length === 0 ? (
-                    <p className="rounded-lg bg-bone/50 p-3 text-[11.5px] tracking-tight text-charcoal/55">
-                      Aucune note pour le moment.
+                    <p className="rounded-lg bg-bone/50 p-2.5 text-[10.5px] tracking-tight text-charcoal/55">
+                      Aucune note pour le moment. Les notes internes ne sont jamais
+                      envoyées au patient.
                     </p>
                   ) : (
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {patient.notes.map((n) => (
                         <div
                           key={n.id}
-                          className="rounded-lg bg-bone/60 p-3 ring-1 ring-navy-900/[0.04]"
+                          // Style très différent du message patient : fond
+                          // navy léger, bord pointillé, tag INTERNE — pour
+                          // garantir qu\'une note ne ressemble jamais à une
+                          // réponse envoyée au patient.
+                          className="rounded-lg border border-dashed border-navy-900/15 bg-navy-50/40 p-2.5"
                         >
-                          <p className="whitespace-pre-wrap text-[12px] text-navy-900">
+                          <p className="mb-1 text-[8.5px] font-semibold uppercase tracking-[0.16em] text-navy-700">
+                            ✦ Note interne
+                          </p>
+                          <p className="whitespace-pre-wrap text-[11.5px] text-navy-900">
                             {n.text}
                           </p>
-                          <p className="mt-1 text-[10px] tracking-tight text-charcoal/45">
+                          <p className="mt-1 text-[9.5px] tracking-tight text-charcoal/45">
                             {n.author} · {formatDateTime(n.at)}
                           </p>
                         </div>
@@ -1378,32 +1378,23 @@ export default function PatientFiche() {
                   )}
                 </div>
               )}
-
-              {activeTab === "journal" && (
+              {bottomTab === "journal" && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
-                      Journal d'action
-                    </p>
-                    <span className="text-[10.5px] tracking-tight text-charcoal/55">
-                      {patientLogs.length} entrée{patientLogs.length > 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  <p className="rounded-md bg-bone/60 px-2.5 py-1.5 text-[10.5px] leading-relaxed tracking-tight text-charcoal/60 ring-1 ring-navy-900/[0.04]">
-                    Journal d&apos;action prototype — audit trail réel prévu en V1.
+                  <p className="rounded-md bg-bone/60 px-2.5 py-1.5 text-[9.5px] leading-relaxed tracking-tight text-charcoal/60 ring-1 ring-navy-900/[0.04]">
+                    Journal d\'action prototype — audit trail réel prévu en V1.
                   </p>
                   {patientLogs.length === 0 ? (
-                    <p className="rounded-lg bg-bone/50 p-3 text-[11.5px] tracking-tight text-charcoal/55">
+                    <p className="rounded-lg bg-bone/50 p-2.5 text-[10.5px] tracking-tight text-charcoal/55">
                       Aucun log.
                     </p>
                   ) : (
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {patientLogs.map((l) => (
-                        <div key={l.id} className="border-l-2 border-teal-200 pl-3">
-                          <p className="text-[11.5px] leading-relaxed text-navy-900">
+                        <div key={l.id} className="border-l-2 border-teal-200 pl-2.5">
+                          <p className="text-[10.5px] leading-relaxed text-navy-900">
                             {l.detail}
                           </p>
-                          <p className="text-[10px] tracking-tight text-charcoal/45">
+                          <p className="text-[9.5px] tracking-tight text-charcoal/45">
                             {l.user} · {formatDateTime(l.at)}
                           </p>
                         </div>
