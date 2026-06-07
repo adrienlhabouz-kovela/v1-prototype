@@ -244,12 +244,16 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
 
 export function LeadForm({ ctaLabel }: { ctaLabel: string }) {
   // useSearchParams nécessite une Suspense boundary en App Router.
+  // Fallback : skeleton invisible (mêmes dimensions que le formulaire)
+  // pour éviter l'apparition fugace d'un texte « Chargement… » avant
+  // hydratation. L'utilisateur voit directement le formulaire propre.
   return (
     <Suspense
       fallback={
-        <div className="rounded-2xl bg-white p-8 shadow-lift ring-1 ring-navy-900/[0.06]">
-          <p className="text-[13px] text-charcoal/55">Chargement du formulaire…</p>
-        </div>
+        <div
+          aria-hidden
+          className="min-h-[520px] rounded-2xl bg-white shadow-lift ring-1 ring-navy-900/[0.06]"
+        />
       }
     >
       <LeadFormInner ctaLabel={ctaLabel} />

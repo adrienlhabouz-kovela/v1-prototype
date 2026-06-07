@@ -57,7 +57,7 @@ const steps = [
   },
   {
     n: "02",
-    t: "Le patient est onboardé",
+    t: "Le patient active son suivi",
     d: "Il reçoit un lien sécurisé pour comprendre le dispositif, confirmer ses informations et activer son suivi.",
   },
   {
@@ -95,6 +95,20 @@ const isThat = [
   "Un cadre validé avec le cabinet",
   "Une transmission factuelle",
   "Une traçabilité opérationnelle",
+];
+
+// Qualification cabinet — ressort de positionnement avant le CTA final.
+const fitYes = [
+  "vous opérez régulièrement en ambulatoire",
+  "votre équipe reçoit des sollicitations post-op récurrentes",
+  "vous ne souhaitez pas recruter une ressource dédiée",
+  "vous voulez structurer le suivi sans ajouter un outil à gérer",
+];
+
+const fitNo = [
+  "votre volume post-op est très faible",
+  "vous cherchez un service d'urgence",
+  "vous souhaitez une IA autonome côté patient",
 ];
 
 // Composants utilitaires inline ---------------------------------------------
@@ -155,6 +169,10 @@ export default function ChirurgiensEsthetiquesLanding() {
             Nous prenons en charge le suivi post-opératoire quotidien de vos patients
             selon votre référentiel cabinet : échanges, relances, éléments déclarés,
             transmissions cabinet et CR factuels.
+          </p>
+          <p className="mx-auto mt-2 max-w-xl text-[11.5px] italic leading-relaxed tracking-tight text-charcoal/55">
+            CR factuel — synthèse courte des éléments déclarés et actions tracées,
+            sans interprétation médicale.
           </p>
           <p className="mx-auto mt-3 max-w-xl text-[13.5px] font-medium tracking-tight text-navy-900">
             Sans recruter. Sans former. Sans ajouter un logiciel de plus à gérer.
@@ -409,6 +427,62 @@ export default function ChirurgiensEsthetiquesLanding() {
       </section>
 
       {/* ============================================================
+          QUALIFICATION — pour quels cabinets ?
+          Ressort de qualification avant le CTA final : aide à la
+          conversion ET au filtrage des leads peu qualifiés.
+          ============================================================ */}
+      <section className="border-t border-navy-900/[0.05] bg-white px-5 py-16 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-3xl text-center">
+            <SectionEyebrow>Qualification</SectionEyebrow>
+            <SectionTitle>
+              Pour les cabinets qui veulent structurer sans recruter.
+            </SectionTitle>
+          </div>
+
+          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+            {/* Colonne gauche — KOVELA est pertinent si */}
+            <div className="rounded-2xl bg-teal-50/40 p-6 ring-1 ring-teal-100/70">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-700">
+                KOVELA est pertinent si
+              </p>
+              <ul className="mt-4 space-y-2.5">
+                {fitYes.map((i) => (
+                  <li
+                    key={i}
+                    className="flex items-start gap-2.5 text-[13.5px] leading-relaxed tracking-tight text-navy-900"
+                  >
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-500 text-[11px] font-bold text-white">
+                      ✓
+                    </span>
+                    {i}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Colonne droite — KOVELA n'est pas adapté si */}
+            <div className="rounded-2xl bg-bone/50 p-6 ring-1 ring-navy-900/[0.06]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
+                KOVELA n&apos;est pas adapté si
+              </p>
+              <ul className="mt-4 space-y-2.5">
+                {fitNo.map((i) => (
+                  <li
+                    key={i}
+                    className="flex items-start gap-2.5 text-[13.5px] leading-relaxed tracking-tight text-charcoal/65"
+                  >
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-charcoal/35" />
+                    {i}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
           CTA FINAL + FORMULAIRE
           ============================================================ */}
       <section
@@ -423,7 +497,10 @@ export default function ChirurgiensEsthetiquesLanding() {
             <h2 className="mt-3 font-display text-[2rem] font-medium leading-tight tracking-tight text-white sm:text-[2.4rem]">
               Votre post-op peut être structuré sans recruter.
             </h2>
-            <p className="mt-5 text-[15px] leading-relaxed tracking-tight text-navy-100/80">
+            <p className="mt-4 text-[16px] font-medium tracking-tight text-teal-300">
+              Structurer mon post-op sans recruter.
+            </p>
+            <p className="mt-4 text-[15px] leading-relaxed tracking-tight text-navy-100/80">
               En 20 minutes, nous pouvons voir si KOVELA est adapté à votre volume,
               votre organisation et votre manière de suivre vos patients.
             </p>
@@ -473,7 +550,8 @@ export default function ChirurgiensEsthetiquesLanding() {
             <Wordmark light />
           </div>
           <p className="text-[10.5px] tracking-tight text-navy-100/50">
-            Prototype — données fictives. Pas une plateforme de production HDS.
+            Prototype de présentation — les canaux et l&apos;architecture de production
+            seront validés en V1 selon le cadre RGPD / HDS.
           </p>
           <Link
             href="/"
