@@ -47,6 +47,7 @@ const solutionBenefits = [
   "CR factuel en fin de suivi",
   "Journal d'action",
   "Expérience patient plus cohérente",
+  "Demande d'avis Google neutre en fin de suivi",
   "Aucune ressource à recruter",
 ];
 
@@ -343,6 +344,14 @@ export default function ChirurgiensEsthetiquesLanding() {
           <p className="mx-auto mt-10 max-w-2xl text-center text-[13.5px] italic leading-relaxed tracking-tight text-charcoal/65">
             Le patient ne retient pas seulement le geste. Il retient aussi la manière
             dont il a été accompagné après.
+          </p>
+
+          {/* Avis Google — formulation prudente, sans promesse, sans incentive. */}
+          <p className="mx-auto mt-6 max-w-2xl rounded-2xl bg-bone/60 px-6 py-5 text-center text-[13px] leading-relaxed tracking-tight text-charcoal/75 ring-1 ring-navy-900/[0.05]">
+            Le post-op ne s&apos;arrête pas au dernier message. KOVELA peut intégrer,
+            en fin de suivi, une demande d&apos;avis Google neutre et validée avec le
+            cabinet, afin de faciliter le retour d&apos;expérience patient sans
+            alourdir l&apos;équipe.
           </p>
 
           <p className="mx-auto mt-8 max-w-xl text-center font-display text-[1.4rem] font-medium leading-tight tracking-tight text-navy-900">

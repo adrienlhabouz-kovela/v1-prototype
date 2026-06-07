@@ -908,6 +908,55 @@ Layout permanent à 2 panneaux principaux (3 sur la fiche patient) :
 
 ---
 
+## 13duodecies. Demande d'avis Google en fin de suivi — feature backlog (2026-06-07)
+
+**Décision.** Positionner KOVELA comme **facilitateur du retour d'expérience patient en fin de suivi**, sans jamais glisser vers la promesse d'avis positifs, le review gating ou l'incentive. Intégration visible dès maintenant sur la landing acquisition `/chirurgiens-esthetiques` ; implémentation produit renvoyée en **backlog**.
+
+**Positionnement validé sur la landing acquisition.**
+
+- Carte bénéfice ajoutée dans la solution : *« Demande d'avis Google neutre en fin de suivi »*.
+- Paragraphe explicatif ajouté dans la section bénéfices concrets : *« Le post-op ne s'arrête pas au dernier message. KOVELA peut intégrer, en fin de suivi, une demande d'avis Google neutre et validée avec le cabinet, afin de faciliter le retour d'expérience patient sans alourdir l'équipe. »*
+
+**Doctrine à respecter — ne JAMAIS écrire.**
+
+- ❌ « avis Google garantis »
+- ❌ « avis 5 étoiles »
+- ❌ « e-réputation protégée »
+- ❌ « patients satisfaits uniquement »
+- ❌ « parcours parfait détecté »
+- ❌ « centre de profit »
+- ❌ « incentive », « récompense », « réduction » associée à un avis
+- ❌ « boost garanti »
+- ❌ « review gating »
+- ❌ « bouche-à-oreille garanti »
+- ❌ Tout claim chiffré non prouvé.
+
+**Backlog feature — implémentation V1.**
+
+- **Déclenchement** : en fin de fenêtre de suivi (cf. `getFollowUpWindow` côté superviseur), une fois le CR factuel transmis au chirurgien et le suivi marqué comme clôturé.
+- **Canal** : message patient sur le canal validé V1 (à finaliser selon cadre RGPD / HDS).
+- **Validation cabinet** : le lien Google du cabinet / chirurgien est fourni et validé à l'activation. Le cabinet peut désactiver la demande d'avis dans son référentiel.
+- **Message patient type (à documenter)** :
+
+  > Bonjour [Prénom],
+  >
+  > Votre suivi post-opératoire KOVELA touche à sa fin.
+  >
+  > Si vous souhaitez partager votre expérience du parcours avec le cabinet du Dr [Nom], vous pouvez le faire ici : [Lien Google].
+  >
+  > Votre retour est précieux pour le cabinet et pour les futurs patients.
+  >
+  > Merci pour votre confiance.
+
+- **Journal d'action** : ajouter un événement `demande_avis_envoyee` (LogKind à créer en V1).
+- **Aucun filtrage positif/négatif automatisé en V1.** Pas de NPS interne préalable qui orienterait vers une demande d'avis seulement en cas de satisfaction.
+- **Aucune incitation ou récompense.** La demande est strictement informationnelle et facultative pour le patient.
+- **Pas de relance.** Une seule demande, à la fin du suivi.
+
+**Statut prototype actuel.** Aucun code branché. La feature est uniquement annoncée dans la landing comme valeur produit. Implémentation = travail futur de l'équipe dev.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1

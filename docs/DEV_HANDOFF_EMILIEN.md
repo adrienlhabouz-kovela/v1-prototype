@@ -132,6 +132,7 @@ Voir [`SUPERVISOR_UX_V1.md`](SUPERVISOR_UX_V1.md) pour le détail complet.
 8. **Préparer export PDF V1 réel** (CR factuel actuellement export désactivé).
 9. **Préparer architecture HDS / RGPD** (cf. [`V1_HDS_ARCHITECTURE_BRIEF.md`](V1_HDS_ARCHITECTURE_BRIEF.md)).
 10. **Préparer gestion permissions** superviseur / chirurgien / admin (lecture / écriture / transmission).
+11. **Implémenter la demande d'avis Google en fin de suivi** (annoncée sur la landing acquisition, non implémentée côté code). Déclenchement en fin de fenêtre de suivi · message patient neutre · lien Google du cabinet validé à l'activation · journal d'action `demande_avis_envoyee` · **aucun filtrage / review gating / incentive**. Cadre complet : [`DECISIONS_LOG.md`](DECISIONS_LOG.md) § 13duodecies.
 
 ---
 
