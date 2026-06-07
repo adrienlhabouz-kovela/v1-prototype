@@ -98,7 +98,7 @@ function HeroTableHeader() {
       <span>Cabinet</span>
       <span>Dernier événement</span>
       <span>Action attendue</span>
-      <span className="text-right">CTA</span>
+      <span className="text-right">{" "}</span>
     </div>
   );
 }
@@ -200,10 +200,10 @@ function HeroPatientRow({ patient }: { patient: Patient }) {
           <span className="text-teal-700">→</span> {action.label}
         </p>
 
-        {/* Colonne 7 — CTA */}
+        {/* Colonne 7 — CTA compact pour tenir dans la colonne 6rem. */}
         <div className="flex justify-end">
           <span className="rounded-md bg-navy-900 px-3 py-1.5 text-[11px] font-medium text-white transition-colors group-hover:bg-navy-800">
-            Ouvrir le dossier
+            Ouvrir →
           </span>
         </div>
       </div>

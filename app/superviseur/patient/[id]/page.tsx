@@ -508,8 +508,11 @@ export default function PatientFiche() {
       <div className="grid gap-4 lg:grid-cols-12">
         {/* ===== COLONNE GAUCHE — Contexte stable, scannable, NON redondant
             avec le header sticky. On enlève intervention / J+ / chirurgien /
-            cabinet / fenêtre J0→J+N qui sont déjà dans le bandeau. ===== */}
-        <aside className="space-y-3 lg:col-span-2">
+            cabinet / fenêtre J0→J+N qui sont déjà dans le bandeau.
+            Responsive : 3 cols par défaut sur lg (laptop 1366), 2 cols
+            seulement sur 2xl+ pour donner plus de place à la conversation
+            sur grand écran sans casser la lisibilité sur laptop. ===== */}
+        <aside className="space-y-3 lg:col-span-3 2xl:col-span-2">
           {/* Bloc référentiel — version + cabinet contact, suffisant. */}
           <div className="rounded-xl bg-teal-50/40 px-3 py-2.5 ring-1 ring-teal-100/60">
             <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
@@ -595,7 +598,7 @@ export default function PatientFiche() {
         </aside>
 
         {/* ===== COLONNE CENTRE — Conversation patient (zone dominante) ===== */}
-        <section className="lg:col-span-7">
+        <section className="lg:col-span-6 2xl:col-span-7">
           <div className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-navy-900/[0.045]">
             {/* En-tête conversation — discret pour ne pas voler la vedette à la conversation. */}
             <div className="flex items-center justify-between gap-3 border-b border-navy-900/[0.05] px-5 py-3">
@@ -885,7 +888,7 @@ export default function PatientFiche() {
             5 blocs empilés par priorité opérationnelle :
               1. Action principale (CTA dominant)
               2. Cabinet (Contacter + pipeline transmission + Marquer transmis)
-              3. CR factuel (statut + Préparer / Valider / Publier)
+              3. CR factuel (statut + Préparer / Valider / Transmettre)
               4. Suivi (fenêtre + clôture)
               5. Notes / Journal (mini-tabs, visuellement secondaires)
             Plus de tabs égaux = la hiérarchie d'action est immédiatement
