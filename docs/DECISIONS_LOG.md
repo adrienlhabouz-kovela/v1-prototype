@@ -1006,6 +1006,57 @@ Texte UI visible — remplacements appliqués sur l'ensemble du prototype (hors 
 
 ---
 
+## 13quaterdecies. Landing acquisition V3.1 — conversion premium (2026-06-07)
+
+**Décision.** Landing acquisition `/chirurgiens-esthetiques` optimisée pour la conversion sans rallonger la page : mockup produit, mini-flow 10 secondes, tracking conversion prototype, bloc preuve sociale **préparé mais non affiché** sans preuve réelle.
+
+**Ajouts dans les sections existantes** (toujours 5 sections strictes).
+
+- **Section 1 (Hero)** : mockup cockpit produit en extension visuelle juste sous le hero (3 colonnes File patients · Éléments déclarés · Actions cabinet). Mirror visuel du workspace superviseur réel, wording strict (« À revoir selon référentiel », « Réponse patient préparée — à relire », « Transmission cabinet préparée », « CR factuel en cours », « Demande d'avis neutre prévue en fin de suivi »). Aucun mot médical risqué.
+- **Section 3 (Prise en charge)** : mini-flow 5 étapes en 10 secondes ajouté entre la grille des 7 blocs et les micro-explications. Étapes : Le cabinet transmet → Le patient active son suivi → KOVELA suit et documente → Le cabinet reçoit l'essentiel → Avis Google neutre en fin de parcours.
+- **Section 4 (Différenciation)** : phrase punchy ajoutée sous la SectionTitle : *« Rien à implémenter. Rien à manager. Rien à apprendre côté cabinet. »*
+
+**Tracking conversion prototype.**
+
+Nouveau composant `app/chirurgiens-esthetiques/LandingAnalytics.tsx` qui expose :
+- `trackEvent(name, extra)` — log `console.info("[KOVELA_CONVERSION_EVENT]", payload)` avec route, landing_version, lead_segment, timestamp, device_hint, UTM × 5, extra payload.
+- `LandingViewTracker` — composant invisible monté au plus haut, tracke `landing_view`.
+- `TrackedCtaLink` — wrapper Link qui tracke le clic CTA.
+
+Événements branchés :
+- `landing_view` (mount).
+- `hero_cta_click` (top bar + hero primary, avec position dans extra).
+- `secondary_cta_click` (hero secondary).
+- `form_start` (premier input du formulaire, déclenché une fois via `useRef`).
+- `form_submit` (clic submit, avec `form_fields_completed_count`).
+- `lead_created` (succès soumission, avec `form_fields_completed_count`).
+
+**Aucun analytics externe branché** (pas de Google Analytics, Meta Pixel, LinkedIn Insight) — la structure est prête pour intégration V1 avec validation cookies / RGPD.
+
+**Funnel CRM cible à documenter côté backend** : `landing_view` → `hero_cta_click` → `form_start` → `form_submit` → `lead_created` → `qualified` → `meeting_booked` → `meeting_done` → `pilot_proposed` → `pilot_started` (ou `lost`).
+
+**Bloc social proof — préparé mais DÉSACTIVÉ par défaut.**
+
+- Constante centralisée `SHOW_SOCIAL_PROOF = false` en haut de `page.tsx`.
+- Type `SocialProofItem` + tableau `socialProofItems: SocialProofItem[] = []` prêts à remplir avec témoignages chirurgien / cabinet pilote / retour terrain (statut `validated` obligatoire).
+- Composant `SocialProof()` rend **null** tant que `SHOW_SOCIAL_PROOF=false` OU que `socialProofItems` est vide. Aucune fausse preuve affichée.
+- Procédure d'activation documentée dans le code : passer `SHOW_SOCIAL_PROOF` à `true` ET remplir `socialProofItems` avec des entrées validées par le cabinet concerné (autorisation écrite recommandée).
+
+**Doctrine respectée**
+
+- Aucun tarif affiché.
+- Aucune fausse preuve sociale, aucun témoignage / logo / chiffre fictif.
+- Aucun mot interdit ajouté (vérif grep exhaustive : tri médical · surveillance médicale · patient à risque · anomalie cicatrice · complication détectée · nécrose · computer vision · rapport médical · compte-rendu médical · synthèse clinique · certifié HDS · preuve juridique · bouclier médico-légal · avis 5 étoiles · avis garanti · e-réputation · incentive · review gating · réduction garantie · filtre 80% · boost garanti · patients satisfaits uniquement).
+- Les seules occurrences « diagnostic / prescription / décision médicale / interprétation médicale » sont en négation explicite (« Sans décision médicale », « sans interprétation médicale », « ne pose pas de diagnostic, ne prescrit pas et ne prend aucune décision médicale »).
+
+**Page courte préservée.** Bundle `/chirurgiens-esthetiques` : 2.1 kB → 2.62 kB (+520 bytes, +25 %). Route toujours statique. Lecture en 60 secondes préservée.
+
+**Périmètre non touché.** Landing `/` : non modifiée. Pricing : aucun changement, aucun affichage. Espaces superviseur / chirurgien / patient : non touchés.
+
+`landing_version` bumpée à `chirurgiens-esthetiques-v3.1` dans le formulaire et le tracker.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1

@@ -1,7 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { trackEvent } from "./LandingAnalytics";
 
 // ---------------------------------------------------------------------------
 // LeadForm V3 — formulaire d'acquisition chirurgiens esthétiques.
@@ -45,6 +46,8 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
   const params = useSearchParams();
   const [fields, setFields] = useState<LeadFormFields>(INITIAL_FIELDS);
   const [submitted, setSubmitted] = useState(false);
+  // Drapeau pour ne tracker form_start qu'une fois (premier input).
+  const formStartTracked = useRef(false);
 
   // Métadonnées RevOps capturées au montage. specialty est en dur côté
   // landing : la route /chirurgiens-esthetiques sert exclusivement ce
@@ -56,7 +59,7 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
     utm_campaign: "",
     utm_content: "",
     utm_term: "",
-    landing_version: "chirurgiens-esthetiques-v3",
+    landing_version: "chirurgiens-esthetiques-v3.1",
     lead_segment: "chirurgien_esthetique",
     route: "/chirurgiens-esthetiques",
   });
@@ -74,11 +77,17 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
   }, [params]);
 
   function update<K extends keyof LeadFormFields>(key: K, value: LeadFormFields[K]) {
+    if (!formStartTracked.current) {
+      formStartTracked.current = true;
+      trackEvent("form_start", { field: String(key) });
+    }
     setFields((f) => ({ ...f, [key]: value }));
   }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
+    const completed = Object.values(fields).filter((v) => v.trim() !== "").length;
+    trackEvent("form_submit", { form_fields_completed_count: completed });
     const lead = {
       ...fields,
       ...meta,
@@ -88,6 +97,7 @@ function LeadFormInner({ ctaLabel }: { ctaLabel: string }) {
     // Prototype : aucun backend. La structure est prête pour intégration
     // CRM en V1 (HubSpot / Pipedrive / Salesforce / API maison).
     console.log("[KOVELA — lead acquisition chirurgien]", lead);
+    trackEvent("lead_created", { form_fields_completed_count: completed });
     setSubmitted(true);
   }
 
