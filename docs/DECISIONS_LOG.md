@@ -858,6 +858,56 @@ Layout permanent à 2 panneaux principaux (3 sur la fiche patient) :
 
 ---
 
+## 13undecies. Landing acquisition chirurgiens esthétiques (2026-06-07)
+
+**Décision.** Créer une **nouvelle landing courte dédiée acquisition** sur la route `/chirurgiens-esthetiques`, sans modifier la landing principale `/`.
+
+**Contexte.** La landing principale `/` reste la page de **crédibilité institutionnelle**. Elle est trop dense et trop verticale pour servir de page de conversion sur trafic ciblé (LinkedIn outbound, email ciblé, introduction réseau, retargeting, futures ads LinkedIn / Google).
+
+**Objectif unique.** Obtenir une demande d'échange / démo qualifiée avec un chirurgien esthétique libéral ou un cabinet à activité opératoire régulière.
+
+**Structure de page.**
+
+1. Top bar minimaliste (Wordmark + CTA primary persistant).
+2. Hero — *« Votre post-op prend trop de place. KOVELA prend le relais. »* + sous-titre + micro-réassurance + 2 CTAs.
+3. Douleur métier — constat terrain + 6 douleurs visibles.
+4. Solution — couche opérationnelle post-op + 7 bénéfices fonctionnels.
+5. Fonctionnement en 4 étapes — Vous validez le cadre → Patient onboardé → KOVELA suit → Vous recevez l'essentiel.
+6. Bénéfices concrets — 6 changements concrets.
+7. Différenciation — 2 colonnes « Ce que KOVELA n'est pas » vs « Ce que KOVELA est ».
+8. Cadre clair — doctrine non médicale + rappel 15/112 + mention canaux V1 RGPD/HDS.
+9. CTA final + formulaire dans bandeau navy (col gauche pitch, col droite formulaire).
+10. Footer minimal (Wordmark light + mention prototype + lien retour landing principale).
+
+**Décisions UI.**
+
+- **Pas de tarif** affiché sur cette page. Le pricing existant (690 + 80 €) reste inchangé ailleurs.
+- CTA principal : *« Voir si KOVELA est adapté à votre cabinet »* (volontairement pas « Demander une démo » seul, trop SaaS).
+- Style premium : blanc / navy / teal, sections courtes, beaucoup d'espace, mobile-first.
+- Pas de témoignages fictifs, pas de logos fictifs, pas de claim chiffré non prouvé.
+
+**Formulaire lead.**
+
+- Champs visibles : Nom complet · Email professionnel · Téléphone · Ville · Spécialité · Interventions/mois · Message optionnel.
+- Champs cachés RevOps : `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `landing_version`, `lead_segment`, `route`, `submitted_at`, `status: new_lead`.
+- Soumission prototype : aucun backend branché. La structure est prête pour intégration CRM en V1 (HubSpot / Pipedrive / Salesforce / API maison). État de succès affiché à la soumission.
+- Capture des UTM via `useSearchParams` (wrappé en Suspense boundary).
+
+**Wording.** Doctrine respectée. Aucun mot interdit. Les seules occurrences de termes potentiellement sensibles sont en **négation explicite** :
+- « Sans décision médicale » (micro-réassurance hero).
+- « ne pose pas de diagnostic, ne prescrit pas et ne prend aucune décision médicale » (bloc cadre).
+
+**Pricing / landing principale.** Non touchés.
+
+**Backlog (à brancher en V1 production).**
+
+- Endpoint backend pour ingestion du lead (CRM ou API).
+- Page de remerciement dédiée avec calendly / cal.com pour réservation directe.
+- Variantes A/B des headlines (4 variantes documentées dans le brief, à brancher via feature flag ou param URL).
+- Page de politique de confidentialité dédiée si trafic ads.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1

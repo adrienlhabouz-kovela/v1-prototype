@@ -49,7 +49,8 @@ Référence canonique : [`DECISIONS_LOG.md`](DECISIONS_LOG.md) § 2.
 
 | Route | État | Doit-on toucher ? |
 |---|---|---|
-| `/` | Landing actuelle validée | ❌ Ne pas remplacer sans demande explicite |
+| `/` | Landing institutionnelle (crédibilité) | ❌ Ne pas remplacer sans demande explicite |
+| `/chirurgiens-esthetiques` | Landing courte acquisition (conversion ciblée) | ⚠ Améliorations OK (variantes A/B, branchement CRM) ; ne pas casser la structure validée |
 | `/login` | Accès prototype (sélecteur de rôle) | ⚠ Toucher uniquement si bug |
 | `/superviseur` | Cockpit superviseur **validé** | ❌ Locked V1 prototype |
 | `/superviseur/patient/[id]` | Fiche patient superviseur **validée** | ❌ Locked V1 prototype |
@@ -93,6 +94,7 @@ Voir [`SUPERVISOR_UX_V1.md`](SUPERVISOR_UX_V1.md) pour le détail complet.
 ### Pricing
 
 - 690 € HT / mois + 80 € HT / patient activé.
+- **Ne jamais afficher** ce pricing sur la page `/chirurgiens-esthetiques` (landing acquisition). La page de conversion ne mentionne pas de tarif — c'est volontaire pour préserver la qualification commerciale.
 
 ### Doctrine HDS / RGPD
 

@@ -21,7 +21,8 @@ n'analyse jamais médicalement les photos et ne décide jamais de transmission c
 
 ## 0. État actuel du prototype (2026-06-07)
 
-- **Landing actuelle** conservée. Ne pas remplacer sans demande explicite.
+- **Landing institutionnelle `/`** conservée. Ne pas remplacer sans demande explicite. C'est la page de crédibilité.
+- **Landing acquisition `/chirurgiens-esthetiques`** — nouvelle landing courte dédiée à la conversion de trafic ciblé (LinkedIn outbound, email, retargeting). Pas de tarif affiché. Formulaire prêt pour intégration CRM (UTM capturés via `useSearchParams`). Détail : [`docs/DECISIONS_LOG.md`](docs/DECISIONS_LOG.md) § 13undecies.
 - **UX superviseur V1 prototype validée** (commit stable de référence : `7ff14f2`).
   - Workspace superviseur unifié + rail patient permanent (`components/SupervisorQueueRail.tsx`).
   - Dashboard cockpit orienté action (priorité à la file « À traiter maintenant »).
