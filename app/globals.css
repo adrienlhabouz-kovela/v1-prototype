@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Georgia", serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-abyss-900 text-sail antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Empêche le rebond / zoom involontaire sur les contrôles tactiles */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  touch-action: none;
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/[0.04] backdrop-blur-sm ring-1 ring-white/10;
+  }
+  .card {
+    @apply rounded-2xl bg-white/[0.04] ring-1 ring-white/10 shadow-card;
+  }
+  .card-light {
+    @apply rounded-2xl bg-sail text-abyss-900 shadow-card;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold
+      transition-all duration-150 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-spray-500 text-abyss-950 shadow-glow hover:bg-spray-400;
+  }
+  .btn-ghost {
+    @apply btn bg-white/5 text-sail ring-1 ring-white/10 hover:bg-white/10;
+  }
+  .btn-sun {
+    @apply btn bg-sun-500 text-abyss-950 hover:bg-sun-400;
+  }
+  .label-caps {
+    @apply text-[0.68rem] font-bold uppercase tracking-brand text-spray-400/90;
+  }
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-spray-400 focus-visible:ring-offset-2 focus-visible:ring-offset-abyss-900;
+  }
+}
+
+/* Masque le scrollbar horizontal des carrousels mobiles */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
