@@ -145,6 +145,19 @@ Logique : `lib/engine/` (`points-of-sail.ts`, `wind-trainer.ts`, `adaptive.ts`).
 - Backend optionnel (sync multi-appareils, comptes), notifications de streak.
 - Accessibilité : navigation clavier complète, mode contraste élevé.
 
+### V3 — module avancé : **Race Tracker Lab** 🗺️ (futur, non développé)
+Apprendre à **lire une cartographie de course comme un skipper** (inspiré des
+cartographies de course type Vendée Arctique transmises par Bertrand).
+Carte de course pédagogique, flotte concurrente, vent (direction/force), zones
+météo, routes possibles, analyse de position, questions tactiques, débrief après
+chaque décision, et un **mode « Bertrand »** pour analyser plus tard une situation
+de régate réelle.
+
+Ce module fait le **pont** entre l'apprentissage voile, Virtual Regatta, les
+régates de Bertrand, la lecture météo et la prise de décision de skipper.
+
+➡️ Architecture détaillée : [`docs/roadmap/race-tracker-lab.md`](docs/roadmap/race-tracker-lab.md)
+
 ---
 
 ## Structure du projet
