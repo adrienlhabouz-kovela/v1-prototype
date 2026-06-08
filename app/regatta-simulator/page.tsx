@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { REGATTA_STEPS } from "@/lib/content/scenarios";
+import { REGATTA_STEPS, type RegattaStep } from "@/lib/content/scenarios";
 import { useProgress } from "@/lib/progress/store";
+import { HelpButton } from "@/components/help/HelpButton";
+import type { HelpTier } from "@/lib/engine/help";
 import { Pill } from "@/components/ui/primitives";
 
 const FLEET = 8;
 const START_PLACE = 5;
 
 export default function RegattaSimulatorPage() {
-  const { bumpScore, flagAchievement, recordSession } = useProgress();
+  const { bumpScore, flagAchievement, recordSession, recordHelp } = useProgress();
   const [started, setStarted] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
   const [place, setPlace] = useState(START_PLACE);
@@ -115,6 +117,12 @@ export default function RegattaSimulatorPage() {
                       {o.label}
                     </button>
                   ))}
+                  <div className="flex justify-end pt-1">
+                    <HelpButton
+                      tiers={stepHelp(step)}
+                      onUse={() => recordHelp("regate-tactique")}
+                    />
+                  </div>
                 </div>
               ) : (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -159,6 +167,16 @@ export default function RegattaSimulatorPage() {
 
 function ordinal(n: number) {
   return n === 1 ? "1er" : `${n}e`;
+}
+
+function stepHelp(step: RegattaStep): HelpTier[] {
+  const best = step.options.reduce((a, b) => (b.places > a.places ? b : a));
+  return [
+    { kind: "hint", label: "Indice 1", body: "Vise le choix qui te fait gagner des places sans prendre de risque inutile : va vers la pression, fuis le vent sale." },
+    { kind: "hint", label: "Indice 2", body: "Écarte les options qui te mettent en faute de priorité, te font partir trop tôt, ou t'enferment sur la layline." },
+    { kind: "explanation", label: "Explication", body: best.feedback },
+    { kind: "answer", label: "Le bon choix", body: best.label },
+  ];
 }
 
 function RaceTrack({ place, stepIdx }: { place: number; stepIdx: number }) {

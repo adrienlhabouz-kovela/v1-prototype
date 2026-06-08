@@ -4,13 +4,24 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { WindCircle } from "@/components/svg/WindCircle";
 import { adviseWind, windCategory } from "@/lib/engine/wind-trainer";
+import { useProgress } from "@/lib/progress/store";
+import { HelpButton } from "@/components/help/HelpButton";
+import type { HelpTier } from "@/lib/engine/help";
 import { Pill } from "@/components/ui/primitives";
 
 export default function WindTrainerPage() {
+  const { recordHelp } = useProgress();
   const [angle, setAngle] = useState(45);
   const [knots, setKnots] = useState(18);
   const advice = adviseWind(angle, knots);
   const cat = windCategory(knots);
+
+  const helpTiers: HelpTier[] = [
+    { kind: "hint", label: "Indice 1", body: "L'angle au vent donne l'allure ; la force du vent donne le niveau de risque." },
+    { kind: "hint", label: "Indice 2", body: "Plus l'allure s'ouvre, plus on choque la voile ; quand ça forcit, on réduit la toile." },
+    { kind: "explanation", label: "Explication", body: `${advice.pos.name} : ${advice.trim}` },
+    { kind: "answer", label: "La lecture", body: `${advice.sail} — ${advice.action}` },
+  ];
 
   const riskTone =
     advice.riskLevel === "musclé" ? "coral" : advice.riskLevel === "vigilance" ? "sun" : "spray";
@@ -23,6 +34,9 @@ export default function WindTrainerPage() {
         <p className="mt-1 text-sm text-abyss-100/80">
           Place le bateau et règle la force du vent. L'app lit la situation comme un chef de bord.
         </p>
+        <div className="mt-2 flex justify-end">
+          <HelpButton tiers={helpTiers} onUse={() => recordHelp("lecture-vent")} />
+        </div>
       </header>
 
       <div className="card p-4">

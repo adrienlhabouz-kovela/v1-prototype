@@ -241,6 +241,10 @@ const m3: Module = {
           tolerance: 15,
           explanation: "Au travers, le vent vient à 90°. C'est souvent l'allure la plus rapide et la plus confortable.",
           concept: "allure-travers",
+          hints: [
+            "Pense à l'allure où le vent arrive sur le côté du bateau.",
+            "Cette allure est souvent la plus confortable et performante.",
+          ],
         },
         {
           id: "q2",
@@ -856,6 +860,9 @@ export const CONCEPT_LABELS: Record<string, string> = {
   "priorite-tribord": "Priorités (tribord)",
   "vent-sale": "Vent sale / dévente",
   layline: "Laylines",
+  "regate-tactique": "Tactique de régate",
+  "lecture-vent": "Lecture du vent (trainer)",
+  "choix-mouillage": "Choix du mouillage",
 };
 
 export function conceptLabel(concept: string): string {

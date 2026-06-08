@@ -37,6 +37,7 @@ export function emptyState(): ProgressState {
     concepts: {},
     scores: { securite: 0, regate: 0, meteo: 0, manoeuvres: 0 },
     trainingHistory: [],
+    helpUsage: {},
   };
 }
 
@@ -57,6 +58,7 @@ export function migrateState(raw: unknown): ProgressState {
     trainingHistory: Array.isArray(r.trainingHistory)
       ? r.trainingHistory.slice(-HISTORY_LIMIT)
       : [],
+    helpUsage: r.helpUsage && typeof r.helpUsage === "object" ? r.helpUsage : {},
   };
 }
 

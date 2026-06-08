@@ -61,6 +61,8 @@ export interface Question {
   explanation: string;
   /** Notion rattachée — sert au moteur adaptatif. */
   concept: string;
+  /** Indices d'aide progressifs (optionnels) — repli générique sinon. */
+  hints?: string[];
 }
 
 /** Bloc de contenu d'une leçon (avant les tests). */
@@ -175,4 +177,6 @@ export interface ProgressState {
   };
   /** Historique des sessions d'entraînement (les plus récentes en fin de tableau). */
   trainingHistory: TrainingSession[];
+  /** Nombre de demandes d'aide par concept (identifie les notions difficiles). */
+  helpUsage: Record<string, number>;
 }

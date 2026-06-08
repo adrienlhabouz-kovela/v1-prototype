@@ -4,12 +4,14 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CRUISE_SCENARIOS, type CruiseScenario, type Choice } from "@/lib/content/scenarios";
 import { useProgress } from "@/lib/progress/store";
+import { HelpButton } from "@/components/help/HelpButton";
+import type { HelpTier } from "@/lib/engine/help";
 import { Gauge, Pill } from "@/components/ui/primitives";
 
 type Phase = "select" | "briefing" | "decision" | "followup" | "result";
 
 export default function CruiseSimulatorPage() {
-  const { bumpScore, flagAchievement, recordSession } = useProgress();
+  const { bumpScore, flagAchievement, recordSession, recordHelp } = useProgress();
   const [phase, setPhase] = useState<Phase>("select");
   const [scenario, setScenario] = useState<CruiseScenario | null>(null);
   const [decisionGood, setDecisionGood] = useState(false);
@@ -90,6 +92,12 @@ export default function CruiseSimulatorPage() {
               <Brief label="👥 Équipage" value={scenario.crew} />
               <Brief label="⚙️ Contraintes" value={scenario.constraints} />
             </div>
+            <div className="flex justify-end">
+              <HelpButton
+                tiers={decisionHelp(scenario)}
+                onUse={() => recordHelp("decision-meteo")}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <button onClick={() => decide("GO")} className="btn-primary py-4 text-base">
                 ✅ GO
@@ -119,7 +127,14 @@ export default function CruiseSimulatorPage() {
               </div>
             </div>
             <div className="card p-4">
-              <p className="mb-3 text-sm font-semibold text-sail">{scenario.followUp.prompt}</p>
+              <div className="mb-3 flex items-start justify-between gap-3">
+                <p className="text-sm font-semibold text-sail">{scenario.followUp.prompt}</p>
+                <HelpButton
+                  tiers={followUpHelp(scenario)}
+                  onUse={() => recordHelp("choix-mouillage")}
+                  className="shrink-0"
+                />
+              </div>
               <div className="space-y-2">
                 {scenario.followUp.options.map((o, i) => (
                   <button
@@ -167,6 +182,25 @@ export default function CruiseSimulatorPage() {
 
 function clamp(v: number) {
   return Math.max(0.05, Math.min(1, v));
+}
+
+function decisionHelp(s: CruiseScenario): HelpTier[] {
+  return [
+    { kind: "hint", label: "Indice 1", body: "Compare le vent (sens et force) à ta route, et regarde la distance : est-ce gérable pour l'équipage ?" },
+    { kind: "hint", label: "Indice 2", body: "Un vent qui forcit, une mer qui se forme ou une dégradation annoncée poussent vers le NO-GO." },
+    { kind: "explanation", label: "Explication", body: s.decisionExplain },
+    { kind: "answer", label: "La décision", body: `Recommandation : ${s.recommended}.` },
+  ];
+}
+
+function followUpHelp(s: CruiseScenario): HelpTier[] {
+  const good = s.followUp.options.find((o) => o.good);
+  return [
+    { kind: "hint", label: "Indice 1", body: "Cherche l'abri du vent dominant du moment." },
+    { kind: "hint", label: "Indice 2", body: "La tenue du fond, la longueur de chaîne et la sécurité priment sur la vue." },
+    { kind: "explanation", label: "Explication", body: good?.feedback ?? s.decisionExplain },
+    { kind: "answer", label: "Le bon choix", body: good?.label ?? "Voir l'explication." },
+  ];
 }
 
 function Brief({ label, value }: { label: string; value: string }) {

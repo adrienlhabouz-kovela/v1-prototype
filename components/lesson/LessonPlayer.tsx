@@ -14,6 +14,8 @@ import { PointsOfSailExplorer } from "./PointsOfSailExplorer";
 import { SailTrim } from "@/components/svg/SailTrim";
 import { ManeuverTimeline } from "./ManeuverTimeline";
 import { QuizRunner } from "./QuizRunner";
+import { HelpButton } from "@/components/help/HelpButton";
+import type { HelpTier } from "@/lib/engine/help";
 import { ScoreRing } from "@/components/ui/primitives";
 
 type Phase = "learn" | "quiz" | "done";
@@ -56,6 +58,9 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <h1 className="font-display text-2xl text-sail">{lesson.title}</h1>
           <p className="mt-1 text-sm text-abyss-100/80">{lesson.goal}</p>
+          <div className="mt-2 flex justify-end">
+            <HelpButton tiers={lessonHelp(lesson)} />
+          </div>
 
           {paginate ? (
             <>
@@ -136,6 +141,14 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
       )}
     </div>
   );
+}
+
+function lessonHelp(lesson: Lesson): HelpTier[] {
+  return [
+    { kind: "hint", label: "Indice 1", body: "Lis tranquillement et manipule les schémas : rien à mémoriser d'un coup." },
+    { kind: "hint", label: "Indice 2", body: `Garde en tête l'objectif : ${lesson.goal}` },
+    { kind: "explanation", label: "Explication", body: "Les exercices qui suivent reprennent exactement ces notions, une par une. Tu pourras y redemander de l'aide à tout moment." },
+  ];
 }
 
 function BlockView({ block }: { block: LessonBlock }) {

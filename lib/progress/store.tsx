@@ -103,6 +103,8 @@ interface ProgressContextValue {
   }) => string[];
   /** Ajoute une entrée à l'historique d'entraînement. */
   recordSession: (session: SessionInput) => void;
+  /** Comptabilise une demande d'aide sur un concept (stats). */
+  recordHelp: (concept: string) => void;
   /** Réinitialise la progression du profil actif. */
   reset: () => void;
 }
@@ -276,6 +278,14 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  const recordHelp = useCallback<ProgressContextValue["recordHelp"]>((concept) => {
+    if (!concept) return;
+    setState((s) => ({
+      ...s,
+      helpUsage: { ...s.helpUsage, [concept]: (s.helpUsage[concept] ?? 0) + 1 },
+    }));
+  }, []);
+
   const reset = useCallback(() => setState(emptyState()), []);
 
   const profile = useMemo(() => profileById(activeId) ?? null, [activeId]);
@@ -296,6 +306,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       bumpScore,
       flagAchievement,
       recordSession,
+      recordHelp,
       reset,
     }),
     [
@@ -311,6 +322,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       bumpScore,
       flagAchievement,
       recordSession,
+      recordHelp,
       reset,
     ],
   );

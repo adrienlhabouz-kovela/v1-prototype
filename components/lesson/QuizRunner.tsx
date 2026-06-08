@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { Question } from "@/lib/types";
 import { useProgress } from "@/lib/progress/store";
 import { prioritizeQuestions } from "@/lib/engine/adaptive";
+import { buildQuestionHelp } from "@/lib/engine/help";
+import { HelpButton } from "@/components/help/HelpButton";
 import { BoatTopView } from "@/components/svg/BoatTopView";
 import { WindCircle } from "@/components/svg/WindCircle";
 import { pointOfSailForAngle } from "@/lib/engine/points-of-sail";
@@ -44,7 +46,7 @@ export function QuizRunner({
   questions: Question[];
   onComplete: (score: number) => void;
 }) {
-  const { state, answerConcept, tuning } = useProgress();
+  const { state, answerConcept, recordHelp, tuning } = useProgress();
   const kid = tuning.extraPositiveFeedback;
   // Ordonne selon le moteur adaptatif (concepts fragiles / dus en premier).
   const ordered = useMemo(
@@ -99,6 +101,16 @@ export function QuizRunner({
           <h3 className="mb-4 font-display text-lg leading-snug text-sail">{q.prompt}</h3>
 
           <QuestionBody q={q} answered={answered} onSubmit={submit} />
+
+          {/* aide contextuelle — toujours disponible avant de répondre */}
+          {answered === null && (
+            <div className="mt-4">
+              <HelpButton
+                tiers={buildQuestionHelp(q)}
+                onUse={() => recordHelp(q.concept)}
+              />
+            </div>
+          )}
         </motion.div>
       </AnimatePresence>
 

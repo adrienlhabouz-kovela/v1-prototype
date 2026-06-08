@@ -7,6 +7,7 @@ import { levelForXp, nextLevelFor, levelProgress, LEVELS } from "@/lib/content/l
 import { BADGES } from "@/lib/content/badges";
 import { ALL_LESSONS, conceptLabel } from "@/lib/content/modules";
 import { weakestConcepts } from "@/lib/engine/adaptive";
+import { topHelpConcepts } from "@/lib/engine/help";
 import { ProgressBar, ScoreRing, Gauge, Pill } from "@/components/ui/primitives";
 import type { TrainingSession } from "@/lib/types";
 
@@ -20,6 +21,7 @@ export default function ProgressPage() {
   const errors = weakestConcepts(state, 5);
   const unlocked = new Set(state.badges);
   const history = [...state.trainingHistory].reverse().slice(0, 8);
+  const helpNeeds = topHelpConcepts(state, 5);
 
   return (
     <div className="space-y-6">
@@ -128,6 +130,24 @@ export default function ProgressPage() {
               Le moteur de tests te reposera ces notions en priorité, et plus souvent tant qu'elles ne sont pas acquises (répétition espacée).
             </p>
           )}
+        </div>
+      )}
+
+      {/* notions qui demandent le plus d'aide */}
+      {helpNeeds.length > 0 && (
+        <div>
+          <div className="label-caps mb-2">Notions qui demandent le plus d'aide</div>
+          <div className="space-y-2">
+            {helpNeeds.map((h) => (
+              <div
+                key={h.concept}
+                className="flex items-center justify-between rounded-xl bg-sun-500/8 p-3 ring-1 ring-sun-500/20"
+              >
+                <span className="text-sm text-abyss-100">🛟 {conceptLabel(h.concept)}</span>
+                <Pill tone="sun">{h.count} aide{h.count > 1 ? "s" : ""}</Pill>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
