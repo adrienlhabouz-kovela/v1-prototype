@@ -37,11 +37,45 @@ const config: Config = {
         sand: "#EAE5DC",
         offwhite: "#E6E9EC",
         charcoal: "#1B1F23",
-        ink: "#0A1F2D",
+
+        // ─── Système éditorial KOVELA (Operating Room Discipline) ─────────
+        // Direction artistique validée — voir docs/strategy/.
+        // Coexiste avec l'ancien système (navy/teal/bone) pendant la
+        // bascule progressive page par page.
+        ink: {
+          DEFAULT: "#0F1419",  // text principal éditorial
+          60: "#4A4F55",       // text secondaire
+          30: "#8C9098",       // text tertiaire, métadonnées
+        },
+        paper: {
+          DEFAULT: "#FAFAF7",  // fond principal éditorial
+          shade: "#F1EFE8",    // fond contrasté section
+        },
+        rule: "#D8D6D0",       // filets, séparateurs
+        accent: "#2A6B5C",     // status valid, lien actif, focus (vert lichen)
+        alert: "#B85F3A",      // status critique (orange brûlé)
       },
       fontFamily: {
         sans: ["var(--font-sans)", "Inter", "system-ui", "sans-serif"],
         display: ["var(--font-display)", "Georgia", "serif"],
+        // ─── Famille éditoriale (Operating Room Discipline) ──────────────
+        // Söhne en cible. Inter Display + Inter en fallback open source.
+        // Mono : JetBrains Mono / Geist Mono.
+        editorial: [
+          "var(--font-editorial)",
+          "Inter Display",
+          "Inter",
+          "system-ui",
+          "sans-serif",
+        ],
+        "editorial-mono": [
+          "var(--font-editorial-mono)",
+          "JetBrains Mono",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "monospace",
+        ],
       },
       letterSpacing: {
         brand: "0.18em",

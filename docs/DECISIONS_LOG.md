@@ -1103,6 +1103,64 @@ Nouveau composant `app/chirurgiens-esthetiques/LandingAnalytics.tsx` qui expose 
 
 ---
 
+## 13sexdecies. Direction artistique V2 — validation + Phase 1 (2026-06-07)
+
+**Décision.** Direction artistique « Operating Room Discipline » (Direction B) validée comme épine dorsale, avec chaleur humaine maîtrisée (inflexions empruntées à Direction C : numérotation éditoriale, citations attribuées, mention nom propre du fondateur en pied).
+
+**Cinq corrections V3 finales appliquées au wording avant Phase 1 :**
+
+1. **« KOVELA structure le cadre, prend en charge les échanges opérationnels courants, documente les éléments déclarés par le patient, et remonte ce qui nécessite votre attention. »** — remplace « répond aux échanges courants » trop risqué.
+2. **« Le chirurgien est sollicité lorsqu'un élément nécessite son attention ou une transmission cabinet. »** — remplace « uniquement quand c'est utile » trop vague.
+3. **« Le patient sait où écrire, quoi attendre, et quand le cabinet sera sollicité. »** — ajout pour la chaleur humaine maîtrisée.
+4. **Tableau différenciation 5 vs 5 lignes strictement** (5e ligne droite : « Des transmissions factuelles et tracées »).
+5. **Hero : « Cadre RGPD et hébergement HDS prévus pour la V1. »** — formulation détaillée HDS-ready reste en footer uniquement.
+
+**Phase 1 — Système visuel — LIVRÉE.**
+
+- `tailwind.config.ts` étendu avec palette éditoriale :
+  - `ink` (DEFAULT `#0F1419`, `60` `#4A4F55`, `30` `#8C9098`)
+  - `paper` (DEFAULT `#FAFAF7`, `shade` `#F1EFE8`)
+  - `rule` `#D8D6D0`
+  - `accent` `#2A6B5C` (vert lichen)
+  - `alert` `#B85F3A` (orange brûlé)
+  - Palette ancienne (navy/teal/bone/etc.) **conservée** — coexistence pendant la bascule.
+
+- `app/layout.tsx` étendu avec fonts éditoriales :
+  - Variable CSS `--font-editorial` (Inter cible, Söhne en cible production)
+  - Variable CSS `--font-editorial-mono` (JetBrains Mono cible, Söhne Mono en cible production)
+  - Classes Tailwind `font-editorial` et `font-editorial-mono`
+
+- `components/editorial.tsx` (nouveau, ~530 lignes) — 18 primitives :
+  - `<EditorialSection>` (wrapper + max-w-[1280px] + paddings réguliers)
+  - `<SectionHeader>` (`[NN / TT] EYEBROW` + H2 + lead)
+  - `<EditorialNumber>`, `<EditorialEyebrow>`, `<EditorialTitle>`
+  - `<EditorialLead>`, `<EditorialBody>`, `<EditorialFootnote>`
+  - `<EditorialList>`, `<EditorialObservations>`
+  - `<EditorialColumns>` (2 col typographiques, ex différenciation)
+  - `<EditorialAlignedRows>` (label/value, ex bénéfices solution)
+  - `<EditorialQuote>` (avec attribution optionnelle)
+  - `<EditorialRule>` (filet horizontal)
+  - `<EditorialPrimaryButton>`, `<EditorialSecondaryButton>` (2 variants stricts, radius 4px)
+  - `<EditorialInput>`, `<EditorialSelect>` (underline, label mono flottant)
+  - `<EditorialMockupFrame>` (wrapper neutre cockpit typographique)
+
+- `app/styleguide-editorial/page.tsx` (nouveau, page interne non indexée) — showcase complet du système visuel en composition réelle :
+  - Hero V3 + bloc problème V3 + bloc solution V3 (avec cockpit mockup typographique) + différenciation V3 + CTA V3 + footer V3
+  - Inventaire complet des primitives : typographie, boutons, listes, citation, formulaire, palette, numérotation.
+  - URL `/styleguide-editorial` — accessible mais pas linkée depuis la navigation Shell.
+
+**Cockpit mockup typographique.** Première version sans chrome de fenêtre OS, sans dots colorés cosmétiques. Composition 3 colonnes (File · Conversation · Actions cabinet) séparées par des filets `rule`. Un seul accent (alert orange brûlé) sur le chip « SLA dépassé ». À évaluer visuellement avant Phase 2.
+
+**Doctrine respectée.** Aucun mot interdit ajouté. Doctrine non médicale stricte conservée. HDS reformulé en « architecture HDS-ready » + « prévus pour la V1 ».
+
+**Périmètre non touché.** Aucune page existante modifiée (`/`, `/chirurgiens-esthetiques`, `/superviseur`, `/chirurgien`, `/patient`, etc.). Le système coexiste sans interférer.
+
+**Prochain pas — Phase 2.** Après validation visuelle du `/styleguide-editorial`, réécriture complète de `/chirurgiens-esthetiques` sur le nouveau système (5 blocs strict, plus de chrome de fenêtre, plus de palette navy-depth/teal sur cette page).
+
+**Build OK.** 21/21 pages (nouvelle : `/styleguide-editorial` statique 137 B). TypeScript 0 erreur.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1
