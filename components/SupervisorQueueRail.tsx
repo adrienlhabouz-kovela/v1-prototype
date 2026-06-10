@@ -19,7 +19,10 @@ import {
   getOperationalStatus,
   getPostOpDay,
   getRecommendedAction,
+  getSLA,
   getUrgence,
+  slaStyles,
+  unTreatedCount,
 } from "@/lib/supervisor";
 import type { Patient } from "@/lib/types";
 
@@ -209,11 +212,27 @@ export function QueueRail({
         )}
       </div>
 
-      {/* Pied : total et lien dashboard global */}
-      <div className="border-t border-navy-900/[0.05] bg-bone/40 px-3 py-2 text-[10px] tracking-tight text-charcoal/55">
-        {sorted.length} patient{sorted.length > 1 ? "s" : ""} affiché
-        {sorted.length > 1 ? "s" : ""}
-        {sorted.length !== scope.length && ` · ${scope.length} au total`}
+      {/* Pied : total + action « tout lu » si des non-lus subsistent. */}
+      <div className="flex items-center justify-between gap-2 border-t border-navy-900/[0.05] bg-bone/40 px-3 py-2 text-[10px] tracking-tight text-charcoal/55">
+        <span>
+          {sorted.length} patient{sorted.length > 1 ? "s" : ""} affiché
+          {sorted.length > 1 ? "s" : ""}
+          {sorted.length !== scope.length && ` · ${scope.length} au total`}
+        </span>
+        {(() => {
+          const unread = sorted.filter((p) => !k.isPatientRead(p.id)).length;
+          if (unread === 0) return null;
+          return (
+            <button
+              type="button"
+              onClick={() => k.markAllPatientsRead()}
+              className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium text-teal-700 transition-colors hover:bg-teal-50/60"
+              title="Marquer tous les patients affichés comme lus"
+            >
+              {unread} non-lu{unread > 1 ? "s" : ""} · tout lu
+            </button>
+          );
+        })()}
       </div>
     </div>
   );
@@ -232,6 +251,12 @@ function QueueRow({
   const action = getRecommendedAction(patient, ctx);
   const urgence = getUrgence(patient, ctx);
   const last = getLastEvent(patient, ctx);
+  const sla = getSLA(patient, ctx);
+  const unreadMessages = unTreatedCount(patient);
+  const isRead = k.isPatientRead(patient.id);
+  // « Non-lu » côté superviseur : soit le store dit non-lu, soit il y a
+  // des messages patient non traités qui n'ont pas été vus.
+  const showUnread = !isRead && unreadMessages > 0;
 
   // Citation courte du dernier message patient pour scanner.
   const lastPatientMsg = [...patient.messages]
@@ -262,6 +287,8 @@ function QueueRow({
       className={`group relative block border-b border-navy-900/[0.04] px-3 py-2 transition-colors ${
         selected
           ? "bg-teal-50/40"
+          : showUnread
+          ? "bg-amber-50/30 hover:bg-amber-50/50"
           : "hover:bg-bone/40"
       }`}
     >
@@ -284,11 +311,20 @@ function QueueRow({
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-1.5">
             <p
-              className={`truncate text-[11.5px] tracking-tight ${
-                selected ? "font-semibold text-navy-900" : "font-medium text-navy-900"
+              className={`flex min-w-0 items-baseline gap-1.5 truncate text-[11.5px] tracking-tight ${
+                showUnread || selected
+                  ? "font-semibold text-navy-900"
+                  : "font-medium text-navy-900"
               }`}
             >
-              {patient.name}
+              {/* Pastille non-lu — bleue, juste avant le nom. */}
+              {showUnread && (
+                <span
+                  className="shrink-0 h-1.5 w-1.5 rounded-full bg-teal-600"
+                  aria-label="Non lu"
+                />
+              )}
+              <span className="truncate">{patient.name}</span>
             </p>
             <span className="shrink-0 font-mono text-[9.5px] font-medium text-teal-700">
               {day}
@@ -308,6 +344,18 @@ function QueueRow({
           ) : (
             <p className="mt-0.5 truncate text-[10px] tracking-tight text-charcoal/45">
               → {action.label}
+            </p>
+          )}
+          {/* Chip SLA — visible seulement quand pression active. */}
+          {sla.state !== "none" && sla.state !== "ok" && (
+            <p
+              className={`mt-1 inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[9px] font-medium ring-1 ${slaStyles[sla.state]}`}
+              title={sla.detail}
+            >
+              {sla.state === "critical" ? "⚠" : "·"}
+              <span>{sla.label}</span>
+              <span className="opacity-60">·</span>
+              <span>{sla.detail.split(" ").slice(-1)[0]}</span>
             </p>
           )}
         </div>

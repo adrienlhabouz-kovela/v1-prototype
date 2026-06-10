@@ -117,6 +117,144 @@ function lastPatientMessageAgeHours(patient: Patient, nowMs: number): number | n
   return Math.max(0, (nowMs - patientMsgs[0]) / 3_600_000);
 }
 
+// ---------------------------------------------------------------------------
+// SLA — indicateur production de priorité visuelle.
+//
+// Modèle :
+//   - Seuil "retard" sur message patient = 24h (cohérent avec getUrgence).
+//   - state = critical → message patient en retard OU < 30min restantes,
+//     OU compilation transmise sans retour > 48h, OU CR validé > 48h.
+//   - state = warning → 30min à 4h restantes.
+//   - state = ok → > 4h restantes OU pas de pression SLA active.
+// Le SLA est calculé pour donner au superviseur un signal visuel rapide
+// dans la file et sur la fiche patient ; il ne remplace pas getUrgence
+// (qui pilote le classement).
+// ---------------------------------------------------------------------------
+
+export type SlaState = "ok" | "warning" | "critical" | "none";
+
+export interface SlaInfo {
+  state: SlaState;
+  minutesRemaining: number | null;
+  label: string;
+  detail: string;
+}
+
+const SLA_PATIENT_MESSAGE_HOURS = 24;
+const SLA_CR_VALIDE_HOURS = 48;
+const SLA_TRANSMISSION_HOURS = 48;
+
+function formatTimeLeft(minutes: number): string {
+  if (minutes <= 0) return "dépassé";
+  if (minutes < 60) return `${Math.round(minutes)}min`;
+  const hours = minutes / 60;
+  if (hours < 24) return `${Math.round(hours)}h`;
+  return `${Math.round(hours / 24)}j`;
+}
+
+export function getSLA(patient: Patient, ctx: SupervisorCtx): SlaInfo {
+  const now = ctx.now ?? Date.now();
+  const report = ctx.reportFor(patient.id);
+  const escalation = ctx.escalationFor(patient.id);
+
+  let mostUrgent: { minutes: number; label: string; detail: string } | null = null;
+
+  // SLA 1 : message patient non traité (24h)
+  const untreatedAge = oldestUntreatedAgeHours(patient, now);
+  if (untreatedAge !== null) {
+    const remaining = (SLA_PATIENT_MESSAGE_HOURS - untreatedAge) * 60;
+    const detail =
+      remaining > 0
+        ? `Réponse attendue dans ${formatTimeLeft(remaining)}`
+        : `Message en retard de ${formatTimeLeft(Math.abs(remaining))}`;
+    mostUrgent = { minutes: remaining, label: "Message patient", detail };
+  }
+
+  // SLA 2 : CR validé non publié (48h)
+  if (report?.status === "valide") {
+    const age = (now - new Date(report.updatedAt).getTime()) / 3_600_000;
+    const remaining = (SLA_CR_VALIDE_HOURS - age) * 60;
+    if (!mostUrgent || remaining < mostUrgent.minutes) {
+      const detail =
+        remaining > 0
+          ? `CR à transmettre dans ${formatTimeLeft(remaining)}`
+          : `CR à transmettre — retard ${formatTimeLeft(Math.abs(remaining))}`;
+      mostUrgent = { minutes: remaining, label: "CR factuel", detail };
+    }
+  }
+
+  // SLA 3 : compilation transmise sans retour cabinet (48h)
+  if (escalation?.status === "transmise" && escalation.transmittedAt) {
+    const age = (now - new Date(escalation.transmittedAt).getTime()) / 3_600_000;
+    const remaining = (SLA_TRANSMISSION_HOURS - age) * 60;
+    if (!mostUrgent || remaining < mostUrgent.minutes) {
+      const detail =
+        remaining > 0
+          ? `Retour cabinet attendu dans ${formatTimeLeft(remaining)}`
+          : `Cabinet à relancer — sans retour depuis ${formatTimeLeft(Math.abs(remaining))}`;
+      mostUrgent = { minutes: remaining, label: "Retour cabinet", detail };
+    }
+  }
+
+  if (!mostUrgent) {
+    return { state: "none", minutesRemaining: null, label: "", detail: "" };
+  }
+
+  let state: SlaState;
+  if (mostUrgent.minutes <= 30) state = "critical";
+  else if (mostUrgent.minutes <= 4 * 60) state = "warning";
+  else state = "ok";
+
+  return {
+    state,
+    minutesRemaining: Math.round(mostUrgent.minutes),
+    label: mostUrgent.label,
+    detail: mostUrgent.detail,
+  };
+}
+
+// Styles partagés du chip SLA (rail, HERO row, bandeau patient).
+export const slaStyles: Record<SlaState, string> = {
+  critical: "bg-amber-100 text-amber-900 ring-amber-300/60",
+  warning: "bg-amber-50/80 text-amber-800 ring-amber-200/60",
+  ok: "bg-teal-50/70 text-teal-700 ring-teal-100/70",
+  none: "bg-navy-900/[0.05] text-charcoal/55 ring-navy-900/[0.06]",
+};
+
+// ---------------------------------------------------------------------------
+// Patient suivant — utilité pour le bouton « Suivant → » dans le bandeau.
+// Trouve le prochain patient à traiter (priorité urgence en_retard >
+// aujourdhui > a_venir, exclut le patient courant et les clôturés).
+// ---------------------------------------------------------------------------
+
+export function getNextPatientToTreat(
+  currentPatientId: string,
+  patients: Patient[],
+  ctx: SupervisorCtx
+): Patient | null {
+  const order = { en_retard: 0, aujourdhui: 1, a_venir: 2 } as const;
+  const sortable = patients
+    .filter((p) => p.id !== currentPatientId && p.status !== "cloture")
+    .map((p) => ({
+      p,
+      urgenceRank: order[getUrgence(p, ctx) as keyof typeof order] ?? 3,
+      slaMinutes: getSLA(p, ctx).minutesRemaining ?? Number.POSITIVE_INFINITY,
+    }))
+    // Filtre : on ne propose comme suivant que les dossiers nécessitant action
+    // (a_traiter dans le statut opérationnel). Si rien, on tombe sur la file
+    // « a_relancer » / « a_transmettre_cabinet ».
+    .filter(({ p }) => {
+      const s = getOperationalStatus(p, ctx);
+      return s === "a_traiter" || s === "a_relancer" || s === "a_transmettre_cabinet";
+    })
+    .sort((a, b) => {
+      if (a.urgenceRank !== b.urgenceRank) return a.urgenceRank - b.urgenceRank;
+      return a.slaMinutes - b.slaMinutes;
+    });
+
+  return sortable[0]?.p ?? null;
+}
+
 // Fin de suivi approximative : on prend le dernier "J+N" du protocole patient.
 // Si on ne sait pas extraire, on retourne null.
 function endOfFollowUpDays(patient: Patient): number | null {

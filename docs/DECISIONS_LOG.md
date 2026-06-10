@@ -1057,6 +1057,52 @@ Nouveau composant `app/chirurgiens-esthetiques/LandingAnalytics.tsx` qui expose 
 
 ---
 
+## 13quindecies. Refonte production espace superviseur — outils 80-100 patients (2026-06-07)
+
+**Décision.** Refondre l'espace superviseur pour passer du « prototype démonstrable » à un **outil exploitable par 10 superviseurs en production**, capables de gérer 80 à 100 patients actifs avec une charge cognitive minimale.
+
+**Cible explicite.** En moins de 5 secondes : comprendre l'état d'un patient, identifier la priorité du jour, traiter un flux sans hésitation, contacter / transmettre cabinet en 1 clic.
+
+**Audit critique avant refonte.**
+
+| Friction identifiée | Impact production | Décision |
+|---|---|---|
+| Aucun indicateur SLA visible | La pression temporelle est invisible avant qu'un dossier ne devienne « en retard » | **Helper `getSLA(patient, ctx)`** + chip SLA dans rail / HERO / bandeau patient + indicateur global cockpit. |
+| Aucune notion lu/non-lu | Pas de signal sur l'activité non vue depuis la dernière session | **État volatile `readPatientIds: Set<string>`** dans le store + pastille bleue dans rail + indicateur global. Auto-marquage lu à l'ouverture de la fiche. Tout message patient remet en non-lu. |
+| Pas de « patient suivant » | Friction de retour rail entre 2 patients | **Bouton `Suivant →`** dans le bandeau patient + raccourci `n`, calcul `getNextPatientToTreat`. |
+| Aucun raccourci clavier | Productivité limitée sur usage intensif | **Set complet de raccourcis** : `e` focus réponse · `t` transmission cabinet · `c` focus note · `n` patient suivant · `/` recherche rail · `?` aide · `⌘+Entrée` envoyer · `Esc` ferme modales / dropdown. Modale d'aide dédiée. |
+| Pas de recherche globale | Navigation par filtres uniquement | **Command palette `⌘K`** dédiée (`components/SupervisorCommandPalette.tsx`) — search patient + 4 actions (cockpit, prochain prioritaire, tout marquer lu, formation) + navigation clavier ↑↓↵. |
+| Templates en modale | Perte de contexte conversation à chaque ouverture | **Dropdown inline** depuis le composer — clic = insertion immédiate dans le textarea. Modale conservée comme fallback global. |
+| Référentiel applicable replié | Pas accessible quand on prend une décision de transmission | **`<details open>`** par défaut dans la carte Cabinet — pliable manuellement. |
+| Aucun bandeau alerte SLA | Surcharge non signalée | **Bandeau ambre fort** au-dessus du header sticky quand `sla.state === "critical"`, avec rappel de l'action recommandée. |
+
+**Architecture ajoutée.**
+
+- **`lib/supervisor.ts`** : `SlaState`, `SlaInfo`, `getSLA()`, `slaStyles`, `getNextPatientToTreat()`. Modèle SLA :
+  - Critique : ≤ 30min restantes OU dépassé (message patient > 24h non traité, CR validé > 48h, compilation transmise > 48h sans retour).
+  - Warning : 30min à 4h restantes.
+  - OK : > 4h restantes.
+  - None : aucune pression SLA active.
+- **`lib/store.tsx`** : `readPatientIds`, `markPatientRead()`, `markAllPatientsRead()`, `isPatientRead()`. Auto-déclenchement en non-lu à chaque `sendMessage(author: "patient")`.
+- **`components/SupervisorQueueRail.tsx`** : pastille teal de non-lu + chip SLA par ligne + ligne « N non-lus · tout lu » dans le footer + fond ambre léger sur lignes non-lues.
+- **`components/SupervisorCommandPalette.tsx`** : nouveau composant Cmd+K (218 lignes).
+- **`app/superviseur/page.tsx`** : KPIs étendus (« SLA dépassés », « Non-lus ») + SLA chip + pastille non-lu dans HERO row + Command Palette montée.
+- **`app/superviseur/patient/[id]/page.tsx`** : auto-marquer lu au mount, bouton `Suivant →`, raccourcis clavier complet (effet keydown), chip SLA dans header, bandeau alerte SLA critique, templates inline dropdown, modale d'aide raccourcis, référentiel ouvert par défaut, Command Palette montée.
+
+**Doctrine respectée.** Aucun wording médical risqué ajouté. Le terme « SLA » est purement opérationnel (Service Level Agreement, pas médical). Les labels SLA produits (« Message patient », « CR factuel », « Retour cabinet ») restent factuels.
+
+**Build OK.** Bundle `/superviseur` 6.54 → 6.82 kB (+280 bytes). Bundle `/superviseur/patient/[id]` 11.7 → 13.2 kB (+1.5 kB). Tout statique sauf `/superviseur/patient/[id]` (dynamique, attendu). TypeScript : 0 erreur.
+
+**Limites connues à traiter en V1 production.**
+
+- **Mobile/tablette portrait** : le rail est `hidden lg:block`. En-dessous de 1024px, il disparaît. Décision provisoire : pas de drawer mobile dans cette passe, doc backlog. Tablette landscape (≥1024) fonctionne déjà.
+- **Persistance** : `readPatientIds` est volatile (perdu au refresh). Branchement backend / cookie / localStorage = V1.
+- **Virtual scrolling** : la liste rail pour 100+ patients reste un DOM complet. Tests de perf à faire en pilote. Si scroll lag : intégrer `react-virtuoso` ou `@tanstack/react-virtual`.
+- **Notifications temps réel** : pas de Web Push / WebSocket. À brancher en V1 avec un service push validé RGPD.
+- **Retour cabinet réel** : aucun simulacre de retour cabinet visible (seul le timestamp de transmission est tracké). À implémenter avec le canal cabinet validé.
+
+---
+
 ## 14. Éléments locked (à ne plus toucher sans décision explicite)
 
 - Landing V1

@@ -104,6 +104,15 @@ interface KovelaState {
   supervisors: Supervisor[];
   pricing: typeof PRICING;
 
+  // Lu/non-lu superviseur — set in-memory volatile, valable pour la
+  // session. Quand un patient envoie un nouveau message, son id sort du
+  // set (devient non-lu). Quand le superviseur ouvre la fiche patient,
+  // l'id rentre dans le set (devient lu).
+  readPatientIds: Set<string>;
+  markPatientRead: (patientId: string) => void;
+  markAllPatientsRead: () => void;
+  isPatientRead: (patientId: string) => boolean;
+
   // actions
   assignSupervisor: (patientId: string, supervisorId: string | null) => void;
   sendMessage: (patientId: string, text: string, author: Message["author"]) => void;
@@ -229,6 +238,9 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
     () => seedSupervisorSuggestions.map((s) => ({ ...s }))
   );
 
+  // Lu/non-lu superviseur — volatile, démarre vide (tous non-lus à l'init).
+  const [readPatientIds, setReadPatientIds] = useState<Set<string>>(() => new Set());
+
   function updateProspect(id: string, fn: (p: Prospect) => Prospect) {
     setProspects((prev) => prev.map((p) => (p.id === id ? fn(p) : p)));
   }
@@ -270,6 +282,22 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
     supervisors: supervisorsState,
     pricing: PRICING,
 
+    readPatientIds,
+    markPatientRead(patientId) {
+      setReadPatientIds((prev) => {
+        if (prev.has(patientId)) return prev;
+        const next = new Set(prev);
+        next.add(patientId);
+        return next;
+      });
+    },
+    markAllPatientsRead() {
+      setReadPatientIds(new Set(patients.map((p) => p.id)));
+    },
+    isPatientRead(patientId) {
+      return readPatientIds.has(patientId);
+    },
+
     assignSupervisor(patientId, supervisorId) {
       updatePatient(patientId, (p) => ({ ...p, supervisorId }));
       const p = patients.find((x) => x.id === patientId);
@@ -295,6 +323,15 @@ export function KovelaProvider({ children }: { children: React.ReactNode }) {
         status: author === "patient" && p.status === "silencieux" ? "actif" : p.status,
       }));
       if (author === "superviseur") pushLog("message_envoye", "Message envoyé au patient.", patientId);
+      // Tout message patient remet le dossier en non-lu côté superviseur.
+      if (author === "patient") {
+        setReadPatientIds((prev) => {
+          if (!prev.has(patientId)) return prev;
+          const next = new Set(prev);
+          next.delete(patientId);
+          return next;
+        });
+      }
     },
 
     markTreated(patientId) {

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { QueueRail } from "@/components/SupervisorQueueRail";
+import { SupervisorCommandPalette } from "@/components/SupervisorCommandPalette";
 import { Badge, Button, Card, Modal } from "@/components/ui";
 import { useKovela, type SuggestionInput } from "@/lib/store";
 import { aiEstimatedMinutes, formatMinutes } from "@/lib/ai";
@@ -21,13 +22,16 @@ import {
   getPostOpDay,
   getRecommendedAction,
   getFollowUpWindow,
+  getSLA,
   getTodayScheduledLabel,
   getUrgence,
   getUrgenceLabelDetailed,
   operationalStatusHints,
   operationalStatusLabels,
   operationalStatusOrder,
+  slaStyles,
   type OperationalStatus,
+  unTreatedCount,
   urgenceStyles,
 } from "@/lib/supervisor";
 
@@ -115,6 +119,10 @@ function HeroPatientRow({ patient }: { patient: Patient }) {
   const last = getLastEvent(patient, ctx);
   const action = getRecommendedAction(patient, ctx);
   const urgence = getUrgence(patient, ctx);
+  const sla = getSLA(patient, ctx);
+  const isRead = k.isPatientRead(patient.id);
+  const unreadMsgs = unTreatedCount(patient);
+  const showUnread = !isRead && unreadMsgs > 0;
 
   const lastPatientMsg = [...patient.messages]
     .reverse()
@@ -144,22 +152,41 @@ function HeroPatientRow({ patient }: { patient: Patient }) {
   return (
     <Link
       href={`/superviseur/patient/${patient.id}`}
-      className="group block border-t border-navy-900/[0.05] transition-colors first:border-t-0 hover:bg-bone/40"
+      className={`group block border-t border-navy-900/[0.05] transition-colors first:border-t-0 ${
+        showUnread ? "bg-amber-50/30 hover:bg-amber-50/60" : "hover:bg-bone/40"
+      }`}
     >
       {/* Layout mobile : empilé. Layout desktop : grille alignée. */}
       <div className="flex flex-col gap-1.5 px-5 py-3 sm:grid sm:grid-cols-[1.5fr_1.2fr_3rem_1.2fr_1.2fr_1.4fr_6rem] sm:items-center sm:gap-3 sm:py-2.5">
-        {/* Colonne 1 — Patient (avatar + nom + raison) */}
+        {/* Colonne 1 — Patient (avatar + nom + raison + SLA) */}
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-navy-50 text-[11px] font-semibold tracking-tight text-navy-900 ring-1 ring-navy-100">
             {initials}
           </span>
-          <div className="min-w-0">
-            <p className="truncate text-[12.5px] font-semibold tracking-tight text-navy-900">
-              {patient.name}
+          <div className="min-w-0 flex-1">
+            <p className="flex items-baseline gap-1.5 truncate text-[12.5px] font-semibold tracking-tight text-navy-900">
+              {showUnread && (
+                <span
+                  className="shrink-0 h-1.5 w-1.5 rounded-full bg-teal-600"
+                  aria-label="Non lu"
+                />
+              )}
+              <span className="truncate">{patient.name}</span>
             </p>
-            <p className="truncate text-[10.5px] font-medium tracking-tight text-amber-800">
-              {reason}
-            </p>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <p className="truncate text-[10.5px] font-medium tracking-tight text-amber-800">
+                {reason}
+              </p>
+              {sla.state !== "none" && sla.state !== "ok" && (
+                <span
+                  className={`inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 py-0.5 text-[9px] font-medium ring-1 ${slaStyles[sla.state]}`}
+                  title={sla.detail}
+                >
+                  {sla.state === "critical" ? "⚠" : "·"}
+                  <span>{sla.detail.split(" ").slice(-1)[0]}</span>
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -604,6 +631,14 @@ export default function SuperviseurInbox() {
   const crBrouillonARelire = scope.filter((p) => k.reportFor(p.id)?.status === "brouillon").length;
   const crValidesAPublier = scope.filter((p) => k.reportFor(p.id)?.status === "valide").length;
   const enRetard = scope.filter((p) => getUrgence(p, ctx) === "en_retard").length;
+  // SLA critiques : dossiers où la pression temporelle est haute (≤ 30min
+  // restantes ou déjà dépassé). Indicateur production.
+  const slaCritical = scope.filter((p) => getSLA(p, ctx).state === "critical").length;
+  // Non-lus côté superviseur : patients avec messages non traités et fiche
+  // non encore ouverte dans la session.
+  const unreadCount = scope.filter(
+    (p) => !k.isPatientRead(p.id) && unTreatedCount(p) > 0
+  ).length;
 
   const surgeonsInScope = useMemo(() => {
     const ids = Array.from(new Set(baseScope.map((p) => p.surgeonId)));
@@ -725,6 +760,8 @@ export default function SuperviseurInbox() {
 
   return (
     <Shell>
+      {/* Command palette globale Cmd+K — toujours montée, contrôle interne. */}
+      <SupervisorCommandPalette />
       {/* ─── WORKSPACE SUPERVISEUR ──────────────────────────────────────────
           Layout 2 panneaux permanent :
             · Rail patient (gauche) — toujours visible, navigation en place.
@@ -789,11 +826,14 @@ export default function SuperviseurInbox() {
         </div>
 
         {/* Bandeau métriques compact — 1 ligne pills, ne vole pas la vedette
-            à la file prioritaire. */}
+            à la file prioritaire. SLA et non-lus sont visibles ici car ce
+            sont des signaux production critiques. */}
         <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px] tracking-tight">
           {(
             [
               ["À traiter", counts.a_traiter, "amber"],
+              ["SLA dépassés", slaCritical, slaCritical > 0 ? "critical" : "navy"],
+              ["Non-lus", unreadCount, unreadCount > 0 ? "amber" : "navy"],
               ["Sans réponse", counts.a_relancer, "amber"],
               ["Transmissions", counts.a_transmettre_cabinet, "teal"],
               ["Retours cabinet", counts.en_attente_cabinet, "navy"],
@@ -814,6 +854,8 @@ export default function SuperviseurInbox() {
                     ? "text-amber-700"
                     : tone === "teal"
                     ? "text-teal-700"
+                    : tone === "critical"
+                    ? "text-red-700"
                     : "text-navy-900"
                 }`}
               >

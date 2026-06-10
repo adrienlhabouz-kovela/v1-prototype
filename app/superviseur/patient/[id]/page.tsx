@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Shell } from "@/components/Shell";
 import { QueueRail } from "@/components/SupervisorQueueRail";
+import { SupervisorCommandPalette } from "@/components/SupervisorCommandPalette";
 import { AiSuggestion, Badge, Button, Card, CardHeader, Modal } from "@/components/ui";
 import { useKovela } from "@/lib/store";
 import {
@@ -22,9 +23,11 @@ import {
   filterTimelineEvents,
   getApplicableReferentiel,
   getLastEvent,
+  getNextPatientToTreat,
   getOperationalStatus,
   getPostOpDay,
   getRecommendedAction,
+  getSLA,
   getStructuredTimeline,
   followUpStatusStyles,
   getFollowUpWindow,
@@ -35,6 +38,7 @@ import {
   operationalStatusLabels,
   scheduledMessageStatusLabels,
   scheduledMessageStatusStyles,
+  slaStyles,
   timelineFilterLabels,
   urgenceStyles,
   type ScheduledMessage,
@@ -107,16 +111,23 @@ function getInitials(name: string): string {
 export default function PatientFiche() {
   const k = useKovela();
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const patient = k.patients.find((p) => p.id === params.id);
 
   const [reply, setReply] = useState("");
   const [noteText, setNoteText] = useState("");
   const [templatesOpen, setTemplatesOpen] = useState(false);
+  // Dropdown templates inline — accessible directement depuis le composer
+  // sans ouvrir une modale.
+  const [templatesInlineOpen, setTemplatesInlineOpen] = useState(false);
   const [aiKind, setAiKind] = useState<AiKind | null>(null);
   const [aiOutput, setAiOutput] = useState("");
   const [editing, setEditing] = useState(false);
   const [scheduledPreview, setScheduledPreview] = useState<ScheduledMessage | null>(null);
   const [sentScheduledIds, setSentScheduledIds] = useState<Set<string>>(() => new Set());
+  // Refs pour les raccourcis clavier.
+  const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const noteInputRef = useRef<HTMLInputElement>(null);
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [contactCabinetOpen, setContactCabinetOpen] = useState(false);
   const [contactCabinetCopied, setContactCabinetCopied] = useState(false);
@@ -193,6 +204,22 @@ export default function PatientFiche() {
   const recommended = getRecommendedAction(patient, ctx);
   const day = getPostOpDay(patient);
   const last = getLastEvent(patient, ctx);
+  const sla = getSLA(patient, ctx);
+
+  // Patient suivant — calcul mémorisé pour éviter le re-render à chaque
+  // frappe. Utilisé par le bouton « Suivant → » et le raccourci `n`.
+  const nextPatient = useMemo(
+    () =>
+      patient ? getNextPatientToTreat(patient.id, k.patients, ctx) : null,
+    [patient, k.patients, ctx]
+  );
+
+  // Marquer le patient comme lu au montage de la fiche — la pastille
+  // bleue du rail disparaît dès qu'on ouvre la conversation.
+  useEffect(() => {
+    if (patient) k.markPatientRead(patient.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patient?.id]);
 
   // IA -----------------------------------------------------------------------
   function runAi(kind: AiKind) {
@@ -319,8 +346,111 @@ export default function PatientFiche() {
 
   const initials = getInitials(patient.name);
 
+  // -------------------------------------------------------------------------
+  // Raccourcis clavier — productivité superviseur sur usage intensif.
+  //   e        focus textarea réponse patient
+  //   t        ouvrir modale transmission cabinet
+  //   c        focus champ note interne
+  //   n        ouvrir patient suivant
+  //   /        focus recherche du rail (best effort)
+  //   Esc      ferme modale active
+  //   ?        ouvre / ferme la modale d'aide raccourcis
+  //   Cmd+Enter (depuis le textarea) → envoyer le message
+  //
+  // Les touches simples sont ignorées si un input/textarea est focusé.
+  // -------------------------------------------------------------------------
+  const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false);
+
+  useEffect(() => {
+    function isTyping(target: EventTarget | null): boolean {
+      if (!(target instanceof HTMLElement)) return false;
+      const tag = target.tagName.toLowerCase();
+      return tag === "input" || tag === "textarea" || target.isContentEditable;
+    }
+
+    function onKey(e: KeyboardEvent) {
+      // Escape ferme toute modale active.
+      if (e.key === "Escape") {
+        if (templatesOpen) setTemplatesOpen(false);
+        if (templatesInlineOpen) setTemplatesInlineOpen(false);
+        if (contactCabinetOpen) setContactCabinetOpen(false);
+        if (closeConfirmOpen) setCloseConfirmOpen(false);
+        if (aiKind) closeAi();
+        if (scheduledPreview) setScheduledPreview(null);
+        if (shortcutsHelpOpen) setShortcutsHelpOpen(false);
+        return;
+      }
+
+      // Cmd/Ctrl+Enter depuis le textarea = envoyer.
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        e.key === "Enter" &&
+        document.activeElement === replyTextareaRef.current
+      ) {
+        e.preventDefault();
+        if (reply.trim() && patient) {
+          k.sendMessage(patient.id, reply.trim(), "superviseur");
+          setReply("");
+        }
+        return;
+      }
+
+      // Raccourcis simples — ignorés en cours de saisie.
+      if (isTyping(e.target)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      switch (e.key) {
+        case "e":
+          e.preventDefault();
+          replyTextareaRef.current?.focus();
+          break;
+        case "t":
+          e.preventDefault();
+          setContactCabinetOpen(true);
+          setContactCabinetCopied(false);
+          break;
+        case "c":
+          e.preventDefault();
+          noteInputRef.current?.focus();
+          break;
+        case "n":
+          e.preventDefault();
+          if (nextPatient) router.push(`/superviseur/patient/${nextPatient.id}`);
+          break;
+        case "/": {
+          e.preventDefault();
+          const railSearch = document.querySelector<HTMLInputElement>(
+            'input[type="search"]'
+          );
+          railSearch?.focus();
+          break;
+        }
+        case "?":
+          e.preventDefault();
+          setShortcutsHelpOpen((v) => !v);
+          break;
+      }
+    }
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    reply,
+    nextPatient?.id,
+    templatesOpen,
+    templatesInlineOpen,
+    contactCabinetOpen,
+    closeConfirmOpen,
+    aiKind,
+    scheduledPreview,
+    shortcutsHelpOpen,
+  ]);
+
   return (
     <Shell>
+      {/* Command palette globale Cmd+K — always-on, contrôle interne. */}
+      <SupervisorCommandPalette />
       {/* ============================================================
           WORKSPACE SUPERVISEUR — 2 panneaux principaux :
             · Rail patient (gauche, permanent) — change de patient sans
@@ -339,6 +469,20 @@ export default function PatientFiche() {
 
         {/* Pane droit — contient le header sticky + le contenu fiche */}
         <div className="min-w-0 flex-1">
+          {/* Bandeau alerte SLA critique — signal production fort,
+              au-dessus du header sticky. Disparaît dès que la pression
+              SLA est résorbée (action prise → SLA recalculé). */}
+          {sla.state === "critical" && (
+            <div className="mb-3 flex items-center justify-between gap-3 rounded-xl bg-amber-50 px-4 py-2.5 ring-1 ring-amber-200/70">
+              <p className="text-[11.5px] tracking-tight text-amber-900">
+                <span className="font-semibold">SLA critique — {sla.label}.</span>{" "}
+                <span className="text-amber-800/85">{sla.detail}.</span>
+              </p>
+              <span className="shrink-0 rounded-md bg-white px-2 py-0.5 text-[10px] font-semibold tracking-tight text-amber-800 ring-1 ring-amber-300/60">
+                Action recommandée : {recommended.label}
+              </span>
+            </div>
+          )}
           {/* Header patient — sticky pour rester visible pendant la conversation. */}
       <div className="sticky top-2 z-30 mb-4 overflow-hidden rounded-2xl bg-white/95 shadow-card ring-1 ring-navy-900/[0.045] backdrop-blur supports-[backdrop-filter]:bg-white/85">
         <div className="border-l-[3px] border-teal-500/80 px-5 py-4">
@@ -385,6 +529,22 @@ export default function PatientFiche() {
                   <Badge className="bg-bone/80 text-charcoal/70 ring-navy-900/[0.06]">
                     Réf. {refl.version}
                   </Badge>
+                  {/* Chip SLA — affiche le temps restant ou « dépassé » sur
+                      la dimension la plus serrée du dossier. Permet de
+                      lire la pression du dossier en un coup d'œil. */}
+                  {sla.state !== "none" && (
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10.5px] font-medium tracking-tight ring-1 ${slaStyles[sla.state]}`}
+                      title={sla.detail}
+                    >
+                      {sla.state === "critical" && (
+                        <span aria-hidden>⚠</span>
+                      )}
+                      <span>SLA · {sla.label}</span>
+                      <span className="opacity-60">·</span>
+                      <span>{sla.detail.split(" ").slice(-1)[0]}</span>
+                    </span>
+                  )}
                 </div>
                 {/* Fenêtre prévue + temps humain — compact, repère métier. */}
                 <p className="mt-1.5 text-[10px] tracking-tight text-charcoal/55">
@@ -441,6 +601,27 @@ export default function PatientFiche() {
                 >
                   Contacter le cabinet
                 </Button>
+                {/* Patient suivant — fluidifie le traitement en série. */}
+                {nextPatient && (
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/superviseur/patient/${nextPatient.id}`)}
+                    className="rounded-lg bg-white px-3 py-2 text-[12px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/[0.1] transition-colors hover:bg-bone"
+                    title={`Patient suivant : ${nextPatient.name} (n)`}
+                  >
+                    Suivant →
+                  </button>
+                )}
+                {/* Raccourcis clavier — accès rapide à la modale d'aide. */}
+                <button
+                  type="button"
+                  onClick={() => setShortcutsHelpOpen(true)}
+                  className="rounded-lg px-2 py-2 text-[12px] font-medium tracking-tight text-charcoal/55 transition-colors hover:bg-navy-900/[0.04] hover:text-navy-900"
+                  title="Raccourcis clavier ( ? )"
+                  aria-label="Raccourcis clavier"
+                >
+                  ⌘
+                </button>
                 <details className="relative">
                   <summary className="cursor-pointer list-none rounded-lg px-3 py-2 text-[12px] font-medium tracking-tight text-charcoal/65 ring-1 ring-navy-900/[0.06] transition-colors hover:bg-navy-900/[0.04] hover:text-navy-900">
                     Autres ▾
@@ -813,20 +994,53 @@ export default function PatientFiche() {
                 </span>
               </div>
               <textarea
+                ref={replyTextareaRef}
                 value={reply}
                 onChange={(e) => setReply(e.target.value)}
                 rows={4}
-                placeholder="Écrire une réponse de coordination, sans avis médical…"
+                placeholder="Écrire une réponse de coordination, sans avis médical…  ⌘+Entrée pour envoyer"
                 className="w-full resize-none rounded-xl border border-navy-900/[0.08] bg-white p-3 text-[13px] leading-relaxed outline-none transition-colors focus:border-teal-500/60 focus:ring-2 focus:ring-teal-500/10"
               />
               <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setTemplatesOpen(true)}
-                  className="rounded-md bg-white px-2.5 py-1.5 text-[11px] font-medium tracking-tight text-charcoal/75 ring-1 ring-navy-900/[0.08] transition-colors hover:bg-bone hover:text-navy-900"
-                >
-                  Modèles de réponse
-                </button>
+                {/* Modèles de réponse — dropdown inline (pas de modale,
+                    pas de perte de contexte). Clic = insertion immédiate
+                    au composer. */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setTemplatesInlineOpen((v) => !v)}
+                    aria-expanded={templatesInlineOpen}
+                    className="rounded-md bg-white px-2.5 py-1.5 text-[11px] font-medium tracking-tight text-charcoal/75 ring-1 ring-navy-900/[0.08] transition-colors hover:bg-bone hover:text-navy-900"
+                  >
+                    Modèles {templatesInlineOpen ? "▴" : "▾"}
+                  </button>
+                  {templatesInlineOpen && (
+                    <div className="absolute bottom-full left-0 z-20 mb-1.5 max-h-[320px] w-[340px] overflow-y-auto rounded-xl bg-white shadow-lift ring-1 ring-navy-900/[0.08]">
+                      <p className="border-b border-navy-900/[0.05] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/55">
+                        Modèles de réponse · coordination uniquement
+                      </p>
+                      {templates.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => {
+                            setReply((prev) => (prev ? prev + "\n\n" : "") + t.body);
+                            setTemplatesInlineOpen(false);
+                            replyTextareaRef.current?.focus();
+                          }}
+                          className="block w-full border-b border-navy-900/[0.04] px-3 py-2.5 text-left last:border-0 hover:bg-bone/60"
+                        >
+                          <p className="text-[12px] font-medium tracking-tight text-navy-900">
+                            {t.title}
+                          </p>
+                          <p className="mt-1 line-clamp-2 text-[10.5px] leading-relaxed text-charcoal/55">
+                            {t.body}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={() => runAi("reformulation")}
@@ -1095,9 +1309,9 @@ export default function PatientFiche() {
 
             {/* Référentiel applicable — directement dans le bloc Cabinet
                 car c'est ce qui pilote les décisions de transmission. */}
-            <details className="border-t border-navy-900/[0.05]">
+            <details open className="border-t border-navy-900/[0.05]">
               <summary className="cursor-pointer list-none px-4 py-2 text-[10.5px] font-medium tracking-tight text-charcoal/65 hover:bg-bone/40">
-                Référentiel applicable ▾
+                Référentiel applicable
               </summary>
               <div className="space-y-2 border-t border-navy-900/[0.04] bg-bone/20 px-4 py-3">
                 <p className="text-[10.5px] tracking-tight text-charcoal/55">
@@ -1356,6 +1570,7 @@ export default function PatientFiche() {
             <div className="max-h-[260px] space-y-2.5 overflow-y-auto px-3 py-3">
               <div className="flex gap-1.5">
                 <input
+                  ref={noteInputRef}
                   value={noteText}
                   onChange={(e) => setNoteText(e.target.value)}
                   placeholder="Ajouter une note interne…"
@@ -1668,6 +1883,46 @@ KOVELA — transmission factuelle, sans interprétation médicale.`;
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Modal raccourcis clavier — aide productivité superviseur. */}
+      <Modal
+        open={shortcutsHelpOpen}
+        onClose={() => setShortcutsHelpOpen(false)}
+        title="Raccourcis clavier"
+      >
+        <p className="mb-4 text-[12.5px] leading-relaxed tracking-tight text-charcoal/65">
+          Les raccourcis simples s&apos;activent quand aucun champ de saisie
+          n&apos;est focusé. Pendant la saisie, seuls les modificateurs
+          (Cmd/Ctrl) et Échap restent actifs.
+        </p>
+        <dl className="divide-y divide-navy-900/[0.05] rounded-xl bg-bone/40 px-4 py-2 ring-1 ring-navy-900/[0.05]">
+          {[
+            ["e", "Focus la zone de réponse patient"],
+            ["t", "Ouvrir la modale Transmission cabinet"],
+            ["c", "Focus le champ Note interne"],
+            ["n", "Ouvrir le patient suivant à traiter"],
+            ["/", "Focus la recherche de la file patient"],
+            ["?", "Ouvrir / fermer cette aide"],
+            ["⌘+Entrée", "Envoyer le message depuis la zone de réponse"],
+            ["Échap", "Fermer la modale ou le dropdown actif"],
+          ].map(([key, desc]) => (
+            <div key={key} className="flex items-center justify-between gap-4 py-2">
+              <dt className="font-mono text-[11.5px] font-semibold tracking-tight text-navy-900">
+                <kbd className="rounded-md bg-white px-2 py-0.5 ring-1 ring-navy-900/[0.08]">
+                  {key}
+                </kbd>
+              </dt>
+              <dd className="flex-1 text-right text-[12px] tracking-tight text-charcoal/70">
+                {desc}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-4 text-[10.5px] tracking-tight text-charcoal/50">
+          Les raccourcis sont valables sur la fiche patient. Une command palette
+          globale arrive en V1.
+        </p>
       </Modal>
 
       {/* Modal templates */}
