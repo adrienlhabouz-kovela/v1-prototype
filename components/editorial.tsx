@@ -515,6 +515,236 @@ export function EditorialSelect({
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
+// ║  Hero humain — Clinical Trust Premium                                  ║
+// ║                                                                        ║
+// ║  Layout 2 colonnes (text gauche · photo droite) sur desktop, empilé    ║
+// ║  sur mobile. Le visuel à droite est soit une vraie photo (à            ║
+// ║  commissionner pour V1), soit un placeholder typographique sobre.      ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+
+interface EditorialHumanHeroProps {
+  number: string;
+  total: string;
+  eyebrow: string;
+  title: React.ReactNode;
+  lead: React.ReactNode;
+  /** URL de la photo. Laisser undefined pour afficher le placeholder. */
+  photoSrc?: string;
+  /** Alt de la photo. */
+  photoAlt?: string;
+  /** Bouton primary (texte + href). */
+  primaryCta: { label: string; href: string };
+  /** Optionnel — bouton secondary. */
+  secondaryCta?: { label: string; href: string };
+  /** Optionnel — caption sous la photo (placeholder ou crédit). */
+  photoCaption?: string;
+}
+
+export function EditorialHumanHero({
+  number,
+  total,
+  eyebrow,
+  title,
+  lead,
+  photoSrc,
+  photoAlt = "",
+  primaryCta,
+  secondaryCta,
+  photoCaption,
+}: EditorialHumanHeroProps) {
+  return (
+    <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
+      {/* Colonne gauche — texte */}
+      <div className="flex flex-col justify-center">
+        <div className="border-t border-rule pt-3">
+          <div className="flex items-baseline gap-x-6 font-editorial-mono text-[10.5px] uppercase tracking-[0.14em] text-ink-60">
+            <span className="text-ink-30">
+              {number} <span className="text-ink-30/60">/</span> {total}
+            </span>
+            <span>{eyebrow}</span>
+          </div>
+        </div>
+        <h1 className="mt-6 font-editorial text-[2.25rem] font-extrabold leading-[1.02] tracking-[-0.025em] text-ink sm:text-[2.75rem] sm:mt-8 lg:text-[3.5rem]">
+          {title}
+        </h1>
+        <p className="mt-6 max-w-[48ch] font-editorial text-[16px] leading-[1.55] tracking-[-0.005em] text-ink-60 sm:text-[17px] sm:mt-8">
+          {lead}
+        </p>
+        <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10">
+          <EditorialPrimaryButton href={primaryCta.href}>
+            {primaryCta.label}
+          </EditorialPrimaryButton>
+          {secondaryCta && (
+            <EditorialSecondaryButton href={secondaryCta.href}>
+              {secondaryCta.label}
+            </EditorialSecondaryButton>
+          )}
+        </div>
+      </div>
+
+      {/* Colonne droite — photo ou placeholder */}
+      <div className="relative">
+        {photoSrc ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photoSrc}
+            alt={photoAlt}
+            className="aspect-[4/5] w-full object-cover"
+          />
+        ) : (
+          <EditorialPhotoPlaceholder caption={photoCaption} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Placeholder photo — utilisé quand aucune photo réelle n'est encore
+ * commissionnée. Crème + warm-accent, sobre, demonstre la zone du visuel
+ * sans tricher.
+ */
+export function EditorialPhotoPlaceholder({
+  caption = "Photographie cabinet à commissionner pour V1",
+}: {
+  caption?: string;
+}) {
+  return (
+    <div className="relative aspect-[4/5] w-full overflow-hidden bg-cream">
+      {/* Composition typographique discrète au centre */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
+        {/* Petite forme géométrique sobre suggérant la présence */}
+        <svg
+          width="64"
+          height="64"
+          viewBox="0 0 64 64"
+          aria-hidden="true"
+          className="mb-8 text-warm-accent opacity-40"
+        >
+          <circle cx="32" cy="22" r="10" stroke="currentColor" strokeWidth="1" fill="none" />
+          <path
+            d="M14 56 C 14 42, 50 42, 50 56"
+            stroke="currentColor"
+            strokeWidth="1"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </svg>
+        <p className="font-editorial-mono text-[10.5px] uppercase tracking-[0.16em] text-ink-60">
+          {caption}
+        </p>
+      </div>
+      {/* Filet d'enrobage sobre */}
+      <div className="pointer-events-none absolute inset-0 border border-rule" />
+    </div>
+  );
+}
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║  Réassurance — bande de badges typographiques                          ║
+// ║                                                                        ║
+// ║  HDS · RGPD · Europe · Supervision humaine · Assistance IA interne.    ║
+// ║  Pas de logo institutionnel. Typographie seule + petits marqueurs      ║
+// ║  géométriques discrets.                                                ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+
+export interface ReassuranceItem {
+  label: string;
+  /** Sous-libellé optionnel (caption mono). */
+  sub?: string;
+}
+
+export function EditorialReassurance({
+  items,
+  surface = "cream",
+}: {
+  items: ReassuranceItem[];
+  /** Couleur de fond : cream (par défaut) ou paper. */
+  surface?: "cream" | "paper" | "shade";
+}) {
+  const bg =
+    surface === "cream" ? "bg-cream" : surface === "shade" ? "bg-paper-shade" : "bg-paper";
+  return (
+    <div className={`${bg} border-y border-rule`}>
+      <div className="mx-auto grid max-w-[1280px] gap-y-4 px-6 py-6 sm:grid-cols-2 sm:px-10 lg:grid-cols-5 lg:gap-x-8 lg:px-20">
+        {items.map((item, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 lg:border-r lg:border-rule lg:pr-6 lg:last:border-r-0"
+          >
+            <span
+              aria-hidden
+              className="block h-1.5 w-1.5 shrink-0 rounded-full bg-warm-accent"
+            />
+            <div className="min-w-0">
+              <p className="font-editorial text-[13px] font-medium leading-tight text-ink">
+                {item.label}
+              </p>
+              {item.sub && (
+                <p className="font-editorial-mono text-[10px] uppercase tracking-[0.1em] text-ink-60">
+                  {item.sub}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║  Avant / Après KOVELA — 2 colonnes claires                             ║
+// ║                                                                        ║
+// ║  Aucun chiffre inventé. Faits opérationnels seulement.                 ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+
+export function EditorialAvantApres({
+  avantTitle = "Avant KOVELA",
+  apresTitle = "Avec KOVELA",
+  avantItems,
+  apresItems,
+}: {
+  avantTitle?: string;
+  apresTitle?: string;
+  avantItems: string[];
+  apresItems: string[];
+}) {
+  return (
+    <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
+      {/* Colonne Avant — neutre, observation factuelle */}
+      <div className="bg-paper-shade p-8 sm:p-10">
+        <p className="font-editorial-mono text-[10.5px] uppercase tracking-[0.14em] text-ink-60">
+          {avantTitle}
+        </p>
+        <ul className="mt-6 space-y-3 font-editorial text-[15px] leading-[1.55] text-ink-60">
+          {avantItems.map((item, i) => (
+            <li key={i} className="flex gap-3">
+              <span aria-hidden className="select-none text-ink-30">—</span>
+              <span className="flex-1">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {/* Colonne Avec KOVELA — accent vert sobre */}
+      <div className="border-l-2 border-accent bg-paper p-8 sm:p-10">
+        <p className="font-editorial-mono text-[10.5px] uppercase tracking-[0.14em] text-accent">
+          {apresTitle}
+        </p>
+        <ul className="mt-6 space-y-3 font-editorial text-[15px] leading-[1.55] text-ink">
+          {apresItems.map((item, i) => (
+            <li key={i} className="flex gap-3">
+              <span aria-hidden className="select-none text-accent">—</span>
+              <span className="flex-1">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  Frame mockup — wrapper neutre pour le cockpit typographique           ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 

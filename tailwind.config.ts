@@ -38,7 +38,7 @@ const config: Config = {
         offwhite: "#E6E9EC",
         charcoal: "#1B1F23",
 
-        // ─── Système éditorial KOVELA (Operating Room Discipline) ─────────
+        // ─── Système éditorial KOVELA (Clinical Trust Premium) ───────────
         // Direction artistique validée — voir docs/strategy/.
         // Coexiste avec l'ancien système (navy/teal/bone) pendant la
         // bascule progressive page par page.
@@ -51,8 +51,10 @@ const config: Config = {
           DEFAULT: "#FAFAF7",  // fond principal éditorial
           shade: "#F1EFE8",    // fond contrasté section
         },
+        cream: "#F1EBE0",      // chaleur — bandes réassurance, photos
         rule: "#D8D6D0",       // filets, séparateurs
         accent: "#2A6B5C",     // status valid, lien actif, focus (vert lichen)
+        "warm-accent": "#A06B3F", // cuivre patiné — éléments humains/photo
         alert: "#B85F3A",      // status critique (orange brûlé)
       },
       fontFamily: {
