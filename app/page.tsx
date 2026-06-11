@@ -287,23 +287,19 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Colonne droite — visuel cabinet.
-              Pile de fallback en 3 couches (CSS multiple backgrounds) :
-                1. /hero-consultation.jpg (local — la photo définitive
-                   dès qu'elle est déposée dans /public)
-                2. Photo Unsplash CC0 hotlink (placeholder immédiat,
-                   chirurgien / consultation médicale)
-                3. Gradient crème (filet de sécurité si réseau coupé)
-              Quand une couche 404, elle est transparente et la couche
-              suivante apparaît. */}
+          {/* Colonne droite — slot photo.
+              Dépose la photo finale dans public/hero-consultation.jpg
+              (n'importe quel ratio paysage / portrait — couvre la zone
+              avec bg-cover). Tant qu'elle n'est pas là, gradient
+              ivoire→bone→cream + voile teal léger en fallback. */}
           <div
             className="relative min-h-[360px] lg:min-h-[720px]"
             style={{
               backgroundImage:
-                "url('/hero-consultation.jpg'), url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
-              backgroundSize: "cover, cover, cover",
-              backgroundPosition: "center, center, center",
-              backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+                "url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
+              backgroundSize: "cover, cover",
+              backgroundPosition: "center, center",
+              backgroundRepeat: "no-repeat, no-repeat",
             }}
             role="img"
             aria-label="Chirurgien en consultation post-opératoire avec une patiente"
