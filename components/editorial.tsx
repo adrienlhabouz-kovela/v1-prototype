@@ -585,12 +585,24 @@ export function EditorialHumanHero({
       {/* Colonne droite — photo ou placeholder */}
       <div className="relative">
         {photoSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={photoSrc}
-            alt={photoAlt}
-            className="aspect-[4/5] w-full object-cover"
-          />
+          <figure className="relative">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photoSrc}
+              alt={photoAlt}
+              className="aspect-[4/5] w-full object-cover"
+            />
+            {/* Filet d'enrobage discret pour ancrer la photo dans le système */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 border border-rule"
+            />
+            {photoCaption && (
+              <figcaption className="mt-3 font-editorial-mono text-[10px] uppercase tracking-[0.14em] text-ink-30">
+                {photoCaption}
+              </figcaption>
+            )}
+          </figure>
         ) : (
           <EditorialPhotoPlaceholder caption={photoCaption} />
         )}
@@ -641,18 +653,187 @@ export function EditorialPhotoPlaceholder({
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
-// ║  Réassurance — bande de badges typographiques                          ║
+// ║  Réassurance — bande de badges propriétaires KOVELA                    ║
 // ║                                                                        ║
 // ║  HDS · RGPD · Europe · Supervision humaine · Assistance IA interne.    ║
-// ║  Pas de logo institutionnel. Typographie seule + petits marqueurs      ║
-// ║  géométriques discrets.                                                ║
+// ║  PAS de logo institutionnel (CNIL, drapeau EU, etc.). PAS de claim     ║
+// ║  « certifié ». Badges KOVELA propriétaires : icône custom 1px stroke   ║
+// ║  + label éditorial + sub-label mono. Style premium, sobre, assumé.     ║
+// ║  Couleurs à plat seulement, AUCUN gradient.                            ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 
 export interface ReassuranceItem {
   label: string;
   /** Sous-libellé optionnel (caption mono). */
   sub?: string;
+  /** Icône SVG custom — 1px stroke ink-100, 24×24 viewBox. */
+  icon: React.ReactNode;
 }
+
+// ─── Icônes custom 1px stroke (Müller-Brockmann school) ─────────────────
+// 24×24 viewBox, currentColor, stroke-width 1.25. Géométrie stricte, pas
+// de pictogramme cheap. Style cohérent entre les 5 badges.
+
+const STROKE = {
+  width: 1.25,
+  linecap: "round" as const,
+  linejoin: "round" as const,
+  fill: "none" as const,
+};
+
+export const IconShield = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="M12 3 L20 6 V12 C20 16.5 16.5 19.5 12 21 C7.5 19.5 4 16.5 4 12 V6 Z"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+      strokeLinejoin={STROKE.linejoin}
+      fill={STROKE.fill}
+    />
+    <path
+      d="M9 12 L11 14 L15.5 9.5"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+      strokeLinejoin={STROKE.linejoin}
+      fill={STROKE.fill}
+    />
+  </svg>
+);
+
+export const IconDocument = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="M6 3 H15 L18 6 V21 H6 Z"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinejoin={STROKE.linejoin}
+      fill={STROKE.fill}
+    />
+    <path
+      d="M15 3 V6 H18"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinejoin={STROKE.linejoin}
+      fill={STROKE.fill}
+    />
+    <line
+      x1="9"
+      y1="11"
+      x2="15"
+      y2="11"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+    />
+    <line
+      x1="9"
+      y1="14"
+      x2="15"
+      y2="14"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+    />
+    <line
+      x1="9"
+      y1="17"
+      x2="13"
+      y2="17"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+    />
+  </svg>
+);
+
+export const IconGlobe = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <circle
+      cx="12"
+      cy="12"
+      r="9"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      fill={STROKE.fill}
+    />
+    <ellipse
+      cx="12"
+      cy="12"
+      rx="4"
+      ry="9"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      fill={STROKE.fill}
+    />
+    <line
+      x1="3"
+      y1="12"
+      x2="21"
+      y2="12"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+    />
+    <line
+      x1="3.5"
+      y1="8"
+      x2="20.5"
+      y2="8"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+    />
+    <line
+      x1="3.5"
+      y1="16"
+      x2="20.5"
+      y2="16"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+    />
+  </svg>
+);
+
+export const IconPerson = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <circle
+      cx="12"
+      cy="8.5"
+      r="3.75"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      fill={STROKE.fill}
+    />
+    <path
+      d="M5 21 C 5 16.5, 8 14, 12 14 C 16 14, 19 16.5, 19 21"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+      fill={STROKE.fill}
+    />
+  </svg>
+);
+
+export const IconDiamond = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="M12 3 L21 12 L12 21 L3 12 Z"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinejoin={STROKE.linejoin}
+      fill={STROKE.fill}
+    />
+    <path
+      d="M7.5 12 L12 7.5 L16.5 12 L12 16.5 Z"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinejoin={STROKE.linejoin}
+      fill={STROKE.fill}
+    />
+  </svg>
+);
 
 export function EditorialReassurance({
   items,
@@ -666,28 +847,33 @@ export function EditorialReassurance({
     surface === "cream" ? "bg-cream" : surface === "shade" ? "bg-paper-shade" : "bg-paper";
   return (
     <div className={`${bg} border-y border-rule`}>
-      <div className="mx-auto grid max-w-[1280px] gap-y-4 px-6 py-6 sm:grid-cols-2 sm:px-10 lg:grid-cols-5 lg:gap-x-8 lg:px-20">
-        {items.map((item, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 lg:border-r lg:border-rule lg:pr-6 lg:last:border-r-0"
-          >
-            <span
-              aria-hidden
-              className="block h-1.5 w-1.5 shrink-0 rounded-full bg-warm-accent"
-            />
-            <div className="min-w-0">
-              <p className="font-editorial text-[13px] font-medium leading-tight text-ink">
-                {item.label}
-              </p>
-              {item.sub && (
-                <p className="font-editorial-mono text-[10px] uppercase tracking-[0.1em] text-ink-60">
-                  {item.sub}
+      <div className="mx-auto max-w-[1280px] px-6 py-8 sm:px-10 sm:py-10 lg:px-20 lg:py-12">
+        {/* Légende discrète au-dessus de la bande */}
+        <p className="mb-6 font-editorial-mono text-[10px] uppercase tracking-[0.18em] text-ink-60">
+          ─── Cadre opérationnel & garanties ───
+        </p>
+        <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-5">
+          {items.map((item, i) => (
+            <div
+              key={i}
+              className="flex flex-col gap-3 border-t border-rule pt-5 sm:border-t-0 sm:border-l sm:pl-6 sm:pt-0 sm:first:border-l-0 sm:first:pl-0 lg:border-l-0 lg:border-t lg:pl-0 lg:pt-5"
+            >
+              <span aria-hidden className="text-ink">
+                {item.icon}
+              </span>
+              <div className="min-w-0">
+                <p className="font-editorial text-[14.5px] font-semibold leading-tight tracking-[-0.005em] text-ink">
+                  {item.label}
                 </p>
-              )}
+                {item.sub && (
+                  <p className="mt-1.5 font-editorial-mono text-[10px] uppercase tracking-[0.12em] text-ink-60">
+                    {item.sub}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

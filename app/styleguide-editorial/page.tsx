@@ -41,8 +41,33 @@ import {
   EditorialSection,
   EditorialSelect,
   EditorialTitle,
+  IconDiamond,
+  IconDocument,
+  IconGlobe,
+  IconPerson,
+  IconShield,
   SectionHeader,
 } from "@/components/editorial";
+
+// ───────────────────────────────────────────────────────────────────────────
+// VISUEL HUMAIN PROVISOIRE
+//
+// Photo Unsplash utilisée uniquement pour valider la perception de la
+// direction « Clinical Trust Premium ». À REMPLACER avant publication par
+// une photographie commissionnée éthiquement : cabinet privé premium,
+// chirurgien / patient / cabinet, sobre, sans visage trompeur pouvant
+// laisser croire à un faux médecin de référence KOVELA.
+//
+// Critères pour la commande V1 :
+//   - prise de vue calme, lumière naturelle ;
+//   - cadrage cabinet réel (pas de studio fond blanc) ;
+//   - pas de sourire publicitaire ;
+//   - pas de pose marketing ;
+//   - pas de blouse blanche stéréotypée ;
+//   - droits cédés à KOVELA, modèle release signé.
+// ───────────────────────────────────────────────────────────────────────────
+const HERO_PHOTO_TEMP =
+  "https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?w=1200&h=1500&auto=format&fit=crop&q=80";
 
 export const metadata: Metadata = {
   title: "KOVELA — Styleguide éditorial (interne)",
@@ -50,19 +75,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const REASSURANCE: { label: string; sub?: string }[] = [
-  { label: "Hébergement HDS", sub: "France · Europe" },
-  { label: "Cadre RGPD", sub: "Conception" },
-  { label: "Données en Europe", sub: "Localisation" },
-  { label: "Supervision humaine", sub: "Équipe formée" },
-  { label: "Assistance IA interne", sub: "Jamais autonome" },
+const REASSURANCE = [
+  { label: "Hébergement HDS", sub: "France · Europe", icon: IconShield },
+  { label: "Cadre RGPD", sub: "Documenté · conception", icon: IconDocument },
+  { label: "Données en Europe", sub: "Localisation européenne", icon: IconGlobe },
+  { label: "Supervision humaine", sub: "Équipe formée cabinet", icon: IconPerson },
+  { label: "Assistance IA interne", sub: "Jamais autonome patient", icon: IconDiamond },
 ];
 
 const AVANT_ITEMS = [
   "Appels, mails, SMS, photos arrivent par cinq canaux différents.",
   "Historique à reconstituer pour chaque question patient.",
   "Cabinet sollicité plusieurs fois par jour pour des sujets post-op.",
-  "Chirurgien interrompu entre deux consultations.",
+  "Le chirurgien est sollicité en dehors du bon cadre.",
   "Aucune trace consolidée du suivi en fin de parcours.",
 ];
 
@@ -124,7 +149,9 @@ export default function EditorialStyleguide() {
             </>
           }
           primaryCta={{ label: "Demander un échange opérationnel", href: "#contact" }}
-          secondaryCta={{ label: "Voir le fonctionnement", href: "#prise-en-charge" }}
+          photoSrc={HERO_PHOTO_TEMP}
+          photoAlt="Cabinet médical premium — visuel provisoire à remplacer par une photographie commissionnée"
+          photoCaption="Visuel provisoire · photographie cabinet à commissionner pour V1"
         />
       </EditorialSection>
 
@@ -181,15 +208,24 @@ export default function EditorialStyleguide() {
           lead="Votre cabinet partage une fois ses habitudes, ses consignes post-op et son référentiel de transmission. KOVELA structure le cadre, prend en charge les échanges opérationnels courants, documente les éléments déclarés par le patient, et remonte ce qui nécessite votre attention."
         />
 
-        <div className="mt-12 grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
-          {/* Photo détail cabinet — sobre, secondaire */}
-          <div>
-            <EditorialPhotoPlaceholder caption="Visuel détail cabinet · à commissionner" />
-          </div>
+        {/* Liste des prises en charge — colonne gauche dédiée. */}
+        <div className="mt-12">
+          <EditorialAlignedRows rows={COVERAGE} />
+        </div>
 
-          <div>
-            <EditorialAlignedRows rows={COVERAGE} />
-          </div>
+        <EditorialRule className="mt-16" />
+
+        {/* Mockup cockpit — preuve du service opéré, secondaire après le
+            texte. Sobre, sans chrome OS, sans dashboard SaaS générique.
+            Démontre le suivi sans diagnostic, sans alerte médicale, sans
+            détection de complication. */}
+        <div className="mt-12">
+          <p className="mb-4 font-editorial-mono text-[10.5px] uppercase tracking-[0.16em] text-ink-60">
+            ─── Aperçu cockpit opérateur ───
+          </p>
+          <EditorialMockupFrame caption="Aperçu interface prototype superviseur · visuel à valider pour V1">
+            <CockpitMockupV2 />
+          </EditorialMockupFrame>
         </div>
 
         <EditorialRule className="mt-16" />
@@ -376,15 +412,15 @@ export default function EditorialStyleguide() {
             </div>
             <div>
               <EditorialFootnote>
-                KOVELA ne remplace pas le chirurgien, ne pose pas de diagnostic,
-                ne prescrit pas et ne prend aucune décision médicale. En cas de
-                situation urgente ou de doute, le patient contacte le 15 / 112,
-                les urgences de la clinique ou suit les consignes remises par
-                son chirurgien.
+                KOVELA s&apos;appuie sur un hébergement HDS, un cadre RGPD
+                documenté et des données hébergées en Europe. Le service ne
+                remplace pas le chirurgien, ne pose pas de diagnostic, ne
+                prescrit pas et ne prend aucune décision médicale.
               </EditorialFootnote>
               <EditorialFootnote className="mt-3">
-                Architecture RGPD / HDS-ready pensée dès la conception.
-                Données hébergées en Europe. Cadre cabinet à valider en V1.
+                En cas de situation urgente ou de doute, le patient contacte le
+                15 / 112, les urgences de la clinique ou suit les consignes
+                remises par son chirurgien. Cadre cabinet à finaliser en V1.
               </EditorialFootnote>
             </div>
           </div>
@@ -527,6 +563,123 @@ export default function EditorialStyleguide() {
           </div>
         </div>
       </EditorialSection>
+    </div>
+  );
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Cockpit mockup V2 — composition typographique sobre.
+//
+// Sans chrome de fenêtre OS, sans dashboard SaaS générique. 3 zones :
+//   01 File patients · 02 Conversation · 03 Actions cabinet.
+// Un seul élément coloré : chip alert orange brûlé sur le SLA dépassé.
+// Démontre le suivi opérationnel sans diagnostic, sans alerte médicale,
+// sans détection de complication, sans réponse autonome au patient.
+// ───────────────────────────────────────────────────────────────────────────
+function CockpitMockupV2() {
+  return (
+    <div className="font-editorial-mono text-[10px] uppercase tracking-[0.12em] text-ink-60">
+      <div className="flex items-baseline justify-between border-b border-rule pb-3">
+        <span>Cockpit superviseur</span>
+        <span className="text-ink-30">Service actif · 8 h – 20 h</span>
+      </div>
+
+      <div className="grid gap-0 sm:grid-cols-3 sm:divide-x sm:divide-rule">
+        {/* ── Col 1 : File patients ─────────────────────────────────── */}
+        <div className="pt-6 sm:pr-6">
+          <p className="text-ink">01 · File patients</p>
+          <p className="mt-1 text-ink-30">À traiter maintenant</p>
+
+          <div className="mt-5 space-y-4 normal-case tracking-normal">
+            <div>
+              <div className="flex items-baseline justify-between">
+                <span className="font-editorial text-[14px] font-semibold text-ink">
+                  A. D.
+                </span>
+                <span className="font-editorial-mono text-[10px] uppercase tracking-[0.1em] text-ink-30">
+                  J+1
+                </span>
+              </div>
+              <p className="font-editorial text-[12px] text-ink-60">
+                Rhinoplastie
+              </p>
+              <p className="mt-2 inline-flex items-center gap-2 border border-alert px-2 py-0.5 font-editorial-mono text-[9.5px] uppercase tracking-[0.1em] text-alert">
+                ⚠ SLA dépassé · 02 h
+              </p>
+            </div>
+
+            <div className="border-t border-rule pt-3">
+              <div className="flex items-baseline justify-between">
+                <span className="font-editorial text-[13px] font-medium text-ink-60">
+                  M. L.
+                </span>
+                <span className="font-editorial-mono text-[10px] uppercase tracking-[0.1em] text-ink-30">
+                  J+3
+                </span>
+              </div>
+              <p className="font-editorial text-[11.5px] text-ink-30">
+                Blépharoplastie
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Col 2 : Conversation ──────────────────────────────────── */}
+        <div className="border-t border-rule pt-6 sm:border-t-0 sm:px-6">
+          <p className="text-ink">02 · Conversation patient</p>
+          <p className="mt-1 text-ink-30">Éléments déclarés</p>
+
+          <div className="mt-5 space-y-3 normal-case tracking-normal">
+            <div className="border-l-2 border-rule pl-3">
+              <p className="font-editorial-mono text-[9.5px] uppercase tracking-[0.1em] text-ink-60">
+                Message patient · 14:02
+              </p>
+              <p className="mt-1 font-editorial text-[12.5px] leading-[1.5] text-ink">
+                Léger œdème ce matin, photo jointe. Est-ce normal à J+1 ?
+              </p>
+            </div>
+            <div className="border-l-2 border-accent pl-3">
+              <p className="font-editorial-mono text-[9.5px] uppercase tracking-[0.1em] text-accent">
+                Réponse préparée · à relire
+              </p>
+              <p className="mt-1 font-editorial text-[12.5px] leading-[1.5] text-ink">
+                Réponse selon référentiel cabinet, à valider avant envoi.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Col 3 : Actions cabinet ───────────────────────────────── */}
+        <div className="border-t border-rule pt-6 sm:border-t-0 sm:pl-6">
+          <p className="text-ink">03 · Actions cabinet</p>
+          <p className="mt-1 text-ink-30">Transmission · CR · journal</p>
+
+          <div className="mt-5 space-y-3 normal-case tracking-normal">
+            <div>
+              <p className="font-editorial text-[12px] text-ink">
+                Transmission cabinet
+              </p>
+              <p className="font-editorial text-[11px] text-ink-30">
+                Préparée · à valider
+              </p>
+            </div>
+            <div className="border-t border-rule pt-2">
+              <p className="font-editorial text-[12px] text-ink">
+                CR factuel · J+15
+              </p>
+              <p className="font-editorial text-[11px] text-ink-30">
+                À transmettre au chirurgien
+              </p>
+            </div>
+            <div className="border-t border-rule pt-2">
+              <p className="font-editorial text-[12px] text-ink">Journal d&apos;action</p>
+              <p className="font-editorial text-[11px] text-ink-30">
+                12 entrées · 48 h
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
