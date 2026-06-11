@@ -162,7 +162,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 
 export default function Landing() {
   return (
-    <div className="bg-bone text-navy-900">
+    <div className="bg-white text-navy-900">
       {/* Header — barre navy pleine largeur */}
       <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-navy-900/95 backdrop-blur-md">
         <div className="flex items-center justify-between gap-6 px-6 py-3.5 lg:px-10 xl:px-16">
@@ -194,7 +194,7 @@ export default function Landing() {
       {/* ============================================================
           Section A — Hero split : contenu gauche + photo droite
           ============================================================ */}
-      <section className="relative bg-bone">
+      <section className="relative bg-white">
         <div className="grid lg:grid-cols-2">
           {/* Colonne gauche — promesse + comparatif */}
           <div className="flex items-center px-6 py-16 sm:px-10 sm:py-20 lg:px-10 lg:py-24 xl:px-16 xl:py-28">
@@ -288,17 +288,22 @@ export default function Landing() {
           </div>
 
           {/* Colonne droite — visuel cabinet.
-              Slot photo : dépose le fichier dans public/hero-consultation.jpg
-              et il s'affichera automatiquement.
-              Fallback : gradient ivoire → crème (charte chaude KOVELA). */}
+              Pile de fallback en 3 couches (CSS multiple backgrounds) :
+                1. /hero-consultation.jpg (local — la photo définitive
+                   dès qu'elle est déposée dans /public)
+                2. Photo Unsplash CC0 hotlink (placeholder immédiat,
+                   chirurgien / consultation médicale)
+                3. Gradient crème (filet de sécurité si réseau coupé)
+              Quand une couche 404, elle est transparente et la couche
+              suivante apparaît. */}
           <div
             className="relative min-h-[360px] lg:min-h-[720px]"
             style={{
               backgroundImage:
-                "url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
-              backgroundSize: "cover, cover",
-              backgroundPosition: "center, center",
-              backgroundRepeat: "no-repeat, no-repeat",
+                "url('/hero-consultation.jpg'), url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
+              backgroundSize: "cover, cover, cover",
+              backgroundPosition: "center, center, center",
+              backgroundRepeat: "no-repeat, no-repeat, no-repeat",
             }}
             role="img"
             aria-label="Chirurgien en consultation post-opératoire avec une patiente"
@@ -309,7 +314,7 @@ export default function Landing() {
       </section>
 
       {/* Barre de preuves — 4 indicateurs */}
-      <section className="border-t border-navy-900/[0.06] bg-bone">
+      <section className="border-t border-navy-900/[0.06] bg-white">
         <div className="grid grid-cols-2 gap-x-10 gap-y-9 px-6 py-12 sm:grid-cols-4 lg:gap-y-0 lg:px-10 xl:px-16">
           {heroStats.map((s, i) => (
             <div
@@ -460,7 +465,7 @@ export default function Landing() {
             supervision humaine, des messages programmés, des comptes-rendus factuels et une IA
             assistive.
           </p>
-          <p className="mt-5 max-w-3xl rounded-md bg-bone/70 px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/60 ring-1 ring-navy-900/[0.04]">
+          <p className="mt-5 max-w-3xl rounded-md bg-ivory px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/60 ring-1 ring-navy-900/[0.04]">
             Baseline terrain — à mesurer et affiner en pilote KOVELA. Aucun gain chiffré n&apos;est
             promis à ce stade.
           </p>
@@ -468,7 +473,7 @@ export default function Landing() {
       </section>
 
       {/* Bande preuve terrain — prudente, non chiffrée, non datée. */}
-      <section className="border-b border-navy-900/[0.06] bg-bone/40">
+      <section className="border-b border-navy-900/[0.06] bg-ivory">
         <div className="mx-auto max-w-6xl px-6 py-5">
           <p className="text-[12.5px] leading-relaxed text-charcoal/65">
             <span className="font-semibold text-navy-900">Construit à partir de retours terrain</span>
@@ -647,7 +652,7 @@ export default function Landing() {
 
               {/* Qui supervise — profils terrain senior, non médicaux. Répond à
                   l'objection chirurgien : qui lit mes patients et quel est leur niveau. */}
-              <div className="mt-10 rounded-2xl bg-bone/60 px-5 py-5 ring-1 ring-navy-900/[0.05]">
+              <div className="mt-10 rounded-2xl bg-ivory px-5 py-5 ring-1 ring-navy-900/[0.05]">
                 <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
                   Qui supervise ?
                 </p>
@@ -730,7 +735,7 @@ export default function Landing() {
 
         {/* Card pricing — fixe + variable, hiérarchie forte, prix lisible */}
         <div className="mt-12 overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-navy-900/[0.06]">
-          <div className="flex flex-wrap items-center gap-2 border-b border-navy-900/[0.05] bg-bone/60 px-7 py-4">
+          <div className="flex flex-wrap items-center gap-2 border-b border-navy-900/[0.05] bg-ivory px-7 py-4">
             <span className="rounded-md bg-navy-900 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white">
               Offre pilote
             </span>
@@ -855,7 +860,7 @@ export default function Landing() {
           </a>
           <a
             href={PILOT}
-            className="rounded-lg bg-white px-6 py-3 text-[13.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/15 transition-colors hover:bg-bone"
+            className="rounded-lg bg-white px-6 py-3 text-[13.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/15 transition-colors hover:bg-ivory"
           >
             Discuter du pilote
           </a>
@@ -928,7 +933,7 @@ export default function Landing() {
         </div>
 
         {/* Preuve d'exécution sobre */}
-        <p className="mt-10 max-w-3xl rounded-md bg-bone/70 px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
+        <p className="mt-10 max-w-3xl rounded-md bg-ivory px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
           <span className="font-medium text-navy-900">Preuve d&apos;exécution :</span> prototype
           produit fonctionnel · activation cabinet · parcours chirurgien · espace superviseur ·
           suivi patient · workflow CR · cockpit admin.
