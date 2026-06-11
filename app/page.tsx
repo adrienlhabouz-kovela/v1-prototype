@@ -197,8 +197,8 @@ export default function Landing() {
       <section className="relative bg-white">
         <div className="grid lg:grid-cols-2">
           {/* Colonne gauche — promesse + comparatif */}
-          <div className="flex items-center px-6 py-16 sm:px-10 sm:py-20 lg:px-10 lg:py-24 xl:px-16 xl:py-28">
-            <div className="w-full max-w-[640px]">
+          <div className="flex items-center px-6 py-12 sm:px-10 sm:py-14 lg:px-10 lg:py-16 xl:px-16 xl:py-20">
+            <div className="w-full max-w-[600px]">
               {/* Eyebrow + filet */}
               <div className="flex items-center gap-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700">
@@ -232,7 +232,7 @@ export default function Landing() {
               </div>
 
               {/* Carte comparative Avant / Avec */}
-              <div className="relative mt-10 rounded-2xl bg-white p-7 shadow-card ring-1 ring-navy-900/[0.05] sm:p-8">
+              <div className="relative mt-8 rounded-2xl bg-white p-7 shadow-card ring-1 ring-navy-900/[0.05] sm:p-8">
                 {/* Badge VS sur le séparateur */}
                 <div className="pointer-events-none absolute left-1/2 top-[30px] z-10 hidden -translate-x-1/2 sm:block">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-[10.5px] font-semibold uppercase tracking-wide text-teal-700 ring-4 ring-white">
@@ -293,7 +293,7 @@ export default function Landing() {
               avec bg-cover). Tant qu'elle n'est pas là, gradient
               ivoire→bone→cream + voile teal léger en fallback. */}
           <div
-            className="relative min-h-[360px] lg:min-h-[720px]"
+            className="relative min-h-[300px] lg:min-h-[560px]"
             style={{
               backgroundImage:
                 "url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
@@ -311,7 +311,7 @@ export default function Landing() {
 
       {/* Barre de preuves — 4 indicateurs */}
       <section className="border-t border-navy-900/[0.06] bg-white">
-        <div className="grid grid-cols-2 gap-x-10 gap-y-9 px-6 py-12 sm:grid-cols-4 lg:gap-y-0 lg:px-10 xl:px-16">
+        <div className="grid grid-cols-2 gap-x-10 gap-y-8 px-6 pb-10 pt-8 sm:grid-cols-4 lg:gap-y-0 lg:px-10 xl:px-16">
           {heroStats.map((s, i) => (
             <div
               key={s.label}
