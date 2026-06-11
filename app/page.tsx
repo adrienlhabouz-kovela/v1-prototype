@@ -4,49 +4,110 @@ import { BrandMark, Wordmark } from "@/components/Brand";
 const DEMO = "mailto:contact@kovela.care?subject=Demande%20de%20démo%20KOVELA";
 const PILOT = "mailto:contact@kovela.care?subject=Discuter%20du%20pilote%20KOVELA";
 
-// Graphisme « infrastructure » : flux Patient → Coordination → Chirurgien.
-function HeroGraphic() {
+// ─── Icônes hero ──────────────────────────────────────────────────────────
+// Petites icônes inline (currentColor) — taille/couleur pilotées via className.
+
+function IconCircleX({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 420 460" fill="none" className="h-full w-full" aria-hidden="true">
-      <defs>
-        <radialGradient id="core" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#38B8B1" />
-          <stop offset="100%" stopColor="#137C76" />
-        </radialGradient>
-        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="6" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      <g stroke="#1FA7A0" strokeOpacity="0.5" strokeWidth="1.4" strokeDasharray="2 7" strokeLinecap="round">
-        <path d="M110 96 C 200 130, 230 180, 256 224" />
-        <path d="M150 392 C 220 340, 240 300, 262 256" />
-        <path d="M300 240 C 350 250, 380 210, 392 150" />
-      </g>
-      <circle cx="270" cy="240" r="74" stroke="#1FA7A0" strokeOpacity="0.18" />
-      <circle cx="270" cy="240" r="54" stroke="#1FA7A0" strokeOpacity="0.28" />
-      <circle cx="270" cy="240" r="34" fill="url(#core)" filter="url(#glow)" />
-      <text x="270" y="245" textAnchor="middle" fontSize="13" fontWeight="700" fill="#06121B">K</text>
-      <circle cx="100" cy="86" r="22" fill="#0E2835" stroke="#1FA7A0" strokeOpacity="0.7" />
-      <circle cx="100" cy="86" r="4" fill="#BFE3DE" />
-      <text x="100" y="46" textAnchor="middle" fontSize="11" fill="#9CB1BC" letterSpacing="1">PATIENT</text>
-      <circle cx="138" cy="404" r="22" fill="#0E2835" stroke="#1FA7A0" strokeOpacity="0.7" />
-      <circle cx="138" cy="404" r="4" fill="#BFE3DE" />
-      <text x="138" y="444" textAnchor="middle" fontSize="11" fill="#9CB1BC" letterSpacing="1">CHIRURGIEN</text>
-      <circle cx="392" cy="150" r="5" fill="#1FA7A0" />
-      <circle cx="356" cy="320" r="3" fill="#BFE3DE" fillOpacity="0.6" />
+    <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">
+      <circle cx="10" cy="10" r="8.25" stroke="currentColor" strokeWidth="1.4" />
+      <path
+        d="M7.3 7.3 12.7 12.7 M12.7 7.3 7.3 12.7"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
-const heroBadges = [
-  "Supervision humaine issue du terrain",
-  "Assistance interne",
-  "Cadre RGPD / HDS pensé dès la conception",
-  "Sans diagnostic ni décision médicale",
+function IconCircleCheck({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">
+      <circle cx="10" cy="10" r="8.25" stroke="currentColor" strokeWidth="1.4" />
+      <path
+        d="M6.5 10.2 9 12.6 13.7 7.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconTarget({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.4" />
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.4" />
+      <circle cx="12" cy="12" r="1.2" fill="currentColor" />
+    </svg>
+  );
+}
+
+function IconDoc({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M7 3.5h7L18 7.5v12.2a.8.8 0 0 1-.8.8H7a.8.8 0 0 1-.8-.8V4.3a.8.8 0 0 1 .8-.8Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      <path d="M13.5 3.6v4.1h4.1 M9 12h6 M9 15h6 M9 18h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconTrend({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M4 15.5 9.5 10l3.2 3.2L20 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15 6h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconShield({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M12 3.5 5.5 6v5c0 4.2 2.8 7.2 6.5 8.5 3.7-1.3 6.5-4.3 6.5-8.5V6L12 3.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+      <path d="M9.2 12.1 11 14l4-4.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconFlag({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M6.5 4v16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M6.5 5h10l-2.2 3.4L16.5 12h-10" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// ─── Données hero — bloc comparatif & barre de preuves ────────────────────
+const beforeKovela = [
+  "Suivi dispersé (téléphone, emails)",
+  "Perte d'informations et oublis",
+  "Charge admin chronophage",
+  "Satisfaction patient variable",
+];
+
+const withKovela = [
+  "Parcours structuré et centralisé",
+  "Traçabilité complète et sécurisée",
+  "Temps médical recentré",
+  "Expérience patient premium",
+];
+
+const heroStats: { icon: React.ReactNode; value: string; label: string }[] = [
+  { icon: <IconTarget className="h-[22px] w-[22px]" />, value: "100%", label: "Traçabilité" },
+  { icon: <IconDoc className="h-[22px] w-[22px]" />, value: "-40%", label: "Charge admin" },
+  { icon: <IconTrend className="h-[22px] w-[22px]" />, value: "+30%", label: "Satisfaction patient" },
+  { icon: <IconShield className="h-[22px] w-[22px]" />, value: "Sécurisé", label: "HDS + RGPD" },
+  { icon: <IconFlag className="h-[22px] w-[22px]" />, value: "Dès 2 chirurgiens", label: "Sans complexité" },
 ];
 
 const pains = [
@@ -106,27 +167,27 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 export default function Landing() {
   return (
     <div className="bg-bone text-navy-900">
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-navy-900/[0.06] bg-bone/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Wordmark />
-          <nav className="hidden items-center gap-9 text-[13px] tracking-tight text-charcoal/70 md:flex">
-            <a href="#probleme" className="transition-colors hover:text-navy-900">Le constat</a>
-            <a href="#solution" className="transition-colors hover:text-navy-900">La solution</a>
-            <a href="#etapes" className="transition-colors hover:text-navy-900">Fonctionnement</a>
-            <a href="#cadre" className="transition-colors hover:text-navy-900">Cadre KOVELA</a>
-            <a href="#modele" className="transition-colors hover:text-navy-900">Tarifs</a>
+      {/* Header — barre navy pleine largeur */}
+      <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-navy-900/95 backdrop-blur-md">
+        <div className="flex items-center justify-between gap-6 px-6 py-3.5 lg:px-10 xl:px-16">
+          <Wordmark light />
+          <nav className="hidden items-center gap-9 text-[13px] tracking-tight text-navy-100/75 lg:flex">
+            <a href="#probleme" className="transition-colors hover:text-white">Le constat</a>
+            <a href="#solution" className="transition-colors hover:text-white">La solution</a>
+            <a href="#etapes" className="transition-colors hover:text-white">Fonctionnement</a>
+            <a href="#cadre" className="transition-colors hover:text-white">Cadre KOVELA</a>
+            <a href="#modele" className="transition-colors hover:text-white">Tarifs</a>
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-navy-900 transition-colors hover:bg-navy-900/[0.05] sm:block"
+              className="hidden text-[13px] font-medium text-navy-100/80 transition-colors hover:text-white sm:block"
             >
               Voir le prototype
             </Link>
             <a
               href={DEMO}
-              className="rounded-lg bg-navy-900 px-4 py-2 text-[13px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
+              className="rounded-lg bg-teal-500 px-4 py-2 text-[13px] font-semibold tracking-tight text-white shadow-soft transition-colors hover:bg-teal-600"
             >
               Demander une démo
             </a>
@@ -134,84 +195,155 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Section A — Hero */}
-      <section className="relative overflow-hidden bg-navy-depth text-white">
-        <div className="pointer-events-none absolute inset-0 hero-lines opacity-90" />
-        <div className="pointer-events-none absolute right-0 top-0 hidden h-[560px] w-[460px] opacity-90 lg:block">
-          <HeroGraphic />
-        </div>
-        <div className="relative mx-auto max-w-6xl px-6 pb-28 pt-20 md:pt-28">
-          <span className="inline-flex items-center gap-2.5 rounded-md bg-white/[0.06] px-3 py-1.5 text-[10.5px] font-semibold uppercase tracking-[0.18em] text-teal-200/90 ring-1 ring-white/10">
-            <span className="h-1 w-1 rounded-full bg-teal-400" />
-            Coordination post-opératoire · chirurgie esthétique privée
-          </span>
+      {/* ============================================================
+          Section A — Hero split : contenu gauche + photo droite
+          ============================================================ */}
+      <section className="relative bg-bone">
+        <div className="grid lg:grid-cols-2">
+          {/* Colonne gauche — promesse + comparatif */}
+          <div className="flex items-center px-6 py-12 sm:px-10 lg:px-10 lg:py-16 xl:px-16 xl:py-20">
+            <div className="w-full max-w-[600px]">
+              {/* Eyebrow + filet */}
+              <div className="flex items-center gap-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700">
+                  Coordination post-opératoire
+                </p>
+                <span className="h-px w-14 bg-teal-500/40" />
+              </div>
 
-          <h1 className="mt-8 max-w-3xl font-display text-[2.6rem] font-normal leading-[1.08] tracking-[-0.03em] md:text-[3.6rem]">
-            Votre suivi post-opératoire, structuré et opéré.
-          </h1>
+              <h1 className="mt-7 font-display text-[2.5rem] font-normal leading-[1.07] tracking-[-0.02em] text-navy-900 sm:text-[2.9rem] xl:text-[3.1rem]">
+                Un suivi d&rsquo;exception.
+                <br />
+                Des chirurgiens libérés.
+              </h1>
 
-          <p className="mt-7 max-w-2xl text-[17px] leading-relaxed text-navy-100/80">
-            KOVELA est une <span className="font-semibold text-white">extension opérationnelle premium du cabinet</span>{" "}
-            pour chirurgiens libéraux : suivi patient structuré, transmissions cabinet, CR factuels
-            et journal d&apos;action, selon le référentiel validé avec le cabinet.
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-2">
-            {heroBadges.map((b) => (
-              <span
-                key={b}
-                className="rounded-md bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium tracking-tight text-navy-100/85 ring-1 ring-white/10"
-              >
-                {b}
-              </span>
-            ))}
-          </div>
-
-          {/* Bloc trust HDS + RGPD — affirmé, premium, entre badges et CTAs. */}
-          <div className="mt-6 max-w-2xl rounded-2xl border border-teal-400/25 bg-white/[0.04] px-6 py-5 backdrop-blur-sm sm:flex sm:items-center sm:gap-6">
-            <div className="shrink-0">
-              <p className="font-display text-[22px] font-semibold leading-none tracking-tight text-white">
-                HDS + RGPD
+              <p className="mt-6 max-w-md text-[15.5px] leading-relaxed text-charcoal/70">
+                KOVELA centralise, structure et sécurise votre suivi
+                post-opératoire pour une expérience patient optimale et un
+                cabinet plus efficient.
               </p>
-              <p className="mt-1.5 text-[12px] tracking-tight text-teal-200/90">
-                Conçus dans l&apos;architecture dès le premier jour.
-              </p>
+
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <a
+                  href={DEMO}
+                  className="rounded-lg bg-navy-900 px-6 py-3 text-[13.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
+                >
+                  Demander une démo
+                </a>
+                <a
+                  href="#etapes"
+                  className="rounded-lg bg-white px-6 py-3 text-[13.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/15 transition-colors hover:bg-ivory"
+                >
+                  Voir le fonctionnement
+                </a>
+              </div>
+
+              {/* Carte comparative Avant / Avec */}
+              <div className="relative mt-9 rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.05] sm:p-7">
+                {/* Badge VS sur le séparateur */}
+                <div className="pointer-events-none absolute left-1/2 top-[26px] z-10 hidden -translate-x-1/2 sm:block">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-[10.5px] font-semibold uppercase tracking-wide text-teal-700 ring-4 ring-white">
+                    VS
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-0">
+                  {/* Avant KOVELA */}
+                  <div className="sm:pr-7">
+                    <h3 className="font-display text-[17px] font-medium tracking-tight text-navy-900">
+                      Avant KOVELA
+                    </h3>
+                    <ul className="mt-4 space-y-3">
+                      {beforeKovela.map((t) => (
+                        <li
+                          key={t}
+                          className="flex items-start gap-2.5 text-[13px] leading-snug text-charcoal/75"
+                        >
+                          <IconCircleX className="mt-px h-[17px] w-[17px] shrink-0 text-[#D24B3E]" />
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-5 text-[14px] font-semibold tracking-tight text-[#D24B3E]">
+                      Coût caché élevé
+                    </p>
+                  </div>
+
+                  {/* Avec KOVELA */}
+                  <div className="sm:border-l sm:border-navy-900/[0.07] sm:pl-7">
+                    <h3 className="font-display text-[17px] font-medium tracking-tight text-navy-900">
+                      Avec KOVELA
+                    </h3>
+                    <ul className="mt-4 space-y-3">
+                      {withKovela.map((t) => (
+                        <li
+                          key={t}
+                          className="flex items-start gap-2.5 text-[13px] leading-snug text-navy-900"
+                        >
+                          <IconCircleCheck className="mt-px h-[17px] w-[17px] shrink-0 text-teal-500" />
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-5 text-[14px] font-semibold tracking-tight text-teal-600">
+                      ROI rapide et mesurable
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="mt-4 h-px w-full bg-white/10 sm:my-0 sm:ml-1 sm:mt-0 sm:h-10 sm:w-px" />
-            <p className="text-[12.5px] leading-relaxed text-navy-100/75">
-              Environnement santé, consentement patient, traçabilité des actions et rôles
-              séparés.
-            </p>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-2.5">
-            <a
-              href={DEMO}
-              className="rounded-lg bg-white px-6 py-3 text-[13.5px] font-medium tracking-tight text-navy-900 shadow-soft transition-colors hover:bg-ivory"
-            >
-              Demander une démo
-            </a>
-            <a
-              href="#etapes"
-              className="rounded-lg bg-white/[0.05] px-6 py-3 text-[13.5px] font-medium tracking-tight text-white ring-1 ring-white/15 transition-colors hover:bg-white/[0.1]"
-            >
-              Voir le fonctionnement
-            </a>
+          {/* Colonne droite — visuel cabinet.
+              Slot photo : dépose le fichier dans public/hero-consultation.jpg
+              et il s'affichera automatiquement. À défaut, fond navy premium. */}
+          <div
+            className="relative min-h-[320px] bg-navy-depth bg-cover bg-center lg:min-h-[680px]"
+            style={{ backgroundImage: "url('/hero-consultation.jpg')" }}
+            role="img"
+            aria-label="Chirurgien en consultation post-opératoire avec une patiente"
+          >
+            <div className="pointer-events-none absolute inset-0 bg-teal-sheen" />
           </div>
-
-          <p className="mt-7 text-[12.5px] text-navy-100/50">
-            Démarrage progressif sur 2 ou 3 interventions prioritaires, avec accompagnement KOVELA.
-          </p>
         </div>
       </section>
 
-      {/* Bande de positionnement « service opéré » */}
-      <section className="border-y border-navy-900/[0.06] bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-10">
-          <p className="font-display text-[19px] leading-relaxed tracking-tight text-navy-900 md:text-[22px]">
-            <span className="font-semibold">KOVELA est un service opéré</span> de coordination
-            post-opératoire, appuyé sur une plateforme métier, une supervision humaine
-            spécialisée et une IA assistive interne.
+      {/* Barre de preuves — 5 indicateurs */}
+      <section className="border-t border-navy-900/[0.06] bg-bone">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-7 px-6 py-7 sm:grid-cols-3 lg:grid-cols-5 lg:gap-y-0 lg:px-10 xl:px-16">
+          {heroStats.map((s, i) => (
+            <div
+              key={s.label}
+              className={`flex items-center gap-3 ${
+                i > 0 ? "lg:border-l lg:border-navy-900/[0.07] lg:pl-6" : ""
+              }`}
+            >
+              <span className="shrink-0 text-teal-600/85">{s.icon}</span>
+              <div className="leading-none">
+                <p className="font-display text-[18px] font-semibold tracking-tight text-navy-900">
+                  {s.value}
+                </p>
+                <p className="mt-1.5 text-[12px] tracking-tight text-charcoal/60">
+                  {s.label}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Baseline */}
+      <section className="border-t border-navy-900/[0.06] bg-ivory">
+        <div className="px-6 py-5 text-center">
+          <p className="text-[15px] tracking-tight text-charcoal/70">
+            <span className="font-display font-semibold text-navy-900">
+              KOVELA.
+            </span>{" "}
+            Le suivi post-opératoire repensé pour les{" "}
+            <span className="font-medium text-teal-600">
+              chirurgiens exigeants
+            </span>
+            .
           </p>
         </div>
       </section>
