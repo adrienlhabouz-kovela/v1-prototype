@@ -835,6 +835,130 @@ export const IconDiamond = (
   </svg>
 );
 
+export const IconLock = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <rect
+      x="5"
+      y="11"
+      width="14"
+      height="9"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      fill={STROKE.fill}
+    />
+    <path
+      d="M8 11 V8 C 8 5.5 9.8 4 12 4 C 14.2 4 16 5.5 16 8 V11"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+      fill={STROKE.fill}
+    />
+    <circle cx="12" cy="15" r="1" fill="currentColor" />
+  </svg>
+);
+
+export const IconClock = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <circle
+      cx="12"
+      cy="12"
+      r="8.5"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      fill={STROKE.fill}
+    />
+    <path
+      d="M12 7 V12 L15 14.5"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+      strokeLinejoin={STROKE.linejoin}
+      fill={STROKE.fill}
+    />
+  </svg>
+);
+
+export const IconList = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <line x1="9" y1="6" x2="20" y2="6" stroke="currentColor" strokeWidth={STROKE.width} strokeLinecap={STROKE.linecap} />
+    <line x1="9" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth={STROKE.width} strokeLinecap={STROKE.linecap} />
+    <line x1="9" y1="18" x2="20" y2="18" stroke="currentColor" strokeWidth={STROKE.width} strokeLinecap={STROKE.linecap} />
+    <circle cx="5" cy="6" r="1" fill="currentColor" />
+    <circle cx="5" cy="12" r="1" fill="currentColor" />
+    <circle cx="5" cy="18" r="1" fill="currentColor" />
+  </svg>
+);
+
+export const IconArrow = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="M5 12 H19"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+    />
+    <path
+      d="M13 6 L19 12 L13 18"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+      strokeLinejoin={STROKE.linejoin}
+      fill={STROKE.fill}
+    />
+  </svg>
+);
+
+export const IconLink = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="M10 14 L14 10"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+    />
+    <path
+      d="M13.5 7.5 L15 6 C 17 4 20 4 21.5 6 C 23 7.5 23 10 21.5 12 L20 13.5"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+      fill={STROKE.fill}
+    />
+    <path
+      d="M10.5 16.5 L9 18 C 7 20 4 20 2.5 18 C 1 16.5 1 14 2.5 12 L4 10.5"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinecap={STROKE.linecap}
+      fill={STROKE.fill}
+    />
+  </svg>
+);
+
+export const IconStar = (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="M12 3.5 L14.4 9 L20.5 9.6 L15.8 13.6 L17.3 19.5 L12 16.4 L6.7 19.5 L8.2 13.6 L3.5 9.6 L9.6 9 Z"
+      stroke="currentColor"
+      strokeWidth={STROKE.width}
+      strokeLinejoin={STROKE.linejoin}
+      fill={STROKE.fill}
+    />
+  </svg>
+);
+
+export const IconCheck = (
+  <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+    <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth={STROKE.width} fill={STROKE.fill} />
+    <path d="M6.5 10 L9 12.5 L13.5 8" stroke="currentColor" strokeWidth={STROKE.width} strokeLinecap={STROKE.linecap} strokeLinejoin={STROKE.linejoin} fill={STROKE.fill} />
+  </svg>
+);
+
+export const IconCross = (
+  <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+    <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth={STROKE.width} fill={STROKE.fill} />
+    <path d="M7 7 L13 13 M13 7 L7 13" stroke="currentColor" strokeWidth={STROKE.width} strokeLinecap={STROKE.linecap} fill={STROKE.fill} />
+  </svg>
+);
+
 export function EditorialReassurance({
   items,
   surface = "cream",
@@ -880,9 +1004,11 @@ export function EditorialReassurance({
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
-// ║  Avant / Après KOVELA — 2 colonnes claires                             ║
+// ║  Avant / Après KOVELA — 2 colonnes avec divider central                ║
 // ║                                                                        ║
 // ║  Aucun chiffre inventé. Faits opérationnels seulement.                 ║
+// ║  Petit pictogramme ✗ / ✓ devant chaque item pour donner la présence    ║
+// ║  visuelle d'une comparaison premium.                                   ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 
 export function EditorialAvantApres({
@@ -897,34 +1023,214 @@ export function EditorialAvantApres({
   apresItems: string[];
 }) {
   return (
-    <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
-      {/* Colonne Avant — neutre, observation factuelle */}
-      <div className="bg-paper-shade p-8 sm:p-10">
+    <div className="relative grid items-stretch gap-10 lg:grid-cols-[1fr_auto_1fr] lg:gap-0">
+      {/* Colonne Avant — neutre, fond paper-shade */}
+      <div className="bg-paper-shade p-8 sm:p-10 lg:p-12">
         <p className="font-editorial-mono text-[10.5px] uppercase tracking-[0.14em] text-ink-60">
           {avantTitle}
         </p>
-        <ul className="mt-6 space-y-3 font-editorial text-[15px] leading-[1.55] text-ink-60">
+        <ul className="mt-7 space-y-4 font-editorial text-[15px] leading-[1.55] text-ink-60">
           {avantItems.map((item, i) => (
-            <li key={i} className="flex gap-3">
-              <span aria-hidden className="select-none text-ink-30">—</span>
+            <li key={i} className="flex items-start gap-3">
+              <span aria-hidden className="mt-0.5 shrink-0 text-ink-30">{IconCross}</span>
               <span className="flex-1">{item}</span>
             </li>
           ))}
         </ul>
       </div>
-      {/* Colonne Avec KOVELA — accent vert sobre */}
-      <div className="border-l-2 border-accent bg-paper p-8 sm:p-10">
+
+      {/* Divider central « VS » — uniquement desktop */}
+      <div className="hidden lg:flex lg:flex-col lg:items-center lg:justify-center lg:px-4">
+        <div className="h-12 w-px bg-rule" />
+        <div className="my-3 flex h-10 w-10 items-center justify-center border border-rule bg-paper font-editorial-mono text-[10px] uppercase tracking-[0.16em] text-ink-60">
+          VS
+        </div>
+        <div className="h-12 w-px bg-rule" />
+      </div>
+
+      {/* Colonne Avec KOVELA — fond paper, bordure accent gauche */}
+      <div className="border-l-2 border-accent bg-paper p-8 sm:p-10 lg:p-12">
         <p className="font-editorial-mono text-[10.5px] uppercase tracking-[0.14em] text-accent">
           {apresTitle}
         </p>
-        <ul className="mt-6 space-y-3 font-editorial text-[15px] leading-[1.55] text-ink">
+        <ul className="mt-7 space-y-4 font-editorial text-[15px] leading-[1.55] text-ink">
           {apresItems.map((item, i) => (
-            <li key={i} className="flex gap-3">
-              <span aria-hidden className="select-none text-accent">—</span>
+            <li key={i} className="flex items-start gap-3">
+              <span aria-hidden className="mt-0.5 shrink-0 text-accent">{IconCheck}</span>
               <span className="flex-1">{item}</span>
             </li>
           ))}
         </ul>
+      </div>
+    </div>
+  );
+}
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║  Grille fonctionnalités — Ce que KOVELA prend en charge                ║
+// ║                                                                        ║
+// ║  Grid 2 / 3 / 4 cols selon viewport. Chaque item : icône custom 1px    ║
+// ║  stroke en haut + label éditorial + description courte.                ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+
+export interface FeatureItem {
+  icon: React.ReactNode;
+  label: string;
+  description: string;
+}
+
+export function EditorialFeatureGrid({ items }: { items: FeatureItem[] }) {
+  return (
+    <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map((item, i) => (
+        <div key={i} className="border-t border-rule pt-6">
+          <span aria-hidden className="block text-ink">
+            {item.icon}
+          </span>
+          <p className="mt-5 font-editorial text-[16px] font-semibold leading-tight tracking-[-0.01em] text-ink">
+            {item.label}
+          </p>
+          <p className="mt-2 font-editorial text-[13.5px] leading-[1.55] text-ink-60">
+            {item.description}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║  Sécurité & conformité — panel dédié, présence forte                   ║
+// ║                                                                        ║
+// ║  Section autonome avec en-tête + grille de badges propriétaires KOVELA.║
+// ║  PAS de logo institutionnel CNIL ou EU. Formulations safe :            ║
+// ║    « Hébergement HDS » (chez hébergeur certifié)                       ║
+// ║    « Cadre RGPD » documenté                                            ║
+// ║    « Données en Europe »                                               ║
+// ║    « Conformité CNIL » aux exigences (pas un faux label officiel)      ║
+// ║    « Accès sécurisés » · « Journal d'action »                          ║
+// ║    « Supervision humaine » · « Assistance IA interne »                 ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+
+export interface SecurityBadge {
+  icon: React.ReactNode;
+  label: string;
+  sub: string;
+}
+
+export function EditorialSecurityPanel({
+  eyebrow = "SÉCURITÉ & CONFORMITÉ",
+  title,
+  intro,
+  badges,
+  footnote,
+}: {
+  eyebrow?: string;
+  title: React.ReactNode;
+  intro?: React.ReactNode;
+  badges: SecurityBadge[];
+  footnote?: React.ReactNode;
+}) {
+  return (
+    <div className="bg-paper-shade">
+      <div className="mx-auto max-w-[1280px] px-6 py-16 sm:px-10 sm:py-20 lg:px-20 lg:py-24">
+        {/* En-tête */}
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+          <div>
+            <p className="font-editorial-mono text-[10.5px] uppercase tracking-[0.14em] text-ink-60">
+              {eyebrow}
+            </p>
+            <h2 className="mt-4 font-editorial text-[1.875rem] font-extrabold leading-[1.05] tracking-[-0.025em] text-ink sm:text-[2.25rem] lg:text-[2.75rem]">
+              {title}
+            </h2>
+          </div>
+          {intro && (
+            <p className="font-editorial text-[15.5px] leading-[1.6] text-ink-60 lg:pt-2">
+              {intro}
+            </p>
+          )}
+        </div>
+
+        {/* Grille de badges propriétaires — 4 cols desktop, 2 mobile */}
+        <div className="mt-12 grid gap-px bg-rule sm:grid-cols-2 lg:mt-16 lg:grid-cols-4">
+          {badges.map((badge, i) => (
+            <div
+              key={i}
+              className="flex flex-col gap-4 bg-paper p-6 sm:p-7"
+            >
+              <span aria-hidden className="text-accent">
+                {badge.icon}
+              </span>
+              <div className="min-w-0">
+                <p className="font-editorial text-[14.5px] font-semibold leading-tight tracking-[-0.005em] text-ink">
+                  {badge.label}
+                </p>
+                <p className="mt-1.5 font-editorial-mono text-[10px] uppercase tracking-[0.12em] text-ink-60">
+                  {badge.sub}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Note légale en pied du panel */}
+        {footnote && (
+          <p className="mt-8 max-w-[760px] font-editorial text-[12px] leading-[1.55] text-ink-30">
+            {footnote}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║  CTA final banner — section dédiée fond ink                            ║
+// ║                                                                        ║
+// ║  Bandeau CTA fort en fin de page. Fond ink, texte paper, bouton        ║
+// ║  primary inversé. Pas de gradient. Pas de glow.                        ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+
+export function EditorialCTAFinal({
+  eyebrow = "ÉCHANGE OPÉRATIONNEL",
+  title,
+  lead,
+  primaryCta,
+  note,
+}: {
+  eyebrow?: string;
+  title: React.ReactNode;
+  lead?: React.ReactNode;
+  primaryCta: { label: string; href: string };
+  note?: React.ReactNode;
+}) {
+  return (
+    <div className="bg-ink text-paper">
+      <div className="mx-auto max-w-[1280px] px-6 py-16 text-center sm:px-10 sm:py-20 lg:px-20 lg:py-24">
+        <p className="font-editorial-mono text-[10.5px] uppercase tracking-[0.16em] text-paper/60">
+          {eyebrow}
+        </p>
+        <h2 className="mx-auto mt-5 max-w-[760px] font-editorial text-[2rem] font-extrabold leading-[1.05] tracking-[-0.025em] text-paper sm:text-[2.5rem] lg:text-[3rem]">
+          {title}
+        </h2>
+        {lead && (
+          <p className="mx-auto mt-6 max-w-[560px] font-editorial text-[16px] leading-[1.55] text-paper/75">
+            {lead}
+          </p>
+        )}
+        <div className="mt-10">
+          <a
+            href={primaryCta.href}
+            className="inline-flex h-12 items-center justify-center rounded-[4px] bg-paper px-7 font-editorial text-[14px] font-medium tracking-[-0.005em] text-ink transition-opacity hover:opacity-85"
+          >
+            {primaryCta.label}
+          </a>
+        </div>
+        {note && (
+          <p className="mx-auto mt-6 max-w-[480px] font-editorial-mono text-[10px] uppercase tracking-[0.12em] text-paper/50">
+            {note}
+          </p>
+        )}
       </div>
     </div>
   );

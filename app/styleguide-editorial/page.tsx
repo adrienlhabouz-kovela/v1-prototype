@@ -1,29 +1,46 @@
 // ───────────────────────────────────────────────────────────────────────────
-// /styleguide-editorial — Showcase Phase 1 (V2) Clinical Trust Premium.
+// /styleguide-editorial — Showcase Phase 1 V4 Clinical Trust Premium.
 //
 // Page interne non liée depuis la nav, robots: noindex/nofollow.
 // Sert UNIQUEMENT à la validation visuelle de la direction artistique
 // « Clinical Trust Premium » avant Phase 2 (réécriture
 // /chirurgiens-esthetiques).
 //
-// Différences vs V1 (Operating Room Discipline pur) :
-//   - Hero avec PHOTO (placeholder si pas encore commissionnée).
-//   - Bande de réassurance assumée : HDS · RGPD · Europe · Supervision · IA.
-//   - Bloc avant/après KOVELA (sans aucune statistique inventée).
-//   - Palette élargie : cream + warm-accent pour la chaleur humaine.
-//   - Mêmes primitives typographiques de base, mais composition plus
-//     généreuse et plus humaine.
+// Différences vs V3 :
+//   - Réassurance assumée beaucoup plus fortement.
+//   - Bande inline sous le hero ET section dédiée « Sécurité & conformité »
+//     avec 8 badges propriétaires (HDS, RGPD, Europe, Conformité CNIL,
+//     Accès sécurisés, Journal d'action, Supervision humaine, IA interne).
+//   - Bloc 03 utilise EditorialFeatureGrid avec icônes par fonctionnalité
+//     (au lieu d'une liste label/valeur).
+//   - Avant/Après upgradé : pictos ✓/✗ devant chaque item + divider VS au
+//     centre.
+//   - CTA final en bandeau ink-100 dédié.
+//   - Structure passée à 6 sections (Hero / Avant-Après / Prise en charge /
+//     Sécurité / Pas un logiciel / Échange).
+//
+// Formulations conformité — SAFE :
+//   - « Hébergement HDS » (sous-libellé : « Hébergeur certifié »).
+//     KOVELA s'appuie sur un hébergeur certifié HDS, KOVELA elle-même n'est
+//     pas certifiée HDS en propre tant que la procédure n'est pas finalisée.
+//   - « Cadre RGPD » documenté.
+//   - « Données en Europe » localisation européenne.
+//   - « Conformité CNIL » aux exigences (jamais « certifié CNIL »,
+//     jamais logo officiel).
+//   - « Accès sécurisés » · « Journal d'action ».
+//   - « Supervision humaine » · « Assistance IA interne ».
 //
 // À supprimer ou rendre privé une fois la direction validée et appliquée.
 // ───────────────────────────────────────────────────────────────────────────
 
 import type { Metadata } from "next";
 import {
-  EditorialAlignedRows,
   EditorialAvantApres,
   EditorialBody,
+  EditorialCTAFinal,
   EditorialColumns,
   EditorialEyebrow,
+  EditorialFeatureGrid,
   EditorialFootnote,
   EditorialHumanHero,
   EditorialInput,
@@ -32,20 +49,26 @@ import {
   EditorialMockupFrame,
   EditorialNumber,
   EditorialObservations,
-  EditorialPhotoPlaceholder,
   EditorialPrimaryButton,
   EditorialQuote,
   EditorialReassurance,
   EditorialRule,
   EditorialSecondaryButton,
   EditorialSection,
+  EditorialSecurityPanel,
   EditorialSelect,
   EditorialTitle,
+  IconArrow,
+  IconCheck,
+  IconClock,
   IconDiamond,
   IconDocument,
   IconGlobe,
+  IconList,
+  IconLock,
   IconPerson,
   IconShield,
+  IconStar,
   SectionHeader,
 } from "@/components/editorial";
 
@@ -71,12 +94,14 @@ const HERO_PHOTO_TEMP =
 
 export const metadata: Metadata = {
   title: "KOVELA — Styleguide éditorial (interne)",
-  description: "Showcase Phase 1 du système visuel V2 — Clinical Trust Premium.",
+  description: "Showcase Phase 1 V4 du système visuel — Clinical Trust Premium.",
   robots: { index: false, follow: false },
 };
 
-const REASSURANCE = [
-  { label: "Hébergement HDS", sub: "France · Europe", icon: IconShield },
+// ─── Données ───────────────────────────────────────────────────────────────
+
+const REASSURANCE_INLINE = [
+  { label: "Hébergement HDS", sub: "Hébergeur certifié", icon: IconShield },
   { label: "Cadre RGPD", sub: "Documenté · conception", icon: IconDocument },
   { label: "Données en Europe", sub: "Localisation européenne", icon: IconGlobe },
   { label: "Supervision humaine", sub: "Équipe formée cabinet", icon: IconPerson },
@@ -99,15 +124,61 @@ const APRES_ITEMS = [
   "Un CR factuel et un journal d'action clôturent chaque suivi.",
 ];
 
-const COVERAGE: { label: string; value: React.ReactNode }[] = [
-  { label: "Suivi patient", value: "Parcours post-op structuré selon votre référentiel." },
-  { label: "Relances", value: "Messages programmés selon vos jalons (J+1, J+7, J+15…)." },
-  { label: "Éléments déclarés", value: "Documentés factuellement, sans interprétation médicale." },
-  { label: "Transmissions cabinet", value: "Compilation factuelle envoyée sur votre canal validé." },
-  { label: "Journal d'action", value: "Traçabilité opérationnelle horodatée." },
-  { label: "CR factuel", value: "Synthèse courte de fin de suivi, à votre disposition." },
-  { label: "Avis Google", value: "Demande neutre en fin de parcours, validée avec le cabinet." },
+const FEATURES = [
+  {
+    icon: IconPerson,
+    label: "Suivi patient",
+    description: "Parcours post-op structuré selon votre référentiel cabinet.",
+  },
+  {
+    icon: IconClock,
+    label: "Relances",
+    description: "Messages programmés selon vos jalons (J+1, J+7, J+15…).",
+  },
+  {
+    icon: IconList,
+    label: "Éléments déclarés",
+    description: "Documentés factuellement, sans interprétation médicale.",
+  },
+  {
+    icon: IconArrow,
+    label: "Transmissions cabinet",
+    description: "Compilation factuelle envoyée sur votre canal validé.",
+  },
+  {
+    icon: IconDocument,
+    label: "Journal d'action",
+    description: "Traçabilité opérationnelle horodatée, accessible à tout moment.",
+  },
+  {
+    icon: IconShield,
+    label: "CR factuel",
+    description: "Synthèse courte de fin de suivi, à votre disposition.",
+  },
+  {
+    icon: IconStar,
+    label: "Avis Google",
+    description: "Demande neutre en fin de parcours, validée avec le cabinet.",
+  },
+  {
+    icon: IconLock,
+    label: "Accès sécurisés",
+    description: "Rôles et permissions distincts, journal d'audit complet.",
+  },
 ];
+
+const SECURITY_BADGES = [
+  { label: "Hébergement HDS", sub: "Hébergeur certifié", icon: IconShield },
+  { label: "Cadre RGPD", sub: "Documenté · conception", icon: IconDocument },
+  { label: "Données en Europe", sub: "Localisation européenne", icon: IconGlobe },
+  { label: "Conformité CNIL", sub: "Aux exigences", icon: IconCheck },
+  { label: "Accès sécurisés", sub: "Rôles & permissions", icon: IconLock },
+  { label: "Journal d'action", sub: "Audit trail complet", icon: IconList },
+  { label: "Supervision humaine", sub: "Équipe formée cabinet", icon: IconPerson },
+  { label: "Assistance IA interne", sub: "Jamais autonome patient", icon: IconDiamond },
+];
+
+// ─── Page ──────────────────────────────────────────────────────────────────
 
 export default function EditorialStyleguide() {
   return (
@@ -115,13 +186,13 @@ export default function EditorialStyleguide() {
       {/* ── Bandeau interne ─────────────────────────────────────────────── */}
       <div className="border-b border-rule bg-paper-shade px-6 py-3 sm:px-10 lg:px-20">
         <p className="mx-auto flex max-w-[1280px] items-baseline justify-between font-editorial-mono text-[10.5px] uppercase tracking-[0.14em] text-ink-60">
-          <span>KOVELA · Styleguide V2 · Clinical Trust Premium</span>
+          <span>KOVELA · Styleguide V4 · Clinical Trust Premium</span>
           <span className="text-ink-30">Interne · non indexé</span>
         </p>
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════
-            1. HERO HUMAIN
+            01. HERO HUMAIN
           ════════════════════════════════════════════════════════════════════ */}
       <EditorialSection className="!py-12 sm:!py-16 lg:!py-24">
         <p className="mb-12 font-editorial-mono text-[14px] uppercase tracking-[0.18em] text-ink lg:mb-20">
@@ -130,7 +201,7 @@ export default function EditorialStyleguide() {
 
         <EditorialHumanHero
           number="01"
-          total="05"
+          total="06"
           eyebrow="POUR CHIRURGIENS LIBÉRAUX"
           title={
             <>
@@ -144,8 +215,8 @@ export default function EditorialStyleguide() {
           lead={
             <>
               Service opéré de coordination post-opératoire pour chirurgiens
-              libéraux. Supervision humaine. Assistance IA interne. Cadre RGPD
-              et hébergement HDS prévus pour la V1.
+              libéraux. Supervision humaine. Assistance IA interne.
+              Hébergement HDS. Cadre RGPD.
             </>
           }
           primaryCta={{ label: "Demander un échange opérationnel", href: "#contact" }}
@@ -155,16 +226,16 @@ export default function EditorialStyleguide() {
         />
       </EditorialSection>
 
-      {/* ── Bande de réassurance directement sous le hero ─────────────── */}
-      <EditorialReassurance items={REASSURANCE} surface="cream" />
+      {/* ── Bande de réassurance immédiate, juste sous le hero ─────────── */}
+      <EditorialReassurance items={REASSURANCE_INLINE} surface="cream" />
 
       {/* ════════════════════════════════════════════════════════════════════
-            2. AVANT / APRÈS KOVELA
+            02. AVANT / APRÈS KOVELA
           ════════════════════════════════════════════════════════════════════ */}
       <EditorialSection>
         <SectionHeader
           number="02"
-          total="05"
+          total="06"
           eyebrow="LE QUOTIDIEN POST-OP"
           title={
             <>
@@ -191,12 +262,12 @@ export default function EditorialStyleguide() {
       </EditorialSection>
 
       {/* ════════════════════════════════════════════════════════════════════
-            3. CE QUE KOVELA PREND EN CHARGE
+            03. CE QUE KOVELA PREND EN CHARGE
           ════════════════════════════════════════════════════════════════════ */}
       <EditorialSection surface="shade" id="prise-en-charge">
         <SectionHeader
           number="03"
-          total="05"
+          total="06"
           eyebrow="LE RELAIS OPÉRATIONNEL"
           title={
             <>
@@ -208,17 +279,16 @@ export default function EditorialStyleguide() {
           lead="Votre cabinet partage une fois ses habitudes, ses consignes post-op et son référentiel de transmission. KOVELA structure le cadre, prend en charge les échanges opérationnels courants, documente les éléments déclarés par le patient, et remonte ce qui nécessite votre attention."
         />
 
-        {/* Liste des prises en charge — colonne gauche dédiée. */}
-        <div className="mt-12">
-          <EditorialAlignedRows rows={COVERAGE} />
+        {/* Grille de fonctionnalités avec icônes — plus visuel que la liste
+            label/valeur. 8 items en grille 4 colonnes desktop. */}
+        <div className="mt-14">
+          <EditorialFeatureGrid items={FEATURES} />
         </div>
 
         <EditorialRule className="mt-16" />
 
         {/* Mockup cockpit — preuve du service opéré, secondaire après le
-            texte. Sobre, sans chrome OS, sans dashboard SaaS générique.
-            Démontre le suivi sans diagnostic, sans alerte médicale, sans
-            détection de complication. */}
+            texte. Sobre, sans chrome OS, sans dashboard SaaS générique. */}
         <div className="mt-12">
           <p className="mb-4 font-editorial-mono text-[10.5px] uppercase tracking-[0.16em] text-ink-60">
             ─── Aperçu cockpit opérateur ───
@@ -239,12 +309,36 @@ export default function EditorialStyleguide() {
       </EditorialSection>
 
       {/* ════════════════════════════════════════════════════════════════════
-            4. PAS UN LOGICIEL — DIFFÉRENCIATION
+            04. SÉCURITÉ & CONFORMITÉ — panel dédié, présence forte
+          ════════════════════════════════════════════════════════════════════ */}
+      <EditorialSecurityPanel
+        eyebrow="04 / 06    SÉCURITÉ & CONFORMITÉ"
+        title={
+          <>
+            Pensé pour les données
+            <br />
+            de santé.
+          </>
+        }
+        intro="KOVELA est conçu pour répondre aux exigences réglementaires applicables aux services de coordination de soins. L'architecture, l'hébergement et les protocoles sont alignés sur le cadre HDS, RGPD et les exigences CNIL applicables."
+        badges={SECURITY_BADGES}
+        footnote={
+          <>
+            KOVELA s&apos;appuie sur un hébergeur certifié HDS. La mention
+            « Conformité CNIL » désigne le respect des exigences applicables
+            (RGPD, recommandations CNIL), sans constituer un label officiel.
+            Le cadre cabinet sera finalisé en V1.
+          </>
+        }
+      />
+
+      {/* ════════════════════════════════════════════════════════════════════
+            05. PAS UN LOGICIEL — DIFFÉRENCIATION
           ════════════════════════════════════════════════════════════════════ */}
       <EditorialSection>
         <SectionHeader
-          number="04"
-          total="05"
+          number="05"
+          total="06"
           eyebrow="PAS UN LOGICIEL"
           title={
             <>
@@ -284,55 +378,51 @@ export default function EditorialStyleguide() {
       </EditorialSection>
 
       {/* ════════════════════════════════════════════════════════════════════
-            5. CTA + FORMULAIRE
+            06. ÉCHANGE OPÉRATIONNEL — CTA banner + formulaire
           ════════════════════════════════════════════════════════════════════ */}
-      <EditorialSection surface="shade" id="contact">
-        <SectionHeader
-          number="05"
-          total="05"
-          eyebrow="ÉCHANGE OPÉRATIONNEL"
-          title={
-            <>
-              Voyons si KOVELA convient
-              <br />
-              à votre cabinet.
-            </>
-          }
-          lead="Vingt minutes pour comprendre votre volume, votre organisation actuelle et vos habitudes de suivi. Aucune préparation requise de votre côté."
-        />
 
-        <form className="mt-12 grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
-          {/* Colonne gauche — rappels d'engagement KOVELA */}
+      {/* Banner CTA fort en fond ink — appel à l'action principale */}
+      <EditorialCTAFinal
+        eyebrow="06 / 06    ÉCHANGE OPÉRATIONNEL"
+        title={
+          <>
+            Voyons si KOVELA convient
+            <br />
+            à votre cabinet.
+          </>
+        }
+        lead="Vingt minutes pour comprendre votre volume, votre organisation actuelle et vos habitudes de suivi. Aucune préparation requise de votre côté."
+        primaryCta={{ label: "Demander un échange opérationnel", href: "#contact" }}
+        note="Aucune donnée patient demandée — réservé aux chirurgiens libéraux."
+      />
+
+      {/* Formulaire — accessible directement sous le banner CTA */}
+      <EditorialSection surface="shade" id="contact">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
+          {/* Colonne gauche — garanties */}
           <div>
             <p className="font-editorial-mono text-[10.5px] uppercase tracking-[0.14em] text-ink-60">
               CE QUE NOUS GARANTISSONS
             </p>
-            <ul className="mt-5 space-y-3 font-editorial text-[14.5px] leading-[1.55] text-ink">
-              <li className="flex gap-3">
-                <span aria-hidden className="text-warm-accent">—</span>
-                <span>Aucune donnée patient demandée dans ce formulaire.</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="text-warm-accent">—</span>
-                <span>Échange opérationnel, pas une démo commerciale.</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="text-warm-accent">—</span>
-                <span>Réponse sous 48 h ouvrées.</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="text-warm-accent">—</span>
-                <span>
-                  Cadre cabinet présenté en clair :
-                  <br />
-                  HDS · RGPD · Europe · Supervision humaine.
-                </span>
-              </li>
+            <ul className="mt-6 space-y-4 font-editorial text-[14.5px] leading-[1.55] text-ink">
+              {[
+                "Aucune donnée patient demandée dans ce formulaire.",
+                "Échange opérationnel, pas une démo commerciale.",
+                "Réponse sous 48 h ouvrées.",
+                "Cadre cabinet présenté en clair : HDS · RGPD · Europe · Supervision humaine.",
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span aria-hidden className="mt-0.5 shrink-0 text-accent">
+                    {IconCheck}
+                  </span>
+                  <span className="flex-1">{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Colonne droite — formulaire */}
-          <div className="bg-paper p-8 sm:p-10">
+          <form className="bg-paper p-8 sm:p-10">
             <div className="space-y-6">
               <EditorialInput
                 label="Nom complet"
@@ -379,8 +469,8 @@ export default function EditorialStyleguide() {
                 opératoire régulière.
               </EditorialFootnote>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </EditorialSection>
 
       {/* ════════════════════════════════════════════════════════════════════
@@ -412,9 +502,10 @@ export default function EditorialStyleguide() {
             </div>
             <div>
               <EditorialFootnote>
-                KOVELA s&apos;appuie sur un hébergement HDS, un cadre RGPD
-                documenté et des données hébergées en Europe. Le service ne
-                remplace pas le chirurgien, ne pose pas de diagnostic, ne
+                KOVELA s&apos;appuie sur un hébergement HDS (hébergeur
+                certifié), un cadre RGPD documenté, des données hébergées en
+                Europe et respecte les exigences CNIL applicables. Le service
+                ne remplace pas le chirurgien, ne pose pas de diagnostic, ne
                 prescrit pas et ne prend aucune décision médicale.
               </EditorialFootnote>
               <EditorialFootnote className="mt-3">
@@ -505,11 +596,43 @@ export default function EditorialStyleguide() {
               ))}
             </div>
             <EditorialFootnote className="mt-4">
-              Règles d&apos;usage : <code>accent</code> max 3 fois par page (status,
-              focus, accent vert). <code>warm-accent</code> pour les éléments
-              humains / photo / réassurance. <code>alert</code> seulement quand
+              Règles d&apos;usage : <code>accent</code> max 3 fois par page
+              (status, focus, accent vert). <code>warm-accent</code> pour les
+              éléments humains. <code>alert</code> seulement quand
               l&apos;alerte est réelle. Tout le reste en niveaux d&apos;ink.
+              ZÉRO gradient, ZÉRO glow.
             </EditorialFootnote>
+          </div>
+
+          <EditorialRule />
+
+          {/* ── Icônes custom ───────────────────────────────────────────── */}
+          <div>
+            <EditorialEyebrow>ICÔNES CUSTOM 1PX STROKE</EditorialEyebrow>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
+              {[
+                ["IconShield", IconShield],
+                ["IconDocument", IconDocument],
+                ["IconGlobe", IconGlobe],
+                ["IconPerson", IconPerson],
+                ["IconDiamond", IconDiamond],
+                ["IconLock", IconLock],
+                ["IconClock", IconClock],
+                ["IconList", IconList],
+                ["IconArrow", IconArrow],
+                ["IconStar", IconStar],
+              ].map(([name, icon]) => (
+                <div
+                  key={name as string}
+                  className="border border-rule p-4 text-center"
+                >
+                  <div className="flex justify-center text-ink">{icon as React.ReactNode}</div>
+                  <p className="mt-3 font-editorial-mono text-[9.5px] uppercase tracking-[0.1em] text-ink-60">
+                    {name as string}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
           <EditorialRule />
