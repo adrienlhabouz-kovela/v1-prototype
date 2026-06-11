@@ -197,7 +197,7 @@ export default function Landing() {
       <section className="relative bg-white">
         <div className="grid lg:grid-cols-2">
           {/* Colonne gauche — promesse + comparatif */}
-          <div className="flex items-center px-6 py-12 sm:px-10 sm:py-14 lg:px-10 lg:py-16 xl:px-16 xl:py-20">
+          <div className="flex items-start px-6 pt-12 pb-6 sm:px-10 sm:pt-14 sm:pb-8 lg:px-10 lg:pt-16 lg:pb-12 xl:px-16 xl:pt-20 xl:pb-14">
             <div className="w-full max-w-[600px]">
               {/* Eyebrow + filet */}
               <div className="flex items-center gap-4">
@@ -293,7 +293,7 @@ export default function Landing() {
               avec bg-cover). Tant qu'elle n'est pas là, gradient
               ivoire→bone→cream + voile teal léger en fallback. */}
           <div
-            className="relative min-h-[300px] lg:min-h-[560px]"
+            className="relative min-h-[300px] lg:h-[680px] lg:min-h-0 lg:self-start"
             style={{
               backgroundImage:
                 "url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
