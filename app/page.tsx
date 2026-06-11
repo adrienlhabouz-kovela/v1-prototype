@@ -290,13 +290,12 @@ export default function Landing() {
           {/* Colonne droite — visuel cabinet.
               Slot photo : dépose le fichier dans public/hero-consultation.jpg
               et il s'affichera automatiquement.
-              Fallback : si le fichier est absent, le layer url() rate
-              silencieusement et le gradient navy premium prend le relais. */}
+              Fallback : gradient ivoire → crème (charte chaude KOVELA). */}
           <div
             className="relative min-h-[360px] lg:min-h-[720px]"
             style={{
               backgroundImage:
-                "url('/hero-consultation.jpg'), radial-gradient(120% 120% at 85% -10%, #16384A 0%, #0A1F2D 45%, #06121B 100%)",
+                "url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
               backgroundSize: "cover, cover",
               backgroundPosition: "center, center",
               backgroundRepeat: "no-repeat, no-repeat",
@@ -304,7 +303,7 @@ export default function Landing() {
             role="img"
             aria-label="Chirurgien en consultation post-opératoire avec une patiente"
           >
-            <div className="pointer-events-none absolute inset-0 bg-teal-sheen" />
+            <div className="pointer-events-none absolute inset-0 bg-teal-sheen opacity-60" />
           </div>
         </div>
       </section>
