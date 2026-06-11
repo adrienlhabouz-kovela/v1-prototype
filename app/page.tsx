@@ -46,16 +46,22 @@ function IconTarget({ className = "" }: { className?: string }) {
   );
 }
 
-function IconDoc({ className = "" }: { className?: string }) {
+function IconSilence({ className = "" }: { className?: string }) {
+  // Bulle de conversation barrée — promesse « plus de bruit côté patient ».
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
       <path
-        d="M7 3.5h7L18 7.5v12.2a.8.8 0 0 1-.8.8H7a.8.8 0 0 1-.8-.8V4.3a.8.8 0 0 1 .8-.8Z"
+        d="M5 5h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-5.2L8 18.5V15H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
         stroke="currentColor"
         strokeWidth="1.4"
         strokeLinejoin="round"
       />
-      <path d="M13.5 3.6v4.1h4.1 M9 12h6 M9 15h6 M9 18h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M4 20 20 4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -78,15 +84,6 @@ function IconShield({ className = "" }: { className?: string }) {
   );
 }
 
-function IconFlag({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path d="M6.5 4v16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M6.5 5h10l-2.2 3.4L16.5 12h-10" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 // ─── Données hero — bloc comparatif & barre de preuves ────────────────────
 const beforeKovela = [
   "Suivi dispersé (téléphone, emails)",
@@ -104,10 +101,9 @@ const withKovela = [
 
 const heroStats: { icon: React.ReactNode; value: string; label: string }[] = [
   { icon: <IconTarget className="h-[22px] w-[22px]" />, value: "100%", label: "Traçabilité" },
-  { icon: <IconDoc className="h-[22px] w-[22px]" />, value: "-40%", label: "Charge admin" },
+  { icon: <IconSilence className="h-[22px] w-[22px]" />, value: "Zéro bruit", label: "Patient" },
   { icon: <IconTrend className="h-[22px] w-[22px]" />, value: "+30%", label: "Satisfaction patient" },
   { icon: <IconShield className="h-[22px] w-[22px]" />, value: "Sécurisé", label: "HDS + RGPD" },
-  { icon: <IconFlag className="h-[22px] w-[22px]" />, value: "Dès 2 chirurgiens", label: "Sans complexité" },
 ];
 
 const pains = [
@@ -211,16 +207,13 @@ export default function Landing() {
                 <span className="h-px w-14 bg-teal-500/40" />
               </div>
 
-              <h1 className="mt-7 font-display text-[2.5rem] font-normal leading-[1.07] tracking-[-0.02em] text-navy-900 sm:text-[2.9rem] xl:text-[3.1rem]">
-                Un suivi d&rsquo;exception.
-                <br />
-                Des chirurgiens libérés.
+              <h1 className="mt-7 text-balance font-display text-[2.5rem] font-normal leading-[1.07] tracking-[-0.02em] text-navy-900 sm:text-[2.9rem] xl:text-[3.1rem]">
+                KOVELA fait disparaître le bruit post-op du quotidien du
+                cabinet.
               </h1>
 
               <p className="mt-6 max-w-md text-[15.5px] leading-relaxed text-charcoal/70">
-                KOVELA centralise, structure et sécurise votre suivi
-                post-opératoire pour une expérience patient optimale et un
-                cabinet plus efficient.
+                Un suivi post-op structuré. Des chirurgiens libérés du bruit.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -310,12 +303,12 @@ export default function Landing() {
 
       {/* Barre de preuves — 5 indicateurs */}
       <section className="border-t border-navy-900/[0.06] bg-bone">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-7 px-6 py-7 sm:grid-cols-3 lg:grid-cols-5 lg:gap-y-0 lg:px-10 xl:px-16">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-7 px-6 py-7 sm:grid-cols-4 lg:gap-y-0 lg:px-10 xl:px-16">
           {heroStats.map((s, i) => (
             <div
               key={s.label}
               className={`flex items-center gap-3 ${
-                i > 0 ? "lg:border-l lg:border-navy-900/[0.07] lg:pl-6" : ""
+                i > 0 ? "sm:border-l sm:border-navy-900/[0.07] sm:pl-6" : ""
               }`}
             >
               <span className="shrink-0 text-teal-600/85">{s.icon}</span>
