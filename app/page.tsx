@@ -100,10 +100,10 @@ const withKovela = [
 ];
 
 const heroStats: { icon: React.ReactNode; value: string; label: string }[] = [
-  { icon: <IconTarget className="h-[22px] w-[22px]" />, value: "100%", label: "Traçabilité" },
-  { icon: <IconSilence className="h-[22px] w-[22px]" />, value: "Zéro bruit", label: "Patient" },
-  { icon: <IconTrend className="h-[22px] w-[22px]" />, value: "+30%", label: "Satisfaction patient" },
-  { icon: <IconShield className="h-[22px] w-[22px]" />, value: "Sécurisé", label: "HDS + RGPD" },
+  { icon: <IconTarget className="h-[26px] w-[26px]" />, value: "100%", label: "Traçabilité" },
+  { icon: <IconSilence className="h-[26px] w-[26px]" />, value: "Zéro bruit", label: "Patient" },
+  { icon: <IconTrend className="h-[26px] w-[26px]" />, value: "+30%", label: "Satisfaction patient" },
+  { icon: <IconShield className="h-[26px] w-[26px]" />, value: "Sécurisé", label: "HDS + RGPD" },
 ];
 
 const pains = [
@@ -197,8 +197,8 @@ export default function Landing() {
       <section className="relative bg-bone">
         <div className="grid lg:grid-cols-2">
           {/* Colonne gauche — promesse + comparatif */}
-          <div className="flex items-center px-6 py-12 sm:px-10 lg:px-10 lg:py-16 xl:px-16 xl:py-20">
-            <div className="w-full max-w-[600px]">
+          <div className="flex items-center px-6 py-16 sm:px-10 sm:py-20 lg:px-10 lg:py-24 xl:px-16 xl:py-28">
+            <div className="w-full max-w-[640px]">
               {/* Eyebrow + filet */}
               <div className="flex items-center gap-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700">
@@ -232,53 +232,53 @@ export default function Landing() {
               </div>
 
               {/* Carte comparative Avant / Avec */}
-              <div className="relative mt-9 rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.05] sm:p-7">
+              <div className="relative mt-10 rounded-2xl bg-white p-7 shadow-card ring-1 ring-navy-900/[0.05] sm:p-8">
                 {/* Badge VS sur le séparateur */}
-                <div className="pointer-events-none absolute left-1/2 top-[26px] z-10 hidden -translate-x-1/2 sm:block">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-[10.5px] font-semibold uppercase tracking-wide text-teal-700 ring-4 ring-white">
+                <div className="pointer-events-none absolute left-1/2 top-[30px] z-10 hidden -translate-x-1/2 sm:block">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-[10.5px] font-semibold uppercase tracking-wide text-teal-700 ring-4 ring-white">
                     VS
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-0">
+                <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 sm:gap-0">
                   {/* Avant KOVELA */}
-                  <div className="sm:pr-7">
-                    <h3 className="font-display text-[17px] font-medium tracking-tight text-navy-900">
+                  <div className="sm:pr-8">
+                    <h3 className="font-display text-[18px] font-medium tracking-tight text-navy-900">
                       Avant KOVELA
                     </h3>
-                    <ul className="mt-4 space-y-3">
+                    <ul className="mt-5 space-y-3">
                       {beforeKovela.map((t) => (
                         <li
                           key={t}
-                          className="flex items-start gap-2.5 text-[13px] leading-snug text-charcoal/75"
+                          className="flex items-start gap-2.5 text-[13.5px] leading-snug text-charcoal/75"
                         >
-                          <IconCircleX className="mt-px h-[17px] w-[17px] shrink-0 text-[#D24B3E]" />
+                          <IconCircleX className="mt-px h-[18px] w-[18px] shrink-0 text-[#D24B3E]" />
                           {t}
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-5 text-[14px] font-semibold tracking-tight text-[#D24B3E]">
+                    <p className="mt-6 text-[14px] font-semibold tracking-tight text-[#D24B3E]">
                       Coût caché élevé
                     </p>
                   </div>
 
                   {/* Avec KOVELA */}
-                  <div className="sm:border-l sm:border-navy-900/[0.07] sm:pl-7">
-                    <h3 className="font-display text-[17px] font-medium tracking-tight text-navy-900">
+                  <div className="sm:border-l sm:border-navy-900/[0.07] sm:pl-8">
+                    <h3 className="font-display text-[18px] font-medium tracking-tight text-navy-900">
                       Avec KOVELA
                     </h3>
-                    <ul className="mt-4 space-y-3">
+                    <ul className="mt-5 space-y-3">
                       {withKovela.map((t) => (
                         <li
                           key={t}
-                          className="flex items-start gap-2.5 text-[13px] leading-snug text-navy-900"
+                          className="flex items-start gap-2.5 text-[13.5px] leading-snug text-navy-900"
                         >
-                          <IconCircleCheck className="mt-px h-[17px] w-[17px] shrink-0 text-teal-500" />
+                          <IconCircleCheck className="mt-px h-[18px] w-[18px] shrink-0 text-teal-500" />
                           {t}
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-5 text-[14px] font-semibold tracking-tight text-teal-600">
+                    <p className="mt-6 text-[14px] font-semibold tracking-tight text-teal-600">
                       ROI rapide et mesurable
                     </p>
                   </div>
@@ -289,10 +289,18 @@ export default function Landing() {
 
           {/* Colonne droite — visuel cabinet.
               Slot photo : dépose le fichier dans public/hero-consultation.jpg
-              et il s'affichera automatiquement. À défaut, fond navy premium. */}
+              et il s'affichera automatiquement.
+              Fallback : si le fichier est absent, le layer url() rate
+              silencieusement et le gradient navy premium prend le relais. */}
           <div
-            className="relative min-h-[320px] bg-navy-depth bg-cover bg-center lg:min-h-[680px]"
-            style={{ backgroundImage: "url('/hero-consultation.jpg')" }}
+            className="relative min-h-[360px] lg:min-h-[720px]"
+            style={{
+              backgroundImage:
+                "url('/hero-consultation.jpg'), radial-gradient(120% 120% at 85% -10%, #16384A 0%, #0A1F2D 45%, #06121B 100%)",
+              backgroundSize: "cover, cover",
+              backgroundPosition: "center, center",
+              backgroundRepeat: "no-repeat, no-repeat",
+            }}
             role="img"
             aria-label="Chirurgien en consultation post-opératoire avec une patiente"
           >
@@ -301,22 +309,22 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Barre de preuves — 5 indicateurs */}
+      {/* Barre de preuves — 4 indicateurs */}
       <section className="border-t border-navy-900/[0.06] bg-bone">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-7 px-6 py-7 sm:grid-cols-4 lg:gap-y-0 lg:px-10 xl:px-16">
+        <div className="grid grid-cols-2 gap-x-10 gap-y-9 px-6 py-12 sm:grid-cols-4 lg:gap-y-0 lg:px-10 xl:px-16">
           {heroStats.map((s, i) => (
             <div
               key={s.label}
-              className={`flex items-center gap-3 ${
-                i > 0 ? "sm:border-l sm:border-navy-900/[0.07] sm:pl-6" : ""
+              className={`flex items-center gap-4 ${
+                i > 0 ? "sm:border-l sm:border-navy-900/[0.07] sm:pl-10" : ""
               }`}
             >
               <span className="shrink-0 text-teal-600/85">{s.icon}</span>
               <div className="leading-none">
-                <p className="font-display text-[18px] font-semibold tracking-tight text-navy-900">
+                <p className="font-display text-[22px] font-semibold tracking-tight text-navy-900">
                   {s.value}
                 </p>
-                <p className="mt-1.5 text-[12px] tracking-tight text-charcoal/60">
+                <p className="mt-2 text-[12.5px] tracking-tight text-charcoal/60">
                   {s.label}
                 </p>
               </div>
