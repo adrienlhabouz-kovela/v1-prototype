@@ -9,17 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Charte KOVELA
+        // Charte KOVELA — Anthracite warm (registre Apple/Linear premium).
+        // Le nom "navy" est conservé pour éviter une refonte des classes ;
+        // la teinte sous-jacente est désormais un graphite chaud sans
+        // cast bleu, plus juste pour le secteur (chirurgie esthétique
+        // privée premium B2B).
         navy: {
-          DEFAULT: "#0A1F2D", // Deep Navy
-          50: "#EAF0F2",
-          100: "#C8D5DC",
-          200: "#9CB1BC",
-          600: "#21495E",
-          700: "#16384A",
-          800: "#0E2835",
-          900: "#0A1F2D",
-          950: "#06121B",
+          DEFAULT: "#16191D",
+          50: "#F1F2F3",
+          100: "#D9DBDE",
+          200: "#B6BAC0",
+          600: "#3A3F47",
+          700: "#292D34",
+          800: "#1E2127",
+          900: "#16191D",
+          950: "#0C0E11",
         },
         teal: {
           DEFAULT: "#1FA7A0", // Surgical Teal
@@ -107,22 +111,17 @@ const config: Config = {
         brand: "0.18em",
       },
       boxShadow: {
-        // Ombres très douces — registre premium / B2B santé
-        soft: "0 1px 1px rgba(10,31,45,0.03)",
-        card: "0 1px 2px rgba(10,31,45,0.025), 0 4px 14px -8px rgba(10,31,45,0.08)",
-        lift: "0 8px 28px -14px rgba(10,31,45,0.18)",
-        hairline: "inset 0 0 0 1px rgba(10,31,45,0.04)",
+        // Ombres très douces — registre premium / B2B santé, calées
+        // sur l'anthracite warm (#16191D).
+        soft: "0 1px 1px rgba(22,25,29,0.03)",
+        card: "0 1px 2px rgba(22,25,29,0.025), 0 4px 14px -8px rgba(22,25,29,0.08)",
+        lift: "0 8px 28px -14px rgba(22,25,29,0.18)",
+        hairline: "inset 0 0 0 1px rgba(22,25,29,0.04)",
       },
       borderRadius: {
         xl: "0.875rem",
         "2xl": "1.25rem",
         "3xl": "1.75rem",
-      },
-      backgroundImage: {
-        "navy-depth":
-          "radial-gradient(120% 120% at 85% -10%, #16384A 0%, #0A1F2D 45%, #06121B 100%)",
-        "teal-sheen":
-          "linear-gradient(135deg, rgba(31,167,160,0.16) 0%, rgba(31,167,160,0) 55%)",
       },
     },
   },

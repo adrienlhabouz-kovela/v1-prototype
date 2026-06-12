@@ -160,7 +160,7 @@ export function PageHeader({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="relative mb-7 overflow-hidden rounded-2xl bg-navy-depth shadow-card">
+    <div className="relative mb-7 overflow-hidden rounded-2xl bg-navy-900 shadow-card">
       <div className="absolute inset-y-0 left-0 w-[2px] bg-teal-400/70" />
       <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-teal-500/[0.06] blur-3xl" />
       <div className="relative flex flex-col gap-5 px-8 py-7 md:flex-row md:items-end md:justify-between md:py-8">

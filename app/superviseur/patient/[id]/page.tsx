@@ -489,7 +489,7 @@ export default function PatientFiche() {
           <div className="flex flex-wrap items-start gap-x-5 gap-y-3">
             {/* Identité — avatar + nom + métadonnées en ligne */}
             <div className="flex items-center gap-3.5">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-navy-depth text-[14px] font-semibold tracking-tight text-white ring-1 ring-navy-900/10">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-navy-900 text-[14px] font-semibold tracking-tight text-white ring-1 ring-navy-900/10">
                 {initials}
               </span>
               <div className="min-w-0">

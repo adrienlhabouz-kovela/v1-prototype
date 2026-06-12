@@ -99,7 +99,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-bone">
       {/* Sidebar */}
-      <aside className="hidden w-[260px] shrink-0 flex-col border-r border-navy-950/20 bg-navy-depth px-5 py-7 md:flex">
+      <aside className="hidden w-[260px] shrink-0 flex-col border-r border-navy-950/20 bg-navy-900 px-5 py-7 md:flex">
         <Link href={roleHome[role]} className="px-1.5">
           <Wordmark light tagline />
         </Link>

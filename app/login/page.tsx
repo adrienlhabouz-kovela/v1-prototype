@@ -42,7 +42,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-navy-depth px-4 py-14 text-white">
+    <div className="flex min-h-screen items-center justify-center bg-navy-900 px-4 py-14 text-white">
       <div className="w-full max-w-2xl">
         <div className="mb-11 flex flex-col items-center text-center">
           <Logo light />

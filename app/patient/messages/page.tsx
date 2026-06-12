@@ -52,7 +52,7 @@ export default function PatientMessages() {
         )}
 
         <Card className="mt-4 flex flex-1 flex-col overflow-hidden">
-          <div className="flex items-center gap-3 bg-navy-depth px-4 py-3.5 text-white">
+          <div className="flex items-center gap-3 bg-navy-900 px-4 py-3.5 text-white">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-sm font-semibold ring-1 ring-white/15">
               {patient.name
                 .split(" ")

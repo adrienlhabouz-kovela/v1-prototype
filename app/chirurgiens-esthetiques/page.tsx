@@ -169,7 +169,7 @@ function ProductMockup() {
       className="bg-white px-5 pb-16 pt-2 sm:px-8 sm:pb-20 sm:pt-4"
     >
       <div className="mx-auto max-w-5xl">
-        <div className="overflow-hidden rounded-2xl bg-navy-depth shadow-lift ring-1 ring-navy-900/15">
+        <div className="overflow-hidden rounded-2xl bg-navy-900 shadow-lift ring-1 ring-navy-900/15">
           {/* Top window bar */}
           <div className="flex items-center gap-1.5 border-b border-white/[0.08] bg-white/[0.03] px-4 py-2.5">
             <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
@@ -182,7 +182,7 @@ function ProductMockup() {
 
           <div className="grid gap-px bg-white/[0.04] md:grid-cols-3">
             {/* Colonne 1 */}
-            <div className="bg-navy-depth p-4">
+            <div className="bg-navy-900 p-4">
               <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-teal-300">
                 À traiter maintenant
               </p>
@@ -208,7 +208,7 @@ function ProductMockup() {
             </div>
 
             {/* Colonne 2 */}
-            <div className="bg-navy-depth p-4">
+            <div className="bg-navy-900 p-4">
               <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-teal-300">
                 Éléments déclarés
               </p>
@@ -233,7 +233,7 @@ function ProductMockup() {
             </div>
 
             {/* Colonne 3 */}
-            <div className="bg-navy-depth p-4">
+            <div className="bg-navy-900 p-4">
               <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-teal-300">
                 Actions cabinet
               </p>
@@ -404,20 +404,19 @@ export default function ChirurgiensEsthetiquesLanding() {
             </div>
           </div>
 
-          {/* Colonne droite — photo (même WebP que /) */}
+          {/* Colonne droite — photo (même WebP que /). Fallback flat bone. */}
           <div
-            className="relative min-h-[220px] lg:min-h-[480px]"
+            className="relative min-h-[220px] bg-bone lg:min-h-[480px]"
             style={{
               backgroundImage:
-                "url('/hero-consultation.webp'), url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
-              backgroundSize: "cover, cover, cover",
-              backgroundPosition: "center, center, center",
-              backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+                "url('/hero-consultation.webp'), url('/hero-consultation.jpg')",
+              backgroundSize: "cover, cover",
+              backgroundPosition: "center, center",
+              backgroundRepeat: "no-repeat, no-repeat",
             }}
             role="img"
             aria-label="Chirurgien en consultation post-opératoire avec une patiente"
           >
-            <div className="pointer-events-none absolute inset-0 bg-teal-sheen opacity-20" />
           </div>
         </div>
       </section>
@@ -590,7 +589,7 @@ export default function ChirurgiensEsthetiquesLanding() {
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl bg-navy-depth p-7 text-white ring-1 ring-navy-900/10">
+            <div className="rounded-2xl bg-navy-900 p-7 text-white ring-1 ring-navy-900/10">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-300">
                 Ce que KOVELA est
               </p>
@@ -691,7 +690,7 @@ export default function ChirurgiensEsthetiquesLanding() {
           ============================================================ */}
       <section
         id="contact"
-        className="border-t border-navy-900/[0.06] bg-navy-depth px-5 py-20 text-white sm:px-8 sm:py-24"
+        className="border-t border-navy-900/[0.06] bg-navy-900 px-5 py-20 text-white sm:px-8 sm:py-24"
       >
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
@@ -733,7 +732,7 @@ export default function ChirurgiensEsthetiquesLanding() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-navy-900/10 bg-navy-depth px-5 py-6 text-white sm:px-8">
+      <footer className="border-t border-navy-900/10 bg-navy-900 px-5 py-6 text-white sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
           <Wordmark light compact />
           <p className="text-center text-[10.5px] leading-relaxed tracking-tight text-navy-100/45 sm:text-left">

@@ -1346,7 +1346,7 @@ export default function ReferentielFonctionnementPage() {
                   Pour chaque intervention prioritaire, définissez trois catégories simples.
                   KOVELA ne qualifie pas médicalement — KOVELA applique vos règles.
                 </p>
-                <div className="mt-3 rounded-xl bg-navy-depth p-4 text-[12px] leading-relaxed text-navy-100/85 ring-1 ring-white/[0.06]">
+                <div className="mt-3 rounded-xl bg-navy-900 p-4 text-[12px] leading-relaxed text-navy-100/85 ring-1 ring-white/[0.06]">
                   <p className="font-medium text-white">Règle non éditable — situation urgente</p>
                   <p className="mt-1.5">
                     Si le patient décrit une situation urgente ou inquiétante, KOVELA lui rappelle

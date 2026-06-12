@@ -388,21 +388,19 @@ export default function Landing() {
 
           {/* Colonne droite — photo hero.
               Sources empilées : WebP en priorité, puis JPG (si déposé
-              plus tard), puis gradient crème en filet de sécurité. */}
+              plus tard). Fallback flat bone si l'image ne charge pas. */}
           <div
-            className="relative min-h-[220px] lg:min-h-[480px]"
+            className="relative min-h-[220px] bg-bone lg:min-h-[480px]"
             style={{
               backgroundImage:
-                "url('/hero-consultation.webp'), url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
-              backgroundSize: "cover, cover, cover",
-              backgroundPosition: "center, center, center",
-              backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+                "url('/hero-consultation.webp'), url('/hero-consultation.jpg')",
+              backgroundSize: "cover, cover",
+              backgroundPosition: "center, center",
+              backgroundRepeat: "no-repeat, no-repeat",
             }}
             role="img"
             aria-label="Chirurgien en consultation post-opératoire avec une patiente"
           >
-            {/* Voile teal quasi invisible — n'altère pas le rendu photo. */}
-            <div className="pointer-events-none absolute inset-0 bg-teal-sheen opacity-20" />
           </div>
         </div>
       </section>
@@ -647,7 +645,7 @@ export default function Landing() {
       </section>
 
       {/* Section G — IA assistive (compactée, objection chirurgien préservée) */}
-      <section id="ia" className="bg-navy-depth text-white reveal-target">
+      <section id="ia" className="bg-navy-900 text-white reveal-target">
         <div className="mx-auto max-w-6xl px-6 py-12">
           <Eyebrow>
             <span className="text-teal-300/90">IA assistive · jamais autonome</span>
@@ -1153,7 +1151,7 @@ export default function Landing() {
           Masquée < md : la sticky bottom bar mobile porte déjà l'action,
           ce bandeau navy serait redondant. Réapparaît dès md+ où la
           sticky bar est masquée (md:hidden côté sticky bar). */}
-      <section className="hidden bg-navy-depth text-white md:block reveal-target">
+      <section className="hidden bg-navy-900 text-white md:block reveal-target">
         <div className="mx-auto max-w-4xl px-6 py-16 text-center">
           <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] md:text-[2.4rem]">
             Structurer le suivi post-opératoire de votre cabinet.

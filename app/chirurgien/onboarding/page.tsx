@@ -522,7 +522,7 @@ function ChirurgienOnboarding() {
                 </ul>
               </div>
 
-              <div className="rounded-xl bg-navy-depth p-6 text-white ring-1 ring-white/[0.06]">
+              <div className="rounded-xl bg-navy-900 p-6 text-white ring-1 ring-white/[0.06]">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-navy-100/55">

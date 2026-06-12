@@ -193,7 +193,7 @@ export default function PatientOnboarding() {
         <div className="mx-auto max-w-md">
           <UrgencyBanner />
           <Card className="mt-4 overflow-hidden">
-            <div className="bg-navy-depth px-5 py-5 text-white">
+            <div className="bg-navy-900 px-5 py-5 text-white">
               <p className="text-[11px] uppercase tracking-[0.18em] text-teal-300">Mon suivi en bref</p>
               <h1 className="mt-1 font-display text-2xl text-white">
                 Bonjour {patient.name.split(" ")[0]}
