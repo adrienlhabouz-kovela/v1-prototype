@@ -84,12 +84,7 @@ function IconShield({ className = "" }: { className?: string }) {
   );
 }
 
-// ─── Compliance row — pills typographiques ────────────────────────────────
-// Approche Stripe/Linear : pas de logos officiels reproduits à la main
-// (qui finissent toujours par avoir l'air de placeholders), mais des
-// pills monogrammées discrètes intégrées dans le flow du hero.
-// Quand les vrais logos officiels seront déposés en public/trust/, on
-// peut basculer sur des <Image src="/trust/rgpd.svg" ... />.
+// ─── Compliance row — pills typographiques (hero) ─────────────────────────
 
 const compliance = ["HDS", "RGPD", "eIDAS", "CNIL"];
 
@@ -113,6 +108,125 @@ function CompliancePills() {
     </div>
   );
 }
+
+// ─── Trust logos — section Cadre KOVELA ───────────────────────────────────
+// Visuels SVG inline 80×80 px. Quand les vrais logos officiels seront
+// déposés dans public/trust/ (eidas.svg, hds.svg, rgpd.svg, cnil.svg),
+// remplacer chaque <Logo*/> par <Image src="/trust/X.svg" ... />.
+
+function LogoHds() {
+  return (
+    <svg viewBox="0 0 80 80" className="h-20 w-20" aria-label="HDS — Hébergeur de Données de Santé" role="img">
+      <defs>
+        <path id="hdsl-top" d="M 10 40 A 30 30 0 0 1 70 40" fill="none" />
+        <path id="hdsl-bot" d="M 70 40 A 30 30 0 0 1 10 40" fill="none" />
+      </defs>
+      <circle cx="40" cy="40" r="38" fill="#ffffff" stroke="#3b6fb5" strokeWidth="1.6" />
+      <text fontSize="6" fontWeight="700" fill="#1e40af" letterSpacing="1">
+        <textPath href="#hdsl-top" startOffset="50%" textAnchor="middle">
+          CERTIFIED
+        </textPath>
+      </text>
+      <text fontSize="6" fontWeight="700" fill="#1e40af" letterSpacing="1">
+        <textPath href="#hdsl-bot" startOffset="50%" textAnchor="middle">
+          COMPANY
+        </textPath>
+      </text>
+      <circle cx="40" cy="40" r="24" fill="#3b6fb5" />
+      <text x="40" y="40" textAnchor="middle" fontSize="13" fontWeight="700" fill="white" letterSpacing="0.5">
+        HDS
+      </text>
+      <text x="40" y="48" textAnchor="middle" fontSize="3.7" fill="white" opacity="0.95">
+        Hébergeur de données
+      </text>
+      <text x="40" y="53" textAnchor="middle" fontSize="3.7" fill="white" opacity="0.95">
+        de santé
+      </text>
+    </svg>
+  );
+}
+
+function LogoRgpd() {
+  const stars = Array.from({ length: 12 }).map((_, i) => {
+    const angle = ((i * 30 - 90) * Math.PI) / 180;
+    const r = 28;
+    return { x: 40 + r * Math.cos(angle), y: 40 + r * Math.sin(angle) };
+  });
+  return (
+    <svg viewBox="0 0 80 80" className="h-20 w-20" aria-label="RGPD — Règlement Général sur la Protection des Données" role="img">
+      <circle cx="40" cy="40" r="38" fill="#003399" />
+      {stars.map((s, i) => (
+        <text key={i} x={s.x} y={s.y + 2.5} textAnchor="middle" fontSize="6" fill="#FFCC00">
+          ★
+        </text>
+      ))}
+      {/* petit cadenas */}
+      <rect x="33" y="29" width="14" height="11" rx="1.5" fill="none" stroke="white" strokeWidth="1.5" />
+      <path d="M35 29 v-3.5 a5 5 0 0 1 10 0 v3.5" fill="none" stroke="white" strokeWidth="1.5" />
+      <text x="40" y="50" textAnchor="middle" fontSize="11" fontWeight="700" fill="white" letterSpacing="0.5">
+        RGPD
+      </text>
+    </svg>
+  );
+}
+
+function LogoEidas() {
+  // Reproduction fidèle au visuel utilisateur :
+  // anneau gris fin, cadenas bleu central, 8 étoiles UE jaunes sur le
+  // corps du cadenas, coche jaune au milieu du cadenas, eIDAS en bleu
+  // dans la zone basse du cercle (sous le cadenas).
+  const lockStars = [
+    { x: 31, y: 38 }, { x: 38, y: 36 }, { x: 45, y: 36 }, { x: 52, y: 38 },
+    { x: 31, y: 55 }, { x: 38, y: 56 }, { x: 45, y: 56 }, { x: 52, y: 55 },
+  ];
+  return (
+    <svg viewBox="0 0 80 80" className="h-20 w-20" aria-label="eIDAS — Identification électronique européenne" role="img">
+      {/* anneau gris */}
+      <circle cx="40" cy="40" r="38" fill="#ffffff" stroke="#94a3b8" strokeWidth="2.2" />
+      {/* arceau du cadenas */}
+      <path d="M30 32 v-7 a10 10 0 0 1 20 0 v7" fill="none" stroke="#1e3a8a" strokeWidth="3.2" strokeLinecap="round" />
+      {/* corps du cadenas */}
+      <rect x="24" y="32" width="32" height="28" rx="3" fill="#1e3a8a" />
+      {/* étoiles UE jaunes sur le corps */}
+      {lockStars.map((s, i) => (
+        <text key={i} x={s.x} y={s.y} textAnchor="middle" fontSize="4.5" fill="#FFCC00">
+          ★
+        </text>
+      ))}
+      {/* coche jaune au centre du cadenas */}
+      <path
+        d="M30 46 l5 5 l11 -11"
+        stroke="#FFCC00"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* eIDAS */}
+      <text x="40" y="73" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#1e3a8a" letterSpacing="0.4">
+        eIDAS
+      </text>
+    </svg>
+  );
+}
+
+function LogoCnil() {
+  return (
+    <svg viewBox="0 0 80 80" className="h-20 w-20" aria-label="CNIL — Commission Nationale de l'Informatique et des Libertés" role="img">
+      <circle cx="40" cy="40" r="38" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.6" />
+      <text x="40" y="46" textAnchor="middle" fontSize="17" fontWeight="700" fill="#1e40af" letterSpacing="0.4">
+        CNIL.
+      </text>
+    </svg>
+  );
+}
+
+const trustLogos: { Logo: () => React.ReactElement; label: string }[] = [
+  { Logo: LogoHds, label: "Hébergement santé" },
+  { Logo: LogoRgpd, label: "Conformité européenne" },
+  { Logo: LogoEidas, label: "Identité électronique" },
+  { Logo: LogoCnil, label: "Autorité française" },
+];
 
 
 // ─── Données hero — bloc comparatif & barre de preuves ────────────────────
@@ -745,6 +859,24 @@ export default function Landing() {
                     Accès par rôle, traçabilité, minimisation, droits des personnes. IA assistive
                     désactivable et loggée.
                   </p>
+                </div>
+              </div>
+
+              {/* Trust logos — visuels concrets des certifications/conformités
+                  visées par l'architecture KOVELA. */}
+              <div className="mt-10 rounded-2xl border border-navy-900/[0.06] bg-white p-7">
+                <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
+                  Certifications &amp; conformités visées
+                </p>
+                <div className="mt-6 grid grid-cols-2 items-start gap-x-6 gap-y-7 sm:grid-cols-4">
+                  {trustLogos.map(({ Logo, label }) => (
+                    <div key={label} className="flex flex-col items-center text-center">
+                      <Logo />
+                      <p className="mt-3 text-[11px] tracking-tight text-charcoal/55">
+                        {label}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
 
