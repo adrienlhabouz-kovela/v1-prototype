@@ -271,11 +271,10 @@ export default function LandingPreviewTier1() {
                   Card Avant / Avec KOVELA
                   --------------------------------------------------------------
                   Mobile (< sm) : 2 cartes empilées visuellement contrastées
-                    (rouge léger pour Avant, teal léger pour Avec) avec un
-                    pastille "VS" centrée entre les deux. Pattern Apple :
-                    contraste immédiat sans interaction.
-                  Desktop (sm+) : carte unifiée à 2 colonnes avec VS badge
-                    sur le séparateur — inchangée.
+                    (rouge léger pour Sans, teal léger pour Avec). Pattern
+                    Apple : contraste immédiat sans interaction ni VS badge.
+                  Desktop (sm+) : carte unifiée à 2 colonnes avec séparateur
+                    vertical (sans VS badge).
                   ============================================================ */}
 
               {/* === MOBILE — Card déplacée après §1 par TIER 1.B.
@@ -283,7 +282,7 @@ export default function LandingPreviewTier1() {
                   désactivée. La vraie carte mobile vit après §1 Le constat. */}
               <div className="hidden space-y-3">
                 {/* Sans KOVELA — bg rouge léger */}
-                <div className="rounded-2xl bg-[#FDF4F2] p-5 ring-1 ring-[#D24B3E]/15">
+                <div className="rounded-2xl bg-[#FDF4F2] p-6 ring-1 ring-[#D24B3E]/15">
                   <div className="flex items-center gap-2">
                     <span className="rounded-md bg-[#D24B3E]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#D24B3E]">
                       Sans
@@ -308,15 +307,8 @@ export default function LandingPreviewTier1() {
                   </p>
                 </div>
 
-                {/* Séparateur VS rond centré */}
-                <div className="flex items-center justify-center">
-                  <span className="-my-1 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[10px] font-semibold uppercase tracking-wide text-teal-700 shadow-card ring-4 ring-white">
-                    VS
-                  </span>
-                </div>
-
                 {/* Avec KOVELA — bg teal léger */}
-                <div className="rounded-2xl bg-[#EAF7F4] p-5 ring-1 ring-teal-500/20">
+                <div className="rounded-2xl bg-[#EAF7F4] p-6 ring-1 ring-teal-500/20">
                   <div className="flex items-center gap-2">
                     <span className="rounded-md bg-teal-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-teal-700">
                       Avec
@@ -343,17 +335,11 @@ export default function LandingPreviewTier1() {
               </div>
 
               {/* === DESKTOP (sm+) — Carte unifiée actuelle inchangée === */}
-              <div className="relative mt-7 hidden rounded-2xl bg-white p-5 shadow-card ring-1 ring-navy-900/[0.05] sm:block sm:p-6">
-                {/* Badge VS sur le séparateur */}
-                <div className="pointer-events-none absolute left-1/2 top-[22px] z-10 -translate-x-1/2">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-[10px] font-semibold uppercase tracking-wide text-teal-700 ring-4 ring-white">
-                    VS
-                  </span>
-                </div>
+              <div className="relative mt-7 hidden rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.05] sm:block sm:p-7">
 
                 <div className="grid grid-cols-2 gap-0">
                   {/* Sans KOVELA */}
-                  <div className="pr-6">
+                  <div className="pr-8">
                     <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
                       Sans KOVELA
                     </h3>
@@ -374,7 +360,7 @@ export default function LandingPreviewTier1() {
                   </div>
 
                   {/* Avec KOVELA */}
-                  <div className="border-l border-navy-900/[0.07] pl-6">
+                  <div className="border-l border-navy-900/[0.07] pl-8">
                     <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
                       Avec KOVELA
                     </h3>
@@ -496,7 +482,7 @@ export default function LandingPreviewTier1() {
         <div className="px-5 py-10">
           <div className="space-y-3">
             {/* Sans KOVELA — bg rouge léger */}
-            <div className="rounded-2xl bg-[#FDF4F2] p-5 ring-1 ring-[#D24B3E]/15">
+            <div className="rounded-2xl bg-[#FDF4F2] p-6 ring-1 ring-[#D24B3E]/15">
               <div className="flex items-center gap-2">
                 <span className="rounded-md bg-[#D24B3E]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#D24B3E]">
                   Sans
@@ -521,15 +507,8 @@ export default function LandingPreviewTier1() {
               </p>
             </div>
 
-            {/* Séparateur VS rond centré */}
-            <div className="flex items-center justify-center">
-              <span className="-my-1 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[10px] font-semibold uppercase tracking-wide text-teal-700 shadow-card ring-4 ring-white">
-                VS
-              </span>
-            </div>
-
             {/* Avec KOVELA — bg teal léger */}
-            <div className="rounded-2xl bg-[#EAF7F4] p-5 ring-1 ring-teal-500/20">
+            <div className="rounded-2xl bg-[#EAF7F4] p-6 ring-1 ring-teal-500/20">
               <div className="flex items-center gap-2">
                 <span className="rounded-md bg-teal-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-teal-700">
                   Avec
