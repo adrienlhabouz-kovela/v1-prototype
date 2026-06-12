@@ -575,13 +575,13 @@ export default function Landing() {
           supplémentaire dans le cabinet.
         </p>
 
-        {/* Card pricing — fixe + variable, hiérarchie forte, prix lisible */}
+        {/* Card pricing — fixe (5 patients inclus) + variable (au-delà) */}
         <div className="mt-10 overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-navy-900/[0.06]">
           <div className="flex flex-wrap items-center gap-2 border-b border-navy-900/[0.05] bg-ivory px-7 py-4">
             <span className="rounded-md bg-navy-900 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white">
               Offre pilote
             </span>
-            {["Accès service", "Usage réel", "Facturation mensuelle", "Service opéré"].map((b) => (
+            {["Accès service", "5 patients inclus", "Usage réel", "Service opéré"].map((b) => (
               <span
                 key={b}
                 className="rounded-md bg-white px-2.5 py-1 text-[10.5px] font-medium tracking-tight text-navy-700 ring-1 ring-navy-100"
@@ -592,7 +592,7 @@ export default function Landing() {
           </div>
 
           <div className="grid items-stretch md:grid-cols-[1fr_auto_1fr]">
-            {/* Bloc fixe */}
+            {/* Bloc fixe — accès mensuel + 5 patients inclus */}
             <div className="px-7 py-10 md:py-12">
               <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
                 Accès mensuel au service
@@ -601,9 +601,15 @@ export default function Landing() {
                 690 €{" "}
                 <span className="text-[14px] font-normal text-charcoal/55">HT / mois</span>
               </p>
-              <ul className="mt-5 space-y-1.5 text-[13px] leading-relaxed text-charcoal/70">
-                <li>Accès mensuel au service KOVELA</li>
-                <li>Facturé le 1er du mois</li>
+              <p className="mt-3 text-[12.5px] font-medium tracking-tight text-teal-700">
+                Inclut jusqu&apos;à 5 patients activés par mois.
+              </p>
+              <ul className="mt-4 space-y-1.5 text-[13px] leading-relaxed text-charcoal/70">
+                <li>
+                  Accès mensuel au service KOVELA, incluant les 5 premiers
+                  patients activés chaque mois.
+                </li>
+                <li>Facturé le 1er du mois.</li>
               </ul>
             </div>
 
@@ -614,10 +620,10 @@ export default function Landing() {
               </span>
             </div>
 
-            {/* Bloc variable */}
+            {/* Bloc variable — au-delà des 5 patients inclus */}
             <div className="border-t border-navy-900/[0.05] px-7 py-10 md:border-l md:border-t-0 md:py-12">
               <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
-                Part variable d&apos;usage
+                Au-delà des 5 patients inclus
               </p>
               <p className="mt-4 font-display text-[2.6rem] font-medium leading-none tracking-tight text-navy-900 md:text-[3rem]">
                 80 €{" "}
@@ -625,16 +631,22 @@ export default function Landing() {
                   HT / patient activé
                 </span>
               </p>
-              <ul className="mt-5 space-y-1.5 text-[13px] leading-relaxed text-charcoal/70">
-                <li>Facturé en fin de mois selon les patients réellement suivis</li>
-                <li>Patient activé : onboarding validé + suivi lancé</li>
+              <p className="mt-3 text-[12.5px] font-medium tracking-tight text-teal-700">
+                À partir du 6e patient activé du mois.
+              </p>
+              <ul className="mt-4 space-y-1.5 text-[13px] leading-relaxed text-charcoal/70">
+                <li>
+                  Au-delà : 80 € HT par patient activé supplémentaire,
+                  facturé en fin de mois selon l&apos;usage réel.
+                </li>
+                <li>Patient activé : onboarding validé + suivi lancé.</li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-navy-900/[0.05] bg-ivory px-7 py-5">
             <p className="font-display text-[15.5px] italic leading-relaxed tracking-tight text-navy-900 md:text-[17px]">
-              Le fixe donne accès au service. Le variable suit l&apos;usage réel.
+              5 patients inclus chaque mois. Au-delà, vous ne payez que l&apos;usage réel.
             </p>
           </div>
         </div>
