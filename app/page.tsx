@@ -85,7 +85,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 
 export default function Landing() {
   return (
-    <div className="bg-white text-navy-900">
+    <div className="bg-white pb-20 text-navy-900 md:pb-0">
       {/* Header — barre navy pleine largeur, version compacte */}
       <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-navy-900/95 backdrop-blur-md">
         <div className="flex items-center justify-between gap-6 px-6 py-2.5 lg:px-10 xl:px-16">
@@ -130,7 +130,7 @@ export default function Landing() {
                 <span className="h-px w-14 bg-teal-500/40" />
               </div>
 
-              <h1 className="mt-7 font-display text-[1.55rem] font-semibold leading-[1.1] tracking-[-0.035em] text-navy-900 sm:text-balance sm:text-[2.2rem] sm:leading-[1.05] lg:text-[2.65rem] lg:tracking-[-0.04em] xl:text-[2.95rem]">
+              <h1 className="mt-6 font-display text-[1.95rem] font-semibold leading-[1.08] tracking-[-0.035em] text-navy-900 sm:mt-7 sm:text-balance sm:text-[2.2rem] sm:leading-[1.05] lg:text-[2.65rem] lg:tracking-[-0.04em] xl:text-[2.95rem]">
                 KOVELA fait disparaître le bruit post-op du quotidien du
                 cabinet.
               </h1>
@@ -139,16 +139,18 @@ export default function Landing() {
                 Un suivi post-op structuré. Des chirurgiens libérés du bruit.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              {/* CTAs — full-width sur mobile (primary + secondary stack),
+                  inline et naturel à partir de sm+. */}
+              <div className="mt-7 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
                 <a
                   href={DEMO}
-                  className="rounded-lg bg-navy-900 px-6 py-3 text-[13.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
+                  className="rounded-lg bg-navy-900 px-6 py-3.5 text-center text-[14px] font-semibold tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800 sm:py-3 sm:text-[13.5px] sm:font-medium"
                 >
-                  Demander un échange opérationnel
+                  Réserver un call de 20 min
                 </a>
                 <a
                   href="#etapes"
-                  className="rounded-lg bg-white px-6 py-3 text-[13.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/15 transition-colors hover:bg-ivory"
+                  className="rounded-lg bg-white px-6 py-3 text-center text-[13.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/15 transition-colors hover:bg-ivory"
                 >
                   Voir le fonctionnement
                 </a>
@@ -815,6 +817,33 @@ export default function Landing() {
           </p>
         </div>
       </footer>
+
+      {/* ============================================================
+          Sticky bottom contact bar — mobile uniquement (md:hidden).
+          Pattern 2026 (Calendly, Linear, Vercel) : CTA primaire et
+          contact direct toujours accessibles, supprime la friction
+          "scroll-pour-trouver-le-CTA".
+          ============================================================ */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-navy-900/[0.08] bg-white/95 px-4 py-3 shadow-[0_-6px_24px_-8px_rgba(10,31,45,0.18)] backdrop-blur-md md:hidden">
+        <div className="flex items-center gap-2">
+          <a
+            href={DEMO}
+            className="flex flex-1 items-center justify-center rounded-lg bg-navy-900 px-4 py-3 text-[13.5px] font-semibold tracking-tight text-white shadow-soft"
+          >
+            Réserver un call de 20 min
+          </a>
+          <a
+            href="mailto:contact@kovela.care"
+            aria-label="Nous écrire par email"
+            className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 ring-1 ring-navy-900/15 transition-colors hover:bg-ivory"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M3.5 7l8.5 6.5L20.5 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

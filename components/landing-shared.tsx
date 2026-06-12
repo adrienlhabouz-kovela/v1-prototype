@@ -124,8 +124,10 @@ export function CompliancePills() {
         </span>
       </div>
 
-      {/* Ligne 2 — souveraineté & opération, typo pure sans emoji */}
-      <p className="text-[10.5px] leading-relaxed tracking-tight text-charcoal/55">
+      {/* Ligne 2 — souveraineté & opération. Masquée sur mobile pour
+          ne pas surcharger le hero : la stats bar affiche déjà HDS+RGPD,
+          et la mention complète revient dès sm+ (tablet/desktop). */}
+      <p className="hidden text-[10.5px] leading-relaxed tracking-tight text-charcoal/55 sm:block">
         {complianceSupport.map((label, i) => (
           <span key={label}>
             {i > 0 && <span className="mx-1.5 text-charcoal/25">·</span>}
