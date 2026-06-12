@@ -86,7 +86,11 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 export default function Landing() {
   return (
     <div className="bg-white pb-20 text-navy-900 md:pb-0">
-      {/* Header — barre navy pleine largeur, version compacte */}
+      {/* Header — barre navy pleine largeur, version compacte.
+          - lg+ : wordmark + nav + lien prototype + CTA teal.
+          - < lg : wordmark + hamburger (<details>) qui ouvre le menu.
+            Le CTA de header est retiré sur mobile car la sticky bar
+            en bas porte déjà l'action principale. */}
       <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-navy-900/95 backdrop-blur-md">
         <div className="flex items-center justify-between gap-6 px-6 py-2.5 lg:px-10 xl:px-16">
           <Wordmark light compact />
@@ -100,16 +104,60 @@ export default function Landing() {
           <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="hidden text-[12.5px] font-medium text-navy-100/80 transition-colors hover:text-white sm:block"
+              className="hidden text-[12.5px] font-medium text-navy-100/80 transition-colors hover:text-white lg:block"
             >
               Voir le prototype
             </Link>
             <a
               href={DEMO}
-              className="rounded-lg bg-teal-500 px-3.5 py-1.5 text-[12.5px] font-semibold tracking-tight text-white shadow-soft transition-colors hover:bg-teal-600"
+              className="hidden rounded-lg bg-teal-500 px-3.5 py-1.5 text-[12.5px] font-semibold tracking-tight text-white shadow-soft transition-colors hover:bg-teal-600 lg:inline-flex"
             >
               {CTA_DEMO_LABEL}
             </a>
+
+            {/* Hamburger menu — mobile/tablette uniquement, <lg.
+                <details> natif : pas d'état React, accessible clavier,
+                close au tap d'un lien (navigation). */}
+            <details className="relative lg:hidden">
+              <summary
+                aria-label="Ouvrir le menu"
+                className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10 [&::-webkit-details-marker]:hidden"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M4 7h16M4 12h16M4 17h16" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </summary>
+              <nav className="absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-lg border border-navy-900/[0.08] bg-white py-1 shadow-lift">
+                {[
+                  { label: "Le constat", href: "#probleme" },
+                  { label: "La solution", href: "#solution" },
+                  { label: "Fonctionnement", href: "#etapes" },
+                  { label: "Cadre KOVELA", href: "#cadre" },
+                  { label: "Tarifs", href: "#modele" },
+                ].map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="block px-4 py-2.5 text-[14px] tracking-tight text-navy-900 transition-colors hover:bg-ivory"
+                  >
+                    {item.label}
+                  </a>
+                ))}
+                <div className="my-1 border-t border-navy-900/[0.06]" />
+                <Link
+                  href="/login"
+                  className="block px-4 py-2.5 text-[14px] tracking-tight text-charcoal/65 transition-colors hover:bg-ivory"
+                >
+                  Voir le prototype
+                </Link>
+              </nav>
+            </details>
           </div>
         </div>
       </header>
