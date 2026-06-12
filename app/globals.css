@@ -5,7 +5,7 @@
 html,
 body {
   background-color: #ffffff;
-  color: #0a1f2d;
+  color: #1a1916;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -71,8 +71,8 @@ body {
   .hover-lift:hover {
     transform: translateY(-2px);
     box-shadow:
-      0 1px 2px rgba(10, 31, 45, 0.04),
-      0 10px 24px -12px rgba(10, 31, 45, 0.18);
+      0 1px 2px rgba(26, 25, 22, 0.04),
+      0 10px 24px -12px rgba(26, 25, 22, 0.18);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -83,28 +83,10 @@ body {
   }
 }
 
-@layer components {
-  /* Motif discret de lignes fluides / wave teal pour les headers */
-  .wave-motif {
-    background-image:
-      radial-gradient(60% 120% at 92% -20%, rgba(31, 167, 160, 0.16) 0%, rgba(31, 167, 160, 0) 60%),
-      url("data:image/svg+xml,%3Csvg width='1200' height='240' viewBox='0 0 1200 240' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%231FA7A0' stroke-opacity='0.16' fill='none' stroke-width='1.2'%3E%3Cpath d='M0 150 C 220 90, 420 210, 640 140 S 1020 60, 1200 130'/%3E%3Cpath d='M0 185 C 240 125, 440 235, 660 170 S 1040 95, 1200 160'/%3E%3Cpath d='M0 115 C 200 70, 400 175, 620 110 S 1000 35, 1200 100'/%3E%3C/g%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: top right, bottom right;
-    background-size: auto, 1200px 240px;
-  }
-
-  .hero-lines {
-    background-image: url("data:image/svg+xml,%3Csvg width='1440' height='760' viewBox='0 0 1440 760' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%231FA7A0' stroke-opacity='0.22' fill='none' stroke-width='1.1'%3E%3Cpath d='M-50 470 C 320 330, 620 600, 980 430 S 1520 200, 1620 380'/%3E%3Cpath d='M-50 540 C 360 400, 660 660, 1020 500 S 1520 280, 1620 450'/%3E%3Cpath d='M-50 400 C 300 280, 600 520, 960 360 S 1520 140, 1620 320'/%3E%3Cpath d='M-50 610 C 380 470, 700 720, 1060 560 S 1520 360, 1620 520'/%3E%3C/g%3E%3Ccircle cx='1180' cy='250' r='4' fill='%231FA7A0' fill-opacity='0.55'/%3E%3Ccircle cx='1020' cy='470' r='3' fill='%231FA7A0' fill-opacity='0.4'/%3E%3Ccircle cx='860' cy='360' r='3' fill='%23BFE3DE' fill-opacity='0.5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: center right;
-    background-size: cover;
-  }
-}
-
+/* Scrollbar — calé sur la palette stone (rule). */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #c0ccd2 transparent;
+  scrollbar-color: #d4d6d9 transparent;
 }
 
 ::-webkit-scrollbar {
@@ -112,6 +94,6 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #c0ccd2;
+  background-color: #d4d6d9;
   border-radius: 8px;
 }

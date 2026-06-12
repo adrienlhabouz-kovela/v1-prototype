@@ -571,10 +571,10 @@ export default function EditorialStyleguide() {
             <EditorialEyebrow>PALETTE — CLINICAL TRUST PREMIUM</EditorialEyebrow>
             <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
               {[
-                ["paper", "#FAFAF7", "bg-paper border border-rule"],
-                ["paper-shade", "#F1EFE8", "bg-paper-shade border border-rule"],
-                ["cream", "#F1EBE0", "bg-cream border border-rule"],
-                ["rule", "#D8D6D0", "bg-rule"],
+                ["paper", "#F8F9FA", "bg-paper border border-rule"],
+                ["paper-shade", "#E9EBED", "bg-paper-shade border border-rule"],
+                ["cream", "#EEEEEC", "bg-cream border border-rule"],
+                ["rule", "#D4D6D9", "bg-rule"],
                 ["ink", "#0F1419", "bg-ink"],
                 ["ink-60", "#4A4F55", "bg-ink-60"],
                 ["ink-30", "#8C9098", "bg-ink-30"],
