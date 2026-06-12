@@ -831,8 +831,11 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section J — CTA final */}
-      <section className="bg-navy-depth text-white">
+      {/* Section J — CTA final.
+          Masquée < md : la sticky bottom bar mobile porte déjà l'action,
+          ce bandeau navy serait redondant. Réapparaît dès md+ où la
+          sticky bar est masquée (md:hidden côté sticky bar). */}
+      <section className="hidden bg-navy-depth text-white md:block">
         <div className="mx-auto max-w-4xl px-6 py-16 text-center">
           <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] md:text-[2.4rem]">
             Structurer le suivi post-opératoire de votre cabinet.
