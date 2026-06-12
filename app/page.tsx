@@ -22,18 +22,22 @@ const CTA_DEMO_LABEL = "Demander un échange opérationnel";
 
 // ─── Données hero — bloc comparatif & barre de preuves ────────────────────
 const beforeKovela = [
-  "Suivi dispersé (téléphone, emails)",
-  "Perte d'informations et oublis",
-  "Charge admin chronophage",
-  "Satisfaction patient variable",
+  "Trop de messages post-op",
+  "Trop d'interruptions inutiles",
+  "Secrétariat saturé",
+  "Patients anxieux trop tard visibles",
 ];
 
+const beforeKovelaConclusion = "Bruit post-op permanent";
+
 const withKovela = [
-  "Parcours structuré et centralisé",
-  "Traçabilité complète et sécurisée",
-  "Temps médical recentré",
-  "Expérience patient premium",
+  "Le bruit disparaît",
+  "Le cabinet respire",
+  "Le chirurgien est sollicité au bon moment",
+  "Le patient se sent suivi",
 ];
+
+const withKovelaConclusion = "Temps médical utile préservé";
 
 const heroStats: { icon: React.ReactNode; value: string; label: string }[] = [
   { icon: <IconTarget className="h-[26px] w-[26px]" />, value: "100%", label: "Traçabilité" },
@@ -249,11 +253,11 @@ export default function Landing() {
 
               {/* === MOBILE (< sm) — Option A === */}
               <div className="mt-7 space-y-3 sm:hidden">
-                {/* Avant KOVELA — bg rouge léger */}
+                {/* Sans KOVELA — bg rouge léger */}
                 <div className="rounded-2xl bg-[#FDF4F2] p-5 ring-1 ring-[#D24B3E]/15">
                   <div className="flex items-center gap-2">
                     <span className="rounded-md bg-[#D24B3E]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#D24B3E]">
-                      Avant
+                      Sans
                     </span>
                     <h3 className="font-display text-[16.5px] font-semibold tracking-tight text-navy-900">
                       KOVELA
@@ -271,7 +275,7 @@ export default function Landing() {
                     ))}
                   </ul>
                   <p className="mt-4 inline-flex rounded-md bg-[#D24B3E]/10 px-2.5 py-1 text-[12px] font-semibold tracking-tight text-[#D24B3E]">
-                    Coût caché élevé
+                    {beforeKovelaConclusion}
                   </p>
                 </div>
 
@@ -304,7 +308,7 @@ export default function Landing() {
                     ))}
                   </ul>
                   <p className="mt-4 inline-flex rounded-md bg-teal-500/15 px-2.5 py-1 text-[12px] font-semibold tracking-tight text-teal-700">
-                    ROI rapide et mesurable
+                    {withKovelaConclusion}
                   </p>
                 </div>
               </div>
@@ -319,10 +323,10 @@ export default function Landing() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-0">
-                  {/* Avant KOVELA */}
+                  {/* Sans KOVELA */}
                   <div className="pr-6">
                     <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
-                      Avant KOVELA
+                      Sans KOVELA
                     </h3>
                     <ul className="mt-3.5 space-y-2">
                       {beforeKovela.map((t) => (
@@ -336,7 +340,7 @@ export default function Landing() {
                       ))}
                     </ul>
                     <p className="mt-4 text-[13px] font-semibold tracking-tight text-[#D24B3E]">
-                      Coût caché élevé
+                      {beforeKovelaConclusion}
                     </p>
                   </div>
 
@@ -357,7 +361,7 @@ export default function Landing() {
                       ))}
                     </ul>
                     <p className="mt-4 text-[13px] font-semibold tracking-tight text-teal-600">
-                      ROI rapide et mesurable
+                      {withKovelaConclusion}
                     </p>
                   </div>
                 </div>
