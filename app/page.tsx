@@ -262,7 +262,9 @@ export default function Landing() {
               </div>
 
               {/* Conformité réglementaire — intégrée au hero, juste sous
-                  les CTAs, registre Apple/Stripe discret. */}
+                  les CTAs, registre Apple/Stripe discret.
+                  Mobile : ligne 2 « 5 marqueurs souveraineté » accessible
+                  via <details> (cf. CompliancePills). */}
               <div className="mt-5">
                 <CompliancePills />
               </div>
@@ -470,6 +472,39 @@ export default function Landing() {
             </div>
           ))}
         </div>
+
+        {/* DATA STRIP — fusion des anciens §4 (60-90 min) + §5 (17 chirurgiens)
+            en sous-bloc de §1. Plus de sections orphelines, le constat est
+            renforcé par 2 chiffres précis avant la conclusion. */}
+        <div className="mt-10 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl bg-ivory p-6 ring-1 ring-navy-900/[0.05]">
+            <p className="font-display text-[1.75rem] font-medium leading-none tracking-tight text-navy-900">
+              60-90 min
+            </p>
+            <p className="mt-3 text-[12.5px] leading-relaxed text-charcoal/65">
+              de travail humain par patient, sur 3-15 jours en suivi manuel
+              (WhatsApp, audio, SMS).
+            </p>
+          </div>
+          <div className="rounded-2xl bg-ivory p-6 ring-1 ring-navy-900/[0.05]">
+            <p className="font-display text-[1.75rem] font-medium leading-none tracking-tight text-navy-900">
+              17 chirurgiens
+            </p>
+            <p className="mt-3 text-[12.5px] leading-relaxed text-charcoal/65">
+              esthétiques privés interrogés en entretien terrain avec leur
+              équipe. Cadre KOVELA validé.
+            </p>
+          </div>
+        </div>
+
+        {/* QUOTE CONCLUSION — plus marquée que la version actuelle (qui n'en
+            avait pas). Récapitule le constat en une phrase qui prépare la
+            solution. */}
+        <p className="mx-auto mt-12 max-w-3xl text-center font-display text-[1.5rem] italic leading-snug tracking-[-0.02em] text-navy-900 sm:text-[1.85rem]">
+          Le post-op n&apos;est pas un problème médical.
+          <br />
+          C&apos;est un problème opérationnel.
+        </p>
       </section>
 
       {/* Section C SUPPRIMÉE par TIER 1.A — La solution KOVELA · 5 piliers
@@ -536,38 +571,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section E — Baseline terrain (douleur opérationnelle mesurable) */}
-      <section className="border-y border-navy-900/[0.06] bg-white reveal-target">
-        <div className="mx-auto max-w-5xl px-6 py-14">
-          <Eyebrow>Une douleur opérationnelle mesurable</Eyebrow>
-          <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
-            60 à 90 minutes de travail humain par patient, sur 3 à 15 jours.
-          </h2>
-          <p className="mt-5 max-w-3xl text-[14.5px] leading-relaxed text-charcoal/70">
-            En suivi manuel (WhatsApp, audio, SMS), un patient post-op représente
-            généralement{" "}
-            <span className="font-medium text-navy-900">60 à 90 minutes</span> de
-            travail humain sur{" "}
-            <span className="font-medium text-navy-900">3 à 15 jours</span>.
-            KOVELA structure ce temps : référentiel cabinet, supervision humaine,
-            CR factuels.
-          </p>
-          <p className="mt-5 max-w-3xl rounded-md bg-ivory px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/60 ring-1 ring-navy-900/[0.04]">
-            Baseline terrain — à mesurer et affiner en pilote KOVELA. Aucun gain chiffré n&apos;est
-            promis à ce stade.
-          </p>
-        </div>
-      </section>
-
-      {/* Bande preuve terrain — chiffre précis (honnêteté > marketing). */}
-      <section className="border-b border-navy-900/[0.06] bg-ivory reveal-target">
-        <div className="mx-auto max-w-6xl px-6 py-3">
-          <p className="text-[12.5px] leading-relaxed text-charcoal/65">
-            <span className="font-semibold text-navy-900">17 chirurgiens esthétiques privés interrogés.</span>
-            {" "}Cadre KOVELA validé en entretien terrain avec leur équipe.
-          </p>
-        </div>
-      </section>
+      {/* Sections E + Bande preuve fondues en data-strip de §1 Constat. */}
 
       {/* Section F — Le service KOVELA en 5 étapes (TIER 1.A : fusion
           des anciens §2 La solution + §6 Comment ça marche). Chaque étape
@@ -583,7 +587,44 @@ export default function Landing() {
             Pas un logiciel à apprendre. Un service opéré qui prend en charge
             le flux post-op du cabinet, dans le respect de votre cadre.
           </p>
-          <ol className="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+          {/* MOBILE (< md) — Carrousel horizontal swipeable.
+              Snap-x mandatory, snap-start sur chaque card. Chaque card
+              prend ~85 % du viewport pour faire deviner la suivante. */}
+          <ol
+            aria-label="5 étapes du service KOVELA"
+            className="mt-10 -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-4 md:hidden [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: "none" }}
+          >
+            {stepsTier1.map((s, i) => (
+              <li
+                key={s.t}
+                className="relative w-[82%] shrink-0 snap-start rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]"
+              >
+                <span className="font-display text-[26px] font-medium leading-none tracking-tight text-teal-600/80">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-4 font-display text-[14px] font-semibold tracking-tight text-navy-900">
+                  {s.t}
+                </h3>
+                <p className="mt-2 text-[12.5px] leading-relaxed text-charcoal/60">
+                  {s.d}
+                </p>
+              </li>
+            ))}
+          </ol>
+
+          {/* Indicateurs « swipe » mobile uniquement */}
+          <div className="mt-3 flex items-center gap-1.5 md:hidden">
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-charcoal/40" fill="none" stroke="currentColor" aria-hidden="true">
+              <path d="M9 6l-6 6 6 6M15 6l6 6-6 6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <p className="text-[11.5px] text-charcoal/55">
+              Glissez pour voir les 5 étapes
+            </p>
+          </div>
+
+          {/* DESKTOP (md+) — Grille 5 colonnes inchangée. */}
+          <ol className="mt-10 hidden gap-3 md:grid md:grid-cols-2 lg:grid-cols-5">
             {stepsTier1.map((s, i) => (
               <li
                 key={s.t}
@@ -836,59 +877,50 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section Ibis — Un projet construit sur le terrain · 3 cards (Doctrine fondue dans §G/§H) */}
+      {/* Section Ibis — 2 cards étoffées : Chirurgiens + Produit. */}
       <section className="mx-auto max-w-6xl px-6 py-12 reveal-target">
         <Eyebrow>Un projet construit sur le terrain</Eyebrow>
         <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
-          Qui porte KOVELA, et comment.
+          Construit avec les chirurgiens. Démontrable aujourd&apos;hui.
         </h2>
 
-        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Fondateur */}
-          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
-              Fondateur
-            </p>
-            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
-              Une culture de structuration et de risque
-            </h3>
-            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
-              KOVELA est porté par Adrien Lhabouz, entrepreneur et cofondateur de Trecento Asset
-              Management, avec une culture d&apos;investissement et d&apos;analyse du risque.
-            </p>
-          </div>
-
-          {/* Chirurgiens */}
-          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+        <div className="mt-10 grid gap-3 md:grid-cols-2">
+          {/* Chirurgiens — étoffée avec mention 17 chirurgiens */}
+          <div className="rounded-2xl bg-white p-7 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
               Chirurgiens
             </p>
-            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
+            <h3 className="mt-3 font-display text-[16px] font-semibold tracking-tight text-navy-900">
               Conçu à partir de retours terrain
             </h3>
-            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
-              Le service est construit à partir de retours terrain de chirurgiens esthétiques
-              privés et d&apos;années d&apos;expérience cabinet.
+            <p className="mt-3 text-[13px] leading-relaxed text-charcoal/70">
+              <span className="font-semibold text-navy-900">17 chirurgiens
+              esthétiques privés interrogés</span> en entretien terrain avec
+              leur équipe. Le service est construit à partir de retours
+              concrets de cabinets en activité, et d&apos;années d&apos;expérience
+              opérationnelle post-opératoire.
             </p>
           </div>
 
-          {/* Produit */}
-          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+          {/* Produit — étoffée avec liste des espaces opérationnels */}
+          <div className="rounded-2xl bg-white p-7 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
               Produit
             </p>
-            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
+            <h3 className="mt-3 font-display text-[16px] font-semibold tracking-tight text-navy-900">
               Plateforme déjà démontrable
             </h3>
-            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
-              Plateforme complète : activation cabinet, parcours chirurgien, espace superviseur,
-              suivi patient, workflow CR et cockpit admin opérationnels.
+            <p className="mt-3 text-[13px] leading-relaxed text-charcoal/70">
+              <span className="font-semibold text-navy-900">6 espaces opérationnels</span> :
+              activation cabinet, parcours chirurgien, espace superviseur,
+              suivi patient, workflow CR et cockpit admin. Tout est prêt pour
+              les premiers pilotes.
             </p>
           </div>
         </div>
 
-        {/* Preuve d'exécution sobre */}
-        <p className="mt-10 max-w-3xl rounded-md bg-ivory px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
+        {/* Preuve d'exécution sobre — conservée */}
+        <p className="mt-8 max-w-3xl rounded-md bg-ivory px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
           <span className="font-medium text-navy-900">Preuve d&apos;exécution :</span> produit
           fonctionnel · activation cabinet · parcours chirurgien · espace superviseur ·
           suivi patient · workflow CR · cockpit admin.
@@ -982,8 +1014,74 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* 2 colonnes bénéfices : Ce que le cabinet évite · Ce que KOVELA apporte */}
-        <div className="mt-10 grid gap-3 md:grid-cols-2">
+        {/* MOBILE — Les 2 colonnes bénéfices vivent dans un accordéon
+            unique replié par défaut, pour ne pas alourdir le scroll
+            pricing. */}
+        <details className="group mt-8 overflow-hidden rounded-2xl bg-ivory ring-1 ring-navy-900/[0.05] md:hidden">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 [&::-webkit-details-marker]:hidden">
+            <p className="text-[12.5px] font-semibold tracking-tight text-navy-900">
+              Voir le détail des bénéfices
+            </p>
+            <svg
+              viewBox="0 0 24 24"
+              className="h-4 w-4 shrink-0 text-charcoal/55 transition-transform group-open:rotate-180"
+              fill="none"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M6 9l6 6 6-6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </summary>
+          <div className="space-y-3 border-t border-navy-900/[0.06] bg-white px-5 py-5">
+            <div>
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+                Ce que le cabinet évite
+              </p>
+              <ul className="mt-3 space-y-2 text-[13px] leading-relaxed text-charcoal/70">
+                {[
+                  "Recherche de profil",
+                  "Recrutement",
+                  "Formation initiale et montée en compétence",
+                  "Congés, absences et indisponibilités",
+                  "Remplacement",
+                  "Management quotidien",
+                  "Coût fixe déconnecté du volume patient",
+                ].map((it) => (
+                  <li key={it} className="flex gap-3">
+                    <span className="mt-[7px] h-1 w-3 shrink-0 bg-navy-900/30" />
+                    {it}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="mt-5 border-t border-navy-900/[0.06] pt-5">
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+                Ce que KOVELA apporte
+              </p>
+              <ul className="mt-3 space-y-2 text-[13px] leading-relaxed text-navy-900">
+                {[
+                  "Référentiel cabinet",
+                  "Supervision humaine",
+                  "Messages programmés",
+                  "Transmissions cabinet",
+                  "Comptes-rendus factuels",
+                  "Interface chirurgien",
+                  "Service structuré toute l'année",
+                  "Expérience patient mieux structurée",
+                  "Chirurgien sollicité au bon moment, avec un dossier clair",
+                ].map((it) => (
+                  <li key={it} className="flex gap-3">
+                    <span className="mt-[7px] h-1 w-3 shrink-0 bg-teal-500/70" />
+                    {it}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        {/* DESKTOP — 2 colonnes bénéfices inchangées (md+). */}
+        <div className="mt-10 hidden gap-3 md:grid md:grid-cols-2">
           <div className="rounded-2xl bg-ivory p-7 ring-1 ring-navy-900/[0.05] hover-lift">
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
               Ce que le cabinet évite

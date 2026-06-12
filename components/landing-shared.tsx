@@ -139,9 +139,32 @@ export function CompliancePills() {
         </span>
       </div>
 
-      {/* Ligne 2 — souveraineté & opération. Masquée sur mobile pour
-          ne pas surcharger le hero : la stats bar affiche déjà HDS+RGPD,
-          et la mention complète revient dès sm+ (tablet/desktop). */}
+      {/* Ligne 2 — souveraineté & opération.
+          Mobile : repliée dans un <details> discret pour ne pas alourdir
+          le hero, mais reste accessible (≠ silencieuse).
+          sm+ : affichée d'emblée. */}
+      <details className="group sm:hidden">
+        <summary className="flex cursor-pointer list-none items-center gap-1 text-[10.5px] tracking-tight text-charcoal/55 [&::-webkit-details-marker]:hidden">
+          <span>+ 5 marqueurs souveraineté</span>
+          <svg
+            viewBox="0 0 12 12"
+            className="h-3 w-3 transition-transform group-open:rotate-180"
+            fill="none"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M3 4.5 6 7.5 9 4.5" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </summary>
+        <p className="mt-2 text-[10.5px] leading-relaxed tracking-tight text-charcoal/55">
+          {complianceSupport.map((label, i) => (
+            <span key={label}>
+              {i > 0 && <span className="mx-1.5 text-charcoal/25">·</span>}
+              {label}
+            </span>
+          ))}
+        </p>
+      </details>
       <p className="hidden text-[10.5px] leading-relaxed tracking-tight text-charcoal/55 sm:block">
         {complianceSupport.map((label, i) => (
           <span key={label}>
