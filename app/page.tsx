@@ -172,22 +172,57 @@ function BadgeCnil() {
   );
 }
 
-function BadgeBureauVeritas() {
+function BadgeHds() {
   return (
-    <svg viewBox="0 0 64 64" className="h-14 w-14" aria-label="Bureau Veritas" role="img">
-      <circle cx="32" cy="32" r="30" fill="#c8202e" />
-      <text x="32" y="29" textAnchor="middle" fontSize="6.5" fontWeight="700" fill="white" letterSpacing="0.4">
-        BUREAU
+    <svg
+      viewBox="0 0 64 64"
+      className="h-14 w-14"
+      aria-label="HDS — Hébergeur de Données de Santé certifié"
+      role="img"
+    >
+      <defs>
+        {/* Arcs pour textes courbés autour du disque intérieur. */}
+        <path id="hds-top-arc" d="M 8 32 A 24 24 0 0 1 56 32" fill="none" />
+        <path id="hds-bot-arc" d="M 56 32 A 24 24 0 0 1 8 32" fill="none" />
+      </defs>
+      {/* Cercle extérieur blanc avec bordure bleue. */}
+      <circle cx="32" cy="32" r="30" fill="#ffffff" stroke="#3b6fb5" strokeWidth="1.2" />
+      {/* CERTIFIED courbé en haut */}
+      <text fontSize="4.5" fontWeight="700" fill="#1e40af" letterSpacing="0.6">
+        <textPath href="#hds-top-arc" startOffset="50%" textAnchor="middle">
+          CERTIFIED
+        </textPath>
       </text>
-      <text x="32" y="38" textAnchor="middle" fontSize="6.5" fontWeight="700" fill="white" letterSpacing="0.4">
-        VERITAS
+      {/* COMPANY courbé en bas */}
+      <text fontSize="4.5" fontWeight="700" fill="#1e40af" letterSpacing="0.6">
+        <textPath href="#hds-bot-arc" startOffset="50%" textAnchor="middle">
+          COMPANY
+        </textPath>
       </text>
-      <text x="32" y="48" textAnchor="middle" fontSize="5" fill="white" opacity="0.85">
-        1828
+      {/* Disque bleu intérieur */}
+      <circle cx="32" cy="32" r="19" fill="#3b6fb5" />
+      {/* HDS principal */}
+      <text
+        x="32"
+        y="32"
+        textAnchor="middle"
+        fontSize="10.5"
+        fontWeight="700"
+        fill="white"
+      >
+        HDS
+      </text>
+      {/* Sous-titre 2 lignes */}
+      <text x="32" y="39" textAnchor="middle" fontSize="3" fill="white" opacity="0.95">
+        Hébergeur de données
+      </text>
+      <text x="32" y="43" textAnchor="middle" fontSize="3" fill="white" opacity="0.95">
+        de santé
       </text>
     </svg>
   );
 }
+
 
 // ─── Données hero — bloc comparatif & barre de preuves ────────────────────
 const beforeKovela = [
@@ -445,10 +480,10 @@ export default function Landing() {
       <section className="border-t border-navy-900/[0.06] bg-white">
         <div className="px-5 py-6 sm:px-10 sm:py-7 lg:px-10 xl:px-16">
           <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-x-7 gap-y-4 sm:gap-x-10">
+            <BadgeHds />
             <BadgeRgpd />
             <BadgeEidas />
             <BadgeCnil />
-            <BadgeBureauVeritas />
           </div>
         </div>
       </section>
