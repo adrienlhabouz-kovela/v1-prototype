@@ -255,8 +255,8 @@ export default function Landing() {
               {/* === MOBILE (< sm) — Option A === */}
               <div className="mt-7 space-y-3 sm:hidden">
                 {/* Sans KOVELA — bg rouge léger */}
-                <div className="rounded-2xl bg-[#FDF4F2] p-6 ring-1 ring-[#D24B3E]/15">
-                  <div className="flex items-center gap-2">
+                <div className="rounded-2xl bg-[#FDF4F2] p-6 ring-1 ring-[#D24B3E]/15 text-center">
+                  <div className="flex items-center justify-center gap-2">
                     <span className="rounded-md bg-[#D24B3E]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#D24B3E]">
                       Sans
                     </span>
@@ -264,7 +264,7 @@ export default function Landing() {
                       KOVELA
                     </h3>
                   </div>
-                  <ul className="mt-4 space-y-2.5">
+                  <ul className="mt-4 inline-flex flex-col items-start gap-2.5 text-left">
                     {beforeKovela.map((t) => (
                       <li
                         key={t}
@@ -281,8 +281,8 @@ export default function Landing() {
                 </div>
 
                 {/* Avec KOVELA — bg teal léger */}
-                <div className="rounded-2xl bg-[#EAF7F4] p-6 ring-1 ring-teal-500/20">
-                  <div className="flex items-center gap-2">
+                <div className="rounded-2xl bg-[#EAF7F4] p-6 ring-1 ring-teal-500/20 text-center">
+                  <div className="flex items-center justify-center gap-2">
                     <span className="rounded-md bg-teal-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-teal-700">
                       Avec
                     </span>
@@ -290,7 +290,7 @@ export default function Landing() {
                       KOVELA
                     </h3>
                   </div>
-                  <ul className="mt-4 space-y-2.5">
+                  <ul className="mt-4 inline-flex flex-col items-start gap-2.5 text-left">
                     {withKovela.map((t) => (
                       <li
                         key={t}
@@ -312,11 +312,11 @@ export default function Landing() {
 
                 <div className="grid grid-cols-2 gap-0">
                   {/* Sans KOVELA */}
-                  <div className="pr-8">
+                  <div className="pr-8 text-center">
                     <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
                       Sans KOVELA
                     </h3>
-                    <ul className="mt-3.5 space-y-2">
+                    <ul className="mt-3.5 inline-flex flex-col items-start gap-2 text-left">
                       {beforeKovela.map((t) => (
                         <li
                           key={t}
@@ -333,11 +333,11 @@ export default function Landing() {
                   </div>
 
                   {/* Avec KOVELA */}
-                  <div className="border-l border-navy-900/[0.07] pl-8">
+                  <div className="border-l border-navy-900/[0.07] pl-8 text-center">
                     <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
                       Avec KOVELA
                     </h3>
-                    <ul className="mt-3.5 space-y-2">
+                    <ul className="mt-3.5 inline-flex flex-col items-start gap-2 text-left">
                       {withKovela.map((t) => (
                         <li
                           key={t}
