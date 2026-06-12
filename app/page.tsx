@@ -439,26 +439,23 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Colonne droite — slot photo.
-              Dépose la photo finale dans public/hero-consultation.jpg
-              (n'importe quel ratio paysage / portrait — couvre la zone
-              avec bg-cover). Tant qu'elle n'est pas là, gradient
-              ivoire→bone→cream + voile teal léger en fallback. */}
+          {/* Colonne droite — photo hero.
+              Sources empilées : WebP en priorité, puis JPG (si déposé
+              plus tard), puis gradient crème en filet de sécurité. */}
           <div
             className="relative min-h-[220px] lg:min-h-[480px]"
             style={{
               backgroundImage:
-                "url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
-              backgroundSize: "cover, cover",
-              backgroundPosition: "center, center",
-              backgroundRepeat: "no-repeat, no-repeat",
+                "url('/hero-consultation.webp'), url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
+              backgroundSize: "cover, cover, cover",
+              backgroundPosition: "center, center, center",
+              backgroundRepeat: "no-repeat, no-repeat, no-repeat",
             }}
             role="img"
             aria-label="Chirurgien en consultation post-opératoire avec une patiente"
           >
-            {/* Voile teal très léger — discret en fallback, sera quasi
-                invisible une fois la vraie photo en place. */}
-            <div className="pointer-events-none absolute inset-0 bg-teal-sheen opacity-30" />
+            {/* Voile teal quasi invisible — n'altère pas le rendu photo. */}
+            <div className="pointer-events-none absolute inset-0 bg-teal-sheen opacity-20" />
           </div>
         </div>
       </section>
