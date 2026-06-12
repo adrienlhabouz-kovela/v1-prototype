@@ -15,15 +15,15 @@ const config: Config = {
         // cast bleu, plus juste pour le secteur (chirurgie esthétique
         // privée premium B2B).
         navy: {
-          DEFAULT: "#16191D",
-          50: "#F1F2F3",
-          100: "#D9DBDE",
-          200: "#B6BAC0",
-          600: "#3A3F47",
-          700: "#292D34",
-          800: "#1E2127",
-          900: "#16191D",
-          950: "#0C0E11",
+          DEFAULT: "#1A1916",
+          50: "#F2F1EF",
+          100: "#DCDAD6",
+          200: "#BAB7B0",
+          600: "#3F3D38",
+          700: "#2F2C27",
+          800: "#22201C",
+          900: "#1A1916",
+          950: "#100F0D",
         },
         teal: {
           DEFAULT: "#1FA7A0", // Surgical Teal
@@ -112,11 +112,11 @@ const config: Config = {
       },
       boxShadow: {
         // Ombres très douces — registre premium / B2B santé, calées
-        // sur l'anthracite warm (#16191D).
-        soft: "0 1px 1px rgba(22,25,29,0.03)",
-        card: "0 1px 2px rgba(22,25,29,0.025), 0 4px 14px -8px rgba(22,25,29,0.08)",
-        lift: "0 8px 28px -14px rgba(22,25,29,0.18)",
-        hairline: "inset 0 0 0 1px rgba(22,25,29,0.04)",
+        // sur l'anthracite warm (#1A1916, expresso/charbon).
+        soft: "0 1px 1px rgba(26,25,22,0.03)",
+        card: "0 1px 2px rgba(26,25,22,0.025), 0 4px 14px -8px rgba(26,25,22,0.08)",
+        lift: "0 8px 28px -14px rgba(26,25,22,0.18)",
+        hairline: "inset 0 0 0 1px rgba(26,25,22,0.04)",
       },
       borderRadius: {
         xl: "0.875rem",
