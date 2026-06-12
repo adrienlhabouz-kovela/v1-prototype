@@ -212,19 +212,91 @@ export default function Landing() {
                 <CompliancePills />
               </div>
 
-              {/* Carte comparative Avant / Avec — proportions compactes,
-                  ratio largeur >> hauteur calé sur la réf V3. */}
-              <div className="relative mt-7 rounded-2xl bg-white p-5 shadow-card ring-1 ring-navy-900/[0.05] sm:p-6">
+              {/* ============================================================
+                  Card Avant / Avec KOVELA
+                  --------------------------------------------------------------
+                  Mobile (< sm) : 2 cartes empilées visuellement contrastées
+                    (rouge léger pour Avant, teal léger pour Avec) avec un
+                    pastille "VS" centrée entre les deux. Pattern Apple :
+                    contraste immédiat sans interaction.
+                  Desktop (sm+) : carte unifiée à 2 colonnes avec VS badge
+                    sur le séparateur — inchangée.
+                  ============================================================ */}
+
+              {/* === MOBILE (< sm) — Option A === */}
+              <div className="mt-7 space-y-3 sm:hidden">
+                {/* Avant KOVELA — bg rouge léger */}
+                <div className="rounded-2xl bg-[#FDF4F2] p-5 ring-1 ring-[#D24B3E]/15">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md bg-[#D24B3E]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#D24B3E]">
+                      Avant
+                    </span>
+                    <h3 className="font-display text-[16.5px] font-semibold tracking-tight text-navy-900">
+                      KOVELA
+                    </h3>
+                  </div>
+                  <ul className="mt-4 space-y-2.5">
+                    {beforeKovela.map((t) => (
+                      <li
+                        key={t}
+                        className="flex items-start gap-2.5 text-[13px] leading-snug text-charcoal/80"
+                      >
+                        <IconCircleX className="mt-px h-[16px] w-[16px] shrink-0 text-[#D24B3E]" />
+                        <span>{t}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-4 inline-flex rounded-md bg-[#D24B3E]/10 px-2.5 py-1 text-[12px] font-semibold tracking-tight text-[#D24B3E]">
+                    Coût caché élevé
+                  </p>
+                </div>
+
+                {/* Séparateur VS rond centré */}
+                <div className="flex items-center justify-center">
+                  <span className="-my-1 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[10px] font-semibold uppercase tracking-wide text-teal-700 shadow-card ring-4 ring-white">
+                    VS
+                  </span>
+                </div>
+
+                {/* Avec KOVELA — bg teal léger */}
+                <div className="rounded-2xl bg-[#EAF7F4] p-5 ring-1 ring-teal-500/20">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md bg-teal-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-teal-700">
+                      Avec
+                    </span>
+                    <h3 className="font-display text-[16.5px] font-semibold tracking-tight text-navy-900">
+                      KOVELA
+                    </h3>
+                  </div>
+                  <ul className="mt-4 space-y-2.5">
+                    {withKovela.map((t) => (
+                      <li
+                        key={t}
+                        className="flex items-start gap-2.5 text-[13px] leading-snug text-navy-900"
+                      >
+                        <IconCircleCheck className="mt-px h-[16px] w-[16px] shrink-0 text-teal-600" />
+                        <span>{t}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-4 inline-flex rounded-md bg-teal-500/15 px-2.5 py-1 text-[12px] font-semibold tracking-tight text-teal-700">
+                    ROI rapide et mesurable
+                  </p>
+                </div>
+              </div>
+
+              {/* === DESKTOP (sm+) — Carte unifiée actuelle inchangée === */}
+              <div className="relative mt-7 hidden rounded-2xl bg-white p-5 shadow-card ring-1 ring-navy-900/[0.05] sm:block sm:p-6">
                 {/* Badge VS sur le séparateur */}
-                <div className="pointer-events-none absolute left-1/2 top-[22px] z-10 hidden -translate-x-1/2 sm:block">
+                <div className="pointer-events-none absolute left-1/2 top-[22px] z-10 -translate-x-1/2">
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-[10px] font-semibold uppercase tracking-wide text-teal-700 ring-4 ring-white">
                     VS
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-0">
+                <div className="grid grid-cols-2 gap-0">
                   {/* Avant KOVELA */}
-                  <div className="sm:pr-6">
+                  <div className="pr-6">
                     <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
                       Avant KOVELA
                     </h3>
@@ -245,7 +317,7 @@ export default function Landing() {
                   </div>
 
                   {/* Avec KOVELA */}
-                  <div className="sm:border-l sm:border-navy-900/[0.07] sm:pl-6">
+                  <div className="border-l border-navy-900/[0.07] pl-6">
                     <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
                       Avec KOVELA
                     </h3>
