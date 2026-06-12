@@ -231,54 +231,55 @@ export default function Landing() {
                 </a>
               </div>
 
-              {/* Carte comparative Avant / Avec */}
-              <div className="relative mt-8 rounded-2xl bg-white p-7 shadow-card ring-1 ring-navy-900/[0.05] sm:p-8">
+              {/* Carte comparative Avant / Avec — proportions compactes,
+                  ratio largeur >> hauteur calé sur la réf V3. */}
+              <div className="relative mt-7 rounded-2xl bg-white p-5 shadow-card ring-1 ring-navy-900/[0.05] sm:p-6">
                 {/* Badge VS sur le séparateur */}
-                <div className="pointer-events-none absolute left-1/2 top-[30px] z-10 hidden -translate-x-1/2 sm:block">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-[10.5px] font-semibold uppercase tracking-wide text-teal-700 ring-4 ring-white">
+                <div className="pointer-events-none absolute left-1/2 top-[22px] z-10 hidden -translate-x-1/2 sm:block">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-[10px] font-semibold uppercase tracking-wide text-teal-700 ring-4 ring-white">
                     VS
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 sm:gap-0">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-0">
                   {/* Avant KOVELA */}
-                  <div className="sm:pr-8">
-                    <h3 className="font-display text-[18px] font-medium tracking-tight text-navy-900">
+                  <div className="sm:pr-6">
+                    <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
                       Avant KOVELA
                     </h3>
-                    <ul className="mt-5 space-y-3">
+                    <ul className="mt-3.5 space-y-2">
                       {beforeKovela.map((t) => (
                         <li
                           key={t}
-                          className="flex items-start gap-2.5 text-[13.5px] leading-snug text-charcoal/75"
+                          className="flex items-start gap-2 text-[12.5px] leading-snug text-charcoal/75"
                         >
-                          <IconCircleX className="mt-px h-[18px] w-[18px] shrink-0 text-[#D24B3E]" />
+                          <IconCircleX className="mt-px h-[15px] w-[15px] shrink-0 text-[#D24B3E]" />
                           {t}
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-6 text-[14px] font-semibold tracking-tight text-[#D24B3E]">
+                    <p className="mt-4 text-[13px] font-semibold tracking-tight text-[#D24B3E]">
                       Coût caché élevé
                     </p>
                   </div>
 
                   {/* Avec KOVELA */}
-                  <div className="sm:border-l sm:border-navy-900/[0.07] sm:pl-8">
-                    <h3 className="font-display text-[18px] font-medium tracking-tight text-navy-900">
+                  <div className="sm:border-l sm:border-navy-900/[0.07] sm:pl-6">
+                    <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
                       Avec KOVELA
                     </h3>
-                    <ul className="mt-5 space-y-3">
+                    <ul className="mt-3.5 space-y-2">
                       {withKovela.map((t) => (
                         <li
                           key={t}
-                          className="flex items-start gap-2.5 text-[13.5px] leading-snug text-navy-900"
+                          className="flex items-start gap-2 text-[12.5px] leading-snug text-navy-900"
                         >
-                          <IconCircleCheck className="mt-px h-[18px] w-[18px] shrink-0 text-teal-500" />
+                          <IconCircleCheck className="mt-px h-[15px] w-[15px] shrink-0 text-teal-500" />
                           {t}
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-6 text-[14px] font-semibold tracking-tight text-teal-600">
+                    <p className="mt-4 text-[13px] font-semibold tracking-tight text-teal-600">
                       ROI rapide et mesurable
                     </p>
                   </div>
