@@ -279,7 +279,7 @@ export default function Landing() {
       </section>
 
       {/* Section B — Problème cabinet */}
-      <section id="probleme" className="mx-auto max-w-6xl px-6 py-20">
+      <section id="probleme" className="mx-auto max-w-6xl px-6 py-14">
         <Eyebrow>Le constat</Eyebrow>
         <h2 className="max-w-2xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Après l&apos;intervention, tout repose encore trop souvent sur la disponibilité du cabinet.
@@ -289,7 +289,7 @@ export default function Landing() {
           historiques éclatés. Une photo arrive par message, une question suit
           deux heures plus tard, puis il faut reconstituer le contexte.
         </p>
-        <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {pains.map((p) => (
             <div
               key={p.t}
@@ -307,12 +307,12 @@ export default function Landing() {
 
       {/* Section C — Solution KOVELA · 5 piliers */}
       <section id="solution" className="border-y border-navy-900/[0.06] bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-24">
+        <div className="mx-auto max-w-6xl px-6 py-16">
           <Eyebrow>La solution KOVELA</Eyebrow>
           <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
             Le flux opérationnel est pris en charge — humain et IA, encadrés par votre référentiel.
           </h2>
-          <div className="mt-12 grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-5">
             {solutions.map((p, i) => (
               <div
                 key={p.t}
@@ -328,7 +328,7 @@ export default function Landing() {
               </div>
             ))}
           </div>
-          <blockquote className="mt-12 rounded-2xl border-l-2 border-teal-500/80 bg-ivory p-7">
+          <blockquote className="mt-10 rounded-2xl border-l-2 border-teal-500/80 bg-ivory p-7">
             <p className="font-display text-[16.5px] leading-relaxed tracking-tight text-navy-900 md:text-[18px]">
               KOVELA n&apos;est pas un logiciel que le chirurgien doit gérer. C&apos;est un{" "}
               <span className="font-semibold">service opéré</span> qui structure le suivi
@@ -344,7 +344,7 @@ export default function Landing() {
 
       {/* Section E — Baseline terrain (douleur opérationnelle mesurable) */}
       <section className="border-y border-navy-900/[0.06] bg-white">
-        <div className="mx-auto max-w-5xl px-6 py-20">
+        <div className="mx-auto max-w-5xl px-6 py-14">
           <Eyebrow>Une douleur opérationnelle mesurable</Eyebrow>
           <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
             60 à 90 minutes de travail humain par patient, sur 3 à 15 jours.
@@ -367,7 +367,7 @@ export default function Landing() {
 
       {/* Bande preuve terrain — prudente, non chiffrée, non datée. */}
       <section className="border-b border-navy-900/[0.06] bg-ivory">
-        <div className="mx-auto max-w-6xl px-6 py-5">
+        <div className="mx-auto max-w-6xl px-6 py-3">
           <p className="text-[12.5px] leading-relaxed text-charcoal/65">
             <span className="font-semibold text-navy-900">Construit à partir de retours terrain</span>
             {" "}de chirurgiens esthétiques et d&apos;une expérience opérationnelle post-opératoire
@@ -377,12 +377,12 @@ export default function Landing() {
       </section>
 
       {/* Section F — Comment ça marche */}
-      <section id="etapes" className="mx-auto max-w-6xl px-6 py-20">
+      <section id="etapes" className="mx-auto max-w-6xl px-6 py-14">
         <Eyebrow>Comment ça marche</Eyebrow>
         <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           De la mise en place au CR disponible chirurgien, en cinq étapes.
         </h2>
-        <ol className="mt-12 grid gap-3 md:grid-cols-5">
+        <ol className="mt-10 grid gap-3 md:grid-cols-5">
           {steps.map((s, i) => (
             <li
               key={s.t}
@@ -407,7 +407,7 @@ export default function Landing() {
 
       {/* Section G — IA assistive (compactée, objection chirurgien préservée) */}
       <section id="ia" className="bg-navy-depth text-white">
-        <div className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mx-auto max-w-6xl px-6 py-12">
           <Eyebrow>
             <span className="text-teal-300/90">IA assistive · jamais autonome</span>
           </Eyebrow>
@@ -452,7 +452,7 @@ export default function Landing() {
 
       {/* Section H — Cadre opérationnel KOVELA · architecture de confiance */}
       <section id="cadre" className="border-y border-navy-900/[0.06] bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mx-auto max-w-6xl px-6 py-14">
           <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
             <BrandMark size={44} className="shrink-0 text-navy-900" />
             <div>
@@ -565,7 +565,7 @@ export default function Landing() {
       </section>
 
       {/* Section I — Tarification · Moins qu'un mi-temps. Plus qu'un outil. */}
-      <section id="modele" className="mx-auto max-w-6xl px-6 py-20">
+      <section id="modele" className="mx-auto max-w-6xl px-6 py-14">
         <Eyebrow>Tarification</Eyebrow>
         <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Moins qu&apos;un mi-temps. Plus qu&apos;un outil.
@@ -576,7 +576,7 @@ export default function Landing() {
         </p>
 
         {/* Card pricing — fixe + variable, hiérarchie forte, prix lisible */}
-        <div className="mt-12 overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-navy-900/[0.06]">
+        <div className="mt-10 overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-navy-900/[0.06]">
           <div className="flex flex-wrap items-center gap-2 border-b border-navy-900/[0.05] bg-ivory px-7 py-4">
             <span className="rounded-md bg-navy-900 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white">
               Offre pilote
@@ -640,7 +640,7 @@ export default function Landing() {
         </div>
 
         {/* 2 colonnes bénéfices : Ce que le cabinet évite · Ce que KOVELA apporte */}
-        <div className="mt-12 grid gap-3 md:grid-cols-2">
+        <div className="mt-10 grid gap-3 md:grid-cols-2">
           <div className="rounded-2xl bg-ivory p-7 ring-1 ring-navy-900/[0.05]">
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
               Ce que le cabinet évite
@@ -709,7 +709,7 @@ export default function Landing() {
       </section>
 
       {/* Section Ibis — Un projet construit sur le terrain · 3 cards (Doctrine fondue dans §G/§H) */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="mx-auto max-w-6xl px-6 py-12">
         <Eyebrow>Un projet construit sur le terrain</Eyebrow>
         <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Qui porte KOVELA, et comment.
@@ -769,7 +769,7 @@ export default function Landing() {
 
       {/* Section J — CTA final */}
       <section className="bg-navy-depth text-white">
-        <div className="mx-auto max-w-4xl px-6 py-24 text-center">
+        <div className="mx-auto max-w-4xl px-6 py-16 text-center">
           <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] md:text-[2.4rem]">
             Structurer le suivi post-opératoire de votre cabinet.
           </h2>
