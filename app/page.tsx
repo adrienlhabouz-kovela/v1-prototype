@@ -55,17 +55,6 @@ const solutions = [
   { t: "Transmission cabinet", d: "Le cabinet est sollicité au bon moment, avec les bons éléments." },
 ];
 
-const cabinetChanges = [
-  "Moins de messages dispersés",
-  "Moins de relances manuelles",
-  "Patients mieux guidés",
-  "CR factuels disponibles",
-  "Transmissions cabinet plus claires",
-  "Chirurgien sollicité avec un dossier prêt",
-  "Expérience patient mieux structurée",
-  "Démarrage accompagné · 2 ou 3 interventions prioritaires",
-];
-
 const steps = [
   { t: "Mise en place initiale", d: "15 min pour cadrer le cabinet, les contacts et les règles de base." },
   { t: "Référentiel essentiel", d: "30–60 min avec KOVELA pour cadrer 2 ou 3 interventions prioritaires." },
@@ -290,15 +279,15 @@ export default function Landing() {
       </section>
 
       {/* Section B — Problème cabinet */}
-      <section id="probleme" className="mx-auto max-w-6xl px-6 py-24">
+      <section id="probleme" className="mx-auto max-w-6xl px-6 py-20">
         <Eyebrow>Le constat</Eyebrow>
         <h2 className="max-w-2xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Après l&apos;intervention, tout repose encore trop souvent sur la disponibilité du cabinet.
         </h2>
         <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-charcoal/65">
-          Le post-opératoire est un moment clé de l&apos;expérience patient. Il vit pourtant entre
-          canaux dispersés, relances manuelles et historiques éclatés. Une photo arrive par
-          message, une question suit deux heures plus tard, puis il faut reconstituer le contexte.
+          Le post-op vit entre canaux dispersés, relances manuelles et
+          historiques éclatés. Une photo arrive par message, une question suit
+          deux heures plus tard, puis il faut reconstituer le contexte.
         </p>
         <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {pains.map((p) => (
@@ -353,39 +342,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section D — Ce qui change pour votre cabinet */}
-      <section className="mx-auto max-w-6xl px-6 py-24">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
-          <div>
-            <Eyebrow>Ce qui change pour votre cabinet</Eyebrow>
-            <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
-              Le suivi devient structuré, lisible et exploitable.
-            </h2>
-            <p className="mt-5 text-[14.5px] leading-relaxed text-charcoal/65">
-              Pas un outil de plus à gérer. Un service opéré qui prend en charge le flux
-              post-opératoire de votre cabinet, dans le respect de votre référentiel.
-            </p>
-            <Link
-              href="/chirurgien"
-              className="mt-7 inline-block rounded-lg bg-navy-900 px-5 py-3 text-[13px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
-            >
-              Voir l&apos;espace chirurgien
-            </Link>
-          </div>
-          <div className="grid gap-2.5 sm:grid-cols-2">
-            {cabinetChanges.map((b) => (
-              <div
-                key={b}
-                className="flex items-start gap-3 rounded-xl bg-white p-4 text-[13px] tracking-tight text-navy-900 shadow-soft ring-1 ring-navy-900/[0.05]"
-              >
-                <span className="mt-1 h-1 w-3 shrink-0 bg-teal-500/70" />
-                {b}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Section E — Baseline terrain (douleur opérationnelle mesurable) */}
       <section className="border-y border-navy-900/[0.06] bg-white">
         <div className="mx-auto max-w-5xl px-6 py-20">
@@ -394,12 +350,13 @@ export default function Landing() {
             60 à 90 minutes de travail humain par patient, sur 3 à 15 jours.
           </h2>
           <p className="mt-5 max-w-3xl text-[14.5px] leading-relaxed text-charcoal/70">
-            En suivi manuel WhatsApp / audio, un patient post-opératoire représente généralement
-            <span className="font-medium text-navy-900"> 60 à 90 minutes</span> de travail humain
-            sur <span className="font-medium text-navy-900">3 à 15 jours</span> selon
-            l&apos;intervention. KOVELA structure ce temps grâce à un référentiel cabinet, une
-            supervision humaine, des messages programmés, des comptes-rendus factuels et une IA
-            assistive.
+            En suivi manuel (WhatsApp, audio, SMS), un patient post-op représente
+            généralement{" "}
+            <span className="font-medium text-navy-900">60 à 90 minutes</span> de
+            travail humain sur{" "}
+            <span className="font-medium text-navy-900">3 à 15 jours</span>.
+            KOVELA structure ce temps : référentiel cabinet, supervision humaine,
+            CR factuels.
           </p>
           <p className="mt-5 max-w-3xl rounded-md bg-ivory px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/60 ring-1 ring-navy-900/[0.04]">
             Baseline terrain — à mesurer et affiner en pilote KOVELA. Aucun gain chiffré n&apos;est
@@ -420,7 +377,7 @@ export default function Landing() {
       </section>
 
       {/* Section F — Comment ça marche */}
-      <section id="etapes" className="mx-auto max-w-6xl px-6 py-24">
+      <section id="etapes" className="mx-auto max-w-6xl px-6 py-20">
         <Eyebrow>Comment ça marche</Eyebrow>
         <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           De la mise en place au CR disponible chirurgien, en cinq étapes.
@@ -442,30 +399,28 @@ export default function Landing() {
           ))}
         </ol>
         <p className="mt-8 max-w-3xl text-[12.5px] leading-relaxed text-charcoal/55">
-          Démarrage accompagné par l&apos;équipe KOVELA. Le référentiel est relu avec vous avant
-          tout usage opérationnel.
-        </p>
-        <p className="mt-3 max-w-3xl text-[12.5px] leading-relaxed text-charcoal/55">
-          Le patient accède au suivi via un lien sécurisé, sans application à télécharger.
+          Démarrage accompagné par l&apos;équipe KOVELA. Référentiel relu avant
+          tout usage opérationnel. Lien patient sécurisé, sans application à
+          télécharger.
         </p>
       </section>
 
-      {/* Section G — IA assistive */}
+      {/* Section G — IA assistive (compactée, objection chirurgien préservée) */}
       <section id="ia" className="bg-navy-depth text-white">
-        <div className="mx-auto max-w-6xl px-6 py-24">
+        <div className="mx-auto max-w-6xl px-6 py-16">
           <Eyebrow>
             <span className="text-teal-300/90">IA assistive · jamais autonome</span>
           </Eyebrow>
-          <h2 className="max-w-2xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-white md:text-[2.4rem]">
+          <h2 className="max-w-2xl font-sans text-[1.8rem] font-semibold leading-tight tracking-[-0.022em] text-white md:text-[2.1rem]">
             L&apos;IA aide l&apos;équipe. Elle ne décide jamais.
           </h2>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl bg-white/[0.04] p-7 ring-1 ring-white/[0.08]">
+          <div className="mt-8 grid gap-3 md:grid-cols-2">
+            <div className="rounded-2xl bg-white/[0.04] p-5 ring-1 ring-white/[0.08]">
               <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-300/90">
                 L&apos;IA KOVELA fait
               </h3>
-              <ul className="mt-5 space-y-2.5 text-[13.5px] leading-relaxed text-navy-100/85">
+              <ul className="mt-3.5 space-y-2 text-[13px] leading-relaxed text-navy-100/85">
                 {aiDoes.map((x) => (
                   <li key={x} className="flex gap-3">
                     <span className="mt-[7px] h-1 w-3 shrink-0 bg-teal-400/70" />
@@ -474,11 +429,11 @@ export default function Landing() {
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl bg-white/[0.04] p-7 ring-1 ring-white/[0.08]">
+            <div className="rounded-2xl bg-white/[0.04] p-5 ring-1 ring-white/[0.08]">
               <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-navy-100/70">
                 L&apos;IA KOVELA ne fait jamais
               </h3>
-              <ul className="mt-5 space-y-2.5 text-[13.5px] leading-relaxed text-navy-100/70">
+              <ul className="mt-3.5 space-y-2 text-[13px] leading-relaxed text-navy-100/70">
                 {aiDoesNever.map((x) => (
                   <li key={x} className="flex gap-3">
                     <span className="mt-[7px] h-1 w-3 shrink-0 bg-navy-100/30" />
@@ -489,43 +444,15 @@ export default function Landing() {
             </div>
           </div>
 
-          <p className="mt-10 font-display text-[24px] italic leading-tight tracking-[-0.01em] text-teal-200/85">
+          <p className="mt-8 font-display text-[20px] italic leading-tight tracking-[-0.01em] text-teal-200/85">
             L&apos;IA prépare. L&apos;humain valide. Le chirurgien décide.
           </p>
-          <p className="mt-5 max-w-2xl text-[11.5px] leading-relaxed text-navy-100/45">
-            KOVELA ne décide pas médicalement. KOVELA organise les échanges, documente le suivi
-            et transmet au cabinet selon les règles définies.
-          </p>
-        </div>
-      </section>
-
-      {/* Section bonus — Supervision & qualité (compact) */}
-      <section className="mx-auto max-w-6xl px-6 py-14">
-        <Eyebrow>Supervision &amp; qualité opérationnelle</Eyebrow>
-        <p className="mt-3 max-w-3xl text-[14px] leading-relaxed text-charcoal/70">
-          KOVELA ne scale pas seulement par la tech. La charge, les CR, les transmissions cabinet
-          et la qualité opérationnelle sont suivis dans l&apos;interface.
-        </p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          {[
-            "Charge superviseurs",
-            "CR en file de validation",
-            "Transmissions cabinet",
-            "Qualité opérationnelle",
-          ].map((c) => (
-            <span
-              key={c}
-              className="rounded-md bg-white px-2.5 py-1 text-[11px] font-medium tracking-tight text-navy-700 ring-1 ring-navy-100"
-            >
-              {c}
-            </span>
-          ))}
         </div>
       </section>
 
       {/* Section H — Cadre opérationnel KOVELA · architecture de confiance */}
       <section id="cadre" className="border-y border-navy-900/[0.06] bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-24">
+        <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
             <BrandMark size={44} className="shrink-0 text-navy-900" />
             <div>
@@ -535,9 +462,9 @@ export default function Landing() {
               </h2>
               <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-charcoal/70">
                 <span className="font-semibold text-navy-900">HDS / RGPD dès la conception.</span>{" "}
-                KOVELA est construit dès le départ pour être opéré dans un environnement HDS, avec
-                consentement patient, traçabilité des actions, séparation stricte des rôles et
-                documentation RGPD.
+                Consentement patient, traçabilité des actions, séparation
+                stricte des rôles, documentation RGPD. Site public hors HDS,
+                application métier pensée pour HDS dès le premier jour.
               </p>
 
               {/* 3 piliers : Humain · IA encadrée · Traçabilité */}
@@ -587,8 +514,9 @@ export default function Landing() {
               </div>
 
               {/* Qui supervise — profils terrain senior, non médicaux. Répond à
-                  l'objection chirurgien : qui lit mes patients et quel est leur niveau. */}
-              <div className="mt-10 rounded-2xl bg-ivory px-5 py-5 ring-1 ring-navy-900/[0.05]">
+                  l'objection chirurgien : qui lit mes patients et quel est leur niveau.
+                  Wording condensé : 2 paragraphes courts + 1 note horaires courte. */}
+              <div className="mt-8 rounded-2xl bg-ivory px-5 py-5 ring-1 ring-navy-900/[0.05]">
                 <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
                   Qui supervise ?
                 </p>
@@ -596,61 +524,27 @@ export default function Landing() {
                   Une supervision issue du terrain.
                 </p>
                 <p className="mt-3 max-w-3xl text-[13.5px] leading-relaxed text-navy-900">
-                  Les superviseurs KOVELA sont des profils senior issus du bloc, du cabinet ou
-                  du suivi patient — aides opératoires expérimentées, infirmières ou
-                  coordinatrices de parcours — formés au référentiel KOVELA et aux limites non
-                  médicales du service.
+                  Profils senior issus du bloc, du cabinet ou du suivi patient —
+                  aides opératoires, infirmières, coordinatrices — formés au
+                  référentiel KOVELA. Ils structurent et documentent, sans
+                  diagnostiquer, prescrire ni interpréter.
                 </p>
-                <p className="mt-2 max-w-3xl text-[13.5px] leading-relaxed text-navy-900">
-                  Ils ne diagnostiquent pas, ne prescrivent pas et n&apos;interprètent pas. Ils
-                  structurent le suivi, documentent les échanges et transmettent au cabinet
-                  selon le cadre validé avec le chirurgien.
-                </p>
-                <p className="mt-4 max-w-3xl rounded-md bg-white/60 px-3 py-2 text-[12px] leading-relaxed text-charcoal/70 ring-1 ring-navy-900/[0.04]">
+                <p className="mt-3 max-w-3xl rounded-md bg-white/60 px-3 py-2 text-[12px] leading-relaxed text-charcoal/70 ring-1 ring-navy-900/[0.04]">
                   <span className="font-medium text-navy-900">Horaires du service.</span>{" "}
-                  KOVELA opère le suivi sur une plage quotidienne élargie, définie avec le
-                  cabinet — par exemple 8h–20h. Hors horaires, les messages sont conservés et
-                  repris à l&apos;ouverture du service ; les situations urgentes restent
-                  orientées vers les contacts d&apos;urgence définis par le chirurgien.
+                  Plage opérée définie avec le cabinet (par ex. 8h–20h). Hors
+                  horaires : messages conservés, situations urgentes orientées
+                  vers les contacts définis par le chirurgien.
                 </p>
               </div>
 
               {/* Phrase doctrine */}
-              <p className="mt-10 max-w-3xl font-display text-[20px] italic leading-relaxed tracking-tight text-navy-900">
+              <p className="mt-8 max-w-3xl font-display text-[20px] italic leading-relaxed tracking-tight text-navy-900">
                 KOVELA ne remplace pas le chirurgien. KOVELA structure, documente et transmet.
               </p>
 
-              {/* 2 cards site public / app métier — concept architectural distinct (HDS) */}
-              <div className="mt-10 grid gap-3 md:grid-cols-2">
-                <div className="rounded-2xl bg-ivory p-6 ring-1 ring-navy-900/[0.05]">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
-                    Site public
-                  </p>
-                  <p className="mt-2.5 font-display text-[14.5px] font-semibold tracking-tight text-navy-900">
-                    Hors HDS — aucune donnée patient
-                  </p>
-                  <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
-                    Présentation du service, contact démo. Aucun formulaire patient, aucune
-                    collecte de donnée de santé.
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-ivory p-6 ring-1 ring-navy-900/[0.05]">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
-                    Application métier cible
-                  </p>
-                  <p className="mt-2.5 font-display text-[14.5px] font-semibold tracking-tight text-navy-900">
-                    Pensée pour HDS, RGPD, principes CNIL
-                  </p>
-                  <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
-                    Accès par rôle, traçabilité, minimisation, droits des personnes. IA assistive
-                    désactivable et loggée.
-                  </p>
-                </div>
-              </div>
-
               {/* Trust logos — visuels concrets des certifications/conformités
                   visées par l'architecture KOVELA. */}
-              <div className="mt-10 rounded-2xl border border-navy-900/[0.06] bg-white p-7">
+              <div className="mt-8 rounded-2xl border border-navy-900/[0.06] bg-white p-7">
                 <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
                   Certifications &amp; conformités visées
                 </p>
@@ -665,25 +559,19 @@ export default function Landing() {
                   ))}
                 </div>
               </div>
-
-              <p className="mt-8 text-[11.5px] leading-relaxed text-charcoal/45">
-                Prototype de démonstration — hébergement production, certification et
-                documentation juridique finalisés avant tout usage réel. Ce site est un
-                démonstrateur : aucune donnée patient n&apos;y est collectée.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Section I — Tarification · Moins qu'un mi-temps. Plus qu'un outil. */}
-      <section id="modele" className="mx-auto max-w-6xl px-6 py-24">
+      <section id="modele" className="mx-auto max-w-6xl px-6 py-20">
         <Eyebrow>Tarification</Eyebrow>
         <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Moins qu&apos;un mi-temps. Plus qu&apos;un outil.
         </h2>
         <p className="mt-5 max-w-3xl text-[14.5px] leading-relaxed text-charcoal/70">
-          KOVELA donne accès à une organisation post-opératoire structurée, sans créer un poste
+          Accès à une organisation post-op structurée, sans créer un poste
           supplémentaire dans le cabinet.
         </p>
 
@@ -800,9 +688,8 @@ export default function Landing() {
         </div>
 
         <p className="mt-8 max-w-3xl text-[11.5px] leading-relaxed text-charcoal/55">
-          Le cabinet conserve la main, sans porter seul la charge d&apos;organisation du suivi.
-          Les conditions pilotes peuvent être ajustées selon le volume patient, le niveau
-          d&apos;accompagnement et la configuration du cabinet.
+          Conditions pilotes ajustables selon volume patient, niveau
+          d&apos;accompagnement et configuration du cabinet.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-2.5">
@@ -821,14 +708,14 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section Ibis — Un projet construit sur le terrain · réassurance 4 piliers */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
+      {/* Section Ibis — Un projet construit sur le terrain · 3 cards (Doctrine fondue dans §G/§H) */}
+      <section className="mx-auto max-w-6xl px-6 py-16">
         <Eyebrow>Un projet construit sur le terrain</Eyebrow>
         <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Qui porte KOVELA, et comment.
         </h2>
 
-        <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {/* Fondateur */}
           <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
@@ -854,20 +741,6 @@ export default function Landing() {
             <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
               Le service est construit à partir de retours terrain de chirurgiens esthétiques
               privés et d&apos;années d&apos;expérience cabinet.
-            </p>
-          </div>
-
-          {/* Doctrine */}
-          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
-              Doctrine
-            </p>
-            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
-              IA assistive · validation humaine
-            </h3>
-            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
-              IA assistive, validation humaine, chirurgien décisionnaire. KOVELA ne diagnostique
-              pas, ne prescrit pas et ne décide pas médicalement.
             </p>
           </div>
 
