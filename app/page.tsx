@@ -187,12 +187,14 @@ export default function Landing() {
                 Un suivi post-op structuré. Des chirurgiens libérés du bruit.
               </p>
 
-              {/* CTAs — full-width sur mobile (primary + secondary stack),
-                  inline et naturel à partir de sm+. */}
+              {/* CTAs — sur mobile, on garde uniquement le secondaire
+                  "Voir le fonctionnement" : le CTA primaire est porté
+                  par la sticky bottom bar et serait redondant ici. À
+                  partir de sm+, les 2 CTAs réapparaissent inline. */}
               <div className="mt-7 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
                 <a
                   href={DEMO}
-                  className="rounded-lg bg-navy-900 px-6 py-3.5 text-center text-[14px] font-semibold tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800 sm:py-3 sm:text-[13.5px] sm:font-medium"
+                  className="hidden rounded-lg bg-navy-900 px-6 py-3 text-center text-[13.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800 sm:inline-flex"
                 >
                   Réserver un call de 20 min
                 </a>
