@@ -58,14 +58,38 @@ const config: Config = {
         alert: "#B85F3A",      // status critique (orange brûlé)
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "Inter", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "Georgia", "serif"],
-        // ─── Famille éditoriale (Operating Room Discipline) ──────────────
-        // Söhne en cible. Inter Display + Inter en fallback open source.
-        // Mono : JetBrains Mono / Geist Mono.
+        // Registre Apple : SF Pro natif sur appareils Apple
+        // (-apple-system / BlinkMacSystemFont), Inter ailleurs.
+        // Une seule famille sans-serif partout (plus de display serif).
+        sans: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "\"SF Pro Text\"",
+          "var(--font-sans)",
+          "Inter",
+          "\"Segoe UI\"",
+          "system-ui",
+          "Helvetica",
+          "Arial",
+          "sans-serif",
+        ],
+        display: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "\"SF Pro Display\"",
+          "var(--font-sans)",
+          "Inter",
+          "\"Segoe UI\"",
+          "system-ui",
+          "Helvetica",
+          "Arial",
+          "sans-serif",
+        ],
         editorial: [
-          "var(--font-editorial)",
-          "Inter Display",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "\"SF Pro Display\"",
+          "var(--font-sans)",
           "Inter",
           "system-ui",
           "sans-serif",

@@ -1,42 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { KovelaProvider } from "@/lib/store";
 
+// Typographie KOVELA — registre Apple (SF Pro Display / SF Pro Text).
+// Sur appareils Apple : SF Pro natif via -apple-system (cf. tailwind config).
+// Sur autres OS : Inter (proportions très proches de SF Pro), chargée via
+// Next/font. Une seule famille sans-serif, plus de display serif.
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-sans",
-  display: "swap",
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-// ─── Système éditorial (Operating Room Discipline) ────────────────────────
-// Direction artistique validée — voir docs/strategy/.
-//
-// Cible production : Söhne (Klim Type) en display + body + mono.
-// Fallback open source en attendant l'achat de licence Söhne :
-//   - Display + body : Inter — letter-spacing négatif sur grands titres
-//     simule la densité de Söhne Halbfett. (Söhne et Inter ont des
-//     proportions très proches.)
-//   - Mono : JetBrains Mono Light — clarté monospace cohérente avec
-//     l'esprit éditorial.
-//
-// Variables CSS exposées :
-//   --font-editorial      — display + body éditorial
-//   --font-editorial-mono — monospace éditorial
-// -------------------------------------------------------------------------
-const editorial = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-editorial",
   display: "swap",
 });
 
@@ -57,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="fr"
-      className={`${inter.variable} ${fraunces.variable} ${editorial.variable} ${editorialMono.variable}`}
+      className={`${inter.variable} ${editorialMono.variable}`}
     >
       <body className="font-sans">
         <KovelaProvider>{children}</KovelaProvider>

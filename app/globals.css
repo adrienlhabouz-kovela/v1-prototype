@@ -4,37 +4,33 @@
 
 html,
 body {
-  background-color: #f4f1ec;
+  background-color: #ffffff;
   color: #0a1f2d;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* Inter avec set stylistique SS01 (a/g single-storey) + cv11 (1 simplifié)
+     → rapproche du rendu SF Pro sur les OS non-Apple. */
   font-feature-settings: "ss01", "cv11";
+  letter-spacing: -0.011em;
 }
 
-/* Police display (Fraunces) — neutralisation des alternates stylistiques et
-   ligatures (standard ET discrétionnaires) héritées du réglage global ci-dessus.
-   Conservation du crénage uniquement.
-   Désactivation explicite des sets stylistiques SS01–SS07, des Character
-   Variants cv01–cv11, et des ligatures fi/fl/ff qui rendent f / s / j / g
-   trop décoratifs aux grandes tailles avec Fraunces. */
+/* Display = même sans-serif Apple/Inter, juste crénage + tracking serré
+   pour les grands titres. Plus de réglages anti-Fraunces. */
 .font-display {
-  font-feature-settings:
-    "kern" 1,
-    "liga" 0, "clig" 0, "dlig" 0, "calt" 0, "salt" 0,
-    "ss01" 0, "ss02" 0, "ss03" 0, "ss04" 0, "ss05" 0, "ss06" 0, "ss07" 0,
-    "cv01" 0, "cv02" 0, "cv03" 0, "cv04" 0, "cv05" 0, "cv06" 0, "cv07" 0,
-    "cv08" 0, "cv09" 0, "cv10" 0, "cv11" 0;
-  font-variant-ligatures: none;
+  font-feature-settings: "kern" 1, "ss01", "cv11";
+  letter-spacing: -0.022em;
 }
 
 @layer base {
-  h1,
   h2,
   h3 {
-    letter-spacing: -0.018em;
+    letter-spacing: -0.022em;
+    font-weight: 600;
   }
   h1 {
-    letter-spacing: -0.025em;
+    letter-spacing: -0.035em;
+    font-weight: 600;
   }
 }
 
