@@ -35,10 +35,15 @@ const config: Config = {
           600: "#178F89",
           700: "#137C76",
         },
-        // Neutres chauds — fonds, surfaces alternatives, séparateurs
-        ivory: "#FAF8F4",
-        bone: "#F4F1EC",
-        sand: "#EAE5DC",
+        // Neutres pearl stone — fonds, surfaces alternatives, séparateurs.
+        // Bascule depuis l'ancienne échelle crème (boutique beige) vers
+        // une stone pearl légèrement froide : la complémentarité avec
+        // l'anthracite warm crée la profondeur Apple/Hermès/Linear.
+        // Les noms de classes restent identiques pour ne pas casser les
+        // ~140 usages dans l'app.
+        ivory: "#F6F7F8",
+        bone: "#EEEFF1",
+        sand: "#DEE0E3",
         offwhite: "#E6E9EC",
         charcoal: "#1B1F23",
 
@@ -52,11 +57,11 @@ const config: Config = {
           30: "#8C9098",       // text tertiaire, métadonnées
         },
         paper: {
-          DEFAULT: "#FAFAF7",  // fond principal éditorial
-          shade: "#F1EFE8",    // fond contrasté section
+          DEFAULT: "#F8F9FA",  // fond principal éditorial (stone pearl)
+          shade: "#E9EBED",    // fond contrasté section (stone)
         },
-        cream: "#F1EBE0",      // chaleur — bandes réassurance, photos
-        rule: "#D8D6D0",       // filets, séparateurs
+        cream: "#EEEEEC",      // ex-chaleur beige — neutralisée stone
+        rule: "#D4D6D9",       // filets, séparateurs (stone)
         accent: "#2A6B5C",     // status valid, lien actif, focus (vert lichen)
         "warm-accent": "#A06B3F", // cuivre patiné — éléments humains/photo
         alert: "#B85F3A",      // status critique (orange brûlé)
