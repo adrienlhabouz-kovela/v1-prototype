@@ -10,6 +10,8 @@ import {
   CompliancePills,
   trustLogos,
 } from "@/components/landing-shared";
+import { RevealObserver } from "@/components/Reveal";
+import { ScrollProgress } from "@/components/ScrollProgress";
 
 const DEMO = "mailto:contact@kovela.care?subject=Demande%20d%27%C3%A9change%20op%C3%A9rationnel%20KOVELA";
 const PILOT = "mailto:contact@kovela.care?subject=Discuter%20du%20pilote%20KOVELA";
@@ -86,6 +88,12 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 export default function Landing() {
   return (
     <div className="bg-white pb-20 text-navy-900 md:pb-0">
+      {/* ALPHA-5 — Sticky scroll progress bar tout en haut. */}
+      <ScrollProgress />
+      {/* ALPHA-3 — Observer global qui anime les sections marquées
+          .reveal-target à leur apparition dans le viewport. */}
+      <RevealObserver />
+
       {/* Header — barre navy pleine largeur, version compacte.
           - lg+ : wordmark + nav + lien prototype + CTA teal.
           - < lg : wordmark + hamburger (<details>) qui ouvre le menu.
@@ -164,12 +172,28 @@ export default function Landing() {
 
       {/* ============================================================
           Section A — Hero split : contenu gauche + photo droite
+          ALPHA-7 : décorations gradient mesh subtil derrière le hero.
           ============================================================ */}
-      <section className="relative bg-white">
-        <div className="grid lg:grid-cols-2">
-          {/* Colonne gauche — promesse + comparatif */}
-          <div className="flex items-start px-5 pt-10 pb-7 sm:px-10 sm:pt-14 sm:pb-8 lg:px-10 lg:pt-16 lg:pb-6 xl:px-16 xl:pt-20 xl:pb-6">
-            <div className="w-full max-w-[600px]">
+      <section className="relative overflow-hidden bg-white">
+        {/* Gradient mesh decorations — blobs floutés ultra-discrets */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-teal-400/[0.08] blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/4 top-1/3 hidden h-[20rem] w-[20rem] rounded-full bg-amber-200/[0.10] blur-3xl lg:block"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-24 left-1/3 hidden h-[18rem] w-[18rem] rounded-full bg-teal-300/[0.08] blur-3xl lg:block"
+        />
+
+        <div className="relative grid lg:grid-cols-2">
+          {/* Colonne gauche — promesse + comparatif. ALPHA-6 : padding top
+              plus généreux desktop. */}
+          <div className="flex items-start px-5 pt-10 pb-7 sm:px-10 sm:pt-14 sm:pb-8 lg:px-10 lg:pt-20 lg:pb-8 xl:px-16 xl:pt-28 xl:pb-8">
+            <div className="w-full max-w-[680px]">
               {/* Eyebrow + filet */}
               <div className="flex items-center gap-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700">
@@ -178,7 +202,7 @@ export default function Landing() {
                 <span className="h-px w-14 bg-teal-500/40" />
               </div>
 
-              <h1 className="mt-6 font-display text-[1.95rem] font-semibold leading-[1.08] tracking-[-0.035em] text-navy-900 sm:mt-7 sm:text-balance sm:text-[2.2rem] sm:leading-[1.05] lg:text-[2.65rem] lg:tracking-[-0.04em] xl:text-[2.95rem]">
+              <h1 className="mt-6 font-display text-[1.95rem] font-semibold leading-[1.08] tracking-[-0.035em] text-navy-900 sm:mt-7 sm:text-balance sm:text-[2.4rem] sm:leading-[1.04] lg:text-[3.1rem] lg:tracking-[-0.045em] xl:text-[3.75rem] xl:leading-[1.02] 2xl:text-[4.25rem]">
                 KOVELA fait disparaître le bruit post-op du quotidien du
                 cabinet.
               </h1>
@@ -403,7 +427,7 @@ export default function Landing() {
       </section>
 
       {/* Section B — Problème cabinet */}
-      <section id="probleme" className="mx-auto max-w-6xl px-6 py-14">
+      <section id="probleme" className="mx-auto max-w-6xl px-6 py-14 reveal-target">
         <Eyebrow>Le constat</Eyebrow>
         <h2 className="max-w-2xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Après l&apos;intervention, tout repose encore trop souvent sur la disponibilité du cabinet.
@@ -417,7 +441,7 @@ export default function Landing() {
           {pains.map((p) => (
             <div
               key={p.t}
-              className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]"
+              className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift"
             >
               <div className="mb-4 h-px w-7 bg-teal-500/70" />
               <h3 className="font-display text-[14px] font-semibold tracking-tight text-navy-900">
@@ -430,7 +454,7 @@ export default function Landing() {
       </section>
 
       {/* Section C — Solution KOVELA · 5 piliers */}
-      <section id="solution" className="border-y border-navy-900/[0.06] bg-white">
+      <section id="solution" className="border-y border-navy-900/[0.06] bg-white reveal-target">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <Eyebrow>La solution KOVELA</Eyebrow>
           <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
@@ -440,7 +464,7 @@ export default function Landing() {
             {solutions.map((p, i) => (
               <div
                 key={p.t}
-                className="rounded-2xl bg-ivory p-6 ring-1 ring-navy-900/[0.05]"
+                className="rounded-2xl bg-ivory p-6 ring-1 ring-navy-900/[0.05] hover-lift"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-md bg-navy-900 font-display text-[12px] font-medium text-white">
                   {i + 1}
@@ -467,7 +491,7 @@ export default function Landing() {
       </section>
 
       {/* Section E — Baseline terrain (douleur opérationnelle mesurable) */}
-      <section className="border-y border-navy-900/[0.06] bg-white">
+      <section className="border-y border-navy-900/[0.06] bg-white reveal-target">
         <div className="mx-auto max-w-5xl px-6 py-14">
           <Eyebrow>Une douleur opérationnelle mesurable</Eyebrow>
           <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
@@ -490,7 +514,7 @@ export default function Landing() {
       </section>
 
       {/* Bande preuve terrain — prudente, non chiffrée, non datée. */}
-      <section className="border-b border-navy-900/[0.06] bg-ivory">
+      <section className="border-b border-navy-900/[0.06] bg-ivory reveal-target">
         <div className="mx-auto max-w-6xl px-6 py-3">
           <p className="text-[12.5px] leading-relaxed text-charcoal/65">
             <span className="font-semibold text-navy-900">Construit à partir de retours terrain</span>
@@ -501,7 +525,7 @@ export default function Landing() {
       </section>
 
       {/* Section F — Comment ça marche */}
-      <section id="etapes" className="mx-auto max-w-6xl px-6 py-14">
+      <section id="etapes" className="mx-auto max-w-6xl px-6 py-14 reveal-target">
         <Eyebrow>Comment ça marche</Eyebrow>
         <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           De la mise en place au CR disponible chirurgien, en cinq étapes.
@@ -530,7 +554,7 @@ export default function Landing() {
       </section>
 
       {/* Section G — IA assistive (compactée, objection chirurgien préservée) */}
-      <section id="ia" className="bg-navy-depth text-white">
+      <section id="ia" className="bg-navy-depth text-white reveal-target">
         <div className="mx-auto max-w-6xl px-6 py-12">
           <Eyebrow>
             <span className="text-teal-300/90">IA assistive · jamais autonome</span>
@@ -607,7 +631,7 @@ export default function Landing() {
       </section>
 
       {/* Section H — Cadre opérationnel KOVELA · architecture de confiance */}
-      <section id="cadre" className="border-y border-navy-900/[0.06] bg-white">
+      <section id="cadre" className="border-y border-navy-900/[0.06] bg-white reveal-target">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
             <BrandMark size={44} className="shrink-0 text-navy-900" />
@@ -625,7 +649,7 @@ export default function Landing() {
 
               {/* 3 piliers : Humain · IA encadrée · Traçabilité */}
               <div className="mt-10 grid gap-3 md:grid-cols-3">
-                <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+                <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
                   <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
                     Humain
                   </p>
@@ -639,7 +663,7 @@ export default function Landing() {
                     <li>— Aucune décision médicale prise par KOVELA</li>
                   </ul>
                 </div>
-                <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+                <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
                   <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
                     IA encadrée
                   </p>
@@ -653,7 +677,7 @@ export default function Landing() {
                     <li>— Désactivable et loggée</li>
                   </ul>
                 </div>
-                <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+                <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
                   <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
                     Traçabilité
                   </p>
@@ -721,7 +745,7 @@ export default function Landing() {
       </section>
 
       {/* Section Ibis — Un projet construit sur le terrain · 3 cards (Doctrine fondue dans §G/§H) */}
-      <section className="mx-auto max-w-6xl px-6 py-12">
+      <section className="mx-auto max-w-6xl px-6 py-12 reveal-target">
         <Eyebrow>Un projet construit sur le terrain</Eyebrow>
         <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Qui porte KOVELA, et comment.
@@ -729,7 +753,7 @@ export default function Landing() {
 
         <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {/* Fondateur */}
-          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
               Fondateur
             </p>
@@ -743,7 +767,7 @@ export default function Landing() {
           </div>
 
           {/* Chirurgiens */}
-          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
               Chirurgiens
             </p>
@@ -757,30 +781,30 @@ export default function Landing() {
           </div>
 
           {/* Produit */}
-          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
               Produit
             </p>
             <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
-              Prototype déjà démontrable
+              Plateforme déjà démontrable
             </h3>
             <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
-              Prototype complet : activation cabinet, parcours chirurgien, espace superviseur,
-              suivi patient, workflow CR et cockpit admin déjà démontrables.
+              Plateforme complète : activation cabinet, parcours chirurgien, espace superviseur,
+              suivi patient, workflow CR et cockpit admin opérationnels.
             </p>
           </div>
         </div>
 
         {/* Preuve d'exécution sobre */}
         <p className="mt-10 max-w-3xl rounded-md bg-ivory px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
-          <span className="font-medium text-navy-900">Preuve d&apos;exécution :</span> prototype
-          produit fonctionnel · activation cabinet · parcours chirurgien · espace superviseur ·
+          <span className="font-medium text-navy-900">Preuve d&apos;exécution :</span> produit
+          fonctionnel · activation cabinet · parcours chirurgien · espace superviseur ·
           suivi patient · workflow CR · cockpit admin.
         </p>
       </section>
 
       {/* Section I — Tarification · Moins qu'un mi-temps. Plus qu'un outil. */}
-      <section id="modele" className="mx-auto max-w-6xl px-6 py-14">
+      <section id="modele" className="mx-auto max-w-6xl px-6 py-14 reveal-target">
         <Eyebrow>Tarification</Eyebrow>
         <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
           Moins qu&apos;un mi-temps. Plus qu&apos;un outil.
@@ -791,7 +815,7 @@ export default function Landing() {
         </p>
 
         {/* Card pricing — fixe (5 patients inclus) + variable (au-delà) */}
-        <div className="mt-10 overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-navy-900/[0.06]">
+        <div className="mt-10 overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-navy-900/[0.06] hover-lift">
           <div className="flex flex-wrap items-center gap-2 border-b border-navy-900/[0.05] bg-ivory px-7 py-4">
             <span className="rounded-md bg-navy-900 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white">
               Offre pilote
@@ -868,7 +892,7 @@ export default function Landing() {
 
         {/* 2 colonnes bénéfices : Ce que le cabinet évite · Ce que KOVELA apporte */}
         <div className="mt-10 grid gap-3 md:grid-cols-2">
-          <div className="rounded-2xl bg-ivory p-7 ring-1 ring-navy-900/[0.05]">
+          <div className="rounded-2xl bg-ivory p-7 ring-1 ring-navy-900/[0.05] hover-lift">
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
               Ce que le cabinet évite
             </p>
@@ -889,7 +913,7 @@ export default function Landing() {
               ))}
             </ul>
           </div>
-          <div className="rounded-2xl bg-white p-7 shadow-card ring-1 ring-navy-900/[0.045]">
+          <div className="rounded-2xl bg-white p-7 shadow-card ring-1 ring-navy-900/[0.045] hover-lift">
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
               Ce que KOVELA apporte
             </p>
@@ -939,7 +963,7 @@ export default function Landing() {
           Masquée < md : la sticky bottom bar mobile porte déjà l'action,
           ce bandeau navy serait redondant. Réapparaît dès md+ où la
           sticky bar est masquée (md:hidden côté sticky bar). */}
-      <section className="hidden bg-navy-depth text-white md:block">
+      <section className="hidden bg-navy-depth text-white md:block reveal-target">
         <div className="mx-auto max-w-4xl px-6 py-16 text-center">
           <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] md:text-[2.4rem]">
             Structurer le suivi post-opératoire de votre cabinet.
@@ -964,14 +988,117 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-navy-950 text-navy-100/45">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-9 text-center text-[11.5px] sm:flex-row sm:text-left">
-          <Wordmark light />
-          <p>
-            Prototype de démonstration — données fictives, hors HDS. Aucune donnée réelle. ·
-            kovela.care
-          </p>
+      {/* ALPHA-4 — Footer enrichi 4 colonnes : Produit · Ressources ·
+          Légal · Contact, plus ligne basse copyright/SIRET/locale. */}
+      <footer className="bg-navy-950 text-navy-100/55">
+        <div className="mx-auto max-w-6xl px-6 pt-12 pb-8 sm:px-10">
+          {/* Grid 4 colonnes (1 col + 4 col à partir de sm) */}
+          <div className="grid gap-10 sm:grid-cols-[1.4fr_1fr_1fr_1fr]">
+            {/* Colonne 1 — brand + tagline */}
+            <div>
+              <Wordmark light compact />
+              <p className="mt-4 max-w-[16rem] text-[12.5px] leading-relaxed text-navy-100/50">
+                Coordination post-opératoire opérée pour chirurgiens
+                libéraux. Supervision humaine + IA assistive interne, dans le
+                respect du cadre HDS.
+              </p>
+            </div>
+
+            {/* Colonne 2 — Produit */}
+            <div>
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-white/70">
+                Produit
+              </p>
+              <ul className="mt-4 space-y-2.5 text-[12.5px] text-navy-100/55">
+                <li><a href="#solution" className="transition-colors hover:text-white">Le service</a></li>
+                <li><a href="#etapes" className="transition-colors hover:text-white">Fonctionnement</a></li>
+                <li><a href="#cadre" className="transition-colors hover:text-white">Cadre opérationnel</a></li>
+                <li><a href="#modele" className="transition-colors hover:text-white">Tarifs</a></li>
+                <li>
+                  <Link href="/chirurgiens-esthetiques" className="transition-colors hover:text-white">
+                    Pour chirurgiens esthétiques
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Colonne 3 — Ressources */}
+            <div>
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-white/70">
+                Ressources
+              </p>
+              <ul className="mt-4 space-y-2.5 text-[12.5px] text-navy-100/55">
+                <li><a href="#cadre" className="transition-colors hover:text-white">Documentation</a></li>
+                <li><a href="#etapes" className="transition-colors hover:text-white">FAQ</a></li>
+                <li>
+                  <a href="mailto:contact@kovela.care" className="transition-colors hover:text-white">
+                    Nous écrire
+                  </a>
+                </li>
+                <li>
+                  <Link href="/login" className="transition-colors hover:text-white">
+                    Voir le prototype
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Colonne 4 — Légal */}
+            <div>
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-white/70">
+                Légal
+              </p>
+              <ul className="mt-4 space-y-2.5 text-[12.5px] text-navy-100/55">
+                <li><a href="#" className="transition-colors hover:text-white">Mentions légales</a></li>
+                <li><a href="#" className="transition-colors hover:text-white">CGU</a></li>
+                <li><a href="#" className="transition-colors hover:text-white">DPA</a></li>
+                <li><a href="#" className="transition-colors hover:text-white">RGPD</a></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Ligne basse — séparée par filet, copyright + SIRET + locale +
+              LinkedIn + mention prototype (conservée légalement). */}
+          <div className="mt-10 border-t border-white/[0.08] pt-6">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-navy-100/40">
+                <span>KOVELA SAS</span>
+                <span className="text-navy-100/20">·</span>
+                <span>Paris</span>
+                <span className="text-navy-100/20">·</span>
+                <span>SIRET 000 000 000 00000</span>
+                <span className="text-navy-100/20">·</span>
+                <span>© {new Date().getFullYear()} KOVELA</span>
+              </div>
+
+              <div className="flex items-center gap-4 text-[11px]">
+                {/* Locale switcher visuel (EN désactivé) */}
+                <div className="flex items-center gap-1.5">
+                  <span className="rounded-md bg-white/[0.08] px-2 py-0.5 font-semibold text-white/80">
+                    FR
+                  </span>
+                  <span className="px-2 py-0.5 text-navy-100/30">EN</span>
+                </div>
+
+                {/* LinkedIn */}
+                <a
+                  href="https://www.linkedin.com/"
+                  aria-label="LinkedIn"
+                  className="flex h-7 w-7 items-center justify-center rounded-md bg-white/[0.06] text-navy-100/60 transition-colors hover:bg-white/[0.12] hover:text-white"
+                >
+                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor" aria-hidden="true">
+                    <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.15 1.45-2.15 2.95v5.66H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56v11.45z" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            {/* Mention légale prototype — conservée discrète tout en bas */}
+            <p className="mt-4 text-[10.5px] leading-relaxed text-navy-100/30">
+              Prototype de démonstration — données fictives, hors HDS. Aucune
+              donnée réelle collectée sur ce site. · kovela.care
+            </p>
+          </div>
         </div>
       </footer>
 
