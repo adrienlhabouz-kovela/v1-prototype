@@ -197,7 +197,7 @@ export default function Landing() {
       <section className="relative bg-white">
         <div className="grid lg:grid-cols-2">
           {/* Colonne gauche — promesse + comparatif */}
-          <div className="flex items-start px-6 pt-12 pb-8 sm:px-10 sm:pt-14 sm:pb-8 lg:px-10 lg:pt-16 lg:pb-6 xl:px-16 xl:pt-20 xl:pb-6">
+          <div className="flex items-start px-5 pt-10 pb-7 sm:px-10 sm:pt-14 sm:pb-8 lg:px-10 lg:pt-16 lg:pb-6 xl:px-16 xl:pt-20 xl:pb-6">
             <div className="w-full max-w-[600px]">
               {/* Eyebrow + filet */}
               <div className="flex items-center gap-4">
@@ -294,7 +294,7 @@ export default function Landing() {
               avec bg-cover). Tant qu'elle n'est pas là, gradient
               ivoire→bone→cream + voile teal léger en fallback. */}
           <div
-            className="relative min-h-[300px] lg:min-h-[480px]"
+            className="relative min-h-[220px] lg:min-h-[480px]"
             style={{
               backgroundImage:
                 "url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
@@ -314,20 +314,20 @@ export default function Landing() {
 
       {/* Barre de preuves — 4 indicateurs */}
       <section className="border-t border-navy-900/[0.06] bg-white">
-        <div className="grid grid-cols-2 gap-x-10 gap-y-8 px-6 pb-10 pt-8 sm:grid-cols-4 lg:gap-y-0 lg:px-10 xl:px-16">
+        <div className="grid grid-cols-2 gap-x-5 gap-y-7 px-5 pb-8 pt-7 sm:grid-cols-4 sm:gap-x-10 sm:px-6 sm:pb-10 sm:pt-8 lg:gap-y-0 lg:px-10 xl:px-16">
           {heroStats.map((s, i) => (
             <div
               key={s.label}
-              className={`flex items-center gap-4 ${
+              className={`flex items-center gap-3 sm:gap-4 ${
                 i > 0 ? "sm:border-l sm:border-navy-900/[0.07] sm:pl-10" : ""
               }`}
             >
               <span className="shrink-0 text-teal-600/85">{s.icon}</span>
               <div className="leading-none">
-                <p className="font-display text-[22px] font-semibold tracking-tight text-navy-900">
+                <p className="font-display text-[18px] font-semibold tracking-tight text-navy-900 sm:text-[22px]">
                   {s.value}
                 </p>
-                <p className="mt-2 text-[12.5px] tracking-tight text-charcoal/60">
+                <p className="mt-1.5 text-[12px] tracking-tight text-charcoal/60 sm:mt-2 sm:text-[12.5px]">
                   {s.label}
                 </p>
               </div>
