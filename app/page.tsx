@@ -86,26 +86,52 @@ function IconShield({ className = "" }: { className?: string }) {
 }
 
 // ─── Compliance row — pills typographiques (hero) ─────────────────────────
+// Conformité affirmée dès le 1er écran, registre Stripe/Linear.
+// Ligne 1 : conformité réglementaire stricte (HDS + RGPD/CNIL).
+// Ligne 2 : marqueurs souveraineté & opération (FR, EU, supervision,
+// IA interne, journal d'action) en texte fin séparé de bullets.
 
-const compliance = ["HDS", "RGPD", "eIDAS", "CNIL"];
+const complianceCore = ["HDS certifié", "RGPD + CNIL conforme"];
+
+const complianceSupport: { icon: string; label: string }[] = [
+  { icon: "🇫🇷", label: "Société française" },
+  { icon: "🇪🇺", label: "Données hébergées en Europe" },
+  { icon: "👥", label: "Supervision humaine" },
+  { icon: "🤖", label: "IA interne" },
+  { icon: "📋", label: "Journal d'action" },
+];
 
 function CompliancePills() {
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] tracking-tight text-charcoal/55">
-      <span className="flex items-center gap-1.5">
-        <IconShield className="h-3.5 w-3.5 text-teal-600/85" />
-        <span className="font-medium">Conformité réglementaire</span>
-      </span>
-      <span className="flex flex-wrap items-center gap-1.5">
-        {compliance.map((c) => (
-          <span
-            key={c}
-            className="rounded-md bg-navy-900/[0.04] px-2 py-0.5 text-[10.5px] font-semibold tracking-[0.06em] text-navy-900/85 ring-1 ring-navy-900/[0.06]"
-          >
-            {c}
+    <div className="space-y-2">
+      {/* Ligne 1 — pills lourdes, marqueur réglementaire */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[11px] tracking-tight text-charcoal/65">
+        <span className="flex items-center gap-1.5">
+          <IconShield className="h-3.5 w-3.5 text-teal-600/85" />
+          <span className="font-medium">Conformité réglementaire</span>
+        </span>
+        <span className="flex flex-wrap items-center gap-1.5">
+          {complianceCore.map((label) => (
+            <span
+              key={label}
+              className="rounded-md bg-navy-900/[0.05] px-2 py-0.5 text-[10.5px] font-semibold tracking-[0.02em] text-navy-900/90 ring-1 ring-navy-900/[0.07]"
+            >
+              {label}
+            </span>
+          ))}
+        </span>
+      </div>
+
+      {/* Ligne 2 — marqueurs souveraineté & opération, texte fin */}
+      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10.5px] tracking-tight text-charcoal/55">
+        {complianceSupport.map((c, i) => (
+          <span key={c.label} className="flex items-center gap-1.5">
+            {i > 0 && <span className="text-charcoal/25">·</span>}
+            <span aria-hidden="true">{c.icon}</span>
+            <span>{c.label}</span>
           </span>
         ))}
-      </span>
+      </p>
     </div>
   );
 }
