@@ -71,6 +71,31 @@ const steps = [
   { t: "CR factuel", d: "L'IA prépare, la superviseuse valide, le CR devient disponible chirurgien." },
 ];
 
+// TIER 1 — Steps fusionnés piliers + steps. 5 étapes qui décrivent
+// simultanément le QUOI (piliers de la solution) et le COMMENT (process).
+const stepsTier1 = [
+  {
+    t: "Référentiel & mise en place",
+    d: "Vos consignes post-op, actes et contacts utiles formalisés avec KOVELA. 15 min pour cadrer le cabinet, 30-60 min pour vos 2 ou 3 interventions prioritaires.",
+  },
+  {
+    t: "Onboarding patient",
+    d: "Le patient est intégré au suivi via un lien sécurisé. Sans application à télécharger, sans donnée médicale inutile.",
+  },
+  {
+    t: "Suivi opéré",
+    d: "L'équipe KOVELA suit, documente, relance et transmet selon votre référentiel. Service actif 8h-20h, supervision humaine spécialisée.",
+  },
+  {
+    t: "IA assistive interne",
+    d: "L'IA prépare brouillons, résumés et compilations. La superviseuse valide. Le chirurgien décide. Jamais de réponse autonome au patient.",
+  },
+  {
+    t: "CR factuel & transmissions cabinet",
+    d: "Synthèse claire en fin de suivi, factuelle, validée KOVELA. Le cabinet est sollicité au bon moment, avec les bons éléments.",
+  },
+];
+
 const aiDoes = [
   "Prépare les brouillons de CR",
   "Résume les échanges patient",
@@ -252,10 +277,12 @@ export default function Landing() {
                     vertical (sans VS badge).
                   ============================================================ */}
 
-              {/* === MOBILE (< sm) — Option A === */}
-              <div className="mt-7 space-y-3 sm:hidden">
+              {/* === MOBILE — Card déplacée après §1 par TIER 1.B.
+                  Voici une version DUPLIQUÉE masquée pour conserver le code
+                  désactivée. La vraie carte mobile vit après §1 Le constat. */}
+              <div className="hidden space-y-3">
                 {/* Sans KOVELA — bg rouge léger */}
-                <div className="rounded-2xl bg-[#FDF4F2] p-6 ring-1 ring-[#D24B3E]/15 text-center">
+                <div className="rounded-2xl bg-[#FDF4F2] p-6 shadow-card ring-1 ring-[#D24B3E]/20 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <span className="rounded-md bg-[#D24B3E]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#D24B3E]">
                       Sans
@@ -281,7 +308,7 @@ export default function Landing() {
                 </div>
 
                 {/* Avec KOVELA — bg teal léger */}
-                <div className="rounded-2xl bg-[#EAF7F4] p-6 ring-1 ring-teal-500/20 text-center">
+                <div className="rounded-2xl bg-[#EAF7F4] p-6 shadow-card ring-1 ring-teal-500/30 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <span className="rounded-md bg-teal-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-teal-700">
                       Avec
@@ -308,7 +335,7 @@ export default function Landing() {
               </div>
 
               {/* === DESKTOP (sm+) — Carte unifiée actuelle inchangée === */}
-              <div className="relative mt-7 hidden rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.05] sm:block sm:p-7">
+              <div className="relative mt-7 hidden rounded-2xl bg-white p-6 shadow-lift ring-1 ring-navy-900/[0.08] sm:block sm:p-7">
 
                 <div className="grid grid-cols-2 gap-0">
                   {/* Sans KOVELA */}
@@ -445,40 +472,67 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section C — Solution KOVELA · 5 piliers */}
-      <section id="solution" className="border-y border-navy-900/[0.06] bg-white reveal-target">
-        <div className="mx-auto max-w-6xl px-6 py-16">
-          <Eyebrow>La solution KOVELA</Eyebrow>
-          <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
-            Le flux opérationnel est pris en charge — humain et IA, encadrés par votre référentiel.
-          </h2>
-          <div className="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-5">
-            {solutions.map((p, i) => (
-              <div
-                key={p.t}
-                className="rounded-2xl bg-ivory p-6 ring-1 ring-navy-900/[0.05] hover-lift"
-              >
-                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-navy-900 font-display text-[12px] font-medium text-white">
-                  {i + 1}
+      {/* Section C SUPPRIMÉE par TIER 1.A — La solution KOVELA · 5 piliers
+          a été fondue dans §F "Le service en 5 étapes" plus bas. */}
+
+      {/* TIER 1.B — Card Sans / Avec KOVELA, mobile uniquement, déplacée
+          du hero vers ici (après §1 Le constat). Sur desktop la card
+          reste dans le hero. */}
+      <section className="border-b border-navy-900/[0.06] bg-white sm:hidden">
+        <div className="px-5 py-10">
+          <div className="space-y-3">
+            {/* Sans KOVELA — bg rouge léger */}
+            <div className="rounded-2xl bg-[#FDF4F2] p-6 shadow-card ring-1 ring-[#D24B3E]/20 text-center">
+              <div className="flex items-center justify-center gap-2">
+                <span className="rounded-md bg-[#D24B3E]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#D24B3E]">
+                  Sans
                 </span>
-                <h3 className="mt-4 font-display text-[14px] font-semibold tracking-tight text-navy-900">
-                  {p.t}
+                <h3 className="font-display text-[16.5px] font-semibold tracking-tight text-navy-900">
+                  KOVELA
                 </h3>
-                <p className="mt-2.5 text-[13px] leading-relaxed text-charcoal/60">{p.d}</p>
               </div>
-            ))}
+              <ul className="mt-4 inline-flex flex-col items-start gap-2.5 text-left">
+                {beforeKovela.map((t) => (
+                  <li
+                    key={t}
+                    className="flex items-start gap-2.5 text-[13px] leading-snug text-charcoal/80"
+                  >
+                    <IconCircleX className="mt-px h-[16px] w-[16px] shrink-0 text-[#D24B3E]" />
+                    <span>{t}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 inline-flex rounded-md bg-[#D24B3E]/10 px-2.5 py-1 text-[12px] font-semibold tracking-tight text-[#D24B3E]">
+                {beforeKovelaConclusion}
+              </p>
+            </div>
+
+            {/* Avec KOVELA — bg teal léger */}
+            <div className="rounded-2xl bg-[#EAF7F4] p-6 shadow-card ring-1 ring-teal-500/30 text-center">
+              <div className="flex items-center justify-center gap-2">
+                <span className="rounded-md bg-teal-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-teal-700">
+                  Avec
+                </span>
+                <h3 className="font-display text-[16.5px] font-semibold tracking-tight text-navy-900">
+                  KOVELA
+                </h3>
+              </div>
+              <ul className="mt-4 inline-flex flex-col items-start gap-2.5 text-left">
+                {withKovela.map((t) => (
+                  <li
+                    key={t}
+                    className="flex items-start gap-2.5 text-[13px] leading-snug text-navy-900"
+                  >
+                    <IconCircleCheck className="mt-px h-[16px] w-[16px] shrink-0 text-teal-600" />
+                    <span>{t}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 inline-flex rounded-md bg-teal-500/15 px-2.5 py-1 text-[12px] font-semibold tracking-tight text-teal-700">
+                {withKovelaConclusion}
+              </p>
+            </div>
           </div>
-          <blockquote className="mt-10 rounded-2xl border-l-2 border-teal-500/80 bg-ivory p-7">
-            <p className="font-display text-[16.5px] leading-relaxed tracking-tight text-navy-900 md:text-[18px]">
-              KOVELA n&apos;est pas un logiciel que le chirurgien doit gérer. C&apos;est un{" "}
-              <span className="font-semibold">service opéré</span> qui structure le suivi
-              post-opératoire pour son cabinet, avec une équipe de supervision humaine spécialisée
-              et une IA assistive interne.
-            </p>
-          </blockquote>
-          <p className="mt-8 font-display text-[24px] italic leading-tight tracking-[-0.01em] text-navy-900">
-            Le patient se sent accompagné. Le cabinet respire.
-          </p>
         </div>
       </section>
 
@@ -515,33 +569,40 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section F — Comment ça marche */}
-      <section id="etapes" className="mx-auto max-w-6xl px-6 py-14 reveal-target">
-        <Eyebrow>Comment ça marche</Eyebrow>
-        <h2 className="font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
-          De la mise en place au CR disponible chirurgien, en cinq étapes.
-        </h2>
-        <ol className="mt-10 grid gap-3 md:grid-cols-5">
-          {steps.map((s, i) => (
-            <li
-              key={s.t}
-              className="relative rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]"
-            >
-              <span className="font-display text-[26px] font-medium leading-none tracking-tight text-teal-600/80">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <h3 className="mt-4 font-display text-[13.5px] font-semibold tracking-tight text-navy-900">
-                {s.t}
-              </h3>
-              <p className="mt-2 text-[12.5px] leading-relaxed text-charcoal/60">{s.d}</p>
-            </li>
-          ))}
-        </ol>
-        <p className="mt-8 max-w-3xl text-[12.5px] leading-relaxed text-charcoal/55">
-          Démarrage accompagné par l&apos;équipe KOVELA. Référentiel relu avant
-          tout usage opérationnel. Lien patient sécurisé, sans application à
-          télécharger.
-        </p>
+      {/* Section F — Le service KOVELA en 5 étapes (TIER 1.A : fusion
+          des anciens §2 La solution + §6 Comment ça marche). Chaque étape
+          décrit à la fois le QUOI (pilier) et le COMMENT (process). */}
+      <section id="etapes" className="border-y border-navy-900/[0.06] bg-white reveal-target">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <Eyebrow>Le service KOVELA</Eyebrow>
+          <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
+            Un service opéré en 5 étapes — humain et IA encadrés par votre
+            référentiel.
+          </h2>
+          <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-charcoal/65">
+            Pas un logiciel à apprendre. Un service opéré qui prend en charge
+            le flux post-op du cabinet, dans le respect de votre cadre.
+          </p>
+          <ol className="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+            {stepsTier1.map((s, i) => (
+              <li
+                key={s.t}
+                className="relative rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045] hover-lift"
+              >
+                <span className="font-display text-[26px] font-medium leading-none tracking-tight text-teal-600/80">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-4 font-display text-[13.5px] font-semibold tracking-tight text-navy-900">
+                  {s.t}
+                </h3>
+                <p className="mt-2 text-[12.5px] leading-relaxed text-charcoal/60">{s.d}</p>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-8 font-display text-[22px] italic leading-tight tracking-[-0.01em] text-navy-900">
+            Le patient se sent accompagné. Le cabinet respire.
+          </p>
+        </div>
       </section>
 
       {/* Section G — IA assistive (compactée, objection chirurgien préservée) */}
@@ -684,10 +745,50 @@ export default function Landing() {
                 </div>
               </div>
 
-              {/* Qui supervise — profils terrain senior, non médicaux. Répond à
-                  l'objection chirurgien : qui lit mes patients et quel est leur niveau.
-                  Wording condensé : 2 paragraphes courts + 1 note horaires courte. */}
-              <div className="mt-8 rounded-2xl bg-ivory px-5 py-5 ring-1 ring-navy-900/[0.05]">
+              {/* TIER 1.C — Qui supervise + Horaires : sur mobile, dans un
+                  accordéon <details> pour alléger le scroll. Sur desktop,
+                  toujours visible (md:hidden sur le summary uniquement). */}
+
+              {/* MOBILE : accordéon pliable */}
+              <details className="group mt-8 rounded-2xl bg-ivory px-5 py-4 ring-1 ring-navy-900/[0.05] md:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+                  <div>
+                    <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+                      Qui supervise ?
+                    </p>
+                    <p className="mt-1 font-sans text-[15px] font-semibold tracking-tight text-navy-900">
+                      Une supervision issue du terrain.
+                    </p>
+                  </div>
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4 shrink-0 text-charcoal/55 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M6 9l6 6 6-6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </summary>
+                <div className="mt-4 space-y-3">
+                  <p className="text-[13.5px] leading-relaxed text-navy-900">
+                    Profils senior issus du bloc, du cabinet ou du suivi patient
+                    — aides opératoires, infirmières, coordinatrices — formés au
+                    référentiel KOVELA. Ils structurent et documentent, sans
+                    diagnostiquer, prescrire ni interpréter.
+                  </p>
+                  <p className="rounded-md bg-white/60 px-3 py-2 text-[12px] leading-relaxed text-charcoal/70 ring-1 ring-navy-900/[0.04]">
+                    <span className="font-medium text-navy-900">Horaires du service.</span>{" "}
+                    Plage opérée définie avec le cabinet (par ex. 8h–20h). Hors
+                    horaires : messages conservés, situations urgentes orientées
+                    vers les contacts définis par le chirurgien.
+                  </p>
+                </div>
+              </details>
+
+              {/* DESKTOP : panneau ouvert (md+) — contenu identique mais
+                  pas pliable. */}
+              <div className="mt-8 hidden rounded-2xl bg-ivory px-5 py-5 ring-1 ring-navy-900/[0.05] md:block">
                 <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
                   Qui supervise ?
                 </p>
