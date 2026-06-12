@@ -467,7 +467,39 @@ export default function Landing() {
             L&apos;IA aide l&apos;équipe. Elle ne décide jamais.
           </h2>
 
-          <div className="mt-8 grid gap-3 md:grid-cols-2">
+          {/* Mobile (< md) : panneau unifié compact, listes serrées,
+              séparateur fin entre les deux sections. Aucune perte de
+              contenu (5 items "fait" + 5 items "ne fait jamais"). */}
+          <div className="mt-7 rounded-2xl bg-white/[0.04] p-5 ring-1 ring-white/[0.08] md:hidden">
+            <h3 className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-teal-300/90">
+              L&apos;IA KOVELA fait
+            </h3>
+            <ul className="mt-3 space-y-1.5 text-[13px] leading-relaxed text-navy-100/85">
+              {aiDoes.map((x) => (
+                <li key={x} className="flex gap-2.5">
+                  <span className="mt-[7px] h-1 w-2.5 shrink-0 bg-teal-400/70" />
+                  <span>{x}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="my-4 h-px w-full bg-white/[0.08]" />
+
+            <h3 className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-navy-100/70">
+              L&apos;IA KOVELA ne fait jamais
+            </h3>
+            <ul className="mt-3 space-y-1.5 text-[13px] leading-relaxed text-navy-100/70">
+              {aiDoesNever.map((x) => (
+                <li key={x} className="flex gap-2.5">
+                  <span className="mt-[7px] h-1 w-2.5 shrink-0 bg-navy-100/30" />
+                  <span>{x}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Desktop (md+) : 2 cartes côte à côte, inchangé. */}
+          <div className="mt-8 hidden gap-3 md:grid md:grid-cols-2">
             <div className="rounded-2xl bg-white/[0.04] p-5 ring-1 ring-white/[0.08]">
               <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-300/90">
                 L&apos;IA KOVELA fait
