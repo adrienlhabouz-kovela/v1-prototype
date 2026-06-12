@@ -87,27 +87,27 @@ export function IconShield({ className = "" }: { className?: string }) {
   );
 }
 
-// ─── Compliance row — pills typographiques (hero) ─────────────────────────
-// Conformité affirmée dès le 1er écran, registre Stripe/Linear.
-// Ligne 1 : conformité réglementaire stricte (HDS + RGPD/CNIL).
-// Ligne 2 : marqueurs souveraineté & opération (FR, EU, supervision,
-// IA interne, journal d'action) en texte fin séparé de bullets.
+// ─── Compliance row — typographie pure, registre Linear/Stripe ────────────
+// 2 lignes hiérarchisées. Aucune emoji (rendus inconsistants entre OS,
+// look WhatsApp pas du tout B2B health). Iconographie réduite au strict
+// minimum : un seul shield discret en tête de ligne 1. Ligne 2 = pure
+// typographie séparée par bullets.
 
 const complianceCore = ["HDS certifié", "RGPD + CNIL conforme"];
 
-const complianceSupport: { icon: string; label: string }[] = [
-  { icon: "🇫🇷", label: "Société française" },
-  { icon: "🇪🇺", label: "Données hébergées en Europe" },
-  { icon: "👥", label: "Supervision humaine" },
-  { icon: "🤖", label: "IA interne" },
-  { icon: "📋", label: "Journal d'action" },
+const complianceSupport = [
+  "Société française",
+  "Données hébergées en Europe",
+  "Supervision humaine",
+  "IA interne",
+  "Journal d'action",
 ];
 
 export function CompliancePills() {
   return (
-    <div className="space-y-2">
-      {/* Ligne 1 — pills lourdes, marqueur réglementaire */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[11px] tracking-tight text-charcoal/65">
+    <div className="space-y-2.5">
+      {/* Ligne 1 — conformité réglementaire affirmée */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[11px] tracking-tight text-charcoal/70">
         <span className="flex items-center gap-1.5">
           <IconShield className="h-3.5 w-3.5 text-teal-600/85" />
           <span className="font-medium">Conformité réglementaire</span>
@@ -124,13 +124,12 @@ export function CompliancePills() {
         </span>
       </div>
 
-      {/* Ligne 2 — marqueurs souveraineté & opération, texte fin */}
-      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10.5px] tracking-tight text-charcoal/55">
-        {complianceSupport.map((c, i) => (
-          <span key={c.label} className="flex items-center gap-1.5">
-            {i > 0 && <span className="text-charcoal/25">·</span>}
-            <span aria-hidden="true">{c.icon}</span>
-            <span>{c.label}</span>
+      {/* Ligne 2 — souveraineté & opération, typo pure sans emoji */}
+      <p className="text-[10.5px] leading-relaxed tracking-tight text-charcoal/55">
+        {complianceSupport.map((label, i) => (
+          <span key={label}>
+            {i > 0 && <span className="mx-1.5 text-charcoal/25">·</span>}
+            {label}
           </span>
         ))}
       </p>
