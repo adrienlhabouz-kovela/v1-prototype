@@ -564,6 +564,65 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Section Ibis — Un projet construit sur le terrain · 3 cards (Doctrine fondue dans §G/§H) */}
+      <section className="mx-auto max-w-6xl px-6 py-12">
+        <Eyebrow>Un projet construit sur le terrain</Eyebrow>
+        <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
+          Qui porte KOVELA, et comment.
+        </h2>
+
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Fondateur */}
+          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+              Fondateur
+            </p>
+            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
+              Une culture de structuration et de risque
+            </h3>
+            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
+              KOVELA est porté par Adrien Lhabouz, entrepreneur et cofondateur de Trecento Asset
+              Management, avec une culture d&apos;investissement et d&apos;analyse du risque.
+            </p>
+          </div>
+
+          {/* Chirurgiens */}
+          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+              Chirurgiens
+            </p>
+            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
+              Conçu à partir de retours terrain
+            </h3>
+            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
+              Le service est construit à partir de retours terrain de chirurgiens esthétiques
+              privés et d&apos;années d&apos;expérience cabinet.
+            </p>
+          </div>
+
+          {/* Produit */}
+          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
+              Produit
+            </p>
+            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
+              Prototype déjà démontrable
+            </h3>
+            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
+              Prototype complet : activation cabinet, parcours chirurgien, espace superviseur,
+              suivi patient, workflow CR et cockpit admin déjà démontrables.
+            </p>
+          </div>
+        </div>
+
+        {/* Preuve d'exécution sobre */}
+        <p className="mt-10 max-w-3xl rounded-md bg-ivory px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
+          <span className="font-medium text-navy-900">Preuve d&apos;exécution :</span> prototype
+          produit fonctionnel · activation cabinet · parcours chirurgien · espace superviseur ·
+          suivi patient · workflow CR · cockpit admin.
+        </p>
+      </section>
+
       {/* Section I — Tarification · Moins qu'un mi-temps. Plus qu'un outil. */}
       <section id="modele" className="mx-auto max-w-6xl px-6 py-14">
         <Eyebrow>Tarification</Eyebrow>
@@ -718,65 +777,6 @@ export default function Landing() {
             Discuter du pilote
           </a>
         </div>
-      </section>
-
-      {/* Section Ibis — Un projet construit sur le terrain · 3 cards (Doctrine fondue dans §G/§H) */}
-      <section className="mx-auto max-w-6xl px-6 py-12">
-        <Eyebrow>Un projet construit sur le terrain</Eyebrow>
-        <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
-          Qui porte KOVELA, et comment.
-        </h2>
-
-        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Fondateur */}
-          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
-              Fondateur
-            </p>
-            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
-              Une culture de structuration et de risque
-            </h3>
-            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
-              KOVELA est porté par Adrien Lhabouz, entrepreneur et cofondateur de Trecento Asset
-              Management, avec une culture d&apos;investissement et d&apos;analyse du risque.
-            </p>
-          </div>
-
-          {/* Chirurgiens */}
-          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
-              Chirurgiens
-            </p>
-            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
-              Conçu à partir de retours terrain
-            </h3>
-            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
-              Le service est construit à partir de retours terrain de chirurgiens esthétiques
-              privés et d&apos;années d&apos;expérience cabinet.
-            </p>
-          </div>
-
-          {/* Produit */}
-          <div className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]">
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/55">
-              Produit
-            </p>
-            <h3 className="mt-2.5 font-display text-[14px] font-semibold tracking-tight text-navy-900">
-              Prototype déjà démontrable
-            </h3>
-            <p className="mt-2.5 text-[12.5px] leading-relaxed text-charcoal/65">
-              Prototype complet : activation cabinet, parcours chirurgien, espace superviseur,
-              suivi patient, workflow CR et cockpit admin déjà démontrables.
-            </p>
-          </div>
-        </div>
-
-        {/* Preuve d'exécution sobre */}
-        <p className="mt-10 max-w-3xl rounded-md bg-ivory px-3 py-2 text-[11.5px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.04]">
-          <span className="font-medium text-navy-900">Preuve d&apos;exécution :</span> prototype
-          produit fonctionnel · activation cabinet · parcours chirurgien · espace superviseur ·
-          suivi patient · workflow CR · cockpit admin.
-        </p>
       </section>
 
       {/* Section J — CTA final */}
