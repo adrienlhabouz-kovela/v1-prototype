@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const CTA_PRIMARY = "Demander un échange opérationnel de 20 min";
+const CTA_PRIMARY = "Demander un échange opérationnel";
 const CTA_SECONDARY = "Voir ce que KOVELA prend en charge";
 
 const microReassurance = [
@@ -336,19 +336,19 @@ export default function ChirurgiensEsthetiquesLanding() {
       {/* Tracking conversion — composant invisible, tracke landing_view. */}
       <LandingViewTracker />
 
-      {/* Top bar */}
+      {/* Top bar — version compacte alignée sur la landing institutionnelle. */}
       <header className="border-b border-navy-900/[0.05] bg-bone/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-2.5 sm:px-8">
           <Link href="/" className="flex items-center gap-2">
-            <Wordmark />
+            <Wordmark compact />
           </Link>
           <TrackedCtaLink
             href="#contact"
             eventName="hero_cta_click"
             extraPayload={{ position: "top_bar" }}
-            className="whitespace-nowrap rounded-md bg-navy-900 px-3.5 py-2 text-[11.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800 sm:px-4 sm:text-[12px]"
+            className="whitespace-nowrap rounded-md bg-navy-900 px-3.5 py-1.5 text-[11.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800 sm:text-[12.5px]"
           >
-            <span className="sm:hidden">Échange 20 min</span>
+            <span className="sm:hidden">Échange</span>
             <span className="hidden sm:inline">{CTA_PRIMARY}</span>
           </TrackedCtaLink>
         </div>

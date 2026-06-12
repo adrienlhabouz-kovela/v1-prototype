@@ -33,18 +33,23 @@ export function BrandMark({ size = 36, className = "" }: { size?: number; classN
 export function Wordmark({
   light,
   tagline,
+  compact,
   className = "",
 }: {
   light?: boolean;
   tagline?: boolean;
+  /** Version plus fine pour headers serrés. */
+  compact?: boolean;
   className?: string;
 }) {
+  const markSize = compact ? 28 : 32;
+  const labelClass = compact ? "text-base" : "text-lg";
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      <BrandMark size={32} className={light ? "text-white" : "text-navy-900"} />
+      <BrandMark size={markSize} className={light ? "text-white" : "text-navy-900"} />
       <div className="leading-none">
         <span
-          className={`font-display text-lg tracking-brand ${light ? "text-white" : "text-navy-900"}`}
+          className={`font-display ${labelClass} tracking-brand ${light ? "text-white" : "text-navy-900"}`}
         >
           KOVELA
         </span>

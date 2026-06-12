@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { BrandMark, Wordmark } from "@/components/Brand";
 
-const DEMO = "mailto:contact@kovela.care?subject=Demande%20de%20démo%20KOVELA";
+const DEMO = "mailto:contact@kovela.care?subject=Demande%20d%27%C3%A9change%20op%C3%A9rationnel%20KOVELA";
 const PILOT = "mailto:contact@kovela.care?subject=Discuter%20du%20pilote%20KOVELA";
+const CTA_DEMO_LABEL = "Demander un échange opérationnel";
 
 // ─── Icônes hero ──────────────────────────────────────────────────────────
 // Petites icônes inline (currentColor) — taille/couleur pilotées via className.
@@ -308,11 +309,11 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 export default function Landing() {
   return (
     <div className="bg-white text-navy-900">
-      {/* Header — barre navy pleine largeur */}
+      {/* Header — barre navy pleine largeur, version compacte */}
       <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-navy-900/95 backdrop-blur-md">
-        <div className="flex items-center justify-between gap-6 px-6 py-3.5 lg:px-10 xl:px-16">
-          <Wordmark light />
-          <nav className="hidden items-center gap-9 text-[13px] tracking-tight text-navy-100/75 lg:flex">
+        <div className="flex items-center justify-between gap-6 px-6 py-2.5 lg:px-10 xl:px-16">
+          <Wordmark light compact />
+          <nav className="hidden items-center gap-8 text-[12.5px] tracking-tight text-navy-100/75 lg:flex">
             <a href="#probleme" className="transition-colors hover:text-white">Le constat</a>
             <a href="#solution" className="transition-colors hover:text-white">La solution</a>
             <a href="#etapes" className="transition-colors hover:text-white">Fonctionnement</a>
@@ -322,15 +323,15 @@ export default function Landing() {
           <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="hidden text-[13px] font-medium text-navy-100/80 transition-colors hover:text-white sm:block"
+              className="hidden text-[12.5px] font-medium text-navy-100/80 transition-colors hover:text-white sm:block"
             >
               Voir le prototype
             </Link>
             <a
               href={DEMO}
-              className="rounded-lg bg-teal-500 px-4 py-2 text-[13px] font-semibold tracking-tight text-white shadow-soft transition-colors hover:bg-teal-600"
+              className="rounded-lg bg-teal-500 px-3.5 py-1.5 text-[12.5px] font-semibold tracking-tight text-white shadow-soft transition-colors hover:bg-teal-600"
             >
-              Demander une démo
+              {CTA_DEMO_LABEL}
             </a>
           </div>
         </div>
@@ -366,7 +367,7 @@ export default function Landing() {
                   href={DEMO}
                   className="rounded-lg bg-navy-900 px-6 py-3 text-[13.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
                 >
-                  Demander une démo
+                  Demander un échange opérationnel
                 </a>
                 <a
                   href="#etapes"
@@ -1021,7 +1022,7 @@ export default function Landing() {
             href={DEMO}
             className="rounded-lg bg-navy-900 px-6 py-3 text-[13.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
           >
-            Demander une démo
+            Demander un échange opérationnel
           </a>
           <a
             href={PILOT}
@@ -1119,7 +1120,7 @@ export default function Landing() {
               href={DEMO}
               className="rounded-lg bg-white px-6 py-3 text-[13.5px] font-medium tracking-tight text-navy-900 shadow-soft transition-colors hover:bg-ivory"
             >
-              Demander une démo
+              Demander un échange opérationnel
             </a>
             <Link
               href="/chirurgien"
