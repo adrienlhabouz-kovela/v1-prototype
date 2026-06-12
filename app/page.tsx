@@ -84,6 +84,111 @@ function IconShield({ className = "" }: { className?: string }) {
   );
 }
 
+// ─── Badges de réassurance / certifications ───────────────────────────────
+// SVG inline pour affichage immédiat sans dépendance externe. Quand les
+// vrais logos officiels seront déposés dans public/trust/, les composants
+// pourront être remplacés par <Image src="/trust/rgpd.svg" ... />.
+
+function BadgeRgpd() {
+  // 12 étoiles EU jaunes positionnées en cercle.
+  const stars = Array.from({ length: 12 }).map((_, i) => {
+    const angle = ((i * 30 - 90) * Math.PI) / 180;
+    const r = 22;
+    return { x: 32 + r * Math.cos(angle), y: 32 + r * Math.sin(angle) };
+  });
+  return (
+    <svg viewBox="0 0 64 64" className="h-14 w-14" aria-label="Conformité RGPD" role="img">
+      <circle cx="32" cy="32" r="30" fill="#003399" />
+      {stars.map((s, i) => (
+        <text
+          key={i}
+          x={s.x}
+          y={s.y + 2}
+          textAnchor="middle"
+          fontSize="5"
+          fill="#FFCC00"
+        >
+          ★
+        </text>
+      ))}
+      <text
+        x="32"
+        y="37"
+        textAnchor="middle"
+        fontSize="11"
+        fontWeight="700"
+        fill="white"
+        letterSpacing="0.5"
+      >
+        RGPD
+      </text>
+    </svg>
+  );
+}
+
+function BadgeEidas() {
+  return (
+    <svg viewBox="0 0 64 64" className="h-14 w-14" aria-label="eIDAS" role="img">
+      <circle cx="32" cy="32" r="30" fill="#e6e8ee" stroke="#94a3b8" strokeWidth="1.4" />
+      {/* petit cadenas */}
+      <rect x="22" y="20" width="12" height="9" rx="1.2" fill="none" stroke="#334155" strokeWidth="1.4" />
+      <path d="M24 20 v-3 a4 4 0 0 1 8 0 v3" fill="none" stroke="#334155" strokeWidth="1.4" />
+      <text x="32" y="42" textAnchor="middle" fontSize="10" fontWeight="700" fill="#0f172a">
+        eIDAS
+      </text>
+      {/* coche jaune */}
+      <circle cx="46" cy="42" r="6" fill="#fbbf24" />
+      <path
+        d="M43 42 l2 2 l4 -4"
+        stroke="white"
+        strokeWidth="1.6"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function BadgeCnil() {
+  return (
+    <svg viewBox="0 0 64 64" className="h-14 w-14" aria-label="CNIL" role="img">
+      <circle cx="32" cy="32" r="30" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.4" />
+      <text
+        x="32"
+        y="37"
+        textAnchor="middle"
+        fontSize="13.5"
+        fontWeight="700"
+        fill="#1e40af"
+        letterSpacing="0.5"
+      >
+        CNIL
+      </text>
+      <text x="44.5" y="37" fontSize="13.5" fontWeight="700" fill="#1e40af">
+        .
+      </text>
+    </svg>
+  );
+}
+
+function BadgeBureauVeritas() {
+  return (
+    <svg viewBox="0 0 64 64" className="h-14 w-14" aria-label="Bureau Veritas" role="img">
+      <circle cx="32" cy="32" r="30" fill="#c8202e" />
+      <text x="32" y="29" textAnchor="middle" fontSize="6.5" fontWeight="700" fill="white" letterSpacing="0.4">
+        BUREAU
+      </text>
+      <text x="32" y="38" textAnchor="middle" fontSize="6.5" fontWeight="700" fill="white" letterSpacing="0.4">
+        VERITAS
+      </text>
+      <text x="32" y="48" textAnchor="middle" fontSize="5" fill="white" opacity="0.85">
+        1828
+      </text>
+    </svg>
+  );
+}
+
 // ─── Données hero — bloc comparatif & barre de preuves ────────────────────
 const beforeKovela = [
   "Suivi dispersé (téléphone, emails)",
@@ -333,6 +438,18 @@ export default function Landing() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Trust strip — certifications & conformité, visible dès l'arrivée. */}
+      <section className="border-t border-navy-900/[0.06] bg-white">
+        <div className="px-5 py-6 sm:px-10 sm:py-7 lg:px-10 xl:px-16">
+          <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-x-7 gap-y-4 sm:gap-x-10">
+            <BadgeRgpd />
+            <BadgeEidas />
+            <BadgeCnil />
+            <BadgeBureauVeritas />
+          </div>
         </div>
       </section>
 
