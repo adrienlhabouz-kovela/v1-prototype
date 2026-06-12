@@ -483,7 +483,8 @@ function ChirurgienOnboarding() {
                     {k.pricing.baseMonthly} € HT
                   </p>
                   <p className="mt-1 text-[11.5px] text-charcoal/55">
-                    par mois — prélevé le 1er de chaque mois
+                    par mois · {k.pricing.includedPatients} patients activés
+                    inclus — prélevé le 1er du mois
                   </p>
                 </div>
                 <div className="rounded-xl bg-bone/60 p-5 ring-1 ring-navy-900/[0.04]">
@@ -494,7 +495,9 @@ function ChirurgienOnboarding() {
                     {k.pricing.perActivatedPatient} € HT
                   </p>
                   <p className="mt-1 text-[11.5px] text-charcoal/55">
-                    par patient activé — prélevé le dernier jour du mois
+                    par patient activé supplémentaire (au-delà des{" "}
+                    {k.pricing.includedPatients} inclus) — prélevé le dernier
+                    jour du mois
                   </p>
                 </div>
               </div>
@@ -506,8 +509,8 @@ function ChirurgienOnboarding() {
                 </p>
                 <ul className="mt-2.5 space-y-1.5 pl-1">
                   {[
-                    `L'abonnement mensuel de ${k.pricing.baseMonthly} € HT est prélevé le 1er de chaque mois.`,
-                    "La part variable est calculée selon le nombre de patients activés dans le mois.",
+                    `L'abonnement mensuel de ${k.pricing.baseMonthly} € HT inclut ${k.pricing.includedPatients} patients activés et est prélevé le 1er de chaque mois.`,
+                    `La part variable est calculée sur les patients activés au-delà des ${k.pricing.includedPatients} inclus.`,
                     "La part variable est prélevée le dernier jour de chaque mois.",
                     "Les prélèvements sont opérés via GoCardless (simulation — aucun paiement réel).",
                   ].map((x) => (

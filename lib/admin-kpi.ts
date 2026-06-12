@@ -43,7 +43,11 @@ export interface AdminState {
   escalations: Escalation[];
   reportFor: (patientId: string) => ClinicalReport | undefined;
   escalationFor: (patientId: string) => Escalation | undefined;
-  pricing: { baseMonthly: number; perActivatedPatient: number };
+  pricing: {
+    baseMonthly: number;
+    includedPatients: number;
+    perActivatedPatient: number;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -237,8 +241,13 @@ export function getNormalizedFinanceMetrics(state: AdminState): NormalizedFinanc
   );
 
   const revenuAbonnementNormalise = chirurgiensCible * state.pricing.baseMonthly;
+  // Le forfait inclut N patients par cabinet ; seule la part au-delà est facturée.
+  const patientsFactureNormalise = Math.max(
+    0,
+    patientsTotalCible - chirurgiensCible * state.pricing.includedPatients
+  );
   const revenuVariableNormalise =
-    patientsTotalCible * state.pricing.perActivatedPatient;
+    patientsFactureNormalise * state.pricing.perActivatedPatient;
   const mrrNormalise = revenuAbonnementNormalise + revenuVariableNormalise;
   const arrNormalise = mrrNormalise * 12;
 
@@ -275,8 +284,13 @@ export function getFinanceMetrics(state: AdminState): FinanceMetrics {
     .length;
 
   const revenuAbonnement = activeSurgeonsCount * state.pricing.baseMonthly;
+  // 5 patients/mois sont inclus dans le forfait par cabinet actif.
+  const patientsFactureMois = Math.max(
+    0,
+    activatedThisMonth - activeSurgeonsCount * state.pricing.includedPatients
+  );
   const revenuVariablePatients =
-    activatedThisMonth * state.pricing.perActivatedPatient;
+    patientsFactureMois * state.pricing.perActivatedPatient;
   const mrrEstimated = revenuAbonnement + revenuVariablePatients;
   const arrEstimated = mrrEstimated * 12;
 
@@ -1252,7 +1266,12 @@ export function getScaleSimulation(state: AdminState): ScaleSimulation {
   const patientsTotal = chirurgiens * patientsParChirurgien;
 
   const revenuAbonnement = chirurgiens * state.pricing.baseMonthly;
-  const revenuVariable = patientsTotal * state.pricing.perActivatedPatient;
+  // 5 patients/mois sont inclus dans le forfait par cabinet — variable au-delà.
+  const patientsFacture = Math.max(
+    0,
+    patientsTotal - chirurgiens * state.pricing.includedPatients
+  );
+  const revenuVariable = patientsFacture * state.pricing.perActivatedPatient;
   const mrr = revenuAbonnement + revenuVariable;
   const arr = mrr * 12;
 

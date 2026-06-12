@@ -49,14 +49,20 @@ La landing ne doit plus être modifiée, sauf :
 ```
 690 € HT / mois
   = accès mensuel au service opéré KOVELA
+  = inclut les 5 premiers patients activés chaque mois
   = facturé le 1er du mois
 
 +
 
-80 € HT / patient activé
-  = part variable d'usage
-  = facturée en fin de mois selon les patients réellement suivis
+80 € HT / patient activé supplémentaire
+  = au-delà des 5 patients inclus dans le forfait
+  = facturé en fin de mois selon l'usage réel
 ```
+
+**Patient activé** = onboarding validé + suivi lancé (définition canonique).
+
+**Phrase clé landing** : « 5 patients inclus chaque mois. Au-delà, vous ne payez que
+l'usage réel. »
 
 **Définition canonique** : *Patient activé = onboarding validé + suivi lancé.*
 

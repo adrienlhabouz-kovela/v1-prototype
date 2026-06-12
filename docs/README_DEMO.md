@@ -93,9 +93,10 @@ et les pills en haut.
 1. **Landing V1 validée** (`/`) — *« Votre suivi post-opératoire, structuré et opéré. »* Hero,
    constat cabinet, solution (5 piliers), ce qui change pour votre cabinet, baseline terrain
    (60 à 90 min / patient sur 3 à 15 jours), comment ça marche (5 étapes), IA assistive
-   encadrée, supervision compacte, cadre clair, **tarification** (690 € HT/mois + 80 € HT/patient
-   activé · « Moins qu'un mi-temps. Plus qu'un outil. »), CTA *Demander une démo* / *Discuter
-   du pilote*. Référence canonique : [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) § 1.
+   encadrée, supervision compacte, cadre clair, **tarification** (690 € HT/mois incluant 5
+   patients activés · puis 80 € HT/patient supplémentaire · « Moins qu'un mi-temps. Plus
+   qu'un outil. »), CTA *Demander une démo* / *Discuter du pilote*. Référence canonique :
+   [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) § 1.
 2. **Admin** (`/admin`) — bloc *Qualité & délais* (30 s pour piloter), Actions prioritaires
    *Voir → Sans superviseur* → **Attribuer** un patient à un superviseur.
 3. **CRM** (`/admin/crm`) — *Performance commerciale* (KPI globaux + table par sales) ; ouvrir

@@ -367,15 +367,17 @@ en 4 grandes zones :
 ### Pricing landing validé (référence canonique)
 > Voir [`DECISIONS_LOG.md`](./DECISIONS_LOG.md) § 2 pour le détail et les règles d'écriture.
 
-- **690 € HT / mois** — accès mensuel au service opéré KOVELA, facturé le 1er du mois.
-- **+ 80 € HT / patient activé** — part variable d'usage, facturée en fin de mois selon les
-  patients réellement suivis.
+- **690 € HT / mois** — accès mensuel au service opéré KOVELA, **incluant les 5 premiers
+  patients activés chaque mois**, facturé le 1er du mois.
+- **+ 80 € HT / patient activé supplémentaire** — au-delà des 5 inclus, facturé en fin de mois
+  selon l'usage réel.
 - **Définition canonique** : *Patient activé = onboarding validé + suivi lancé.*
 - **Angle pricing** : « Moins qu'un mi-temps. Plus qu'un outil. »
-- **Phrase clé** : « Le fixe donne accès au service. Le variable suit l'usage réel. »
+- **Phrase clé** : « 5 patients inclus chaque mois. Au-delà, vous ne payez que l'usage réel. »
 
-**Wording interdit** : 50 € / patient (ancienne hypothèse), abonnement SaaS, forfait illimité,
-patients illimités, sur devis (section pricing), gratuit lié au pricing.
+**Wording interdit** : 50 € / patient (ancienne hypothèse), 80 € dès le 1er patient (ancienne
+formule sans inclus), abonnement SaaS, forfait illimité, patients illimités, sur devis (section
+pricing), gratuit lié au pricing.
 
 ### V1
 - Vraie intégration GoCardless (mandat SEPA, webhooks, réconciliation).

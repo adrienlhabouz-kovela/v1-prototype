@@ -21,8 +21,9 @@ import type {
 } from "./types";
 
 export const PRICING = {
-  baseMonthly: 690, // € HT / mois / cabinet
-  perActivatedPatient: 80, // € HT / patient activé (onboarding validé + suivi lancé)
+  baseMonthly: 690, // € HT / mois / cabinet — inclut les 5 premiers patients activés
+  includedPatients: 5, // patients activés inclus dans le forfait mensuel
+  perActivatedPatient: 80, // € HT / patient activé supplémentaire au-delà des 5 inclus
 };
 
 // Durées de suivi opérationnel proposées par défaut selon le type d'intervention

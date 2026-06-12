@@ -153,9 +153,11 @@ export default function ActivationPage() {
         <div className="mt-6 rounded-2xl bg-white px-5 py-4 text-[12px] leading-relaxed text-charcoal/65 ring-1 ring-navy-900/[0.05]">
           <p>
             <span className="font-medium text-navy-900">Offre pilote :</span>{" "}
-            690 € HT / mois (accès mensuel au service · facturé le 1er du mois) +{" "}
-            80 € HT / patient activé (facturé en fin de mois · patient activé = onboarding
-            validé + suivi lancé). Les conditions pilotes ont été confirmées lors de votre
+            690 € HT / mois — accès mensuel au service, incluant les 5 premiers
+            patients activés chaque mois (facturé le 1er du mois). Au-delà :
+            80 € HT par patient activé supplémentaire, facturé en fin de mois
+            selon l&apos;usage réel (patient activé = onboarding validé + suivi
+            lancé). Les conditions pilotes ont été confirmées lors de votre
             échange avec l&apos;équipe KOVELA.
           </p>
         </div>

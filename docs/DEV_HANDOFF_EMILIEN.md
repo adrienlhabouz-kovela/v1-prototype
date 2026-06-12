@@ -36,7 +36,8 @@ Chirurgie esthétique libérale. Suivi post-opératoire structuré sur 3 à 12 j
 | Élément | Valeur |
 |---|---|
 | Abonnement cabinet | **690 € HT / mois / chirurgien** |
-| Patient activé | **80 € HT / patient activé** |
+| Patients activés inclus | **5 / mois / cabinet** |
+| Patient activé supplémentaire | **80 € HT / patient activé** au-delà des 5 inclus |
 | Définition patient activé | onboarding validé + suivi lancé |
 
 **Ne pas modifier sans validation produit explicite.**

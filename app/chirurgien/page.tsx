@@ -338,7 +338,9 @@ export default function ChirurgienDashboard() {
                 </span>
               </div>
               <p className="text-[11px] text-charcoal/45">
-                {k.pricing.baseMonthly} € HT / mois + {k.pricing.perActivatedPatient} € HT / patient activé.
+                {k.pricing.baseMonthly} € HT / mois ·{" "}
+                {k.pricing.includedPatients} patients activés inclus · puis{" "}
+                {k.pricing.perActivatedPatient} € HT / patient supplémentaire.
               </p>
             </div>
           </Card>

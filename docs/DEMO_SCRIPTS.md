@@ -21,7 +21,8 @@
 - « Validation médicale » → c'est une **validation KOVELA** (humaine, opérationnelle, non médicale).
 - « Escalade » côté UI utilisateur → préférer **« transmission cabinet »** ou **« transmission prioritaire »**.
 - « IA autonome » → l'IA est **assistive**, validée par une superviseuse à chaque étape.
-- « 50 € / patient » → ancien pricing. Le pricing actuel est **690 € HT/mois + 80 € HT/patient activé**.
+- « 50 € / patient » et « 80 € dès le 1er patient » → anciens pricing. Le pricing actuel est
+  **690 € HT/mois incluant 5 patients activés + 80 € HT/patient supplémentaire au-delà**.
 - « Forfait illimité », « patients illimités », « sur devis », « gratuit » lié au pricing.
 - « Réputation maîtrisée », « image maîtrisée » → dire **« qualité perçue du suivi mieux structurée »** ou
   **« expérience patient mieux structurée »**.
@@ -284,9 +285,10 @@ contextualisée — c'est vous qui décidez médicalement. »*
    complète. Le CR est gating 3 états — c'est ce qui sécurise juridiquement le service. »*
 6. **`/chirurgien`** *(1 min)* — *« Le chirurgien — notre client payant — voit un
    dashboard ultra-simple. Modèle économique : **690 € HT / mois** d'accès au service
-   opéré (facturé le 1er du mois) + **80 € HT / patient activé** (facturé en fin de mois,
-   sur les patients réellement suivis). Patient activé = onboarding validé + suivi lancé.
-   Prélèvement GoCardless automatisé. »* Pointer le bloc *Abonnement*.
+   opéré, **incluant les 5 premiers patients activés chaque mois** (facturé le 1er du mois).
+   Au-delà : **80 € HT par patient activé supplémentaire** (facturé en fin de mois selon
+   l'usage réel). Patient activé = onboarding validé + suivi lancé. Prélèvement GoCardless
+   automatisé. »* Pointer le bloc *Abonnement*.
 
 ### Messages clés à dire
 - *« Le post-op est un angle mort de l'expérience cabinet aujourd'hui. KOVELA est le
