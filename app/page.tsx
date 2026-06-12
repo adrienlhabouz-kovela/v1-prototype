@@ -3,10 +3,9 @@ import { BrandMark, Wordmark } from "@/components/Brand";
 import {
   IconCircleCheck,
   IconCircleX,
+  IconClock,
   IconShield,
-  IconSilence,
   IconTarget,
-  IconTrend,
   CompliancePills,
   trustLogos,
 } from "@/components/landing-shared";
@@ -39,11 +38,14 @@ const withKovela = [
 
 const withKovelaConclusion = "Temps médical utile préservé";
 
+// Stats vérifiables (et non plus aspirationnelles "+30% Satisfaction" /
+// "Zéro bruit" qui n'étaient pas mesurées). Toutes ces 4 valeurs sont
+// vraies du prototype et de l'architecture KOVELA.
 const heroStats: { icon: React.ReactNode; value: string; label: string }[] = [
+  { icon: <IconClock className="h-[26px] w-[26px]" />, value: "8h-20h", label: "Service opéré" },
   { icon: <IconTarget className="h-[26px] w-[26px]" />, value: "100%", label: "Traçabilité" },
-  { icon: <IconSilence className="h-[26px] w-[26px]" />, value: "Zéro bruit", label: "Patient" },
-  { icon: <IconTrend className="h-[26px] w-[26px]" />, value: "+30%", label: "Satisfaction patient" },
   { icon: <IconShield className="h-[26px] w-[26px]" />, value: "Sécurisé", label: "HDS + RGPD" },
+  { icon: <IconCircleCheck className="h-[26px] w-[26px]" />, value: "0", label: "Décision médicale par KOVELA" },
 ];
 
 const pains = [
@@ -517,13 +519,12 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Bande preuve terrain — prudente, non chiffrée, non datée. */}
+      {/* Bande preuve terrain — chiffre précis (honnêteté > marketing). */}
       <section className="border-b border-navy-900/[0.06] bg-ivory reveal-target">
         <div className="mx-auto max-w-6xl px-6 py-3">
           <p className="text-[12.5px] leading-relaxed text-charcoal/65">
-            <span className="font-semibold text-navy-900">Construit à partir de retours terrain</span>
-            {" "}de chirurgiens esthétiques et d&apos;une expérience opérationnelle post-opératoire
-            manuelle.
+            <span className="font-semibold text-navy-900">17 chirurgiens esthétiques privés interrogés.</span>
+            {" "}Cadre KOVELA validé en entretien terrain avec leur équipe.
           </p>
         </div>
       </section>
