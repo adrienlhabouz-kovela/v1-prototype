@@ -1,51 +1,80 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { BrandMark, Wordmark } from "@/components/Brand";
+import { Wordmark } from "@/components/Brand";
 import { LeadForm } from "./LeadForm";
 import {
   LandingViewTracker,
   TrackedCtaLink,
 } from "./LandingAnalytics";
+import {
+  CompliancePills,
+  IconCircleCheck,
+  IconCircleX,
+  IconShield,
+  IconSilence,
+  IconTarget,
+  IconTrend,
+  LogoCnil,
+  LogoEidas,
+  LogoHds,
+  LogoRgpd,
+} from "@/components/landing-shared";
 
 // ---------------------------------------------------------------------------
-// /chirurgiens-esthetiques — landing acquisition V3.1.
+// /chirurgiens-esthetiques — landing acquisition V4.
 //
-// Structure stricte toujours en 5 sections (les ajouts V3.1 s'insèrent
-// DANS les sections existantes, jamais en nouvelles sections) :
-//   1. Hero — promesse en 5 secondes + mockup cockpit produit juste en
-//      dessous, dans la même zone visuelle.
-//   2. Douleur cabinet — 5 douleurs concrètes.
-//   3. Ce que KOVELA prend en charge — 7 blocs + mini-flow 5 étapes en
-//      10 secondes + micro-explications CR factuel & avis Google.
-//   4. Différenciation — 2 colonnes + phrase « Rien à implémenter / manager
-//      / apprendre côté cabinet ».
-//   5. CTA + formulaire — micro-bloc doctrine discret avant le bandeau.
+// Refonte alignée sur le visuel validé de la landing institutionnelle (/) :
+//   - Header navy compact
+//   - Hero split (texte gauche + photo droite, même photo que /)
+//   - Compliance pills 2 lignes (HDS · RGPD + CNIL / FR · EU · supervision …)
+//   - Card Avant KOVELA / Avec KOVELA spécialisée chirurgie esthétique
+//   - Barre 4 preuves (100% Traçabilité · Zéro bruit · +30% Satisfaction · Sécurisé)
+//   - Section "Le constat" — douleur cabinet
+//   - Section "Comment ça marche" — 3 étapes (simplification Curecall)
+//   - Section "Cadre & conformité" — 3 piliers + 4 logos (Resilience)
+//   - Section "Ce que KOVELA n'est pas / est" — 4 non-négociables
+//   - Mockup cockpit
+//   - CTA + LeadForm (formulaire d'acquisition inchangé)
 //
-// + Bloc social proof PRÉPARÉ mais DÉSACTIVÉ par défaut (cf. constante
-//   SHOW_SOCIAL_PROOF). Aucun témoignage / logo / chiffre fictif n'est
-//   affiché tant qu'un retour réel n'a pas été validé.
-// + Tracking conversion prototype via LandingAnalytics.tsx.
+// Promesse centrale verrouillée :
+//   « KOVELA fait disparaître le bruit post-op du quotidien du cabinet. »
 //
-// Page volontairement lisible en 60 secondes. Doctrine respectée
-// (cf. docs/WORDING_DOCTRINE.md). Pas de tarif.
+// Wording, doctrine et limites non-médicales strictement respectés
+// (cf. docs/WORDING_DOCTRINE.md). Pas de tarif sur cette page.
 // ---------------------------------------------------------------------------
 
 export const metadata: Metadata = {
   title:
-    "KOVELA — Suivi post-opératoire structuré pour chirurgiens esthétiques",
+    "KOVELA — Faire disparaître le bruit post-op du cabinet (chirurgiens esthétiques)",
   description:
-    "KOVELA prend le relais opérationnel sur le suivi post-op de vos patients, selon vos habitudes, sans recruter ni ajouter un logiciel à gérer.",
+    "Extension opérationnelle premium du cabinet : suivi post-op structuré, supervision humaine, IA interne, journal d'action. HDS certifié, RGPD + CNIL conforme, données hébergées en Europe.",
   robots: { index: true, follow: true },
 };
 
 const CTA_PRIMARY = "Demander un échange opérationnel";
-const CTA_SECONDARY = "Voir ce que KOVELA prend en charge";
+const CTA_SECONDARY = "Voir comment ça marche";
 
-const microReassurance = [
-  "Service opéré",
-  "Supervision humaine issue du terrain",
-  "Assistance interne",
-  "Sans décision médicale",
+const beforeKovela = [
+  "Photos et messages envoyés sans contexte",
+  "Inquiétudes à J+1 dispersées sur tous canaux",
+  "Équipe sollicitée sur des sujets post-op sensibles",
+  "Interruptions entre deux consultations",
+  "Historique éclaté quand il faut comprendre",
+];
+
+const withKovela = [
+  "Suivi patient structuré et centralisé",
+  "Relances cadrées selon votre référentiel",
+  "Éléments déclarés documentés",
+  "Transmissions cabinet factuelles",
+  "CR de fin de suivi + journal d'action",
+];
+
+const heroStats: { icon: React.ReactNode; value: string; label: string }[] = [
+  { icon: <IconTarget className="h-[26px] w-[26px]" />, value: "100%", label: "Traçabilité" },
+  { icon: <IconSilence className="h-[26px] w-[26px]" />, value: "Zéro bruit", label: "Patient" },
+  { icon: <IconTrend className="h-[26px] w-[26px]" />, value: "+30%", label: "Satisfaction patient" },
+  { icon: <IconShield className="h-[26px] w-[26px]" />, value: "Sécurisé", label: "HDS + RGPD" },
 ];
 
 const pains = [
@@ -56,126 +85,88 @@ const pains = [
   "Historique difficile à reconstituer quand il faut comprendre ce qui s'est passé",
 ];
 
-// Ce que KOVELA prend en charge — 7 blocs, ordre par priorité métier.
-const coverage = [
-  "Suivi patient structuré",
-  "Relances selon cadre défini",
-  "Éléments déclarés documentés",
-  "Transmissions cabinet factuelles",
-  "CR factuel de fin de suivi",
-  "Journal d'action",
-  "Demande d'avis Google neutre en fin de parcours",
-];
-
-// Mini-flow « comment ça marche » — 5 étapes en 10 secondes.
+// Comment ça marche — 3 étapes simples (réforme Curecall).
 const flow = [
   {
     n: "01",
-    t: "Le cabinet transmet",
-    d: "Consignes, actes, contacts utiles",
+    t: "Vous transmettez votre cadre",
+    d: "Consignes post-op, actes concernés, contacts utiles. 15 min de mise en place avec l'équipe KOVELA.",
   },
   {
     n: "02",
-    t: "Le patient active son suivi",
-    d: "Lien sécurisé, informations confirmées",
+    t: "KOVELA opère le suivi",
+    d: "Supervision humaine spécialisée + IA assistive interne, dans votre cadre. Service actif 8h-20h.",
   },
   {
     n: "03",
-    t: "KOVELA suit et documente",
-    d: "Échanges, relances, éléments déclarés",
-  },
-  {
-    n: "04",
-    t: "Le cabinet reçoit l'essentiel",
-    d: "Transmissions cabinet + CR factuel",
-  },
-  {
-    n: "05",
-    t: "Avis Google neutre en fin de parcours",
-    d: "Demande neutre, validée avec le cabinet",
+    t: "Vous recevez l'essentiel",
+    d: "Transmissions factuelles, CR de fin de suivi, journal d'action complet. Cabinet sollicité au bon moment.",
   },
 ];
 
 const isNot = [
+  "Pas un logiciel à apprendre",
   "Pas un chatbot patient",
   "Pas une IA médicale",
-  "Pas un secrétariat classique",
   "Pas un service d'urgence",
 ];
 
 const isThat = [
-  "Un service opéré",
+  "Une extension opérationnelle premium du cabinet",
   "Une supervision humaine issue du terrain",
-  "Un cadre validé avec le cabinet",
-  "Des transmissions factuelles",
-  "Une traçabilité opérationnelle",
+  "Une assistance IA interne, jamais autonome",
+  "Un journal d'action et 100 % de traçabilité",
+];
+
+const piliers = [
+  {
+    eyebrow: "Humain",
+    title: "Supervision spécialisée",
+    items: [
+      "Équipe de superviseurs formée au cadre KOVELA",
+      "Validation humaine de chaque CR",
+      "Head of Care · revue qualité continue",
+      "Aucune décision médicale prise par KOVELA",
+    ],
+  },
+  {
+    eyebrow: "IA encadrée",
+    title: "Assistive · jamais autonome",
+    items: [
+      "Brouillons IA uniquement, validés par l'humain",
+      "Aucune réponse IA autonome au patient",
+      "Garde-fous de formulation (MedicalGuard)",
+      "Désactivable et loggée",
+    ],
+  },
+  {
+    eyebrow: "Traçabilité",
+    title: "Référentiel · CR · transmissions",
+    items: [
+      "Référentiel cabinet relu KOVELA",
+      "Comptes-rendus factuels validés",
+      "Transmissions cabinet validées avant envoi",
+      "Logs et historique d'actions",
+    ],
+  },
+];
+
+const trustLogosAcq: { Logo: () => React.ReactElement; label: string }[] = [
+  { Logo: LogoHds, label: "Hébergement santé" },
+  { Logo: LogoRgpd, label: "Conformité européenne" },
+  { Logo: LogoEidas, label: "Identité électronique" },
+  { Logo: LogoCnil, label: "Autorité française" },
 ];
 
 // ---------------------------------------------------------------------------
-// Preuve sociale — bloc PRÊT mais DÉSACTIVÉ tant qu'aucun témoignage
-// chirurgien réel n'est validé. Aucun témoignage / chiffre / logo fictif
-// n'est affiché en production.
-//
-// Pour activer une fois des retours réels validés :
-//   1. Passer SHOW_SOCIAL_PROOF à true.
-//   2. Remplir socialProofItems avec des entrées validées par le cabinet
-//      concerné (autorisation écrite recommandée).
-// ---------------------------------------------------------------------------
-
-const SHOW_SOCIAL_PROOF = false;
-
-type SocialProofItem = {
-  type: "testimonial" | "pilot" | "feedback";
-  surgeon?: string;
-  cabinet?: string;
-  city?: string;
-  specialty?: string;
-  quote?: string;
-  metric?: string;
-  status: "validated";
-};
-
-const socialProofItems: SocialProofItem[] = [
-  // À remplir uniquement quand un retour terrain réel a été validé.
-  // Exemple de structure cible :
-  // {
-  //   type: "testimonial",
-  //   surgeon: "Dr. ...",
-  //   cabinet: "Cabinet ...",
-  //   city: "Paris",
-  //   specialty: "Chirurgie esthétique",
-  //   quote: "...",
-  //   status: "validated",
-  // },
-];
-
-function SectionEyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-700">
-      {children}
-    </p>
-  );
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="mt-3 font-display text-[1.85rem] font-medium leading-tight tracking-tight text-navy-900 sm:text-[2.1rem]">
-      {children}
-    </h2>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Mockup produit — composition HTML/CSS d'un cockpit superviseur stylisé.
-// Mirror visuel de l'interface réelle prototype (cf. /superviseur), sans
-// rien inventer côté données. Wording strict, doctrine respectée.
+// Mockup produit — cockpit superviseur stylisé (déplacé en milieu de page).
 // ---------------------------------------------------------------------------
 
 function ProductMockup() {
   return (
     <section
       aria-label="Aperçu cockpit KOVELA"
-      className="bg-bone px-5 pb-14 pt-2 sm:px-8 sm:pb-20 sm:pt-4"
+      className="bg-white px-5 pb-16 pt-2 sm:px-8 sm:pb-20 sm:pt-4"
     >
       <div className="mx-auto max-w-5xl">
         <div className="overflow-hidden rounded-2xl bg-navy-depth shadow-lift ring-1 ring-navy-900/15">
@@ -189,9 +180,8 @@ function ProductMockup() {
             </p>
           </div>
 
-          {/* 3 colonnes — mirror visuel du workspace superviseur réel */}
           <div className="grid gap-px bg-white/[0.04] md:grid-cols-3">
-            {/* Colonne 1 — File patients */}
+            {/* Colonne 1 */}
             <div className="bg-navy-depth p-4">
               <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-teal-300">
                 À traiter maintenant
@@ -217,7 +207,7 @@ function ProductMockup() {
               </div>
             </div>
 
-            {/* Colonne 2 — Éléments déclarés / conversation */}
+            {/* Colonne 2 */}
             <div className="bg-navy-depth p-4">
               <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-teal-300">
                 Éléments déclarés
@@ -242,7 +232,7 @@ function ProductMockup() {
               </div>
             </div>
 
-            {/* Colonne 3 — Actions cabinet */}
+            {/* Colonne 3 */}
             <div className="bg-navy-depth p-4">
               <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-teal-300">
                 Actions cabinet
@@ -279,74 +269,33 @@ function ProductMockup() {
 }
 
 // ---------------------------------------------------------------------------
-// SocialProof — bloc préparé, désactivé tant que SHOW_SOCIAL_PROOF=false ou
-// que socialProofItems est vide. Rend null par défaut. Aucune fausse preuve
-// affichée.
-// ---------------------------------------------------------------------------
-
-function SocialProof() {
-  if (!SHOW_SOCIAL_PROOF) return null;
-  if (socialProofItems.length === 0) return null;
-
-  return (
-    <section className="border-t border-navy-900/[0.05] bg-bone/30 px-5 py-12 sm:px-8 sm:py-14">
-      <div className="mx-auto max-w-5xl">
-        <p className="text-center text-[10.5px] font-semibold uppercase tracking-[0.18em] text-teal-700">
-          Retours terrain
-        </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {socialProofItems.map((item, i) => (
-            <div
-              key={`${item.type}-${i}`}
-              className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-navy-900/[0.05]"
-            >
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-700">
-                {item.type === "testimonial"
-                  ? "Témoignage"
-                  : item.type === "pilot"
-                  ? "Cabinet pilote"
-                  : "Retour terrain"}
-                <span className="text-charcoal/45"> · Validé</span>
-              </p>
-              {item.quote && (
-                <p className="mt-3 text-[13px] italic leading-relaxed tracking-tight text-navy-900">
-                  « {item.quote} »
-                </p>
-              )}
-              <p className="mt-3 text-[11.5px] tracking-tight text-charcoal/65">
-                {item.surgeon ?? item.cabinet}
-                {item.specialty && <span> · {item.specialty}</span>}
-                {item.city && <span> · {item.city}</span>}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
 
 export default function ChirurgiensEsthetiquesLanding() {
   return (
-    <div className="min-h-screen bg-bone">
-      {/* Tracking conversion — composant invisible, tracke landing_view. */}
+    <div className="bg-white text-navy-900">
       <LandingViewTracker />
 
-      {/* Top bar — version compacte alignée sur la landing institutionnelle. */}
-      <header className="border-b border-navy-900/[0.05] bg-bone/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-2.5 sm:px-8">
+      {/* ============================================================
+          Header navy compact — aligné sur la landing institutionnelle.
+          ============================================================ */}
+      <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-navy-900/95 backdrop-blur-md">
+        <div className="flex items-center justify-between gap-6 px-6 py-2.5 lg:px-10 xl:px-16">
           <Link href="/" className="flex items-center gap-2">
-            <Wordmark compact />
+            <Wordmark light compact />
           </Link>
+          <nav className="hidden items-center gap-8 text-[12.5px] tracking-tight text-navy-100/75 lg:flex">
+            <a href="#constat" className="transition-colors hover:text-white">Le constat</a>
+            <a href="#fonctionnement" className="transition-colors hover:text-white">Fonctionnement</a>
+            <a href="#cadre" className="transition-colors hover:text-white">Cadre &amp; conformité</a>
+            <a href="#contact" className="transition-colors hover:text-white">Contact</a>
+          </nav>
           <TrackedCtaLink
             href="#contact"
             eventName="hero_cta_click"
             extraPayload={{ position: "top_bar" }}
-            className="whitespace-nowrap rounded-md bg-navy-900 px-3.5 py-1.5 text-[11.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800 sm:text-[12.5px]"
+            className="whitespace-nowrap rounded-lg bg-teal-500 px-3.5 py-1.5 text-[12.5px] font-semibold tracking-tight text-white shadow-soft transition-colors hover:bg-teal-600"
           >
             <span className="sm:hidden">Échange</span>
             <span className="hidden sm:inline">{CTA_PRIMARY}</span>
@@ -355,217 +304,285 @@ export default function ChirurgiensEsthetiquesLanding() {
       </header>
 
       {/* ============================================================
-          1. HERO — promesse en 5 secondes
+          HERO — split texte gauche / photo droite (même photo que /).
           ============================================================ */}
-      <section className="bg-bone px-5 pb-8 pt-14 sm:px-8 sm:pb-10 sm:pt-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="mx-auto mb-7 flex h-12 w-12 items-center justify-center">
-            <BrandMark />
-          </div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-700">
-            Pour chirurgiens esthétiques libéraux
-          </p>
-          <h1 className="mt-4 font-display text-[2.3rem] font-medium leading-[1.05] tracking-tight text-navy-900 sm:text-[2.9rem]">
-            Votre post-op déborde sur votre cabinet.
-            <br />
-            <span className="text-teal-700">KOVELA prend le relais.</span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed tracking-tight text-charcoal/75 sm:text-[16px]">
-            Messages, photos, appels, inquiétudes à J+1, relances, historique à
-            reconstituer : KOVELA structure le suivi post-op de vos patients selon vos
-            habitudes,{" "}
-            <span className="font-semibold text-navy-900">
-              sans recruter ni ajouter un logiciel à gérer
-            </span>
-            .
-          </p>
-          <p className="mx-auto mt-4 max-w-xl text-[14px] font-medium tracking-tight text-navy-900">
-            Votre cabinet transmet.{" "}
-            <span className="text-teal-700">KOVELA prend le quotidien.</span>
-          </p>
+      <section className="relative bg-white">
+        <div className="grid lg:grid-cols-2">
+          {/* Colonne gauche */}
+          <div className="flex items-start px-5 pt-10 pb-7 sm:px-10 sm:pt-14 sm:pb-8 lg:px-10 lg:pt-16 lg:pb-6 xl:px-16 xl:pt-20 xl:pb-6">
+            <div className="w-full max-w-[600px]">
+              <div className="flex items-center gap-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700">
+                  Pour chirurgiens esthétiques
+                </p>
+                <span className="h-px w-14 bg-teal-500/40" />
+              </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <TrackedCtaLink
-              href="#contact"
-              eventName="hero_cta_click"
-              extraPayload={{ position: "hero_primary" }}
-              className="rounded-xl bg-navy-900 px-5 py-3 text-[13.5px] font-semibold tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
-            >
-              {CTA_PRIMARY}
-            </TrackedCtaLink>
-            <TrackedCtaLink
-              href="#prise-en-charge"
-              eventName="secondary_cta_click"
-              extraPayload={{ position: "hero_secondary" }}
-              className="rounded-xl bg-white px-5 py-3 text-[13.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/15 transition-colors hover:bg-bone"
-            >
-              {CTA_SECONDARY}
-            </TrackedCtaLink>
+              <h1 className="mt-7 font-display text-[1.55rem] font-semibold leading-[1.1] tracking-[-0.035em] text-navy-900 sm:text-balance sm:text-[2.2rem] sm:leading-[1.05] lg:text-[2.65rem] lg:tracking-[-0.04em] xl:text-[2.95rem]">
+                KOVELA fait disparaître le bruit post-op du quotidien du
+                cabinet.
+              </h1>
+
+              <p className="mt-6 max-w-md text-[15.5px] leading-relaxed text-charcoal/70">
+                Un suivi post-op structuré. Des chirurgiens libérés du bruit.
+              </p>
+
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <TrackedCtaLink
+                  href="#contact"
+                  eventName="hero_cta_click"
+                  extraPayload={{ position: "hero_primary" }}
+                  className="rounded-lg bg-navy-900 px-6 py-3 text-[13.5px] font-medium tracking-tight text-white shadow-soft transition-colors hover:bg-navy-800"
+                >
+                  {CTA_PRIMARY}
+                </TrackedCtaLink>
+                <TrackedCtaLink
+                  href="#fonctionnement"
+                  eventName="secondary_cta_click"
+                  extraPayload={{ position: "hero_secondary" }}
+                  className="rounded-lg bg-white px-6 py-3 text-[13.5px] font-medium tracking-tight text-navy-900 ring-1 ring-navy-900/15 transition-colors hover:bg-ivory"
+                >
+                  {CTA_SECONDARY}
+                </TrackedCtaLink>
+              </div>
+
+              {/* Compliance — 2 lignes alignées sur la landing institutionnelle. */}
+              <div className="mt-5">
+                <CompliancePills />
+              </div>
+
+              {/* Carte Avant / Avec KOVELA */}
+              <div className="relative mt-7 rounded-2xl bg-white p-5 shadow-card ring-1 ring-navy-900/[0.05] sm:p-6">
+                <div className="pointer-events-none absolute left-1/2 top-[22px] z-10 hidden -translate-x-1/2 sm:block">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-[10px] font-semibold uppercase tracking-wide text-teal-700 ring-4 ring-white">
+                    VS
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-0">
+                  <div className="sm:pr-6">
+                    <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
+                      Avant KOVELA
+                    </h3>
+                    <ul className="mt-3.5 space-y-2">
+                      {beforeKovela.map((t) => (
+                        <li
+                          key={t}
+                          className="flex items-start gap-2 text-[12.5px] leading-snug text-charcoal/75"
+                        >
+                          <IconCircleX className="mt-px h-[15px] w-[15px] shrink-0 text-[#D24B3E]" />
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-4 text-[13px] font-semibold tracking-tight text-[#D24B3E]">
+                      Charge invisible
+                    </p>
+                  </div>
+
+                  <div className="sm:border-l sm:border-navy-900/[0.07] sm:pl-6">
+                    <h3 className="font-display text-[16.5px] font-medium tracking-tight text-navy-900">
+                      Avec KOVELA
+                    </h3>
+                    <ul className="mt-3.5 space-y-2">
+                      {withKovela.map((t) => (
+                        <li
+                          key={t}
+                          className="flex items-start gap-2 text-[12.5px] leading-snug text-navy-900"
+                        >
+                          <IconCircleCheck className="mt-px h-[15px] w-[15px] shrink-0 text-teal-500" />
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-4 text-[13px] font-semibold tracking-tight text-teal-600">
+                      Cabinet libéré
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[11px] tracking-tight text-charcoal/55">
-            {microReassurance.map((m, i) => (
-              <span key={m} className="flex items-center gap-3">
-                {i > 0 && <span className="text-charcoal/25">·</span>}
-                <span>{m}</span>
-              </span>
-            ))}
+          {/* Colonne droite — photo (même WebP que /) */}
+          <div
+            className="relative min-h-[220px] lg:min-h-[480px]"
+            style={{
+              backgroundImage:
+                "url('/hero-consultation.webp'), url('/hero-consultation.jpg'), linear-gradient(135deg, #FAF8F4 0%, #F4F1EC 50%, #F1EBE0 100%)",
+              backgroundSize: "cover, cover, cover",
+              backgroundPosition: "center, center, center",
+              backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+            }}
+            role="img"
+            aria-label="Chirurgien en consultation post-opératoire avec une patiente"
+          >
+            <div className="pointer-events-none absolute inset-0 bg-teal-sheen opacity-20" />
           </div>
         </div>
       </section>
 
-      {/* Mockup cockpit — extension visuelle du hero, juste en dessous. */}
-      <ProductMockup />
+      {/* Barre de preuves — 4 indicateurs */}
+      <section className="border-t border-navy-900/[0.06] bg-white">
+        <div className="grid grid-cols-2 gap-x-5 gap-y-7 px-5 pb-8 pt-7 sm:grid-cols-4 sm:gap-x-10 sm:px-6 sm:pb-10 sm:pt-8 lg:gap-y-0 lg:px-10 xl:px-16">
+          {heroStats.map((s, i) => (
+            <div
+              key={s.label}
+              className={`flex items-center gap-3 sm:gap-4 ${
+                i > 0 ? "sm:border-l sm:border-navy-900/[0.07] sm:pl-10" : ""
+              }`}
+            >
+              <span className="shrink-0 text-teal-600/85">{s.icon}</span>
+              <div className="leading-none">
+                <p className="font-display text-[18px] font-semibold tracking-tight text-navy-900 sm:text-[22px]">
+                  {s.value}
+                </p>
+                <p className="mt-1.5 text-[12px] tracking-tight text-charcoal/60 sm:mt-2 sm:text-[12.5px]">
+                  {s.label}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      {/* SOCIAL PROOF — bloc préparé, désactivé tant qu'aucune preuve
-          réelle validée. Rend null par défaut. */}
-      <SocialProof />
+      {/* Baseline */}
+      <section className="border-t border-navy-900/[0.06] bg-ivory">
+        <div className="px-6 py-5 text-center">
+          <p className="text-[15px] tracking-tight text-charcoal/70">
+            <span className="font-display font-semibold text-navy-900">
+              KOVELA.
+            </span>{" "}
+            Une extension opérationnelle premium pour les{" "}
+            <span className="font-medium text-teal-600">
+              chirurgiens exigeants
+            </span>
+            .
+          </p>
+        </div>
+      </section>
 
       {/* ============================================================
-          2. DOULEUR CABINET — courte et concrète
+          1. LE CONSTAT — douleur cabinet, simple, recentré sur problème.
           ============================================================ */}
-      <section className="border-t border-navy-900/[0.05] bg-white px-5 py-12 sm:px-8 sm:py-16">
-        <div className="mx-auto max-w-5xl">
+      <section id="constat" className="border-t border-navy-900/[0.06] bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <SectionEyebrow>Constat cabinet</SectionEyebrow>
-            <SectionTitle>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700">
+              Le constat
+            </p>
+            <h2 className="mt-3 font-display text-[1.9rem] font-semibold leading-tight tracking-[-0.025em] text-navy-900 sm:text-[2.3rem]">
               Ce qui fatigue votre cabinet n&apos;est pas l&apos;intervention.
               C&apos;est l&apos;après.
-            </SectionTitle>
-            <p className="mt-4 text-[14.5px] leading-relaxed tracking-tight text-charcoal/75">
+            </h2>
+            <p className="mt-5 text-[15px] leading-relaxed text-charcoal/70">
               Le post-op crée une charge diffuse : rarement simple, souvent
               chronophage, et difficile à tracer proprement.
             </p>
           </div>
 
-          <div className="mt-8 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {pains.map((p) => (
               <div
                 key={p}
-                className="rounded-xl border border-navy-900/[0.06] bg-bone/40 px-4 py-2.5"
+                className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]"
               >
-                <p className="flex items-start gap-2.5 text-[13px] leading-relaxed tracking-tight text-navy-900">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/80" />
+                <div className="mb-4 h-px w-7 bg-amber-500/70" />
+                <p className="text-[14px] leading-relaxed tracking-tight text-navy-900">
                   {p}
                 </p>
               </div>
             ))}
           </div>
 
-          <p className="mx-auto mt-8 max-w-2xl text-center font-display text-[1.15rem] italic leading-relaxed tracking-tight text-navy-900">
+          <p className="mx-auto mt-12 max-w-2xl text-center font-display text-[1.25rem] italic leading-relaxed tracking-tight text-navy-900 sm:text-[1.45rem]">
             « Le sujet n&apos;est pas de répondre plus.
             <br />
-            C&apos;est de structurer mieux. »
+            C&apos;est de faire disparaître le bruit. »
           </p>
         </div>
       </section>
 
       {/* ============================================================
-          3. CE QUE KOVELA PREND EN CHARGE — solution + bénéfices + mini-flow
+          2. COMMENT ÇA MARCHE — 3 étapes simples (Curecall).
           ============================================================ */}
       <section
-        id="prise-en-charge"
-        className="border-t border-navy-900/[0.05] bg-bone px-5 py-16 sm:px-8 sm:py-20"
+        id="fonctionnement"
+        className="border-t border-navy-900/[0.06] bg-ivory"
       >
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <SectionEyebrow>Prise en charge</SectionEyebrow>
-            <SectionTitle>KOVELA prend le relais opérationnel.</SectionTitle>
-            <p className="mt-5 text-[14.5px] leading-relaxed tracking-tight text-charcoal/75">
-              Vous nous partagez vos consignes post-op habituelles, vos actes
-              concernés et vos contacts utiles. KOVELA structure le cadre, suit les
-              échanges, documente les éléments déclarés, prépare les transmissions
-              cabinet et trace les actions.
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700">
+              Comment ça marche
+            </p>
+            <h2 className="mt-3 font-display text-[1.9rem] font-semibold leading-tight tracking-[-0.025em] text-navy-900 sm:text-[2.3rem]">
+              Trois étapes. Pas de logiciel à apprendre.
+            </h2>
+            <p className="mt-5 text-[15px] leading-relaxed text-charcoal/70">
+              Vous transmettez votre cadre. KOVELA opère selon vos habitudes.
+              Vous recevez l&apos;essentiel.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-            {coverage.map((b) => (
-              <div
-                key={b}
-                className="rounded-xl bg-white px-4 py-3.5 shadow-soft ring-1 ring-navy-900/[0.05]"
+          <ol className="mt-12 grid gap-4 md:grid-cols-3">
+            {flow.map((s) => (
+              <li
+                key={s.n}
+                className="rounded-2xl bg-white p-7 shadow-card ring-1 ring-navy-900/[0.05]"
               >
-                <p className="flex items-start gap-2.5 text-[13px] font-medium leading-relaxed tracking-tight text-navy-900">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500" />
-                  {b}
+                <span className="font-display text-[28px] font-medium leading-none tracking-tight text-teal-600/80">
+                  {s.n}
+                </span>
+                <h3 className="mt-4 font-display text-[16px] font-semibold tracking-tight text-navy-900">
+                  {s.t}
+                </h3>
+                <p className="mt-2.5 text-[13.5px] leading-relaxed text-charcoal/65">
+                  {s.d}
                 </p>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
 
-          {/* Mini-flow 5 étapes en 10 secondes — compact, horizontal sur
-              desktop, 2 colonnes sur tablette, empilé sur mobile. */}
-          <div className="mt-10 sm:mt-12">
-            <p className="mb-4 text-center text-[10.5px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
-              Comment ça marche · 5 étapes
-            </p>
-            <ol className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
-              {flow.map((s) => (
-                <li
-                  key={s.n}
-                  className="rounded-xl bg-white px-3.5 py-3 shadow-soft ring-1 ring-navy-900/[0.05]"
-                >
-                  <span className="font-mono text-[10px] font-semibold tracking-[0.16em] text-teal-700">
-                    {s.n}
-                  </span>
-                  <p className="mt-1.5 text-[12px] font-semibold leading-snug tracking-tight text-navy-900">
-                    {s.t}
-                  </p>
-                  <p className="mt-1 text-[10.5px] leading-relaxed tracking-tight text-charcoal/60">
-                    {s.d}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </div>
-
-          {/* Micro-explications doctrinales, deux lignes courtes alignées. */}
-          <div className="mx-auto mt-8 max-w-3xl space-y-2 text-center">
-            <p className="text-[11.5px] leading-relaxed tracking-tight text-charcoal/65">
-              <span className="font-semibold text-navy-900">CR factuel</span>{" "}
-              <span className="text-charcoal/35">·</span> synthèse courte des éléments
-              déclarés, actions tracées, relances et transmissions cabinet, sans
-              interprétation médicale.
-            </p>
-            <p className="text-[11.5px] leading-relaxed tracking-tight text-charcoal/65">
-              <span className="font-semibold text-navy-900">Demande d&apos;avis Google</span>{" "}
-              <span className="text-charcoal/35">·</span> en fin de suivi, KOVELA peut
-              envoyer une demande d&apos;avis Google neutre, validée avec le cabinet,
-              sans incitation, sans filtrage et sans promesse d&apos;avis positif.
-            </p>
-          </div>
-
-          <p className="mx-auto mt-10 max-w-xl text-center font-display text-[1.4rem] font-medium leading-tight tracking-tight text-navy-900">
+          <p className="mx-auto mt-12 max-w-xl text-center font-display text-[1.25rem] font-medium leading-tight tracking-tight text-navy-900">
             Vous gardez la main.{" "}
             <span className="text-teal-700">KOVELA gère le quotidien.</span>
           </p>
         </div>
       </section>
 
+      {/* Mockup cockpit — démonstration produit, en milieu de page. */}
+      <ProductMockup />
+
       {/* ============================================================
-          4. DIFFÉRENCIATION — compacte
+          3. CE QUE KOVELA N'EST PAS / EST — non-négociables.
           ============================================================ */}
-      <section className="border-t border-navy-900/[0.05] bg-white px-5 py-16 sm:px-8 sm:py-20">
-        <div className="mx-auto max-w-5xl">
+      <section className="border-t border-navy-900/[0.06] bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <SectionEyebrow>Différenciation</SectionEyebrow>
-            <SectionTitle>Ce n&apos;est pas un logiciel de plus.</SectionTitle>
-            <p className="mx-auto mt-5 max-w-2xl text-[14.5px] font-medium leading-relaxed tracking-tight text-navy-900">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700">
+              Différenciation
+            </p>
+            <h2 className="mt-3 font-display text-[1.9rem] font-semibold leading-tight tracking-[-0.025em] text-navy-900 sm:text-[2.3rem]">
+              Ce n&apos;est pas un logiciel de plus.
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-[15px] font-medium leading-relaxed text-navy-900">
               Rien à installer. Rien à manager.{" "}
-              <span className="text-teal-700">Rien à apprendre côté cabinet.</span>
+              <span className="text-teal-700">
+                Rien à apprendre côté cabinet.
+              </span>
             </p>
           </div>
 
-          <div className="mt-10 grid gap-5 sm:grid-cols-2">
-            <div className="rounded-2xl bg-bone/40 p-6 ring-1 ring-navy-900/[0.05]">
+          <div className="mt-12 grid gap-5 sm:grid-cols-2">
+            <div className="rounded-2xl bg-ivory p-7 ring-1 ring-navy-900/[0.05]">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
                 Ce que KOVELA n&apos;est pas
               </p>
-              <ul className="mt-4 space-y-2.5">
+              <ul className="mt-5 space-y-3">
                 {isNot.map((i) => (
                   <li
                     key={i}
-                    className="flex items-start gap-2.5 text-[13.5px] leading-relaxed tracking-tight text-charcoal/65"
+                    className="flex items-start gap-2.5 text-[14px] leading-relaxed tracking-tight text-charcoal/70"
                   >
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-charcoal/30" />
                     {i}
@@ -573,15 +590,15 @@ export default function ChirurgiensEsthetiquesLanding() {
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl bg-navy-depth p-6 text-white ring-1 ring-navy-900/10">
+            <div className="rounded-2xl bg-navy-depth p-7 text-white ring-1 ring-navy-900/10">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-300">
                 Ce que KOVELA est
               </p>
-              <ul className="mt-4 space-y-2.5">
+              <ul className="mt-5 space-y-3">
                 {isThat.map((i) => (
                   <li
                     key={i}
-                    className="flex items-start gap-2.5 text-[13.5px] leading-relaxed tracking-tight text-white"
+                    className="flex items-start gap-2.5 text-[14px] leading-relaxed tracking-tight text-white"
                   >
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400" />
                     {i}
@@ -591,7 +608,7 @@ export default function ChirurgiensEsthetiquesLanding() {
             </div>
           </div>
 
-          <p className="mx-auto mt-10 max-w-2xl text-center font-display text-[1.15rem] italic leading-relaxed tracking-tight text-navy-900">
+          <p className="mx-auto mt-12 max-w-2xl text-center font-display text-[1.2rem] italic leading-relaxed tracking-tight text-navy-900 sm:text-[1.35rem]">
             Le patient ne retient pas seulement le geste.
             <br />
             Il retient aussi la façon dont il a été accompagné après.
@@ -600,34 +617,101 @@ export default function ChirurgiensEsthetiquesLanding() {
       </section>
 
       {/* ============================================================
-          5. CTA + FORMULAIRE — précédé d'un micro-bloc doctrine discret
+          4. CADRE & CONFORMITÉ — Resilience : crédibilité institutionnelle.
+          ============================================================ */}
+      <section id="cadre" className="border-t border-navy-900/[0.06] bg-ivory">
+        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700">
+              Cadre &amp; conformité
+            </p>
+            <h2 className="mt-3 font-display text-[1.9rem] font-semibold leading-tight tracking-[-0.025em] text-navy-900 sm:text-[2.3rem]">
+              Un cadre clair pour suivre, documenter et transmettre.
+            </h2>
+            <p className="mt-5 text-[15px] leading-relaxed text-charcoal/70">
+              <span className="font-semibold text-navy-900">
+                HDS / RGPD dès la conception.
+              </span>{" "}
+              Données hébergées en Europe. Société française. Supervision
+              spécialisée formée au cadre KOVELA.
+            </p>
+          </div>
+
+          {/* 3 piliers */}
+          <div className="mt-12 grid gap-3 md:grid-cols-3">
+            {piliers.map((p) => (
+              <div
+                key={p.title}
+                className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-navy-900/[0.045]"
+              >
+                <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+                  {p.eyebrow}
+                </p>
+                <h3 className="mt-2.5 font-display text-[14.5px] font-semibold tracking-tight text-navy-900">
+                  {p.title}
+                </h3>
+                <ul className="mt-3 space-y-1.5 text-[12.5px] leading-relaxed text-charcoal/70">
+                  {p.items.map((it) => (
+                    <li key={it}>— {it}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Encart logos */}
+          <div className="mt-10 rounded-2xl border border-navy-900/[0.06] bg-white p-7">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
+              Certifications &amp; conformités visées
+            </p>
+            <div className="mt-6 grid grid-cols-2 items-start gap-x-6 gap-y-7 sm:grid-cols-4">
+              {trustLogosAcq.map(({ Logo, label }) => (
+                <div
+                  key={label}
+                  className="flex flex-col items-center text-center"
+                >
+                  <Logo />
+                  <p className="mt-3 text-[11px] tracking-tight text-charcoal/55">
+                    {label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="mx-auto mt-10 max-w-3xl text-center font-display text-[1.15rem] italic leading-relaxed tracking-tight text-navy-900">
+            KOVELA ne remplace pas le chirurgien. KOVELA structure, documente
+            et transmet.
+          </p>
+        </div>
+      </section>
+
+      {/* ============================================================
+          5. CTA + FORMULAIRE — LeadForm conservé.
           ============================================================ */}
       <section
         id="contact"
-        className="border-t border-navy-900/[0.06] bg-navy-depth px-5 py-16 text-white sm:px-8 sm:py-20"
+        className="border-t border-navy-900/[0.06] bg-navy-depth px-5 py-20 text-white sm:px-8 sm:py-24"
       >
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-300">
               Échange opérationnel
             </p>
-            <h2 className="mt-3 font-display text-[2rem] font-medium leading-tight tracking-tight text-white sm:text-[2.4rem]">
-              Structurer votre post-op sans recruter.
+            <h2 className="mt-3 font-display text-[2rem] font-semibold leading-tight tracking-[-0.03em] text-white sm:text-[2.4rem]">
+              Faire disparaître le bruit post-op de votre cabinet.
             </h2>
             <p className="mt-5 text-[15px] leading-relaxed tracking-tight text-navy-100/80">
               En 20 minutes, nous vérifions si KOVELA est adapté à votre volume,
               votre organisation et vos habitudes de suivi.
             </p>
 
-            {/* Micro-bloc doctrine plus discret — police plus petite, fond
-                moins contrasté. La mention prototype est déplacée vers le
-                footer pour ne pas concurrencer le CTA. */}
             <p className="mt-6 text-[10.5px] leading-relaxed tracking-tight text-navy-100/50">
-              KOVELA ne remplace pas le chirurgien, ne pose pas de diagnostic, ne
-              prescrit pas et ne prend aucune décision médicale. En cas de situation
-              urgente ou de doute important, le patient doit contacter le 15 / 112,
-              les urgences de la clinique ou suivre les consignes remises par son
-              chirurgien.
+              KOVELA ne remplace pas le chirurgien, ne pose pas de diagnostic,
+              ne prescrit pas et ne prend aucune décision médicale. En cas de
+              situation urgente ou de doute important, le patient doit
+              contacter le 15 / 112, les urgences de la clinique ou suivre les
+              consignes remises par son chirurgien.
             </p>
 
             <p className="mt-5 text-[11px] tracking-tight text-navy-100/50">
@@ -648,14 +732,13 @@ export default function ChirurgiensEsthetiquesLanding() {
         </div>
       </section>
 
-      {/* Footer minimal — accueille la mention prototype RGPD/HDS pour
-          la sortir du bandeau CTA sans la cacher. */}
+      {/* Footer */}
       <footer className="border-t border-navy-900/10 bg-navy-depth px-5 py-6 text-white sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
-          <Wordmark light />
+          <Wordmark light compact />
           <p className="text-center text-[10.5px] leading-relaxed tracking-tight text-navy-100/45 sm:text-left">
-            Prototype de présentation — canaux et architecture de production à valider
-            en V1 selon le cadre RGPD / HDS.
+            Prototype de présentation — canaux et architecture de production à
+            valider en V1 selon le cadre RGPD / HDS.
           </p>
           <Link
             href="/"
