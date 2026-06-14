@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BrandMark, Wordmark } from "@/components/Brand";
+import { Wordmark } from "@/components/Brand";
 import {
   IconCircleCheck,
   IconCircleX,
@@ -45,7 +45,7 @@ const heroStats: { icon: React.ReactNode; value: string; label: string }[] = [
   { icon: <IconClock className="h-[26px] w-[26px]" />, value: "8h-20h", label: "Service opéré" },
   { icon: <IconTarget className="h-[26px] w-[26px]" />, value: "100%", label: "Traçabilité" },
   { icon: <IconShield className="h-[26px] w-[26px]" />, value: "Sécurisé", label: "HDS + RGPD" },
-  { icon: <IconCircleCheck className="h-[26px] w-[26px]" />, value: "0", label: "Décision médicale par KOVELA" },
+  { icon: <IconCircleCheck className="h-[26px] w-[26px]" />, value: "Aucune", label: "Décision médicale automatisée" },
 ];
 
 const pains = [
@@ -511,68 +511,9 @@ export default function Landing() {
       {/* Section C SUPPRIMÉE par TIER 1.A — La solution KOVELA · 5 piliers
           a été fondue dans §F "Le service en 5 étapes" plus bas. */}
 
-      {/* TIER 1.B — Card Sans / Avec KOVELA, mobile uniquement, déplacée
-          du hero vers ici (après §1 Le constat). Sur desktop la card
-          reste dans le hero. */}
-      <section className="border-b border-navy-900/[0.06] bg-white sm:hidden">
-        <div className="px-5 py-10">
-          <div className="space-y-3">
-            {/* Sans KOVELA — bg rouge léger */}
-            <div className="rounded-2xl bg-[#FDF4F2] p-6 shadow-card ring-1 ring-[#D24B3E]/20 text-center">
-              <div className="flex items-center justify-center gap-2">
-                <span className="rounded-md bg-[#D24B3E]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#D24B3E]">
-                  Sans
-                </span>
-                <h3 className="font-display text-[16.5px] font-semibold tracking-tight text-navy-900">
-                  KOVELA
-                </h3>
-              </div>
-              <ul className="mt-4 inline-flex flex-col items-start gap-2.5 text-left">
-                {beforeKovela.map((t) => (
-                  <li
-                    key={t}
-                    className="flex items-start gap-2.5 text-[13px] leading-snug text-charcoal/80"
-                  >
-                    <IconCircleX className="mt-px h-[16px] w-[16px] shrink-0 text-[#D24B3E]" />
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4 inline-flex rounded-md bg-[#D24B3E]/10 px-2.5 py-1 text-[12px] font-semibold tracking-tight text-[#D24B3E]">
-                {beforeKovelaConclusion}
-              </p>
-            </div>
-
-            {/* Avec KOVELA — bg teal léger */}
-            <div className="rounded-2xl bg-[#EAF7F4] p-6 shadow-card ring-1 ring-teal-500/30 text-center">
-              <div className="flex items-center justify-center gap-2">
-                <span className="rounded-md bg-teal-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-teal-700">
-                  Avec
-                </span>
-                <h3 className="font-display text-[16.5px] font-semibold tracking-tight text-navy-900">
-                  KOVELA
-                </h3>
-              </div>
-              <ul className="mt-4 inline-flex flex-col items-start gap-2.5 text-left">
-                {withKovela.map((t) => (
-                  <li
-                    key={t}
-                    className="flex items-start gap-2.5 text-[13px] leading-snug text-navy-900"
-                  >
-                    <IconCircleCheck className="mt-px h-[16px] w-[16px] shrink-0 text-teal-600" />
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4 inline-flex rounded-md bg-teal-500/15 px-2.5 py-1 text-[12px] font-semibold tracking-tight text-teal-700">
-                {withKovelaConclusion}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Sections E + Bande preuve fondues en data-strip de §1 Constat. */}
+      {/* TIER 1.B mobile (Sans/Avec) supprimée : doublon de §Constat qui
+          tient déjà toute la charge "voici le bruit cabinet" sur mobile.
+          Sur desktop la card reste dans le hero (sm+). */}
 
       {/* Section F — Le service KOVELA en 5 étapes (TIER 1.A : fusion
           des anciens §2 La solution + §6 Comment ça marche). Chaque étape
@@ -641,7 +582,7 @@ export default function Landing() {
               </li>
             ))}
           </ol>
-          <p className="mt-8 font-display text-[22px] italic leading-tight tracking-[-0.01em] text-navy-900">
+          <p className="mt-8 font-display text-[22px] font-semibold leading-tight tracking-[-0.01em] text-navy-900">
             Le patient se sent accompagné. Le cabinet respire.
           </p>
         </div>
@@ -724,11 +665,13 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Section H — Cadre opérationnel KOVELA · architecture de confiance */}
+      {/* Section H — Cadre opérationnel KOVELA · architecture de confiance.
+          Alignement gauche standard, sans BrandMark décoratif (uniforme
+          avec le reste de la home). Trust logos extraits en micro-section
+          dédiée juste après. */}
       <section id="cadre" className="border-y border-navy-900/[0.06] bg-white reveal-target">
         <div className="mx-auto max-w-6xl px-6 py-14">
-          <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
-            <BrandMark size={44} className="shrink-0 text-navy-900" />
+          <div>
             <div>
               <Eyebrow>Cadre opérationnel KOVELA</Eyebrow>
               <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
@@ -852,28 +795,33 @@ export default function Landing() {
               </div>
 
               {/* Phrase doctrine */}
-              <p className="mt-8 max-w-3xl font-display text-[20px] italic leading-relaxed tracking-tight text-navy-900">
+              <p className="mt-8 max-w-3xl font-display text-[20px] font-semibold leading-relaxed tracking-tight text-navy-900">
                 KOVELA ne remplace pas le chirurgien. KOVELA structure, documente et transmet.
               </p>
 
-              {/* Trust logos — visuels concrets des certifications/conformités
-                  visées par l'architecture KOVELA. */}
-              <div className="mt-8 rounded-2xl border border-navy-900/[0.06] bg-white p-7">
-                <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
-                  Certifications &amp; conformités visées
-                </p>
-                <div className="mt-6 grid grid-cols-2 items-start gap-x-6 gap-y-7 sm:grid-cols-4">
-                  {trustLogos.map(({ Logo, label }) => (
-                    <div key={label} className="flex flex-col items-center text-center">
-                      <Logo />
-                      <p className="mt-3 text-[11px] tracking-tight text-charcoal/55">
-                        {label}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Micro-section dédiée — Certifications & conformités visées.
+          Extraite de §Cadre pour aérer la densité et donner aux 4 logos
+          une respiration propre (registre bandeau de confiance discret,
+          pattern Stripe / Vercel). */}
+      <section className="border-b border-navy-900/[0.06] bg-ivory">
+        <div className="mx-auto max-w-6xl px-6 py-10">
+          <p className="text-center text-[10.5px] font-semibold uppercase tracking-[0.18em] text-charcoal/55">
+            Certifications &amp; conformités visées
+          </p>
+          <div className="mx-auto mt-6 grid max-w-3xl grid-cols-2 items-start gap-x-6 gap-y-7 sm:grid-cols-4">
+            {trustLogos.map(({ Logo, label }) => (
+              <div key={label} className="flex flex-col items-center text-center">
+                <Logo />
+                <p className="mt-3 text-[11px] tracking-tight text-charcoal/55">
+                  {label}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -932,7 +880,7 @@ export default function Landing() {
       <section id="modele" className="mx-auto max-w-6xl px-6 py-14 reveal-target">
         <Eyebrow>Tarification</Eyebrow>
         <h2 className="max-w-3xl font-sans text-[2rem] font-semibold leading-tight tracking-[-0.022em] text-navy-900 md:text-[2.4rem]">
-          Moins qu&apos;un mi-temps. Plus qu&apos;un outil.
+          Un abonnement, pas un poste à recruter.
         </h2>
         <p className="mt-5 max-w-3xl text-[14.5px] leading-relaxed text-charcoal/70">
           Accès à une organisation post-op structurée, sans créer un poste
@@ -1009,7 +957,7 @@ export default function Landing() {
           </div>
 
           <div className="border-t border-navy-900/[0.05] bg-ivory px-7 py-5">
-            <p className="font-display text-[15.5px] italic leading-relaxed tracking-tight text-navy-900 md:text-[17px]">
+            <p className="font-display text-[15.5px] font-medium leading-relaxed tracking-tight text-navy-900 md:text-[17px]">
               5 patients inclus chaque mois. Au-delà, vous ne payez que l&apos;usage réel.
             </p>
           </div>
