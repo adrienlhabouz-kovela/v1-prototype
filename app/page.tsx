@@ -388,9 +388,12 @@ export default function Landing() {
 
           {/* Colonne droite — photo hero.
               Sources empilées : WebP en priorité, puis JPG (si déposé
-              plus tard). Fallback flat bone si l'image ne charge pas. */}
+              plus tard). Fallback flat bone si l'image ne charge pas.
+              Hauteur fixe + self-center : casse le stretch CSS-grid
+              (la colonne gauche fait ~800-900 px avec la carte
+              Avant/Avec). Photo bornée à 480/540 px, centrée. */}
           <div
-            className="relative min-h-[220px] bg-bone lg:min-h-[480px]"
+            className="relative min-h-[220px] bg-bone lg:h-[480px] lg:self-center xl:h-[540px]"
             style={{
               backgroundImage:
                 "url('/hero-consultation.webp'), url('/hero-consultation.jpg')",
