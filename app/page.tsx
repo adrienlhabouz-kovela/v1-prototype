@@ -233,7 +233,7 @@ export default function Landing() {
                 <span className="h-px w-14 bg-teal-500/40" />
               </div>
 
-              <h1 className="mt-6 font-display text-[1.95rem] font-semibold leading-[1.08] tracking-[-0.035em] text-navy-900 sm:mt-7 sm:text-balance sm:text-[2.4rem] sm:leading-[1.04] lg:text-[3.1rem] lg:tracking-[-0.045em] xl:text-[3.75rem] xl:leading-[1.02] 2xl:text-[4.25rem]">
+              <h1 className="mt-6 font-display text-[1.95rem] font-semibold leading-[1.08] tracking-[-0.035em] text-navy-900 sm:mt-7 sm:text-balance sm:text-[2.4rem] sm:leading-[1.04] lg:text-[2.85rem] lg:leading-[1.02] lg:tracking-[-0.05em] xl:text-[3.25rem] 2xl:text-[3.6rem]">
                 KOVELA fait disparaître le bruit post-op du quotidien du
                 cabinet.
               </h1>
