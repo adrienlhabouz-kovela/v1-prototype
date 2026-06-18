@@ -1,0 +1,23 @@
+# KOVELA Growth OS — fichiers à ne jamais versionner
+
+# Données sensibles / exports CRM
+*.csv
+*.xlsx
+*.numbers
+/exports/
+/data/
+
+# Secrets & environnement
+.env
+.env.*
+*.key
+secrets.*
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Éditeurs
+.vscode/
+.idea/
+*.swp
