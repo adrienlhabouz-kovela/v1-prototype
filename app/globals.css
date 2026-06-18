@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  background-color: #ffffff;
+  color: #1a1916;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* Inter avec set stylistique SS01 (a/g single-storey) + cv11 (1 simplifié)
+     → rapproche du rendu SF Pro sur les OS non-Apple. */
+  font-feature-settings: "ss01", "cv11";
+  letter-spacing: -0.011em;
+}
+
+/* Display = même sans-serif Apple/Inter, juste crénage + tracking serré
+   pour les grands titres. Plus de réglages anti-Fraunces. */
+.font-display {
+  font-feature-settings: "kern" 1, "ss01", "cv11";
+  letter-spacing: -0.022em;
+}
+
+@layer base {
+  h2,
+  h3 {
+    letter-spacing: -0.022em;
+    font-weight: 600;
+  }
+  h1 {
+    letter-spacing: -0.035em;
+    font-weight: 600;
+  }
+}
+
+/* Reveal — animation d'apparition au scroll (Intersection Observer).
+   Élément initial : invisible + légèrement décalé bas.
+   Après ajout de .revealed : opacité 1, position d'origine, transition
+   en 600ms ease-out. Respect prefers-reduced-motion (la classe
+   .revealed est ajoutée immédiatement par le composant React si
+   l'utilisateur a désactivé les animations). */
+.reveal-target {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 600ms ease-out, transform 600ms ease-out;
+  will-change: opacity, transform;
+}
+.reveal-target.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-target {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Hover-lift — utilitaire commun pour les cards.
+   Très subtil : -2 px de remontée + shadow renforcée + ring légèrement
+   plus marqué. Désactivé sur tactile (hover:none) et sur reduced motion. */
+@media (hover: hover) {
+  .hover-lift {
+    transition:
+      transform 200ms ease-out,
+      box-shadow 200ms ease-out;
+    will-change: transform;
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 1px 2px rgba(26, 25, 22, 0.04),
+      0 10px 24px -12px rgba(26, 25, 22, 0.18);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hover-lift,
+  .hover-lift:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Scrollbar — calé sur la palette stone (rule). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d6d9 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #d4d6d9;
+  border-radius: 8px;
+}
