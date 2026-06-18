@@ -234,12 +234,26 @@ export default function Landing() {
               </div>
 
               <h1 className="mt-6 font-display text-[1.95rem] font-semibold leading-[1.08] tracking-[-0.035em] text-navy-900 sm:mt-7 sm:text-balance sm:text-[2.4rem] sm:leading-[1.04] lg:text-[2.85rem] lg:leading-[1.02] lg:tracking-[-0.05em] xl:text-[3.25rem] 2xl:text-[3.6rem]">
-                KOVELA fait disparaître le bruit post-op du quotidien du
-                cabinet.
+                Faites disparaître le bruit post-op.
               </h1>
 
-              <p className="mt-6 max-w-md text-[15.5px] leading-relaxed text-charcoal/70">
-                Un suivi post-op structuré. Des chirurgiens libérés du bruit.
+              {/* Sous-titre Apple-style : 2 lignes balancées, registre
+                  éditorial premium, font-display medium navy. Une idée
+                  par ligne, beaucoup d'air. */}
+              <p className="mt-7 max-w-md font-display text-[19px] font-medium leading-[1.25] tracking-[-0.015em] text-navy-900 sm:mt-8 sm:text-[21px] lg:text-[22px]">
+                Vos patients accompagnés.
+                <br />
+                Votre cabinet libéré.
+              </p>
+
+              {/* Ancrage humain — phrase courte, registre intermédiaire. */}
+              <p className="mt-5 max-w-md text-[14px] leading-relaxed text-charcoal/70">
+                Par des infirmières KOVELA.
+              </p>
+
+              {/* Micro-texte de cadre — registre note très discrète. */}
+              <p className="mt-6 max-w-md text-[11.5px] leading-relaxed text-charcoal/50">
+                La technologie les assiste. Vous gardez la décision médicale.
               </p>
 
               {/* CTAs — sur mobile, on garde uniquement le secondaire
